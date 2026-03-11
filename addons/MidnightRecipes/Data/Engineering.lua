@@ -1,0 +1,178 @@
+local _, MR = ...
+
+-- NPC waypoint data: { mapID, x, y, "NPC Name" }
+-- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
+local NPC = {
+    Mirvedon = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
+    Lyrendal = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
+}
+
+MR.EngineeringRecipes = {
+    {
+        name = "Parts & Components",
+        recipes = {
+            { id = 1229755, name = "Song Gear",      source = "trainer",   sourceInfo = "Trainer (Skill 1)",  priority = 1 },
+            { id = 1229853, name = "Soul Sprocket",   source = "trainer",   sourceInfo = "Trainer (Skill 25)", priority = 1 },
+            { id = 1229855, name = "Lumiflux",        source = "discovery", sourceInfo = "Recycling",          priority = 2 },
+        },
+    },
+    {
+        name = "Cogwheels",
+        recipes = {
+            { id = 1229856, name = "Perfected Cogwheel",  source = "trainer", sourceInfo = "Trainer (Skill 1)",  priority = 1 },
+            { id = 1229859, name = "Flux Cogwheel",       source = "trainer", sourceInfo = "Trainer (Skill 5)",  priority = 1 },
+            { id = 1229857, name = "Greased Cogwheel",    source = "trainer", sourceInfo = "Trainer (Skill 20)", priority = 1 },
+            { id = 1229858, name = "Consistent Cogwheel", source = "trainer", sourceInfo = "Trainer (Skill 25)", priority = 1 },
+        },
+    },
+    {
+        name = "Recycling",
+        recipes = {
+            { id = 1229930, name = "Recycling", source = "trainer", sourceInfo = "Trainer (Skill 15)", priority = 1 },
+        },
+    },
+    {
+        name = "Guns",
+        recipes = {
+            { id = 1282455, name = "Evercore Dome Dinger",          source = "trainer",        sourceInfo = "Trainer (Skill 20)",     priority = 1 },
+            { id = 1282457, name = "Thalassian Competitor's Rifle", source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",  priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1282456, name = "P.O.W. x3",                    source = "specialization", sourceInfo = "Combat Analytics - Guns", priority = 3 },
+        },
+    },
+    {
+        name = "Goggles",
+        recipes = {
+            { id = 1229863, name = "Evercore Shade",                          source = "trainer",        sourceInfo = "Trainer (Skill 1)",          priority = 1 },
+            { id = 1229865, name = "Evercore Vision Guard",                   source = "trainer",        sourceInfo = "Trainer (Skill 15)",         priority = 1 },
+            { id = 1229862, name = "Evercore Zoomshroud",                     source = "trainer",        sourceInfo = "Trainer (Skill 20)",         priority = 1 },
+            { id = 1229864, name = "Evercore Reconnaissance",                   source = "trainer",        sourceInfo = "Trainer (Skill 20)",         priority = 1 },
+            { id = 1229882, name = "Quel'dorei Cloth Goggles",                source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229883, name = "Quel'dorei Leather Optics",               source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229884, name = "Quel'dorei Mail Shroud",                  source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229885, name = "Quel'dorei Visor",                        source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229871, name = "Aetherlume Optics",                       source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
+            { id = 1229870, name = "Aetherlume Eye Wrap",                     source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
+            { id = 1229872, name = "Aetherlume Vision Shroud",                source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
+            { id = 1229873, name = "Aetherlume Sun Guard",                    source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
+            { id = 1229908, name = "Thalassian Competitor's Cloth Goggles",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229909, name = "Thalassian Competitor's Leather Optics",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229910, name = "Thalassian Competitor's Mail Visor",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229911, name = "Thalassian Competitor's Plate Guard",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+        },
+    },
+    {
+        name = "Bracers",
+        recipes = {
+            { id = 1229866, name = "Evercore Wrist Latch",                    source = "trainer",        sourceInfo = "Trainer (Skill 35)",          priority = 1 },
+            { id = 1229867, name = "Evercore Binding",                        source = "trainer",        sourceInfo = "Trainer (Skill 35)",          priority = 1 },
+            { id = 1229868, name = "Evercore Chainguards",                    source = "trainer",        sourceInfo = "Trainer (Skill 35)",          priority = 1 },
+            { id = 1229869, name = "Evercore Gear Weight",                    source = "trainer",        sourceInfo = "Trainer (Skill 35)",          priority = 1 },
+            { id = 1229886, name = "Quel'dorei Silken Cuffs",                 source = "discovery",      sourceInfo = "Recycling",                   priority = 2 },
+            { id = 1229887, name = "Quel'dorei Bands",                        source = "discovery",      sourceInfo = "Recycling",                   priority = 2 },
+            { id = 1229888, name = "Quel'dorei Bracelets",                    source = "discovery",      sourceInfo = "Recycling",                   priority = 2 },
+            { id = 1229889, name = "Quel'dorei Guards",                       source = "discovery",      sourceInfo = "Recycling",                   priority = 2 },
+            { id = 1229874, name = "Aetherlume Silken Cuffs",                 source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
+            { id = 1229875, name = "Aetherlume Bands",                        source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
+            { id = 1229876, name = "Aetherlume Bracelets",                    source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
+            { id = 1229877, name = "Aetherlume Guards",                       source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
+            { id = 1229912, name = "Thalassian Competitor's Cloth Cuffs",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229913, name = "Thalassian Competitor's Leather Bands",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229914, name = "Thalassian Competitor's Mail Links",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229915, name = "Thalassian Competitor's Plate Bindings",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+        },
+    },
+    {
+        name = "Boots",
+        recipes = {
+            { id = 1229935, name = "Evercore Swiftfeet",                       source = "trainer",        sourceInfo = "Trainer (Skill 35)",         priority = 1 },
+            { id = 1229936, name = "Evercore Stitchwraps",                      source = "trainer",        sourceInfo = "Trainer (Skill 35)",         priority = 1 },
+            { id = 1229937, name = "Evercore Turbochains",                     source = "trainer",        sourceInfo = "Trainer (Skill 35)",         priority = 1 },
+            { id = 1229938, name = "Evercore Greaseplates",                    source = "trainer",        sourceInfo = "Trainer (Skill 35)",         priority = 1 },
+            { id = 1229890, name = "Quel'dorei Softsteppers",                  source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229891, name = "Quel'dorei Runners",                       source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229892, name = "Quel'dorei Clonkers",                      source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229893, name = "Quel'dorei Stompers",                      source = "discovery",      sourceInfo = "Recycling",                  priority = 2 },
+            { id = 1229878, name = "Aetherlume Softsteppers",                  source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
+            { id = 1229879, name = "Aetherlume Runners",                       source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
+            { id = 1229880, name = "Aetherlume Clonkers",                      source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
+            { id = 1229881, name = "Aetherlume Stompers",                      source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
+            { id = 1261490, name = "Thalassian Competitor's Cloth Tip-Toes",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1261491, name = "Thalassian Competitor's Leather Sliders",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1261492, name = "Thalassian Competitor's Mail Footlinks",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1261493, name = "Thalassian Competitor's Plate Dunkers",    source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+        },
+    },
+    {
+        name = "Scopes & Ammo",
+        recipes = {
+            { id = 1261866, name = "Farstrider's Hawkeye", source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1261893, name = "Smuggler's Lynxeye",   source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1261895, name = "Laced Zoomshots",       source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1261913, name = "Weighted Boomshots",   source = "discovery", sourceInfo = "Recycling", priority = 2 },
+        },
+    },
+    {
+        name = "Devices & Bits",
+        recipes = {
+            { id = 1229923, name = "Emergency Soul Link",   source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1229927, name = "Curious Red Button",    source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1229916, name = "Lucky Keychain",        source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1229919, name = "Kinetic Ankle Primers", source = "discovery", sourceInfo = "Recycling", priority = 2 },
+        },
+    },
+    {
+        name = "Bots",
+        recipes = {
+            { id = 1229917, name = "M3DDY, Travel-Sized",    source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
+            { id = 1229922, name = "B1P, Scorcher of Souls",  source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
+            { id = 1261945, name = "B0P, Curator of Booms",   source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
+            { id = 1229926, name = "W-47CH D0G",              source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
+            { id = 1229924, name = "M3DDY",                   source = "specialization", sourceInfo = "Bits and Bots - Bots",           priority = 3 },
+            { id = 1229921, name = "HU5H, Nonchalant Pup",    source = "specialization", sourceInfo = "Bits and Bots - Bots (30 pts)", priority = 3 },
+        },
+    },
+    {
+        name = "Utility",
+        recipes = {
+            { id = 1229928, name = "Wormhole Generator: Quel'Thalas", source = "discovery", sourceInfo = "Recycling", priority = 2 },
+        },
+    },
+    {
+        name = "Profession Tools",
+        recipes = {
+            { id = 1229896, name = "Junker's Multitool",              source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229901, name = "Junker's Junk Visor",             source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229899, name = "Farstrider Rock Satchel",         source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229904, name = "Farstrider Hardhat",              source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229895, name = "Farstrider Hobbyist Rod",         source = "trainer",        sourceInfo = "Trainer (Skill 45)",              priority = 1 },
+            { id = 1229900, name = "Farstrider Fabric Cutters",       source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229898, name = "Farstrider Clampers",             source = "trainer",        sourceInfo = "Trainer (Skill 35)",              priority = 1 },
+            { id = 1229903, name = "Turbo-Junker's Multitool",        source = "specialization", sourceInfo = "Market Mobility - Engi Tools",    priority = 3 },
+            { id = 1229897, name = "Sin'dorei Gilded Hardhat",        source = "specialization", sourceInfo = "Market Mobility - Mining",        priority = 3 },
+            { id = 1229894, name = "Sin'dorei Headlamp",              source = "specialization", sourceInfo = "Market Mobility - Mining",        priority = 3 },
+            { id = 1229906, name = "Junker's Big Ol' Bag",            source = "specialization", sourceInfo = "Market Mobility - Engi (30 pts)", priority = 3 },
+            { id = 1229902, name = "Sin'dorei Angler's Rod",          source = "specialization", sourceInfo = "Market Mobility - Fishing Rods",  priority = 3 },
+            { id = 1229907, name = "Sin'dorei Snippers",              source = "specialization", sourceInfo = "Market Mobility - Tailoring",     priority = 3 },
+            { id = 1229905, name = "Sin'dorei Clampers",              source = "specialization", sourceInfo = "Market Mobility - JC Tools",      priority = 3 },
+            { id = 1264529, name = "Turbo-Junker's Multitool v9",     source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264523, name = "Head-Mounted Beam Bummer",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264524, name = "Rock Bonkin' Hardhat",            source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264525, name = "Heavy-Duty Rock Assister",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264526, name = "Self-Sharpening Sin'dorei Snippers", source = "vendor",      sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264527, name = "Sin'dorei Reeler's Rod",          source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264528, name = "Giga-Gem Grippers",               source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+        },
+    },
+    {
+        name = "Housing Decor",
+        recipes = {
+            { id = 1248610, name = "Ren'dorei Void Projector",      source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248611, name = "Ren'dorei Lightpost",           source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248612, name = "Ambient Aethercharged Crystal", source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248613, name = "Ren'dorei Stargazer",           source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248614, name = "Small Telogrus Lamp",           source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248615, name = "Ren'dorei Crafting Framework",  source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1248616, name = "Ren'dorei Warp Orb",            source = "discovery", sourceInfo = "Recycling", priority = 2 },
+        },
+    },
+}
