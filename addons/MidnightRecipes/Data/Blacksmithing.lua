@@ -40,7 +40,7 @@ MR.BlacksmithingRecipes = {
             { id = 1229667, name = "Spellbreaker's Shelter",    source = "specialization", sourceInfo = "Armorsmithing - Chestplates", priority = 3 },
             { id = 1229668, name = "Spellbreaker's March",      source = "specialization", sourceInfo = "Armorsmithing - Sabatons",    priority = 3 },
             { id = 1230766, name = "Murder Row Fleet Feet",       source = "drop", sourceInfo = "Drop: Lithiel Cinderfury",   priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1230767, name = "Knight-Commander's Palisade", source = "drop", sourceInfo = "Drop: General Amias Bellamy", priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1230767, name = "Knight-Commander's Palisade", source = "drop", sourceInfo = "Drop: War Chaplain Senn", priority = 4, dropInfo = { rate = "~3%" } },
         },
     },
     {

@@ -70,7 +70,9 @@ local function ShowInfoTooltip(owner, pet)
             local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(wp[1])
             local mapName = mapInfo and mapInfo.name or ("Map " .. wp[1])
             tt:AddDoubleLine("Zone:", mapName, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
-            tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            if wp[2] and wp[3] then
+                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            end
         end
     elseif pet.zone then
         tt:AddDoubleLine("Zone:", pet.zone, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
@@ -111,7 +113,7 @@ local function ShowInfoTooltip(owner, pet)
                 if ok and data and data.reaction then
                     local standings = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
                     current = standings[data.reaction] or tostring(data.reaction)
-                    local standingOrder = { Friendly = 5, Honored = 6, Revered = 7, Exalted = 8 }
+                    local standingOrder = { Hated = 1, Hostile = 2, Unfriendly = 3, Neutral = 4, Friendly = 5, Honored = 6, Revered = 7, Exalted = 8 }
                     metReq = data.reaction >= (standingOrder[req.standing] or 0)
                 end
             end
@@ -396,17 +398,21 @@ function UI:Refresh()
         end
     end
 
+    -- emptyText: show when no content, hide otherwise
+    local theme = MUI.Theme
+    local emptyText = MUI.GetOrCreate(child, "emptyText", function(p)
+        local fs = p:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        return fs
+    end)
     if yOff == 0 then
-        local theme = MUI.Theme
-        local emptyText = MUI.GetOrCreate(child, "emptyText", function(p)
-            local fs = p:CreateFontString(nil, "OVERLAY")
-            fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
-            return fs
-        end)
         emptyText:SetPoint("TOP", child, "TOP", 0, -20)
         emptyText:SetText("No uncollected Midnight pets found.")
         emptyText:SetTextColor(0.7, 0.7, 0.7)
+        emptyText:Show()
         yOff = 60
+    else
+        emptyText:Hide()
     end
 
     self.panel:RefreshScrollContent(yOff)
@@ -579,6 +585,7 @@ function UI:RenderPetRow(parent, pet, yOff, isCollected)
     end)
     nameFs:SetFont(theme.font, theme.fontSize, "OUTLINE")
     nameFs:SetJustifyH("LEFT")
+    nameFs:SetWordWrap(false)
     nameFs:SetPoint("LEFT", row, "LEFT", PADDING + 20, 0)
     nameFs:SetPoint("RIGHT", row, "RIGHT", -50, 0)
     nameFs:SetText(pet.name)
@@ -625,11 +632,11 @@ function UI:RenderPetRow(parent, pet, yOff, isCollected)
         if pet.icon then
             -- Species tooltip
             if C_PetJournal and C_PetJournal.GetPetInfoBySpeciesID then
-                local _, _, petType, companionID, tooltipSource, tooltipDescription = C_PetJournal.GetPetInfoBySpeciesID(pet.speciesID)
-                if tooltipDescription then
+                local ok, _, _, petType, companionID, tooltipSource, tooltipDescription = pcall(C_PetJournal.GetPetInfoBySpeciesID, pet.speciesID)
+                if ok and tooltipDescription then
                     GameTooltip:AddLine(tooltipDescription, 0.7, 0.7, 0.7, true)
                 end
-                if tooltipSource then
+                if ok and tooltipSource then
                     GameTooltip:AddLine(tooltipSource, 0.5, 0.8, 0.5, true)
                 end
             end

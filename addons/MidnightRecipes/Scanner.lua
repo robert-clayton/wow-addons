@@ -17,10 +17,9 @@ local dataSets = {
     [197] = "TailoringRecipes",
 }
 
--- TODO: IsPlayerSpell needs in-game verification for WoW 12.0.
--- May need to be replaced with C_TradeSkillUI APIs if it doesn't work for recipes.
 function Scanner:IsRecipeKnown(recipeID)
-    return IsPlayerSpell(recipeID)
+    local ok, result = pcall(IsPlayerSpell, recipeID)
+    return ok and result
 end
 
 function Scanner:Scan()
@@ -46,7 +45,7 @@ function Scanner:ScanProfession(skillLine, recipeData)
     for _, category in ipairs(recipeData) do
         for _, recipe in ipairs(category.recipes) do
             result.total = result.total + 1
-            local known = self:IsRecipeKnown(recipe.id)
+            local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
 
             local entry = {
                 id         = recipe.id,

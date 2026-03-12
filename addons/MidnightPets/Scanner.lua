@@ -18,6 +18,7 @@ function Scanner:Scan()
 
     local hideTradingPost = MP.db and MP.db.hideTradingPost
 
+    if not MP.PetData then return end
     for _, group in ipairs(MP.PetData) do
         if hideTradingPost and group.source == "tradingpost" then
             -- skip entirely

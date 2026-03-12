@@ -3,11 +3,12 @@ local _, MR = ...
 -- NPC waypoint data: { mapID, x, y, "NPC Name" }
 -- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
 local NPC = {
-    Mirvedon  = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Lyrendal  = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
-    Magovu    = { 2437, 0.458, 0.658, "Magovu, Zul'Aman" },
-    Naynar    = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
+    Mirvedon       = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
+    Lyrendal       = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
+    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Saltheril's Haven" },
+    Magovu         = { 2437, 0.458, 0.658, "Magovu, Zul'Aman" },
+    Naynar         = { 2413, 0.510, 0.508, "Naynar, Harandar" },
+    Anomander      = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
 }
 
 MR.JewelcraftingRecipes = {
@@ -142,7 +143,7 @@ MR.JewelcraftingRecipes = {
         recipes = {
             { id = 1246895, name = "Brilliant Phoenix Harp",        source = "trainer", sourceInfo = "Trainer (Skill 80)",     priority = 1 },
             { id = 1246889, name = "Tenebrous Ren'dorei Armillary", source = "trainer", sourceInfo = "Trainer (Skill 80)",     priority = 1 },
-            { id = 1246891, name = "Bejeweled Sin'dorei Lyre",      source = "vendor",  sourceInfo = "Renown Vendor (150 Moxie)", priority = 1, cost = { currency = { 3262, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1246891, name = "Bejeweled Sin'dorei Lyre",      source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3262, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1246892, name = "Resplendent Highborne Statue",  source = "drop",    sourceInfo = "Eversong Treasures",     priority = 4, dropInfo = { rate = "~5%" } },
             { id = 1246893, name = "Replica Haranir Mural",         source = "drop",    sourceInfo = "Heavy Trunk (Delves)",   priority = 4, dropInfo = { rate = "~3%" } },
             { id = 1246894, name = "Shining Sin'dorei Hourglass",   source = "drop",    sourceInfo = "Challenger's Cache",     priority = 4, dropInfo = { rate = "~5%" } },

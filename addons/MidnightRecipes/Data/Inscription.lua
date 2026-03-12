@@ -16,8 +16,8 @@ MR.InscriptionRecipes = {
     {
         name = "Inks & Reagents",
         recipes = {
-            { id = 1230017, name = "Munsell Ink",      source = "trainer", sourceInfo = "Trainer (Skill 10)", priority = 1 },
-            { id = 1230016, name = "Sienna Ink",       source = "trainer", sourceInfo = "Trainer (Skill 15)", priority = 1 },
+            { id = 1230017, name = "Munsell Ink",      source = "trainer", sourceInfo = "Trainer (Skill 15)", priority = 1 },
+            { id = 1230016, name = "Sienna Ink",       source = "trainer", sourceInfo = "Trainer (Skill 10)", priority = 1 },
             { id = 1230019, name = "Soul Cipher",      source = "trainer", sourceInfo = "Trainer (Skill 20)", priority = 1 },
             { id = 1230018, name = "Codified Azeroot", source = "trainer", sourceInfo = "Trainer (Skill 25)", priority = 1 },
         },

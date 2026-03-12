@@ -270,10 +270,10 @@ MP.PetData = {
     {
         source = "tradingpost",
         pets = {
-            { speciesID = 4965, npcID = 256565, name = "Chirpy Mandrake",      petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = false },
-            { speciesID = 4963, npcID = 256559, name = "Grumpy Mandrake",      petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = false },
-            { speciesID = 4964, npcID = 256560, name = "Plump Mandrake",       petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = false },
-            { speciesID = 4966, npcID = 256566, name = "Screechy Mandrake",    petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = false },
+            { speciesID = 4965, npcID = 256565, name = "Chirpy Mandrake",      petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = true },
+            { speciesID = 4963, npcID = 256559, name = "Grumpy Mandrake",      petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = true },
+            { speciesID = 4964, npcID = 256560, name = "Plump Mandrake",       petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = true },
+            { speciesID = 4966, npcID = 256566, name = "Screechy Mandrake",    petType = 7,  source = "tradingpost", sourceInfo = "Trading Post - Trader's Tender (rotating)",  canBattle = true },
         },
     },
 

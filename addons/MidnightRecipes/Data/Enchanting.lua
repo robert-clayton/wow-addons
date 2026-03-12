@@ -173,7 +173,7 @@ MR.EnchantingRecipes = {
             { id = 1246909, name = "Self-Pouring Thalassian Sunwine",         source = "vendor",  sourceInfo = "Neriv, Eversong Woods",            priority = 1, waypoint = NPC.Neriv, cost = { currency = { 3258, 150 } } },
             { id = 1246907, name = "Spellbound Tome of Thalassian Magics",    source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1246908, name = "Rootflame Campfire",                      source = "drop",    sourceInfo = "Heavy Trunk (Delves)",              priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1246903, name = "Ren'dorei Postage Repository",            source = "drop",    sourceInfo = "Voidstorm (Treasure Drop)",         priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1246903, name = "Ren'dorei Postal Repository",            source = "drop",    sourceInfo = "Voidstorm (Treasure Drop)",         priority = 4, dropInfo = { rate = "~5%" } },
         },
     },
 }

@@ -61,7 +61,9 @@ local function ShowInfoTooltip(owner, recipe)
             local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(wp[1])
             local mapName = mapInfo and mapInfo.name or ("Map " .. wp[1])
             tt:AddDoubleLine("Zone:", mapName, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
-            tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            if wp[2] and wp[3] then
+                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            end
         end
     end
 
@@ -324,17 +326,21 @@ function UI:Refresh()
         end
     end
 
+    -- emptyText: show when no content, hide otherwise
+    local theme = MUI.Theme
+    local noProf = MUI.GetOrCreate(child, "emptyText", function(p)
+        local fs = p:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        return fs
+    end)
     if yOff == 0 then
-        local theme = MUI.Theme
-        local noProf = MUI.GetOrCreate(child, "emptyText", function(p)
-            local fs = p:CreateFontString(nil, "OVERLAY")
-            fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
-            return fs
-        end)
         noProf:SetPoint("TOP", child, "TOP", 0, -20)
         noProf:SetText("No crafting professions detected.")
         noProf:SetTextColor(0.7, 0.7, 0.7)
+        noProf:Show()
         yOff = 60
+    else
+        noProf:Hide()
     end
 
     self.panel:RefreshScrollContent(yOff)

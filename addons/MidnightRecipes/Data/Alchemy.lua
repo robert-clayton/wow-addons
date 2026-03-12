@@ -78,9 +78,9 @@ MR.AlchemyRecipes = {
             { id = 1233137, name = "Haranir Preserving Agents",    source = "vendor", sourceInfo = "Lyrendal, Silvermoon City", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3256, 150 } } },
             { id = 1233133, name = "Rootbound Vat",                source = "vendor", sourceInfo = "Naynar, Harandar",          priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3256, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1233135, name = "Sunsmoke Censer",              source = "vendor", sourceInfo = "Lyrendal, Silvermoon City", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3256, 150 } } },
-            { id = 1233132, name = "Entropic Illuminant",          source = "drop",   sourceInfo = "Voidstorm Treasures",       priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1233132, name = "Entropic Illuminant",          source = "drop",   sourceInfo = "Mysterious Domanaar Vessel", priority = 4, dropInfo = { rate = "~5%" } },
             { id = 1233136, name = "Riftstone",                    source = "drop",   sourceInfo = "Heavy Trunk (Delves)",      priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1233138, name = "Silvermoon Spire Fountain",    source = "drop",   sourceInfo = "Heavy Trunk (Delves)",      priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1233138, name = "Silvermoon Spire Fountain",    source = "drop",   sourceInfo = "Nemesis Strongbox",         priority = 4, dropInfo = { rate = "~3%" } },
         },
     },
 }
