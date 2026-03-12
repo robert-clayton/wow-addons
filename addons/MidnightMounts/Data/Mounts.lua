@@ -203,7 +203,7 @@ MM.MountData = {
             { mountID = 2770, name = "Preyseeker's Wrath", source = "prey", sourceInfo = "Construct V'anore - 2,550 Remnant of Anguish, Rank 10",
               waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
               cost = { currency = { 3392, 2550 } } },
-            { mountID = 2771, name = "Preyseeker's Nightmare", source = "prey", sourceInfo = "Prey: Nightmare Mode III achievement" },
+            { mountID = 2771, name = "Preyseeker's Nightmare", source = "prey", sourceInfo = "Prey: Nightmare Mode III achievement", achievementID = 42703 },
         },
     },
 

@@ -249,7 +249,7 @@ MP.PetData = {
             { speciesID = 4954, npcID = 256276, name = "Ziorg'pharon",          petType = 7,  source = "delve", sourceInfo = "Delve end-of-run (Nemesis Strongbox)",                            canBattle = false },
 
             -- Nullaeus nemesis boss drop
-            { speciesID = 4958, npcID = 256265, name = "Ominous Domanus",       petType = 7,  source = "delve", sourceInfo = "Nullaeus (Season 1 Nemesis boss) - ~7% from Nullaeus Cache",     canBattle = false,
+            { speciesID = 4958, npcID = 256265, name = "Ominous Dominus",       petType = 7,  source = "delve", sourceInfo = "Nullaeus (Season 1 Nemesis boss) - ~7% from Nullaeus Cache",     canBattle = false,
               dropInfo = { mob = "Nullaeus", npcID = 252892, rate = "~7%" } },
         },
     },
