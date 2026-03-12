@@ -33,7 +33,7 @@ function Scanner:Scan()
 
                 -- Collection check via C_MountJournal
                 if mount.mountID and mount.mountID > 0 and C_MountJournal and C_MountJournal.GetMountInfoByID then
-                    local ok, name, spellID, mountIcon, _, _, _, _, _, _, collected
+                    local ok, name, spellID, mountIcon, _, _, _, _, _, _, _, collected
                         = pcall(C_MountJournal.GetMountInfoByID, mount.mountID)
                     if ok then
                         if collected ~= nil then isCollected = collected end

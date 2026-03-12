@@ -250,7 +250,7 @@ MM.MountData = {
     {
         source = "worldevent",
         mounts = {
-            { mountID = 2693, name = "Amani Sunfeather", source = "worldevent", sourceInfo = "Chel the Chip - 1,600 Unalloyed Abundance" },
+            { mountID = 2693, name = "Amani Sunfeather", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance" },
             { mountID = 2772, name = "Blessed Amani Burrower", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance" },
         },
     },
