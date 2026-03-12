@@ -21,6 +21,7 @@ local defaults = {
     locked      = false,
     showCollected = false,
     hideTradingPost = false,
+    wildAlerts  = true,
     collapsed   = {},
     panelShown  = false,
     minimized   = false,
@@ -50,6 +51,81 @@ local function ThrottledScan()
     end)
 end
 
+--------------------------------------------------------------------------
+-- Wild pet proximity alerts (nameplate + mouseover based)
+--------------------------------------------------------------------------
+-- Build a lookup of wild pet species IDs for fast matching
+local wildSpeciesLookup  -- built lazily after data is ready
+
+local function BuildWildSpeciesLookup()
+    wildSpeciesLookup = {}
+    if not MP.PetData then return end
+    for _, group in ipairs(MP.PetData) do
+        if group.source == "wild" then
+            for _, pet in ipairs(group.pets) do
+                wildSpeciesLookup[pet.speciesID] = pet
+            end
+        end
+    end
+end
+
+-- Track which species we've already alerted for this session (avoid spam)
+local alertedThisSession = {}
+
+local function AlertForPet(speciesID)
+    if not MP.db or not MP.db.wildAlerts then return end
+    if not wildSpeciesLookup then BuildWildSpeciesLookup() end
+
+    local pet = wildSpeciesLookup[speciesID]
+    if not pet then return end
+    if alertedThisSession[speciesID] then return end
+
+    -- Check if already collected
+    if C_PetJournal and C_PetJournal.GetNumCollectedInfo then
+        local ok, nc = pcall(C_PetJournal.GetNumCollectedInfo, speciesID)
+        if ok and nc and nc > 0 then return end
+    end
+
+    alertedThisSession[speciesID] = true
+    -- Chat alert
+    local msg = format("|cff40e840[Midnight Pets]|r Uncollected wild pet nearby: |cffffffff%s|r (%s)", pet.name, pet.zone or "")
+    print(msg)
+    -- Raid warning flash (visible even without raid)
+    if RaidNotice_AddMessage then
+        RaidNotice_AddMessage(RaidWarningFrame, format("Uncollected pet: %s", pet.name), ChatTypeInfo["RAID_WARNING"])
+    end
+    -- Play alert sound
+    PlaySound(SOUNDKIT.RAID_WARNING or 8959, "Master")
+end
+
+local function OnNameplateAdded(unitToken)
+    if not MP.db or not MP.db.wildAlerts then return end
+    if not UnitIsWildBattlePet or not UnitBattlePetSpeciesID then return end
+    if not UnitIsWildBattlePet(unitToken) then return end
+    local speciesID = UnitBattlePetSpeciesID(unitToken)
+    if speciesID and speciesID > 0 then
+        AlertForPet(speciesID)
+    end
+end
+
+local function OnMouseoverUnit()
+    if not MP.db or not MP.db.wildAlerts then return end
+    if not UnitIsWildBattlePet or not UnitBattlePetSpeciesID then return end
+    if not UnitIsWildBattlePet("mouseover") then return end
+    local speciesID = UnitBattlePetSpeciesID("mouseover")
+    if speciesID and speciesID > 0 then
+        AlertForPet(speciesID)
+    end
+end
+
+-- Reset alerts when changing zones (so re-entering a zone re-alerts)
+local function OnZoneChanged()
+    wipe(alertedThisSession)
+end
+
+--------------------------------------------------------------------------
+-- Event handler
+--------------------------------------------------------------------------
 frame:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
         frame:UnregisterEvent("ADDON_LOADED")
@@ -62,14 +138,31 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
         ThrottledScan()
+        BuildWildSpeciesLookup()
         if MP.UI then MP.UI:Create() end
         if MP.MinimapButton then MP.MinimapButton:Init() end
+        -- Register nameplate + mouseover events for wild pet alerts
+        frame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+        frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+        frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
     elseif event == "PET_JOURNAL_LIST_UPDATE" then
         ThrottledScan()
+
+    elseif event == "NAME_PLATE_UNIT_ADDED" then
+        OnNameplateAdded(arg1)
+
+    elseif event == "UPDATE_MOUSEOVER_UNIT" then
+        OnMouseoverUnit()
+
+    elseif event == "ZONE_CHANGED_NEW_AREA" then
+        OnZoneChanged()
     end
 end)
 
+--------------------------------------------------------------------------
+-- Slash commands
+--------------------------------------------------------------------------
 SLASH_MIDNIGHTPETS1 = "/mp"
 SLASH_MIDNIGHTPETS2 = "/midnightpets"
 SlashCmdList["MIDNIGHTPETS"] = function(msg)

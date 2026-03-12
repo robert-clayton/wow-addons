@@ -88,10 +88,39 @@ local function ShowInfoTooltip(owner, pet)
         tt:AddDoubleLine("Can battle:", battleStr, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], br, bg, bb)
     end
 
-    -- Collection count
-    if pet.numCollected ~= nil then
-        local maxStr = pet.maxAllowed or 3
-        tt:AddDoubleLine("Collected:", format("%d/%d", pet.numCollected, maxStr), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+    -- Renown / reputation requirement (compact: "Amani Tribe Renown 7/12")
+    if pet.renown then
+        local req = pet.renown
+        local metReq = false
+        local label = ""
+        if req.factionID and req.level then
+            local current = "?"
+            if C_MajorFactions and C_MajorFactions.GetMajorFactionData then
+                local ok, data = pcall(C_MajorFactions.GetMajorFactionData, req.factionID)
+                if ok and data and data.renownLevel then
+                    current = tostring(data.renownLevel)
+                    metReq = data.renownLevel >= req.level
+                end
+            end
+            local name = req.factionName or ("Faction " .. req.factionID)
+            label = format("%s Renown %s/%d", name, current, req.level)
+        elseif req.factionID and req.standing then
+            local current = "?"
+            if C_Reputation and C_Reputation.GetFactionDataByID then
+                local ok, data = pcall(C_Reputation.GetFactionDataByID, req.factionID)
+                if ok and data and data.reaction then
+                    local standings = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
+                    current = standings[data.reaction] or tostring(data.reaction)
+                    local standingOrder = { Friendly = 5, Honored = 6, Revered = 7, Exalted = 8 }
+                    metReq = data.reaction >= (standingOrder[req.standing] or 0)
+                end
+            end
+            local name = req.factionName or ("Faction " .. req.factionID)
+            label = format("%s %s (%s)", name, current, req.standing)
+        end
+        local rr, rg, rb = c.ttCostBad[1], c.ttCostBad[2], c.ttCostBad[3]
+        if metReq then rr, rg, rb = 0.5, 0.8, 0.5 end
+        tt:AddLine(label, rr, rg, rb)
     end
 
     -- Vendor cost
@@ -141,7 +170,7 @@ local function ShowInfoTooltip(owner, pet)
     -- Click hints
     tt:AddLine(" ")
     local src = pet.source
-    if (src == "wild" or src == "vendor" or src == "drop") and pet.waypoint then
+    if pet.waypoint then
         tt:AddLine("Click to set TomTom waypoint", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
     elseif src == "achievement" and pet.achievementID then
         tt:AddLine("Click to open achievement", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
@@ -188,7 +217,7 @@ local function DoPetAction(pet)
         return
     end
     local src = pet.source
-    if (src == "wild" or src == "vendor" or src == "drop") and pet.waypoint then
+    if pet.waypoint then
         local wp = pet.waypoint
         if wp[1] and wp[1] > 0 then
             if TomTom then
@@ -267,6 +296,11 @@ function UI:Create()
             set = function(v)
                 MP.db.showCollected = v
                 self:Refresh()
+            end },
+        { type = "checkbox", label = "Wild Pet Nearby Alerts",
+            get = function() return MP.db.wildAlerts end,
+            set = function(v)
+                MP.db.wildAlerts = v
             end },
         { type = "checkbox", label = "Hide Trading Post Pets",
             get = function() return MP.db.hideTradingPost end,
@@ -381,6 +415,24 @@ end
 --------------------------------------------------------------------------
 -- Render: Source group (collapsible)
 --------------------------------------------------------------------------
+-- Zone display order for wild pets
+local ZONE_ORDER = {
+    "Eversong Woods", "Silvermoon City", "Harandar", "Voidstorm",
+    "Zul'Aman", "Isle of Quel'Danas",
+}
+local ZONE_SET = {}
+for _, z in ipairs(ZONE_ORDER) do ZONE_SET[z] = true end
+
+local function GroupByZone(entries)
+    local byZone = {}
+    for _, pet in ipairs(entries) do
+        local z = pet.zone or "Unknown"
+        if not byZone[z] then byZone[z] = {} end
+        byZone[z][#byZone[z] + 1] = pet
+    end
+    return byZone
+end
+
 function UI:RenderSourceGroup(parent, srcType, entries, yOff)
     local theme = MUI.Theme
     local sr, sg, sb = SourceColor(srcType)
@@ -399,7 +451,52 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
 
     if collapsed then return yOff end
 
-    for _, pet in ipairs(entries) do
+    -- Wild pets: sub-group by zone
+    if srcType == "wild" then
+        local byZone = GroupByZone(entries)
+        -- Render in zone order
+        for _, zoneName in ipairs(ZONE_ORDER) do
+            local pets = byZone[zoneName]
+            if pets and #pets > 0 then
+                yOff = self:RenderZoneSubGroup(parent, zoneName, pets, yOff, sr, sg, sb)
+            end
+        end
+        -- Catch-all for zones not in ZONE_ORDER
+        for zoneName, pets in pairs(byZone) do
+            if not ZONE_SET[zoneName] and #pets > 0 then
+                yOff = self:RenderZoneSubGroup(parent, zoneName, pets, yOff, sr, sg, sb)
+            end
+        end
+    else
+        for _, pet in ipairs(entries) do
+            yOff = self:RenderPetRow(parent, pet, yOff, false)
+        end
+    end
+
+    return yOff
+end
+
+--------------------------------------------------------------------------
+-- Render: Zone sub-group within wild pets (collapsible)
+--------------------------------------------------------------------------
+function UI:RenderZoneSubGroup(parent, zoneName, pets, yOff, sr, sg, sb)
+    local theme = MUI.Theme
+
+    local _, collapsed, newY = self.panel:RenderHeader(parent, yOff, {
+        height     = 18,
+        indent     = 10,
+        collKey    = "zone_" .. zoneName,
+        accentR    = sr, accentG = sg, accentB = sb,
+        label      = zoneName,
+        labelColor = { sr * 0.85, sg * 0.85, sb * 0.85 },
+        count      = tostring(#pets),
+        countColor = theme.colors.countDim,
+    })
+    yOff = newY
+
+    if collapsed then return yOff end
+
+    for _, pet in ipairs(pets) do
         yOff = self:RenderPetRow(parent, pet, yOff, false)
     end
 

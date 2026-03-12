@@ -37,7 +37,7 @@ function Scanner:Scan()
             local icon, petType = nil, pet.petType
             if C_PetJournal and C_PetJournal.GetPetInfoBySpeciesID then
                 local ok, _, petIcon, petPetType = pcall(C_PetJournal.GetPetInfoBySpeciesID, pet.speciesID)
-                if ok and petIcon then icon = petIcon end
+                if ok and petIcon and petIcon ~= 0 and petIcon ~= "" then icon = petIcon end
                 if ok and petPetType and petPetType > 0 then petType = petPetType end
             end
 
@@ -53,10 +53,9 @@ function Scanner:Scan()
                 achievementID = pet.achievementID,
                 canBattle     = pet.canBattle,
                 zone          = pet.zone,
+                renown        = pet.renown,
                 icon          = icon,
                 collected     = isCollected,
-                numCollected  = numCollected,
-                maxAllowed    = maxAllowed or 3,
             }
 
             if isCollected then
