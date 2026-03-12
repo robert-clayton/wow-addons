@@ -1,0 +1,20 @@
+## Interface: 120001
+## Title: Midnight Mounts
+## Notes: Tracks uncollected mounts from Midnight
+## Author: robert-clayton
+## Version: 1.0.0
+## SavedVariables: MidnightMountsDB
+## OptionalDeps: TomTom
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Libs\MidnightUI-1.0\MidnightUI-1.0.xml
+
+Data\Mounts.lua
+
+Core.lua
+Scanner.lua
+UI.lua
+MinimapButton.lua
