@@ -5,8 +5,8 @@ local _, MR = ...
 local NPC = {
     Mirvedon       = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
     Eriden         = { 2393, 0.436, 0.514, "Eriden, Silvermoon City" },
-    CaerisFairdawn = { 2395, 0.434, 0.474, "Caeris Fairdawn, Eversong Woods" },
-    Anomander      = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
+    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
+    Anomander      = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
 }
 
 MR.BlacksmithingRecipes = {

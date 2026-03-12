@@ -517,6 +517,7 @@ function UI:RenderRecipeRow(parent, recipe, skillLine, yOff, isLearned)
         return fs
     end)
     nameFs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+    nameFs:SetWordWrap(false)
     nameFs:SetJustifyH("LEFT")
     nameFs:SetPoint("LEFT", row, "LEFT", PADDING + 10, 0)
     nameFs:SetPoint("RIGHT", row, "RIGHT", 0, 0)

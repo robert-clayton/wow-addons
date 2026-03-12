@@ -4,10 +4,10 @@ local _, MR = ...
 -- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
 local NPC = {
     Mirvedon  = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Magovu    = { 2437, 0.458, 0.658, "Magovu, Zul'Aman" },
+    Magovu    = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
     Naynar    = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander      = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
-    CaerisFairdawn = { 2395, 0.434, 0.474, "Caeris Fairdawn, Eversong Woods" },
+    Anomander      = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
+    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
 }
 
 MR.LeatherworkingRecipes = {

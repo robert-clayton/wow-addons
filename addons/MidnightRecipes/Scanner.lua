@@ -64,7 +64,7 @@ function Scanner:ScanProfession(skillLine, recipeData)
                 result.learned[#result.learned + 1] = entry
             else
                 result.unlearnedCount = result.unlearnedCount + 1
-                local src = recipe.source
+                local src = recipe.source or "unknown"
                 if not result.bySource[src] then result.bySource[src] = {} end
                 result.bySource[src][#result.bySource[src] + 1] = entry
             end

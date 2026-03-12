@@ -3,13 +3,13 @@ local _, MR = ...
 -- NPC waypoint data: { mapID, x, y, "NPC Name" }
 -- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
 local NPC = {
-    ConstructVanore = { 2393, 0.558, 0.658, "Construct V'anore, Silvermoon City" },
+    ConstructVanore = { 2393, 0.557, 0.657, "Construct V'anore, Silvermoon City" },
     Lyna            = { 2393, 0.478, 0.534, "Lyna, Silvermoon City" },
-    CaerisFairdawn  = { 2395, 0.434, 0.474, "Caeris Fairdawn, Eversong Woods" },
+    CaerisFairdawn  = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
     Neriv           = { 2395, 0.434, 0.474, "Neriv, Eversong Woods" },
-    Magovu          = { 2437, 0.458, 0.658, "Magovu, Zul'Aman" },
+    Magovu          = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
     Naynar          = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander       = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
+    Anomander       = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
 }
 
 MR.EnchantingRecipes = {

@@ -6,9 +6,9 @@ local NPC = {
     Camberon          = { 2393, 0.470, 0.518, "Camberon, Silvermoon City" },
     Mirvedon          = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
     Lyrendal          = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
-    Magovu            = { 2437, 0.458, 0.658, "Magovu, Zul'Aman" },
+    Magovu            = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
     Naynar            = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander         = { 2405, 0.524, 0.728, "Void Researcher Anomander, Voidstorm" },
+    Anomander         = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
     CamberonsCauldron = { 2393, 0.470, 0.520, "Camberon's Cauldron, Silvermoon City" },
 }
 
