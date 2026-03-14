@@ -5,6 +5,9 @@ MP.version = C_AddOns and C_AddOns.GetAddOnMetadata(addonName, "Version")
               or GetAddOnMetadata and GetAddOnMetadata(addonName, "Version")
               or "dev"
 
+local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Pets")
+
 local function DeepMergeDefaults(target, source)
     for k, v in pairs(source) do
         if target[k] == nil then
@@ -132,8 +135,8 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if not MidnightPetsDB then MidnightPetsDB = {} end
         DeepMergeDefaults(MidnightPetsDB, defaults)
         MP.db = MidnightPetsDB
-        MP.Theme = LibStub("MidnightUI-1.0").Theme
-        print("|cff80c0ff[Midnight Pets]|r v" .. MP.version .. " loaded. Type /mp to toggle.")
+        MP.Theme = MUI.Theme
+        print(PREFIX .. " v" .. MP.version .. " loaded. Type /mp to toggle.")
 
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
@@ -171,16 +174,16 @@ SlashCmdList["MIDNIGHTPETS"] = function(msg)
         if MP.Scanner then
             MP.Scanner:Scan()
             if MP.UI and MP.UI.frame then MP.UI:Refresh() end
-            print("|cff80c0ff[Midnight Pets]|r Scan complete.")
+            print(PREFIX .. " Scan complete.")
         end
     elseif msg == "collected" then
         if MP.db then
             MP.db.showCollected = not MP.db.showCollected
-            print("|cff80c0ff[Midnight Pets]|r Show collected: " .. tostring(MP.db.showCollected))
+            print(PREFIX .. " Show collected: " .. tostring(MP.db.showCollected))
             if MP.UI and MP.UI.frame then MP.UI:Refresh() end
         end
     elseif msg == "help" then
-        print("|cff80c0ff[Midnight Pets]|r Available commands:")
+        print(PREFIX .. " Available commands:")
         print("  /mp - Toggle panel")
         print("  /mp scan - Force rescan")
         print("  /mp collected - Toggle collected pets display")

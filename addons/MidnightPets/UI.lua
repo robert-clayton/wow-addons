@@ -4,6 +4,7 @@ MP.UI = {}
 local UI = MP.UI
 
 local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Pets")
 
 local ROW_HEIGHT     = 20
 local HEADER_HEIGHT  = 24
@@ -225,21 +226,21 @@ local function DoPetAction(pet)
             if TomTom then
                 local title = wp[4] or pet.sourceInfo or pet.name
                 TomTom:AddWaypoint(wp[1], wp[2], wp[3], { title = title })
-                print(format("|cff80c0ff[Midnight Pets]|r Waypoint set: %s", title))
+                print(format("%s Waypoint set: %s", PREFIX, title))
             else
-                print("|cff80c0ff[Midnight Pets]|r TomTom addon required for waypoints.")
+                print(PREFIX .. " TomTom addon required for waypoints.")
             end
         end
     elseif src == "achievement" and pet.achievementID then
         if InCombatLockdown() then
-            print("|cff80c0ff[Midnight Pets]|r Cannot open achievements during combat.")
+            print(PREFIX .. " Cannot open achievements during combat.")
             return
         end
         local ok = pcall(function()
             OpenAchievementFrame(pet.achievementID)
         end)
         if not ok then
-            print("|cff80c0ff[Midnight Pets]|r Could not open achievement frame.")
+            print(PREFIX .. " Could not open achievement frame.")
         end
     end
 end

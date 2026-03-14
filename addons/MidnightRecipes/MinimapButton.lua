@@ -1,5 +1,8 @@
 local _, MR = ...
 
+local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Recipes")
+
 MR.MinimapButton = {}
 local MB = MR.MinimapButton
 
@@ -26,8 +29,8 @@ function MB:Init()
                         local result = MR.Scanner.results[skillLine]
                         local prof = MR.professions[skillLine]
                         if result and prof then
-                            print(format("|cff80c0ff[Midnight Recipes]|r %s: %d / %d learned (%d remaining)",
-                                prof.name, result.learnedCount, result.total, result.unlearnedCount))
+                            print(format("%s %s: %d / %d learned (%d remaining)",
+                                PREFIX, prof.name, result.learnedCount, result.total, result.unlearnedCount))
                         end
                     end
                 end

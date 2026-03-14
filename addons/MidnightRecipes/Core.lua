@@ -21,6 +21,9 @@ local CRAFT_SKILLS = {
 
 MR.PROF_ORDER = { 171, 164, 185, 333, 202, 773, 755, 165, 197 }
 
+local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Recipes")
+
 local function DeepMergeDefaults(target, source)
     for k, v in pairs(source) do
         if target[k] == nil then
@@ -101,8 +104,8 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if not MidnightRecipesDB then MidnightRecipesDB = {} end
         DeepMergeDefaults(MidnightRecipesDB, defaults)
         MR.db = MidnightRecipesDB
-        MR.Theme = LibStub("MidnightUI-1.0").Theme
-        print("|cff80c0ff[Midnight Recipes]|r v" .. MR.version .. " loaded. Type /mr to toggle.")
+        MR.Theme = MUI.Theme
+        print(PREFIX .. " v" .. MR.version .. " loaded. Type /mr to toggle.")
 
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
@@ -128,16 +131,16 @@ SlashCmdList["MIDNIGHTRECIPES"] = function(msg)
         if MR.Scanner then
             MR.Scanner:Scan()
             if MR.UI and MR.UI.frame then MR.UI:Refresh() end
-            print("|cff80c0ff[Midnight Recipes]|r Scan complete.")
+            print(PREFIX .. " Scan complete.")
         end
     elseif msg == "learned" then
         if MR.db then
             MR.db.showLearned = not MR.db.showLearned
-            print("|cff80c0ff[Midnight Recipes]|r Show learned: " .. tostring(MR.db.showLearned))
+            print(PREFIX .. " Show learned: " .. tostring(MR.db.showLearned))
             if MR.UI and MR.UI.frame then MR.UI:Refresh() end
         end
     elseif msg == "help" then
-        print("|cff80c0ff[Midnight Recipes]|r Available commands:")
+        print(PREFIX .. " Available commands:")
         print("  /mr - Toggle panel")
         print("  /mr scan - Force rescan")
         print("  /mr learned - Toggle learned recipes display")

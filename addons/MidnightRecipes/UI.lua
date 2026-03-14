@@ -4,6 +4,7 @@ MR.UI = {}
 local UI = MR.UI
 
 local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Recipes")
 
 local ROW_HEIGHT     = 18
 local HEADER_HEIGHT  = 24
@@ -181,21 +182,21 @@ local function DoRecipeAction(recipe, skillLine)
             if TomTom then
                 local title = wp[4] or recipe.sourceInfo or recipe.name
                 TomTom:AddWaypoint(wp[1], wp[2], wp[3], { title = title })
-                print(format("|cff80c0ff[Midnight Recipes]|r Waypoint set: %s", title))
+                print(format("%s Waypoint set: %s", PREFIX, title))
             else
-                print("|cff80c0ff[Midnight Recipes]|r TomTom addon required for waypoints.")
+                print(PREFIX .. " TomTom addon required for waypoints.")
             end
         end
     elseif src == "specialization" then
         if InCombatLockdown() then
-            print("|cff80c0ff[Midnight Recipes]|r Cannot open profession window during combat.")
+            print(PREFIX .. " Cannot open profession window during combat.")
             return
         end
         local ok = pcall(function()
             C_TradeSkillUI.OpenTradeSkill(skillLine)
         end)
         if not ok then
-            print("|cff80c0ff[Midnight Recipes]|r Could not open profession window.")
+            print(PREFIX .. " Could not open profession window.")
         end
     end
 end

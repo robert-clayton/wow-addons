@@ -5,6 +5,9 @@ MM.version = C_AddOns and C_AddOns.GetAddOnMetadata(addonName, "Version")
               or GetAddOnMetadata and GetAddOnMetadata(addonName, "Version")
               or "dev"
 
+local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Mounts")
+
 local function DeepMergeDefaults(target, source)
     for k, v in pairs(source) do
         if target[k] == nil then
@@ -58,8 +61,8 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if not MidnightMountsDB then MidnightMountsDB = {} end
         DeepMergeDefaults(MidnightMountsDB, defaults)
         MM.db = MidnightMountsDB
-        MM.Theme = LibStub("MidnightUI-1.0").Theme
-        print("|cff80c0ff[Midnight Mounts]|r v" .. MM.version .. " loaded. Type /mm to toggle.")
+        MM.Theme = MUI.Theme
+        print(PREFIX .. " v" .. MM.version .. " loaded. Type /mm to toggle.")
 
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
@@ -83,16 +86,16 @@ SlashCmdList["MIDNIGHTMOUNTS"] = function(msg)
         if MM.Scanner then
             MM.Scanner:Scan()
             if MM.UI and MM.UI.frame then MM.UI:Refresh() end
-            print("|cff80c0ff[Midnight Mounts]|r Scan complete.")
+            print(PREFIX .. " Scan complete.")
         end
     elseif msg == "collected" then
         if MM.db then
             MM.db.showCollected = not MM.db.showCollected
-            print("|cff80c0ff[Midnight Mounts]|r Show collected: " .. tostring(MM.db.showCollected))
+            print(PREFIX .. " Show collected: " .. tostring(MM.db.showCollected))
             if MM.UI and MM.UI.frame then MM.UI:Refresh() end
         end
     elseif msg == "help" then
-        print("|cff80c0ff[Midnight Mounts]|r Available commands:")
+        print(PREFIX .. " Available commands:")
         print("  /mm - Toggle panel")
         print("  /mm scan - Force rescan")
         print("  /mm collected - Toggle collected mounts display")

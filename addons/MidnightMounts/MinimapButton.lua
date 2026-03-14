@@ -1,5 +1,8 @@
 local _, MM = ...
 
+local MUI = LibStub("MidnightUI-1.0")
+local PREFIX = MUI.ChatPrefix("Midnight Mounts")
+
 MM.MinimapButton = {}
 local MB = MM.MinimapButton
 
@@ -23,8 +26,8 @@ function MB:Init()
                     if MM.UI and MM.UI.frame then MM.UI:Refresh() end
                     local r = MM.Scanner.results
                     if r and r.total then
-                        print(format("|cff80c0ff[Midnight Mounts]|r %d / %d collected (%d remaining)",
-                            r.collectedCount, r.total, r.uncollectedCount))
+                        print(format("%s %d / %d collected (%d remaining)",
+                            PREFIX, r.collectedCount, r.total, r.uncollectedCount))
                         for _, srcType in ipairs(MM.SOURCE_ORDER) do
                             local entries = r.bySource[srcType]
                             if entries and #entries > 0 then

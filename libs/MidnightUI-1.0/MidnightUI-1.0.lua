@@ -76,6 +76,8 @@ lib.Theme = {
         ttHintGreen = { 0.5, 0.8, 0.5 },
         ttHintBlue  = { 0.6, 0.7, 1.0 },
         ttCostBad   = { 1, 0.30, 0.30 },
+        -- Chat prefix color (|cff80c0ff)
+        chat           = { 128/255, 192/255, 1.00 },
         -- Source colors
         source = {
             trainer        = { 0.30, 0.80, 0.30 },
@@ -97,6 +99,12 @@ lib.Theme = {
         bgFile   = "Interface\\Buttons\\WHITE8x8",
     },
 }
+
+function lib.ChatPrefix(name)
+    local c = lib.Theme.colors.chat
+    return format("|cff%02x%02x%02x[%s]|r",
+        c[1] * 255, c[2] * 255, c[3] * 255, name)
+end
 
 function lib.Theme:ProfAccentColor(skillLine)
     local c = self.colors.profAccent[skillLine]

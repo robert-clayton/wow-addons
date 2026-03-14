@@ -1,36 +1,30 @@
-local _, MM = ...
+local _, MD = ...
 
-MM.UI = {}
-local UI = MM.UI
+MD.UI = {}
+local UI = MD.UI
 
 local MUI = LibStub("MidnightUI-1.0")
-local PREFIX = MUI.ChatPrefix("Midnight Mounts")
+local PREFIX = MUI.ChatPrefix("Midnight Decorations")
 
-local ROW_HEIGHT     = 22
+local ROW_HEIGHT     = 20
 local HEADER_HEIGHT  = 24
 local SECTION_PAD    = 8
 local PADDING        = 6
-local ICON_SIZE      = 24
+local ICON_SIZE      = 20
 
 local SOURCE_COLORS = {
-    renown      = { 0.30, 0.60, 1.00 },
-    reputation  = { 0.20, 0.50, 0.90 },
-    drop        = { 0.90, 0.40, 0.30 },
-    achievement = { 0.90, 0.70, 0.20 },
+    crafted     = { 0.80, 0.50, 0.90 },
+    vendor      = { 0.30, 0.60, 1.00 },
     quest       = { 0.90, 0.80, 0.20 },
-    delve       = { 0.55, 0.75, 0.90 },
-    prey        = { 0.80, 0.30, 0.50 },
-    dungeon     = { 0.70, 0.50, 0.90 },
-    raid        = { 0.90, 0.40, 0.60 },
-    pvp         = { 0.85, 0.30, 0.30 },
+    achievement = { 0.90, 0.70, 0.20 },
+    drop        = { 0.90, 0.40, 0.30 },
+    renown      = { 0.30, 0.60, 1.00 },
+    tradingpost = { 0.90, 0.55, 0.80 },
     worldevent  = { 0.70, 0.70, 0.70 },
-    profession  = { 0.80, 0.50, 0.90 },
-    vendor      = { 0.40, 0.80, 0.40 },
-    prepatch    = { 0.60, 0.60, 0.60 },
 }
 
 local SOURCE_SET = {}
-for _, s in ipairs(MM.SOURCE_ORDER) do SOURCE_SET[s] = true end
+for _, s in ipairs(MD.SOURCE_ORDER) do SOURCE_SET[s] = true end
 
 local function SourceColor(srcType)
     local c = SOURCE_COLORS[srcType]
@@ -45,33 +39,39 @@ local infoTooltip
 
 local function GetInfoTooltip()
     if not infoTooltip then
-        infoTooltip = CreateFrame("GameTooltip", "MidnightMountsInfoTooltip", UIParent, "GameTooltipTemplate")
+        infoTooltip = CreateFrame("GameTooltip", "MidnightDecorationsInfoTooltip", UIParent, "GameTooltipTemplate")
         infoTooltip:SetFrameStrata("TOOLTIP")
     end
     return infoTooltip
 end
 
-local function ShowInfoTooltip(owner, mount)
+local function ShowInfoTooltip(owner, deco)
     local tt = GetInfoTooltip()
     tt:SetOwner(owner, "ANCHOR_PRESERVE")
     tt:ClearAllPoints()
     tt:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT", 2, 0)
 
     local theme = MUI.Theme
-    local sr, sg, sb = SourceColor(mount.source)
-    local label = MM.SOURCE_LABELS[mount.source] or mount.source
+    local sr, sg, sb = SourceColor(deco.source)
+    local label = MD.SOURCE_LABELS[deco.source] or deco.source
 
     local c = theme.colors
-    tt:AddLine("Midnight Mounts", c.ttTitle[1], c.ttTitle[2], c.ttTitle[3])
+    tt:AddLine("Midnight Decorations", c.ttTitle[1], c.ttTitle[2], c.ttTitle[3])
     tt:AddDoubleLine("Source:", label, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], sr, sg, sb)
 
-    if mount.sourceInfo then
-        tt:AddLine(mount.sourceInfo, 1, 1, 1)
+    if deco.sourceInfo then
+        tt:AddLine(deco.sourceInfo, 1, 1, 1)
+    end
+
+    -- Profession label for crafted items
+    if deco.skillLine and MD.PROF_LABELS[deco.skillLine] then
+        local pr, pg, pb = theme:ProfAccentColor(deco.skillLine)
+        tt:AddDoubleLine("Profession:", MD.PROF_LABELS[deco.skillLine], c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], pr, pg, pb)
     end
 
     -- Location from waypoint
-    if mount.waypoint then
-        local wp = mount.waypoint
+    if deco.waypoint then
+        local wp = deco.waypoint
         if wp[1] and wp[1] > 0 then
             local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(wp[1])
             local mapName = mapInfo and mapInfo.name or ("Map " .. wp[1])
@@ -80,13 +80,13 @@ local function ShowInfoTooltip(owner, mount)
                 tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
             end
         end
-    elseif mount.zone then
-        tt:AddDoubleLine("Zone:", mount.zone, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+    elseif deco.zone then
+        tt:AddDoubleLine("Zone:", deco.zone, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
     end
 
     -- Renown / reputation requirement
-    if mount.renown then
-        local req = mount.renown
+    if deco.renown then
+        local req = deco.renown
         local metReq = false
         local reqLabel = ""
         if req.factionID and req.level then
@@ -120,16 +120,16 @@ local function ShowInfoTooltip(owner, mount)
     end
 
     -- Vendor cost
-    if mount.cost then
-        if mount.cost.gold then
+    if deco.cost then
+        if deco.cost.gold then
             local playerGold = GetMoney and GetMoney() or 0
             local gr, gg, gb = 1, 1, 1
-            if playerGold < mount.cost.gold then gr, gg, gb = c.ttCostBad[1], c.ttCostBad[2], c.ttCostBad[3] end
-            tt:AddDoubleLine("Cost:", MUI.FormatGold(mount.cost.gold), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], gr, gg, gb)
+            if playerGold < deco.cost.gold then gr, gg, gb = c.ttCostBad[1], c.ttCostBad[2], c.ttCostBad[3] end
+            tt:AddDoubleLine("Cost:", MUI.FormatGold(deco.cost.gold), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], gr, gg, gb)
         end
         local parts = {}
         for _, key in ipairs({"currency", "currency2"}) do
-            local cur = mount.cost[key]
+            local cur = deco.cost[key]
             if cur then
                 local currID, amount = cur[1], cur[2]
                 local info = C_CurrencyInfo and C_CurrencyInfo.GetCurrencyInfo(currID)
@@ -147,8 +147,8 @@ local function ShowInfoTooltip(owner, mount)
     end
 
     -- Drop info
-    if mount.dropInfo then
-        local di = mount.dropInfo
+    if deco.dropInfo then
+        local di = deco.dropInfo
         if di.mob then
             tt:AddDoubleLine("Drops from:", di.mob, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttDropMob[1], c.ttDropMob[2], c.ttDropMob[3])
         end
@@ -165,11 +165,13 @@ local function ShowInfoTooltip(owner, mount)
 
     -- Click hints
     tt:AddLine(" ")
-    local src = mount.source
-    if mount.waypoint then
+    local src = deco.source
+    if deco.waypoint then
         tt:AddLine("Click to set TomTom waypoint", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
-    elseif src == "achievement" and mount.achievementID and mount.achievementID > 0 then
+    elseif src == "achievement" and deco.achievementID and deco.achievementID > 0 then
         tt:AddLine("Click to open achievement", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
+    elseif src == "crafted" and deco.skillLine then
+        tt:AddLine("Click to open profession", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
     end
     tt:AddLine("Shift-click to copy Wowhead URL", c.ttHintBlue[1], c.ttHintBlue[2], c.ttHintBlue[3])
 
@@ -183,7 +185,7 @@ end
 --------------------------------------------------------------------------
 -- Click actions per source type
 --------------------------------------------------------------------------
-StaticPopupDialogs["MIDNIGHTMOUNTS_WOWHEAD"] = {
+StaticPopupDialogs["MIDNIGHTDECORATIONS_WOWHEAD"] = {
     text = "Copy Wowhead URL:",
     button1 = CLOSE,
     hasEditBox = true,
@@ -202,38 +204,56 @@ StaticPopupDialogs["MIDNIGHTMOUNTS_WOWHEAD"] = {
     hideOnEscape = true,
 }
 
-local function OpenWowhead(mountID)
-    local url = "https://www.wowhead.com/mount/" .. mountID
-    StaticPopup_Show("MIDNIGHTMOUNTS_WOWHEAD", nil, nil, url)
+local function OpenWowhead(deco)
+    local url
+    if deco.decorID and deco.decorID > 0 then
+        url = "https://www.wowhead.com/decor=" .. deco.decorID
+    elseif deco.itemID and deco.itemID > 0 then
+        url = "https://www.wowhead.com/item=" .. deco.itemID
+    end
+    if url then
+        StaticPopup_Show("MIDNIGHTDECORATIONS_WOWHEAD", nil, nil, url)
+    end
 end
 
-local function DoMountAction(mount)
+local function DoDecoAction(deco)
     if IsShiftKeyDown() then
-        OpenWowhead(mount.mountID)
+        OpenWowhead(deco)
         return
     end
-    local src = mount.source
-    if mount.waypoint then
-        local wp = mount.waypoint
+    local src = deco.source
+    if deco.waypoint then
+        local wp = deco.waypoint
         if wp[1] and wp[1] > 0 then
             if TomTom then
-                local title = wp[4] or mount.sourceInfo or mount.name
+                local title = wp[4] or deco.sourceInfo or deco.name
                 TomTom:AddWaypoint(wp[1], wp[2], wp[3], { title = title })
                 print(format("%s Waypoint set: %s", PREFIX, title))
             else
                 print(PREFIX .. " TomTom addon required for waypoints.")
             end
         end
-    elseif src == "achievement" and mount.achievementID and mount.achievementID > 0 then
+    elseif src == "achievement" and deco.achievementID and deco.achievementID > 0 then
         if InCombatLockdown() then
             print(PREFIX .. " Cannot open achievements during combat.")
             return
         end
         local ok = pcall(function()
-            OpenAchievementFrame(mount.achievementID)
+            OpenAchievementFrame(deco.achievementID)
         end)
         if not ok then
             print(PREFIX .. " Could not open achievement frame.")
+        end
+    elseif src == "crafted" and deco.skillLine then
+        if InCombatLockdown() then
+            print(PREFIX .. " Cannot open professions during combat.")
+            return
+        end
+        if C_TradeSkillUI and C_TradeSkillUI.OpenTradeSkill then
+            local ok = pcall(C_TradeSkillUI.OpenTradeSkill, deco.skillLine)
+            if not ok then
+                print(PREFIX .. " Could not open profession frame.")
+            end
         end
     end
 end
@@ -262,10 +282,10 @@ function UI:Create()
     if self.panel then return end
 
     local panel = MUI:CreatePanel({
-        name          = "MidnightMounts",
-        title         = "Midnight Mounts",
-        icon          = "Interface\\Icons\\Ability_Mount_RidingHorse",
-        db            = MM.db,
+        name          = "MidnightDecorations",
+        title         = "Midnight Decorations",
+        icon          = "Interface\\Icons\\INV_Misc_Rune_01",
+        db            = MD.db,
         defaultWidth  = 360,
         defaultHeight = 520,
         minWidth      = 240,
@@ -281,42 +301,49 @@ function UI:Create()
     self.panel:PopulateConfig({
         { type = "section", label = "DISPLAY" },
         { type = "checkbox", label = "Lock Frame",
-            get = function() return MM.db.locked end,
+            get = function() return MD.db.locked end,
             set = function(v)
-                MM.db.locked = v
+                MD.db.locked = v
                 if self.frame then self.frame:SetMovable(not v) end
                 self.panel:UpdateDraggerVisibility()
             end },
-        { type = "checkbox", label = "Show Collected Mounts",
-            get = function() return MM.db.showCollected end,
+        { type = "checkbox", label = "Show Collected Decorations",
+            get = function() return MD.db.showCollected end,
             set = function(v)
-                MM.db.showCollected = v
+                MD.db.showCollected = v
+                self:Refresh()
+            end },
+        { type = "checkbox", label = "Hide Trading Post Decorations",
+            get = function() return MD.db.hideTradingPost end,
+            set = function(v)
+                MD.db.hideTradingPost = v
+                if MD.Scanner then MD.Scanner:Scan() end
                 self:Refresh()
             end },
         { type = "checkbox", label = "Hide Minimap Icon",
             get = function()
-                return MM.db.minimap and MM.db.minimap.hide or false
+                return MD.db.minimap and MD.db.minimap.hide or false
             end,
             set = function(v)
-                if MM.db.minimap then MM.db.minimap.hide = v end
-                if MM.MinimapButton and MM.MinimapButton.Update then
-                    MM.MinimapButton:Update()
+                if MD.db.minimap then MD.db.minimap.hide = v end
+                if MD.MinimapButton and MD.MinimapButton.Update then
+                    MD.MinimapButton:Update()
                 end
             end },
         { type = "divider" },
         { type = "section", label = "APPEARANCE" },
         { type = "slider", label = "Background Opacity", min = 0.1, max = 1.0, step = 0.05,
-            get = function() return MM.db.frameAlpha or 1.0 end,
+            get = function() return MD.db.frameAlpha or 1.0 end,
             set = function(v)
-                MM.db.frameAlpha = v
+                MD.db.frameAlpha = v
                 self.panel:ApplyBackdrop()
                 self:Refresh()
             end,
             fillColor = { 0.40, 0.40, 0.40 } },
         { type = "slider", label = "Frame Scale", min = 0.5, max = 2.0, step = 0.05,
-            get = function() return MM.db.frameScale or 1.0 end,
+            get = function() return MD.db.frameScale or 1.0 end,
             set = function(v)
-                MM.db.frameScale = v
+                MD.db.frameScale = v
                 if self.frame then self.frame:SetScale(v) end
             end,
             fillColor = { 0.16, 0.78, 0.75 } },
@@ -336,13 +363,13 @@ end
 --------------------------------------------------------------------------
 function UI:Refresh()
     if not self.panel or not self.panel.scrollChild then return end
-    if not MM.Scanner then return end
+    if not MD.Scanner then return end
 
     self.panel.pool:ReleaseAll()
 
     local child = self.panel.scrollChild
     local yOff = 0
-    local r = MM.Scanner.results
+    local r = MD.Scanner.results
 
     if not r or not r.total then
         self.panel:RefreshScrollContent(0)
@@ -350,7 +377,7 @@ function UI:Refresh()
     end
 
     -- Source type groups
-    for _, srcType in ipairs(MM.SOURCE_ORDER) do
+    for _, srcType in ipairs(MD.SOURCE_ORDER) do
         local entries = r.bySource[srcType]
         if entries and #entries > 0 then
             yOff = self:RenderSourceGroup(child, srcType, entries, yOff)
@@ -367,7 +394,7 @@ function UI:Refresh()
     end
 
     -- Collected
-    if MM.db.showCollected and #r.collected > 0 then
+    if MD.db.showCollected and #r.collected > 0 then
         yOff = self:RenderCollectedGroup(child, r.collected, yOff)
     end
 
@@ -389,7 +416,7 @@ function UI:Refresh()
     end)
     if yOff == 0 then
         emptyText:SetPoint("TOP", child, "TOP", 0, -20)
-        emptyText:SetText("No uncollected Midnight mounts found.")
+        emptyText:SetText("No uncollected Midnight decorations found.")
         emptyText:SetTextColor(0.7, 0.7, 0.7)
         emptyText:Show()
         yOff = 60
@@ -403,22 +430,14 @@ end
 --------------------------------------------------------------------------
 -- Render: Source group (collapsible)
 --------------------------------------------------------------------------
--- Zone display order for rare drops
-local ZONE_ORDER = {
-    "Eversong Woods", "Silvermoon City", "Harandar", "Voidstorm",
-    "Zul'Aman", "Isle of Quel'Danas",
-}
-local ZONE_SET = {}
-for _, z in ipairs(ZONE_ORDER) do ZONE_SET[z] = true end
-
-local function GroupByZone(entries)
-    local byZone = {}
-    for _, mount in ipairs(entries) do
-        local z = mount.zone or "Unknown"
-        if not byZone[z] then byZone[z] = {} end
-        byZone[z][#byZone[z] + 1] = mount
+local function GroupByProfession(entries)
+    local byProf = {}
+    for _, deco in ipairs(entries) do
+        local sl = deco.skillLine or 0
+        if not byProf[sl] then byProf[sl] = {} end
+        byProf[sl][#byProf[sl] + 1] = deco
     end
-    return byZone
+    return byProf
 end
 
 function UI:RenderSourceGroup(parent, srcType, entries, yOff)
@@ -430,7 +449,7 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
         indent     = 0,
         collKey    = "src_" .. srcType,
         accentR    = sr, accentG = sg, accentB = sb,
-        label      = MM.SOURCE_LABELS[srcType] or srcType,
+        label      = MD.SOURCE_LABELS[srcType] or srcType,
         labelColor = { sr, sg, sb },
         count      = tostring(#entries),
         countColor = theme.colors.countDim,
@@ -439,25 +458,26 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
 
     if collapsed then return yOff end
 
-    -- Rare drops: sub-group by zone
-    if srcType == "drop" then
-        local byZone = GroupByZone(entries)
-        -- Render in zone order
-        for _, zoneName in ipairs(ZONE_ORDER) do
-            local mounts = byZone[zoneName]
-            if mounts and #mounts > 0 then
-                yOff = self:RenderZoneSubGroup(parent, zoneName, mounts, yOff, sr, sg, sb)
+    -- Crafted: sub-group by profession
+    if srcType == "crafted" then
+        local byProf = GroupByProfession(entries)
+        for _, skillLine in ipairs(MD.PROF_ORDER) do
+            local profEntries = byProf[skillLine]
+            if profEntries and #profEntries > 0 then
+                yOff = self:RenderProfSubGroup(parent, skillLine, profEntries, yOff)
             end
         end
-        -- Catch-all for zones not in ZONE_ORDER
-        for zoneName, mounts in pairs(byZone) do
-            if not ZONE_SET[zoneName] and #mounts > 0 then
-                yOff = self:RenderZoneSubGroup(parent, zoneName, mounts, yOff, sr, sg, sb)
+        -- Catch-all for unknown professions
+        local profSet = {}
+        for _, sl in ipairs(MD.PROF_ORDER) do profSet[sl] = true end
+        for sl, profEntries in pairs(byProf) do
+            if not profSet[sl] and #profEntries > 0 then
+                yOff = self:RenderProfSubGroup(parent, sl, profEntries, yOff)
             end
         end
     else
-        for _, mount in ipairs(entries) do
-            yOff = self:RenderMountRow(parent, mount, yOff, false)
+        for _, deco in ipairs(entries) do
+            yOff = self:RenderDecoRow(parent, deco, yOff, false)
         end
     end
 
@@ -465,27 +485,29 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
 end
 
 --------------------------------------------------------------------------
--- Render: Zone sub-group within rare drops (collapsible)
+-- Render: Profession sub-group within crafted (collapsible)
 --------------------------------------------------------------------------
-function UI:RenderZoneSubGroup(parent, zoneName, mounts, yOff, sr, sg, sb)
+function UI:RenderProfSubGroup(parent, skillLine, decos, yOff)
     local theme = MUI.Theme
+    local pr, pg, pb = theme:ProfAccentColor(skillLine)
+    local profLabel = MD.PROF_LABELS[skillLine] or ("Profession " .. skillLine)
 
     local _, collapsed, newY = self.panel:RenderHeader(parent, yOff, {
         height     = 18,
         indent     = 10,
-        collKey    = "zone_" .. zoneName,
-        accentR    = sr, accentG = sg, accentB = sb,
-        label      = zoneName,
-        labelColor = { sr * 0.85, sg * 0.85, sb * 0.85 },
-        count      = tostring(#mounts),
+        collKey    = "prof_" .. skillLine,
+        accentR    = pr, accentG = pg, accentB = pb,
+        label      = profLabel,
+        labelColor = { pr * 0.85, pg * 0.85, pb * 0.85 },
+        count      = tostring(#decos),
         countColor = theme.colors.countDim,
     })
     yOff = newY
 
     if collapsed then return yOff end
 
-    for _, mount in ipairs(mounts) do
-        yOff = self:RenderMountRow(parent, mount, yOff, false)
+    for _, deco in ipairs(decos) do
+        yOff = self:RenderDecoRow(parent, deco, yOff, false)
     end
 
     return yOff
@@ -512,17 +534,17 @@ function UI:RenderCollectedGroup(parent, entries, yOff)
 
     if collapsed then return yOff end
 
-    for _, mount in ipairs(entries) do
-        yOff = self:RenderMountRow(parent, mount, yOff, true)
+    for _, deco in ipairs(entries) do
+        yOff = self:RenderDecoRow(parent, deco, yOff, true)
     end
 
     return yOff
 end
 
 --------------------------------------------------------------------------
--- Render: Mount row (clickable)
+-- Render: Decoration row (clickable)
 --------------------------------------------------------------------------
-function UI:RenderMountRow(parent, mount, yOff, isCollected)
+function UI:RenderDecoRow(parent, deco, yOff, isCollected)
     local theme = MUI.Theme
 
     local row = self.panel.pool:Acquire(parent)
@@ -539,27 +561,27 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
     hoverTex:SetAllPoints()
     hoverTex:SetColorTexture(1, 1, 1, 0)
 
-    -- Mount icon (24x24)
-    local mountIcon = MUI.GetOrCreate(row, "icon", function(p)
+    -- Decoration icon (20x20)
+    local decoIcon = MUI.GetOrCreate(row, "icon", function(p)
         local t = p:CreateTexture(nil, "ARTWORK")
         t:SetSize(ICON_SIZE, ICON_SIZE)
         return t
     end)
-    mountIcon:SetPoint("LEFT", row, "LEFT", PADDING, 0)
-    if mount.icon then
-        mountIcon:SetTexture(mount.icon)
+    decoIcon:SetPoint("LEFT", row, "LEFT", PADDING, 0)
+    if deco.icon then
+        decoIcon:SetTexture(deco.icon)
     else
-        mountIcon:SetTexture("Interface\\Icons\\Ability_Mount_RidingHorse")
+        decoIcon:SetTexture("Interface\\Icons\\INV_Misc_Rune_01")
     end
     if isCollected then
-        mountIcon:SetDesaturated(true)
-        mountIcon:SetAlpha(0.5)
+        decoIcon:SetDesaturated(true)
+        decoIcon:SetAlpha(0.5)
     else
-        mountIcon:SetDesaturated(false)
-        mountIcon:SetAlpha(1)
+        decoIcon:SetDesaturated(false)
+        decoIcon:SetAlpha(1)
     end
 
-    -- Mount name
+    -- Decoration name
     local nameFs = MUI.GetOrCreate(row, "name", function(p)
         local fs = p:CreateFontString(nil, "OVERLAY")
         fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
@@ -568,9 +590,9 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
     nameFs:SetFont(theme.font, theme.fontSize, "OUTLINE")
     nameFs:SetJustifyH("LEFT")
     nameFs:SetWordWrap(false)
-    nameFs:SetPoint("LEFT", row, "LEFT", PADDING + 28, 0)
+    nameFs:SetPoint("LEFT", row, "LEFT", PADDING + 24, 0)
     nameFs:SetPoint("RIGHT", row, "RIGHT", -50, 0)
-    nameFs:SetText(mount.name)
+    nameFs:SetText(deco.name)
 
     if isCollected then
         nameFs:SetTextColor(unpack(theme.colors.textDim))
@@ -587,11 +609,11 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
     infoFs:SetFont(theme.font, theme.fontSize - 2, "OUTLINE")
     infoFs:SetJustifyH("RIGHT")
     infoFs:SetPoint("RIGHT", row, "RIGHT", -PADDING, 0)
-    local infoText = mount.zone or ""
+    local infoText = deco.zone or ""
     infoFs:SetText(infoText)
     infoFs:SetTextColor(0.45, 0.45, 0.45)
 
-    -- Strikethrough line for collected mounts
+    -- Strikethrough line for collected decorations
     local strike = MUI.GetOrCreate(row, "strike", function(p)
         local t = p:CreateTexture(nil, "ARTWORK")
         t:SetHeight(1)
@@ -606,23 +628,20 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
         strike:Hide()
     end
 
-    -- Tooltip on hover
+    -- Tooltip on hover: primary = item tooltip (crafted) or name tooltip, secondary = info tooltip
     row:SetScript("OnEnter", function(r)
         hoverTex:SetColorTexture(rc[1], rc[2], rc[3], rc[4])
         GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
-        GameTooltip:AddLine(mount.name, 1, 1, 1)
-        -- Mount description from journal
-        if mount.mountID and mount.mountID > 0 and C_MountJournal and C_MountJournal.GetMountInfoExtraByID then
-            local ok, _, description, source = pcall(C_MountJournal.GetMountInfoExtraByID, mount.mountID)
-            if ok and description then
-                GameTooltip:AddLine(description, 0.7, 0.7, 0.7, true)
-            end
-            if ok and source then
-                GameTooltip:AddLine(source, 0.5, 0.8, 0.5, true)
+        if deco.itemID and deco.itemID > 0 then
+            GameTooltip:SetItemByID(deco.itemID)
+        else
+            GameTooltip:AddLine(deco.name, 1, 1, 1)
+            if deco.sourceInfo then
+                GameTooltip:AddLine(deco.sourceInfo, 0.7, 0.7, 0.7, true)
             end
         end
         GameTooltip:Show()
-        ShowInfoTooltip(r, mount)
+        ShowInfoTooltip(r, deco)
     end)
     row:SetScript("OnLeave", function()
         hoverTex:SetColorTexture(1, 1, 1, 0)
@@ -633,7 +652,7 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
     -- Click action
     if not isCollected then
         row:SetScript("OnMouseUp", function(_, button)
-            if button == "LeftButton" then DoMountAction(mount) end
+            if button == "LeftButton" then DoDecoAction(deco) end
         end)
     end
 
