@@ -61,7 +61,7 @@ MR.TailoringRecipes = {
             { id = 1228981, name = "Sunfire Bracers", source = "specialization", sourceInfo = "Nimble Needlework - Sunfire Expertise",  priority = 3 },
             { id = 1228982, name = "Sunfire Cloak",   source = "specialization", sourceInfo = "Nimble Needlework - Sunfire Expertise",  priority = 3 },
             { id = 1228983, name = "Sunfire Treads",  source = "specialization", sourceInfo = "Nimble Needlework - Sunfire Expertise",  priority = 3 },
-            { id = 1228987, name = "Sunfire Sash",    source = "drop",           sourceInfo = "Restless Heart, Windrunner Spire",       priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1228987, name = "Sunfire Sash",    source = "drop",           sourceInfo = "Restless Heart, Windrunner Spire",       priority = 4 },
         },
     },
     {
@@ -70,14 +70,14 @@ MR.TailoringRecipes = {
             { id = 1228984, name = "Arcanoweave Bracers", source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
             { id = 1228985, name = "Arcanoweave Cloak",   source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
             { id = 1228986, name = "Arcanoweave Treads",  source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
-            { id = 1228988, name = "Arcanoweave Cord",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",                      priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1228988, name = "Arcanoweave Cord",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",                      priority = 4 },
         },
     },
     {
         name = "Optional Reagents",
         recipes = {
-            { id = 1228960, name = "Sunfire Silk Lining",  source = "drop", sourceInfo = "Heavy Trunk (Delves)",              priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1228961, name = "Arcanoweave Lining",   source = "drop", sourceInfo = "Degentrius, Magisters' Terrace",    priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1228960, name = "Sunfire Silk Lining",  source = "drop", sourceInfo = "Heavy Trunk (Delves)",              priority = 4 },
+            { id = 1228961, name = "Arcanoweave Lining",   source = "drop", sourceInfo = "Degentrius, Magisters' Terrace",    priority = 4 },
         },
     },
     {
@@ -85,7 +85,7 @@ MR.TailoringRecipes = {
         recipes = {
             { id = 1228976, name = "Bright Linen Spellthread",    source = "trainer", sourceInfo = "Trainer (Skill 35)",                          priority = 1 },
             { id = 1228975, name = "Arcanoweave Spellthread",      source = "vendor",  sourceInfo = "Caeris Fairdawn (Silvermoon Court Renown 5)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3266, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1228974, name = "Sunfire Silk Spellthread",     source = "drop",    sourceInfo = "Fallen-King Salhadaar, The Voidspire",        priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1228974, name = "Sunfire Silk Spellthread",     source = "drop",    sourceInfo = "Fallen-King Salhadaar, The Voidspire",        priority = 4 },
         },
     },
     {
@@ -159,10 +159,10 @@ MR.TailoringRecipes = {
         recipes = {
             { id = 1229000, name = "Silvermoon Curtains",                  source = "quest",  sourceInfo = "Quest: Clothes Make the Man (Eversong)", priority = 4 },
             { id = 1229001, name = "Lush Telogrus Carpet",                source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)",       priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3266, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1229002, name = "Luxurious Silvermoon Lounge Cushion", source = "drop",   sourceInfo = "Eversong Treasures",                     priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1229002, name = "Luxurious Silvermoon Lounge Cushion", source = "drop",   sourceInfo = "Eversong Treasures",                     priority = 4 },
             { id = 1229003, name = "Plush Silvermoon Bed",                source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
             { id = 1246919, name = "Chic Silvermoon Pillow",              source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1246929, name = "Voidstrider Saddlebag",               source = "drop",   sourceInfo = "Victorious Stormarion Cache",             priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1246929, name = "Voidstrider Saddlebag",               source = "drop",   sourceInfo = "Victorious Stormarion Cache",             priority = 4, dropInfo = { rate = "~1%" } },
         },
     },
 }

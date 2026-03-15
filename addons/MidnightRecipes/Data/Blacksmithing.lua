@@ -39,8 +39,8 @@ MR.BlacksmithingRecipes = {
             { id = 1229666, name = "Spellbreaker's Girdle",     source = "specialization", sourceInfo = "Armorsmithing - Belts",       priority = 3 },
             { id = 1229667, name = "Spellbreaker's Shelter",    source = "specialization", sourceInfo = "Armorsmithing - Chestplates", priority = 3 },
             { id = 1229668, name = "Spellbreaker's March",      source = "specialization", sourceInfo = "Armorsmithing - Sabatons",    priority = 3 },
-            { id = 1230766, name = "Murder Row Fleet Feet",       source = "drop", sourceInfo = "Drop: Lithiel Cinderfury",   priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1230767, name = "Knight-Commander's Palisade", source = "drop", sourceInfo = "Drop: War Chaplain Senn", priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1230766, name = "Murder Row Fleet Feet",       source = "drop", sourceInfo = "Drop: Lithiel Cinderfury",   priority = 4 },
+            { id = 1230767, name = "Knight-Commander's Palisade", source = "drop", sourceInfo = "Drop: War Chaplain Senn", priority = 4 },
         },
     },
     {
@@ -79,8 +79,8 @@ MR.BlacksmithingRecipes = {
             { id = 1229657, name = "Spellbreaker's Warglaive",  source = "specialization", sourceInfo = "Weaponsmithing - Blades",          priority = 3 },
             { id = 1229658, name = "Spellbreaker's Blade",      source = "specialization", sourceInfo = "Weaponsmithing - Long Blades",     priority = 3 },
             { id = 1229659, name = "Farstrider's Mercy",        source = "specialization", sourceInfo = "Weaponsmithing - Short Blades",    priority = 3 },
-            { id = 1229653, name = "Blood Knight's Impetus",    source = "drop", sourceInfo = "Drop: Vaelgor (The Voidspire)",  priority = 4, dropInfo = { rate = "~3%" } },
-            { id = 1229655, name = "Bloomforged Greataxe",      source = "drop", sourceInfo = "Drop: Vorasius (The Voidspire)", priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1229653, name = "Blood Knight's Impetus",    source = "drop", sourceInfo = "Drop: Vaelgor (The Voidspire)",  priority = 4 },
+            { id = 1229655, name = "Bloomforged Greataxe",      source = "drop", sourceInfo = "Drop: Vorasius (The Voidspire)", priority = 4 },
         },
     },
     {
@@ -143,7 +143,7 @@ MR.BlacksmithingRecipes = {
             { id = 1265906, name = "Thalassian Skeleton Key",         source = "vendor",         sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
             { id = 1230758, name = "Refulgent Whetstone",             source = "specialization", sourceInfo = "Weaponsmithing - Weaponstones",        priority = 3 },
             { id = 1230765, name = "Thalassian Master Repair Hammer", source = "specialization", sourceInfo = "Armorsmithing/Weaponsmithing Capstone", priority = 3 },
-            { id = 1230768, name = "Murder Row Fishhook",             source = "drop",           sourceInfo = "Drop: Lithiel Cinderfury",             priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1230768, name = "Murder Row Fishhook",             source = "drop",           sourceInfo = "Drop: Lithiel Cinderfury",             priority = 4 },
         },
     },
     {
@@ -153,7 +153,7 @@ MR.BlacksmithingRecipes = {
             { id = 1276110, name = "Gilded Silvermoon Hanger",     source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3257, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1276111, name = "Ren'dorei Anvil",              source = "vendor", sourceInfo = "Anomander (150 Moxie)",                priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3257, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1276112, name = "Masterwork Crafting Hammer",   source = "vendor", sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1276109, name = "Ornamental Silvermoon Hanger", source = "drop",   sourceInfo = "World Treasures (Eversong Woods)",     priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1276109, name = "Ornamental Silvermoon Hanger", source = "drop",   sourceInfo = "World Treasures (Eversong Woods)",     priority = 4, dropInfo = { rate = "~3%" } },
         },
     },
 }

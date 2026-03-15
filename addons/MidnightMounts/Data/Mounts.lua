@@ -111,24 +111,24 @@ MM.MountData = {
         mounts = {
             -- Eversong Woods
             { mountID = 2762, name = "Cerulean Hawkstrider", source = "drop", sourceInfo = "Rare drop, Eversong Woods",
-              zone = "Eversong Woods", dropInfo = { mob = "Zone rares", zone = "Eversong Woods" } },
+              zone = "Eversong Woods", dropInfo = { mob = "Zone rares", zone = "Eversong Woods", rate = "~0.1%" } },
             { mountID = 2758, name = "Cobalt Dragonhawk", source = "drop", sourceInfo = "Rare drop, Eversong Woods",
-              zone = "Eversong Woods", dropInfo = { mob = "Zone rares", zone = "Eversong Woods" } },
+              zone = "Eversong Woods", dropInfo = { mob = "Zone rares", zone = "Eversong Woods", rate = "~0.1%" } },
             -- Zul'Aman
             { mountID = 2760, name = "Amani Sharptalon", source = "drop", sourceInfo = "Rare drop, Zul'Aman",
-              zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman" } },
+              zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman", rate = "~0.1%" } },
             { mountID = 2775, name = "Escaped Witherbark Pango", source = "drop", sourceInfo = "Rare drop, Zul'Aman",
-              zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman" } },
+              zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman", rate = "~0.1%" } },
             -- Harandar
             { mountID = 2615, name = "Rootstalker Grimlynx", source = "drop", sourceInfo = "Rare drop, Harandar",
-              zone = "Harandar", dropInfo = { mob = "Zone rares", zone = "Harandar" } },
+              zone = "Harandar", dropInfo = { mob = "Zone rares", zone = "Harandar", rate = "~0.1%" } },
             { mountID = 2708, name = "Vibrant Petalwing", source = "drop", sourceInfo = "Rare drop, Harandar",
-              zone = "Harandar", dropInfo = { mob = "Zone rares", zone = "Harandar" } },
+              zone = "Harandar", dropInfo = { mob = "Zone rares", zone = "Harandar", rate = "~0.1%" } },
             -- Voidstorm
             { mountID = 2751, name = "Augmented Stormray", source = "drop", sourceInfo = "Rare drop, Voidstorm",
-              zone = "Voidstorm", dropInfo = { mob = "Zone rares", zone = "Voidstorm" } },
+              zone = "Voidstorm", dropInfo = { mob = "Zone rares", zone = "Voidstorm", rate = "~0.1%" } },
             { mountID = 2827, name = "Sanguine Harrower", source = "drop", sourceInfo = "Rare drop, Voidstorm",
-              zone = "Voidstorm", dropInfo = { mob = "Zone rares", zone = "Voidstorm" } },
+              zone = "Voidstorm", dropInfo = { mob = "Zone rares", zone = "Voidstorm", rate = "~0.1%" } },
         },
     },
 

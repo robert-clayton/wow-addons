@@ -150,7 +150,7 @@ MR.InscriptionRecipes = {
             { id = 1248628, name = "Wild Hanging Scroll",            source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 }, currency2 = { 3392, 500 } } },
             { id = 1248630, name = "Harandar Signpost",              source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1248631, name = "Magnificent Towering Bookcase",  source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1248620, name = "Restful Bronze Bench",           source = "drop",   sourceInfo = "Victorious Stormarion Pinnacle Cache",     priority = 4, dropInfo = { rate = "~5%" } },
+            { id = 1248620, name = "Restful Bronze Bench",           source = "drop",   sourceInfo = "Victorious Stormarion Pinnacle Cache",     priority = 4, dropInfo = { rate = "~1%" } },
         },
     },
 }
