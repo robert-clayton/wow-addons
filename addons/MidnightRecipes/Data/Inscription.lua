@@ -139,7 +139,7 @@ MR.InscriptionRecipes = {
     {
         name = "Housing Decor",
         recipes = {
-            { id = 1248619, name = "Sturdy Ren'dorei Cask",          source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 } } },
+            { id = 1248619, name = "Sturdy Ren'dorei Cask",          source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 }, currency2 = { 3392, 500 } } },
             { id = 1248621, name = "Floating Void-Touched Tome",     source = "vendor", sourceInfo = "Anomander, Voidstorm",                   priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1248622, name = "Homely Sin'dorei Shelf",         source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",   priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
             { id = 1248623, name = "Lively Songwriter's Quill",      source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
@@ -147,7 +147,7 @@ MR.InscriptionRecipes = {
             { id = 1248625, name = "Gilded Eversong Book",           source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
             { id = 1248626, name = "Sin'dorei Phoenix Quill",        source = "vendor", sourceInfo = "Ranger Allorn, Eversong Woods",           priority = 1, cost = { currency = { 3261, 150 } } },
             { id = 1248627, name = "Homely Wall Shelves",            source = "vendor", sourceInfo = "150 Artisan Scribe's Moxie",              priority = 1, cost = { currency = { 3261, 150 } } },
-            { id = 1248628, name = "Wild Hanging Scroll",            source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 } } },
+            { id = 1248628, name = "Wild Hanging Scroll",            source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 }, currency2 = { 3392, 500 } } },
             { id = 1248630, name = "Harandar Signpost",              source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1248631, name = "Magnificent Towering Bookcase",  source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
             { id = 1248620, name = "Restful Bronze Bench",           source = "drop",   sourceInfo = "Victorious Stormarion Pinnacle Cache",     priority = 4, dropInfo = { rate = "~5%" } },

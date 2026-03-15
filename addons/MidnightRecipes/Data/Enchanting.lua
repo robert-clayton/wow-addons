@@ -30,7 +30,7 @@ MR.EnchantingRecipes = {
     {
         name = "Boot Enchants",
         recipes = {
-            { id = 1236085, name = "Enchant Boots - Farstrider's Hunt",      source = "vendor",         sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 } } },
+            { id = 1236085, name = "Enchant Boots - Farstrider's Hunt",      source = "vendor",         sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 }, currency2 = { 3392, 500 } } },
             { id = 1236057, name = "Enchant Boots - Lynx's Dexterity",       source = "specialization", sourceInfo = "Amani Augments",                    priority = 3 },
             { id = 1236072, name = "Enchant Boots - Shaladrassil's Roots",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",              priority = 4, dropInfo = { rate = "~3%" } },
         },
@@ -126,7 +126,7 @@ MR.EnchantingRecipes = {
         name = "Illusions",
         recipes = {
             { id = 1236098, name = "Illusory Adornment - Blooming Light",   source = "trainer", sourceInfo = "Trainer (Skill 25)",                 priority = 1 },
-            { id = 1236099, name = "Illusory Adornment - Nature's Embrace", source = "vendor",  sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 } } },
+            { id = 1236099, name = "Illusory Adornment - Nature's Embrace", source = "vendor",  sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 }, currency2 = { 3392, 500 } } },
             { id = 1236100, name = "Illusory Adornment - Voidtouched",      source = "drop",    sourceInfo = "Victorious Stormarion Pinnacle Cache", priority = 4, dropInfo = { rate = "~5%" } },
         },
     },
