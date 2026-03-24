@@ -303,7 +303,7 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     -- db: addon saved variables (reads db.collapsed[collKey], db.frameAlpha)
     -- refreshCb: function() called on collapse toggle
     local theme = lib.Theme
-    local collapsed = db.collapsed[opts.collKey] ~= false
+    local collapsed = db.collapsed[opts.collKey] == true
 
     local header = pool:Acquire(parent)
     header:SetHeight(opts.height)
@@ -406,7 +406,7 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     local hc = theme.colors.headerHover
     header:SetScript("OnMouseUp", function(_, button)
         if button == "LeftButton" then
-            local wasCollapsed = db.collapsed[opts.collKey] ~= false
+            local wasCollapsed = db.collapsed[opts.collKey] == true
             db.collapsed[opts.collKey] = not wasCollapsed
             refreshCb()
         end

@@ -1,0 +1,52 @@
+## Interface: 120001
+## Title: Midnight Collections
+## Notes: Tracks uncollected recipes, pets, mounts, and decorations from Midnight
+## Author: robert-clayton
+## Version: 1.0.0
+## SavedVariables: MidnightCollectionsDB
+## OptionalDeps: TomTom
+
+# Libraries
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Libs\MidnightUI-1.0\MidnightUI-1.0.xml
+
+# Core framework
+Core.lua
+Data\Locations.lua
+TabBar.lua
+MinimapButton.lua
+
+# Mounts module
+Modules\Mounts\Data\Mounts.lua
+Modules\Mounts\Init.lua
+Modules\Mounts\Scanner.lua
+Modules\Mounts\UI.lua
+
+# Pets module
+Modules\Pets\Data\Pets.lua
+Modules\Pets\Init.lua
+Modules\Pets\Scanner.lua
+Modules\Pets\UI.lua
+
+# Decorations module
+Modules\Decorations\Data\Decorations.lua
+Modules\Decorations\Init.lua
+Modules\Decorations\Scanner.lua
+Modules\Decorations\UI.lua
+
+# Recipes module
+Modules\Recipes\Data\Alchemy.lua
+Modules\Recipes\Data\Blacksmithing.lua
+Modules\Recipes\Data\Cooking.lua
+Modules\Recipes\Data\Enchanting.lua
+Modules\Recipes\Data\Engineering.lua
+Modules\Recipes\Data\Inscription.lua
+Modules\Recipes\Data\Jewelcrafting.lua
+Modules\Recipes\Data\Leatherworking.lua
+Modules\Recipes\Data\Tailoring.lua
+Modules\Recipes\Init.lua
+Modules\Recipes\Scanner.lua
+Modules\Recipes\UI.lua
