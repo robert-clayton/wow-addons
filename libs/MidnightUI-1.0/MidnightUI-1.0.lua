@@ -10,82 +10,83 @@ lib.Theme = {
     fontSize = 11,
 
     colors = {
-        bg           = { 0.02, 0.03, 0.07, 0.96 },
-        border       = { 0.15, 0.15, 0.20, 1 },
-        titlebar     = { 0.04, 0.10, 0.20, 1 },
-        titleBorder  = { 0.10, 0.28, 0.35, 1 },
-        accent       = { 0.16, 0.78, 0.75, 1 },
-        title        = { 0.85, 0.85, 0.85, 1 },
-        text         = { 0.85, 0.85, 0.85, 1 },
-        textDim      = { 0.38, 0.38, 0.38, 1 },
-        textComplete = { 0.00, 1.00, 0.59, 1 },
-        learned      = { 0.30, 0.60, 0.30, 0.60 },
-        progress     = { 0.16, 0.78, 0.75, 1 },
-        progressBg   = { 0.08, 0.08, 0.10, 1 },
-        hoverBg      = { 1, 1, 1, 0.04 },
-        headerBg     = { 0, 0, 0, 0.55 },
+        -- Midnight Gilded: deep velvet darkness with Sin'dorei gold
+        bg           = { 0.035, 0.028, 0.045, 0.96 },
+        border       = { 0.18, 0.14, 0.08, 1 },
+        titlebar     = { 0.06, 0.04, 0.03, 1 },
+        titleBorder  = { 0.50, 0.36, 0.12, 0.85 },
+        accent       = { 0.85, 0.60, 0.15, 1 },
+        title        = { 0.92, 0.87, 0.78, 1 },
+        text         = { 0.86, 0.82, 0.74, 1 },
+        textDim      = { 0.40, 0.36, 0.28, 1 },
+        textComplete = { 0.85, 0.62, 0.15, 1 },
+        learned      = { 0.35, 0.55, 0.30, 0.60 },
+        progress     = { 0.82, 0.58, 0.12, 1 },
+        progressBg   = { 0.06, 0.05, 0.03, 1 },
+        hoverBg      = { 1, 0.85, 0.5, 0.05 },
+        headerBg     = { 0.04, 0.03, 0.02, 0.60 },
         -- Header button colors
-        btnBg        = { 0.06, 0.12, 0.22, 0.85 },
-        btnBorder    = { 0.15, 0.35, 0.40, 0.9 },
-        btnCloseFg   = { 0.75, 0.28, 0.28 },
-        btnCloseHoverBg = { 0.35, 0.06, 0.06 },
-        btnCloseHoverBd = { 0.90, 0.25, 0.25 },
-        btnTealFg    = { 0.25, 0.80, 0.68 },
-        btnTealHoverBg  = { 0.06, 0.22, 0.28 },
-        btnTealHoverBd  = { 0.20, 0.80, 0.65 },
+        btnBg        = { 0.08, 0.06, 0.04, 0.85 },
+        btnBorder    = { 0.40, 0.30, 0.14, 0.9 },
+        btnCloseFg   = { 0.80, 0.28, 0.22 },
+        btnCloseHoverBg = { 0.35, 0.06, 0.04 },
+        btnCloseHoverBd = { 0.90, 0.28, 0.22 },
+        btnTealFg    = { 0.85, 0.62, 0.18 },
+        btnTealHoverBg  = { 0.20, 0.15, 0.04 },
+        btnTealHoverBd  = { 0.85, 0.60, 0.15 },
         -- Profession accent colors
         profAccent = {
             [171] = { 0.30, 0.80, 0.30 },  -- Alchemy
-            [333] = { 0.50, 0.30, 0.90 },  -- Enchanting
-            [202] = { 0.30, 0.60, 1.00 },  -- Engineering
-            [197] = { 0.90, 0.70, 0.20 },  -- Tailoring
-            [185] = { 0.80, 0.40, 0.20 },  -- Cooking
-            [164] = { 0.70, 0.50, 0.30 },  -- Blacksmithing
-            [165] = { 0.60, 0.80, 0.40 },  -- Leatherworking
-            [755] = { 0.80, 0.30, 0.60 },  -- Jewelcrafting
-            [773] = { 0.40, 0.70, 0.90 },  -- Inscription
+            [333] = { 0.55, 0.30, 0.90 },  -- Enchanting
+            [202] = { 0.35, 0.62, 1.00 },  -- Engineering
+            [197] = { 0.90, 0.70, 0.22 },  -- Tailoring
+            [185] = { 0.82, 0.42, 0.22 },  -- Cooking
+            [164] = { 0.72, 0.52, 0.30 },  -- Blacksmithing
+            [165] = { 0.60, 0.78, 0.38 },  -- Leatherworking
+            [755] = { 0.82, 0.32, 0.62 },  -- Jewelcrafting
+            [773] = { 0.42, 0.72, 0.90 },  -- Inscription
         },
         -- Header elements
-        headerHover    = { 1, 1, 1, 0.05 },
-        headerDivider  = { 1, 1, 1, 0.06 },
-        arrowColor     = { 0.45, 0.45, 0.45 },
-        countDim       = { 0.50, 0.50, 0.50 },
-        learnedAccent  = { 0.30, 0.60, 0.30, 1 },
-        learnedDot     = { 0.25, 0.55, 0.25, 0.6 },
+        headerHover    = { 1, 0.85, 0.5, 0.06 },
+        headerDivider  = { 0.85, 0.62, 0.15, 0.10 },
+        arrowColor     = { 0.55, 0.45, 0.25 },
+        countDim       = { 0.55, 0.48, 0.35 },
+        learnedAccent  = { 0.35, 0.55, 0.30, 1 },
+        learnedDot     = { 0.30, 0.50, 0.25, 0.6 },
         -- Count colors
-        countComplete  = { 0.00, 1.00, 0.59 },
-        countPartial   = { 1, 0.47, 0 },
-        countNone      = { 0.6, 0.6, 0.6 },
+        countComplete  = { 0.85, 0.62, 0.15 },
+        countPartial   = { 0.92, 0.55, 0.15 },
+        countNone      = { 0.50, 0.45, 0.36 },
         -- Scrollbar
-        scrollTrack    = { 0, 0, 0, 0.3 },
-        scrollThumb    = { 0.25, 0.65, 0.65, 0.75 },
+        scrollTrack    = { 0.04, 0.03, 0.02, 0.4 },
+        scrollThumb    = { 0.72, 0.52, 0.15, 0.65 },
         -- Options panel
-        optionsBg      = { 0.03, 0.06, 0.12, 0.98 },
-        optionsDivider = { 1, 1, 1, 0.07 },
-        optionsSliderBg = { 0, 0, 0, 0.5 },
-        -- Recipe row
-        rowHover       = { 1, 1, 1, 0.04 },
+        optionsBg      = { 0.04, 0.03, 0.02, 0.98 },
+        optionsDivider = { 0.85, 0.62, 0.15, 0.10 },
+        optionsSliderBg = { 0.02, 0.02, 0.01, 0.5 },
+        -- Row hover
+        rowHover       = { 1, 0.85, 0.5, 0.05 },
         -- Tooltip
-        ttTitle     = { 0.85, 0.85, 0.85 },
-        ttLabel     = { 0.7, 0.7, 0.7 },
-        ttValue     = { 0.8, 0.8, 0.8 },
-        ttDropMob   = { 1, 0.8, 0.5 },
-        ttDropRate  = { 1, 1, 0.5 },
-        ttBoss      = { 1, 0.5, 0.3 },
-        ttSpec      = { 0.8, 0.5, 0.9 },
-        ttHintGreen = { 0.5, 0.8, 0.5 },
-        ttHintBlue  = { 0.6, 0.7, 1.0 },
-        ttCostBad   = { 1, 0.30, 0.30 },
-        -- Chat prefix color (|cff80c0ff)
-        chat           = { 128/255, 192/255, 1.00 },
+        ttTitle     = { 0.92, 0.87, 0.78 },
+        ttLabel     = { 0.62, 0.56, 0.46 },
+        ttValue     = { 0.80, 0.76, 0.66 },
+        ttDropMob   = { 1, 0.80, 0.45 },
+        ttDropRate  = { 1, 0.90, 0.42 },
+        ttBoss      = { 1, 0.48, 0.28 },
+        ttSpec      = { 0.80, 0.50, 0.88 },
+        ttHintGreen = { 0.55, 0.78, 0.42 },
+        ttHintBlue  = { 0.60, 0.72, 0.95 },
+        ttCostBad   = { 1, 0.30, 0.25 },
+        -- Chat prefix color (warm gold)
+        chat           = { 0.85, 0.65, 0.22 },
         -- Source colors
         source = {
-            trainer        = { 0.30, 0.80, 0.30 },
-            vendor         = { 0.30, 0.60, 1.00 },
-            discovery      = { 0.90, 0.70, 0.20 },
-            specialization = { 0.80, 0.50, 0.90 },
-            drop           = { 0.90, 0.40, 0.30 },
-            quest          = { 0.90, 0.80, 0.20 },
+            trainer        = { 0.35, 0.78, 0.30 },
+            vendor         = { 0.35, 0.62, 0.98 },
+            discovery      = { 0.90, 0.68, 0.20 },
+            specialization = { 0.78, 0.50, 0.88 },
+            drop           = { 0.90, 0.38, 0.28 },
+            quest          = { 0.90, 0.78, 0.20 },
         },
     },
 
@@ -316,12 +317,13 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
         return t
     end)
     headerBg:SetAllPoints()
-    headerBg:SetColorTexture(0, 0, 0, 0.55 * (db.frameAlpha or 1))
+    local hbg = theme.colors.headerBg
+    headerBg:SetColorTexture(hbg[1], hbg[2], hbg[3], hbg[4] * (db.frameAlpha or 1))
 
-    -- 2px left accent bar
+    -- 3px left accent bar
     local accentBar = lib.GetOrCreate(header, "accent", function(p)
         local t = p:CreateTexture(nil, "ARTWORK")
-        t:SetWidth(2)
+        t:SetWidth(3)
         return t
     end)
     accentBar:SetPoint("TOPLEFT", header, "TOPLEFT", 0, 0)

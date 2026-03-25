@@ -94,11 +94,13 @@ function PanelProto:ApplyMinimizeState()
         end
         if f.scrollFrame then f.scrollFrame:Hide() end
         if f.scrollTrack then f.scrollTrack:Hide() end
+        if f.tabBar then f.tabBar:Hide() end
         if f.dragger then f.dragger:Hide() end
         f:SetHeight(24)
     else
         if f.scrollFrame then f.scrollFrame:Show() end
         if f.scrollTrack then f.scrollTrack:Show() end
+        if f.tabBar then f.tabBar:Show() end
         if f.dragger and not db.locked then f.dragger:Show() end
         f:SetHeight(db.panelHeight or self.opts.defaultHeight or 520)
         if self.opts.onRefresh then self.opts.onRefresh(self) end
@@ -123,15 +125,23 @@ function PanelProto:CreateTitleBar()
     bar:SetBackdropColor(theme.colors.titlebar[1], theme.colors.titlebar[2], theme.colors.titlebar[3], v)
     bar:SetBackdropBorderColor(theme.colors.titleBorder[1], theme.colors.titleBorder[2], theme.colors.titleBorder[3], math.max(v, 0.4))
     bar:EnableMouse(true)
-    bar:RegisterForDrag("LeftButton")
-    bar:SetScript("OnDragStart", function()
-        if not db.locked then f:StartMoving() end
+    bar:SetScript("OnMouseDown", function(_, button)
+        if button == "LeftButton" and not db.locked then f:StartMoving() end
     end)
-    bar:SetScript("OnDragStop", function()
-        f:StopMovingOrSizing()
-        local point, _, _, x, y = f:GetPoint()
-        db.position = { point = point, x = x, y = y }
+    bar:SetScript("OnMouseUp", function(_, button)
+        if button == "LeftButton" then
+            f:StopMovingOrSizing()
+            local point, _, _, x, y = f:GetPoint()
+            db.position = { point = point, x = x, y = y }
+        end
     end)
+
+    -- Gold crown bar (2px accent at the very top edge)
+    local crown = bar:CreateTexture(nil, "OVERLAY")
+    crown:SetHeight(2)
+    crown:SetPoint("TOPLEFT", bar, "TOPLEFT", 1, -1)
+    crown:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -1, -1)
+    crown:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2], theme.colors.accent[3], 0.70)
 
     -- Icon
     if self.opts.icon then
@@ -154,10 +164,10 @@ function PanelProto:CreateTitleBar()
         title:SetTextColor(unpack(theme.colors.title))
     end
 
-    -- Progress counter
+    -- Progress counter (warm dim gold)
     local progressText = bar:CreateFontString(nil, "OVERLAY")
     progressText:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
-    progressText:SetTextColor(0.45, 0.55, 0.55)
+    progressText:SetTextColor(0.60, 0.50, 0.30)
     self.titleProgressText = progressText
 
     -- Close button
@@ -413,7 +423,14 @@ function PanelProto:BuildConfigFrame()
     bar:SetScript("OnDragStart", function() f:StartMoving() end)
     bar:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
 
-    -- Accent bar
+    -- Gold crown bar (matching main panel)
+    local crownCfg = bar:CreateTexture(nil, "OVERLAY")
+    crownCfg:SetHeight(2)
+    crownCfg:SetPoint("TOPLEFT", bar, "TOPLEFT", 1, -1)
+    crownCfg:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -1, -1)
+    crownCfg:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2], theme.colors.accent[3], 0.70)
+
+    -- Left accent bar
     local acc = bar:CreateTexture(nil, "ARTWORK")
     acc:SetPoint("TOPLEFT"); acc:SetPoint("BOTTOMLEFT")
     acc:SetWidth(3)

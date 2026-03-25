@@ -21,19 +21,20 @@ function TabBar:Create(panel, modules, onSwitch)
     container:SetPoint("TOPLEFT", panel.frame.titleBar, "BOTTOMLEFT", 0, -1)
     container:SetPoint("TOPRIGHT", panel.frame.titleBar, "BOTTOMRIGHT", 0, -1)
     self.container = container
+    panel.frame.tabBar = container
 
     -- Background
     local bg = container:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints()
     bg:SetColorTexture(theme.colors.bg[1], theme.colors.bg[2], theme.colors.bg[3], 0.85)
 
-    -- Bottom border
+    -- Bottom border (warm gold divider)
     local border = container:CreateTexture(nil, "ARTWORK")
     border:SetHeight(1)
     border:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT", 0, 0)
     border:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", 0, 0)
-    border:SetColorTexture(theme.colors.titleBorder[1], theme.colors.titleBorder[2],
-                           theme.colors.titleBorder[3], 0.6)
+    border:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2],
+                           theme.colors.accent[3], 0.15)
 
     -- Re-anchor scroll frame below tab bar
     if panel.frame.scrollFrame then
@@ -56,6 +57,14 @@ function TabBar:Create(panel, modules, onSwitch)
         local tab = CreateFrame("Button", nil, container)
         tab:SetSize(TAB_WIDTH, TAB_HEIGHT)
         tab:SetPoint("LEFT", container, "LEFT", xOff, 0)
+
+        -- Active background (warm glow when selected)
+        local activeBg = tab:CreateTexture(nil, "BACKGROUND")
+        activeBg:SetAllPoints()
+        activeBg:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2],
+                                 theme.colors.accent[3], 0.08)
+        activeBg:Hide()
+        tab._activeBg = activeBg
 
         -- Icon (12x12)
         local icon = tab:CreateTexture(nil, "ARTWORK")
@@ -82,11 +91,14 @@ function TabBar:Create(panel, modules, onSwitch)
         tab._activeBar = activeBar
 
         -- Hover
-        local hoverBg = tab:CreateTexture(nil, "BACKGROUND")
+        local hoverBg = tab:CreateTexture(nil, "BACKGROUND", nil, 1)
         hoverBg:SetAllPoints()
         hoverBg:SetColorTexture(1, 1, 1, 0)
+        tab._hoverBg = hoverBg
         tab:SetScript("OnEnter", function()
-            hoverBg:SetColorTexture(1, 1, 1, 0.04)
+            if not tab._isActive then
+                hoverBg:SetColorTexture(1, 0.85, 0.5, 0.04)
+            end
         end)
         tab:SetScript("OnLeave", function()
             hoverBg:SetColorTexture(1, 1, 1, 0)
@@ -102,19 +114,40 @@ function TabBar:Create(panel, modules, onSwitch)
     end
 end
 
+function TabBar:Reflow()
+    local xOff = TAB_PAD
+    for _, mod in ipairs(MC.modules) do
+        local tab = self.tabs[mod.key]
+        if tab then
+            if MC.IsModuleEnabled(mod.key) then
+                tab:ClearAllPoints()
+                tab:SetPoint("LEFT", self.container, "LEFT", xOff, 0)
+                tab:Show()
+                xOff = xOff + TAB_WIDTH + TAB_PAD
+            else
+                tab:Hide()
+            end
+        end
+    end
+end
+
 function TabBar:SetActive(key)
     for k, tab in pairs(self.tabs) do
         if k == key then
+            tab._isActive = true
             tab._activeBar:Show()
+            tab._activeBg:Show()
             tab._label:SetTextColor(theme.colors.accent[1], theme.colors.accent[2],
                                     theme.colors.accent[3])
             tab._icon:SetVertexColor(theme.colors.accent[1], theme.colors.accent[2],
                                      theme.colors.accent[3])
         else
+            tab._isActive = false
             tab._activeBar:Hide()
+            tab._activeBg:Hide()
             tab._label:SetTextColor(theme.colors.textDim[1], theme.colors.textDim[2],
                                     theme.colors.textDim[3])
-            tab._icon:SetVertexColor(0.5, 0.5, 0.5)
+            tab._icon:SetVertexColor(0.45, 0.40, 0.30)
         end
     end
 end

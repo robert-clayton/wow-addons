@@ -50,17 +50,46 @@ end
 -- Core defaults (panel-level settings)
 --------------------------------------------------------------------------
 local coreDefaults = {
-    minimap     = { minimapPos = 225, hide = false },
-    position    = { point = "CENTER", x = 0, y = 0 },
-    locked      = false,
-    panelShown  = false,
-    minimized   = false,
-    frameAlpha  = 1.0,
-    frameScale  = 1.0,
-    panelWidth  = 380,
-    panelHeight = 560,
-    activeTab   = "mounts",
+    minimap          = { minimapPos = 225, hide = false },
+    position         = { point = "CENTER", x = 0, y = 0 },
+    locked           = false,
+    panelShown       = false,
+    minimized        = false,
+    frameAlpha       = 1.0,
+    frameScale       = 1.0,
+    panelWidth       = 380,
+    panelHeight      = 560,
+    activeTab        = "mounts",
+    disabledModules  = {},
 }
+
+--------------------------------------------------------------------------
+-- Module enabled check
+--------------------------------------------------------------------------
+function MC.IsModuleEnabled(key)
+    return not MC.db.disabledModules[key]
+end
+
+function MC.FirstEnabledModule()
+    for _, mod in ipairs(MC.modules) do
+        if MC.IsModuleEnabled(mod.key) then return mod.key end
+    end
+end
+
+function MC.SetModuleEnabled(key, enabled)
+    MC.db.disabledModules[key] = (not enabled) or nil
+    if MC.TabBar then MC.TabBar:Reflow() end
+    if enabled then
+        local mod = MC.modulesByKey[key]
+        if mod and mod.Scanner then mod.Scanner:Scan() end
+    end
+    -- If the active tab was just disabled, switch to the first enabled one
+    if not enabled and MC.activeModule == key then
+        local first = MC.FirstEnabledModule()
+        if first then MC.SwitchTab(first) end
+    end
+    MC.BuildConfig()
+end
 
 --------------------------------------------------------------------------
 -- Shared Wowhead URL popup
@@ -307,10 +336,13 @@ function MC.DoItemAction(item, skillLine)
             print(PREFIX .. " Cannot open achievements during combat.")
             return
         end
-        local ok = pcall(function()
-            OpenAchievementFrame(item.achievementID)
-        end)
-        if not ok then
+        if not AchievementFrame then
+            AchievementFrame_LoadUI()
+        end
+        if AchievementFrame_SelectAchievement then
+            ShowUIPanel(AchievementFrame)
+            AchievementFrame_SelectAchievement(item.achievementID)
+        else
             print(PREFIX .. " Could not open achievement frame.")
         end
     elseif skillLine or item.skillLine then
@@ -403,17 +435,17 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- Init minimap button
         if MC.MinimapButton then MC.MinimapButton:Init() end
 
-        -- Activate saved tab (or first module)
+        -- Activate saved tab (or first enabled module)
         local tabKey = MC.db.activeTab
-        if not MC.modulesByKey[tabKey] then
-            tabKey = MC.modules[1] and MC.modules[1].key
+        if not MC.modulesByKey[tabKey] or not MC.IsModuleEnabled(tabKey) then
+            tabKey = MC.FirstEnabledModule()
         end
         if tabKey then MC.SwitchTab(tabKey) end
 
     else
-        -- Dispatch to modules
+        -- Dispatch to modules (skip disabled)
         for _, mod in ipairs(MC.modules) do
-            if mod.opts.onEvent then
+            if MC.IsModuleEnabled(mod.key) and mod.opts.onEvent then
                 mod.opts.onEvent(mod, event, ...)
             end
         end
@@ -456,7 +488,7 @@ end
 --------------------------------------------------------------------------
 function MC.SwitchTab(key)
     local mod = MC.modulesByKey[key]
-    if not mod then return end
+    if not mod or not MC.IsModuleEnabled(key) then return end
 
     MC.activeModule = key
     MC.db.activeTab = key
@@ -502,7 +534,17 @@ function MC.BuildConfig()
 
     local defs = {}
 
+    -- Module toggles
+    defs[#defs + 1] = { type = "section", label = "MODULES" }
+    for _, mod in ipairs(MC.modules) do
+        local key = mod.key
+        defs[#defs + 1] = { type = "checkbox", label = mod.label,
+            get = function() return MC.IsModuleEnabled(key) end,
+            set = function(v) MC.SetModuleEnabled(key, v) end }
+    end
+
     -- Global settings
+    defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "DISPLAY" }
     defs[#defs + 1] = { type = "checkbox", label = "Lock Frame",
         get = function() return MC.db.locked end,
@@ -518,9 +560,9 @@ function MC.BuildConfig()
             if MC.MinimapButton and MC.MinimapButton.Update then MC.MinimapButton:Update() end
         end }
 
-    -- Per-module settings
+    -- Per-module settings (only enabled modules)
     for _, mod in ipairs(MC.modules) do
-        if mod.UI and mod.UI.GetConfigDefs then
+        if MC.IsModuleEnabled(mod.key) and mod.UI and mod.UI.GetConfigDefs then
             defs[#defs + 1] = { type = "divider" }
             defs[#defs + 1] = { type = "section", label = strupper(mod.label) }
             for _, def in ipairs(mod.UI:GetConfigDefs()) do
