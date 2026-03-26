@@ -372,6 +372,9 @@ function PanelProto:Show()
     self.frame:Show()
     self.db.panelShown = true
     if self.opts.onRefresh then self.opts.onRefresh(self) end
+    if self.db.minimized then
+        self:ApplyMinimizeState()
+    end
 end
 
 function PanelProto:Hide()
@@ -502,6 +505,8 @@ function PanelProto:RefreshScrollContent(height)
         local f = self.frame
         if f.scrollFrame then f.scrollFrame:Hide() end
         if f.scrollTrack then f.scrollTrack:Hide() end
+        if f.tabBar then f.tabBar:Hide() end
+        if f.dragger then f.dragger:Hide() end
         f:SetHeight(24)
         if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
     end
