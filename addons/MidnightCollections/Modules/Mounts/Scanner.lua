@@ -23,8 +23,6 @@ function Scanner:Scan()
         for _, mount in ipairs(group.mounts) do
             -- PvP faction filtering: skip mounts not for this player's faction
             if not (mount.faction and mount.faction ~= playerFaction) then
-                result.total = result.total + 1
-
                 local isCollected = false
                 local icon = nil
                 local mountName = mount.name
@@ -54,14 +52,21 @@ function Scanner:Scan()
                     collected     = isCollected,
                 }
 
-                if isCollected then
-                    result.collectedCount = result.collectedCount + 1
-                    result.collected[#result.collected + 1] = entry
+                -- Skip unavailable items the player doesn't already own —
+                -- they can't be earned anymore, no point cluttering the list.
+                if mount.unavailable and not isCollected then
+                    -- skip
                 else
-                    result.uncollectedCount = result.uncollectedCount + 1
-                    local src = mount.source
-                    if not result.bySource[src] then result.bySource[src] = {} end
-                    result.bySource[src][#result.bySource[src] + 1] = entry
+                    result.total = result.total + 1
+                    if isCollected then
+                        result.collectedCount = result.collectedCount + 1
+                        result.collected[#result.collected + 1] = entry
+                    else
+                        result.uncollectedCount = result.uncollectedCount + 1
+                        local src = mount.source
+                        if not result.bySource[src] then result.bySource[src] = {} end
+                        result.bySource[src][#result.bySource[src] + 1] = entry
+                    end
                 end
             end
         end

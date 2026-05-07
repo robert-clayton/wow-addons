@@ -388,6 +388,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         tt:AddLine("Click to open profession", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     end
     tt:AddLine("Shift-click to copy Wowhead URL", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
+    tt:AddLine("Ctrl-click to print entry info", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
 
     tt:Show()
 end
@@ -412,6 +413,10 @@ function MC.OpenItemWowhead(item)
         url = "https://www.wowhead.com/item=" .. tonumber(item.itemID)
     elseif item.id then
         url = "https://www.wowhead.com/spell=" .. tonumber(item.id)
+    elseif item.npcID then
+        url = "https://www.wowhead.com/npc=" .. tonumber(item.npcID)
+    elseif item.achievementID then
+        url = "https://www.wowhead.com/achievement=" .. tonumber(item.achievementID)
     end
     if url then
         StaticPopup_Show("MIDNIGHTCOLLECTIONS_WOWHEAD", nil, nil, url)
@@ -501,9 +506,60 @@ end
 -- Row click handler. Shift-click for Wowhead, plain click sets a waypoint
 -- (or opens the achievement / profession if there's no waypoint).
 --------------------------------------------------------------------------
+-- Print a verbose dump of an entry's IDs, source, cost, drop, etc. to chat.
+-- Used by the ctrl-click row handler so the player can copy/paste a row's
+-- raw data without dealing with /run's 255-character cap.
+function MC.PrintItemInfo(item)
+    print(format("%s --- %s ---", PREFIX, item.name or "?"))
+    if item.mountID   then print(format("  mountID: %d   /way wowhead.com/mount/%d",   item.mountID, item.mountID)) end
+    if item.speciesID then print(format("  speciesID: %d  wowhead.com/battle-pet/%d",  item.speciesID, item.speciesID)) end
+    if item.decorID   then print(format("  decorID: %d   wowhead.com/decor=%d",        item.decorID, item.decorID)) end
+    if item.itemID    then print(format("  itemID: %d    wowhead.com/item=%d",         item.itemID, item.itemID)) end
+    if item.id        then print(format("  spellID: %d   wowhead.com/spell=%d",        item.id, item.id)) end
+    if item.npcID     then print(format("  npcID: %d     wowhead.com/npc=%d",          item.npcID, item.npcID)) end
+    if item.criteriaIndex then print("  criteriaIndex: " .. tostring(item.criteriaIndex)) end
+    if item.source     then print("  source: " .. tostring(item.source)) end
+    if item.sourceInfo then print("  info: " .. tostring(item.sourceInfo)) end
+    if item.zone       then print("  zone: " .. tostring(item.zone)) end
+    if item.waypoint then
+        local wp = item.waypoint
+        if type(wp[1]) == "table" then
+            print(format("  waypoint: %d locations (first map=%s, %.2f, %.2f)",
+                #wp, tostring(wp[1][1]), wp[1][2] or 0, wp[1][3] or 0))
+        else
+            print(format("  waypoint: map=%s, %.2f, %.2f", tostring(wp[1]), wp[2] or 0, wp[3] or 0))
+        end
+    else
+        print("  waypoint: none")
+    end
+    if item.renown then
+        local r = item.renown
+        print(format("  renown: faction=%s level=%s standing=%s",
+            tostring(r.factionID), tostring(r.level), tostring(r.standing)))
+    end
+    if item.cost then
+        if item.cost.gold then print("  gold: " .. tostring(item.cost.gold)) end
+        for _, k in ipairs({"currency", "currency2"}) do
+            local c = item.cost[k]
+            if c then print(format("  %s: id=%d amount=%d", k, c[1], c[2])) end
+        end
+    end
+    if item.dropInfo then
+        local d = item.dropInfo
+        print(format("  drop: mob=%s zone=%s rate=%s boss=%s",
+            tostring(d.mob), tostring(d.zone), tostring(d.rate), tostring(d.boss)))
+    end
+    if item.achievementID then print("  achievementID: " .. tostring(item.achievementID)) end
+    if item.collected ~= nil then print("  collected: " .. tostring(item.collected)) end
+end
+
 function MC.DoItemAction(item, skillLine)
     if IsShiftKeyDown() then
         MC.OpenItemWowhead(item)
+        return
+    end
+    if IsControlKeyDown() then
+        MC.PrintItemInfo(item)
         return
     end
     local wp = MC.GetSmartWaypoint(item)

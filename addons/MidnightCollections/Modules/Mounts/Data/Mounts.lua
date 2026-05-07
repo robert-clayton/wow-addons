@@ -280,9 +280,10 @@ MC.MountData = {
     {
         source = "prepatch",
         mounts = {
-            { mountID = 2608, name = "Light-Forged Mechsuit", source = "prepatch", sourceInfo = "Two Minutes to Midnight achievement",
-              achievementID = 42300 },
-            { mountID = 2220, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)" },
+            { mountID = 2608, name = "Light-Forged Mechsuit", source = "prepatch", sourceInfo = "Two Minutes to Midnight achievement (Twilight Ascension pre-patch event, no longer earnable)",
+              achievementID = 42300, unavailable = true },
+            { mountID = 2220, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)",
+              unavailable = true },
         },
     },
 }

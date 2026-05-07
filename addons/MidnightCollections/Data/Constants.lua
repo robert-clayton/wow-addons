@@ -83,6 +83,7 @@ MC.MAP = {
     DaggerspinePoint = 2594,
     -- Sub-zone hubs with their own mapIDs (portal rooms live here).
     HarandarDen      = 2576,
+    SlayersRise      = 2444,  -- Voidstorm sub-map
 }
 
 -- MC.PORTALS is defined at the bottom of Data/Locations.lua (it needs MC.LOC).

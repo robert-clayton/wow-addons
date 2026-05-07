@@ -45,6 +45,12 @@ Modules\Toys\Init.lua
 Modules\Toys\Scanner.lua
 Modules\Toys\UI.lua
 
+# Rares module
+Modules\Rares\Data\Rares.lua
+Modules\Rares\Init.lua
+Modules\Rares\Scanner.lua
+Modules\Rares\UI.lua
+
 # Recipes module
 Modules\Recipes\Data\Alchemy.lua
 Modules\Recipes\Data\Blacksmithing.lua

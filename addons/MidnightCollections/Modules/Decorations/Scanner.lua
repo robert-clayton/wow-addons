@@ -72,8 +72,6 @@ function Scanner:Scan()
     for _, group in ipairs(MC.DecorationData) do
         if not (hideTradingPost and group.source == "tradingpost") then
             for _, deco in ipairs(group.decorations) do
-                result.total = result.total + 1
-
                 local isCollected, catalogInfo = self:CheckCollected(deco.decorID, deco.itemID)
                 local icon = self:GetIcon(deco.decorID, deco.itemID)
                 local decoName = self:GetName(deco.decorID, deco.itemID, deco.name)
@@ -104,14 +102,19 @@ function Scanner:Scan()
                     collected     = isCollected,
                 }
 
-                if isCollected then
-                    result.collectedCount = result.collectedCount + 1
-                    result.collected[#result.collected + 1] = entry
+                if deco.unavailable and not isCollected then
+                    -- skip discontinued decor the player doesn't own
                 else
-                    result.uncollectedCount = result.uncollectedCount + 1
-                    local src = deco.source
-                    if not result.bySource[src] then result.bySource[src] = {} end
-                    result.bySource[src][#result.bySource[src] + 1] = entry
+                    result.total = result.total + 1
+                    if isCollected then
+                        result.collectedCount = result.collectedCount + 1
+                        result.collected[#result.collected + 1] = entry
+                    else
+                        result.uncollectedCount = result.uncollectedCount + 1
+                        local src = deco.source
+                        if not result.bySource[src] then result.bySource[src] = {} end
+                        result.bySource[src][#result.bySource[src] + 1] = entry
+                    end
                 end
             end
         end
