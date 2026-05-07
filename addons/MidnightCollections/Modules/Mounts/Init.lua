@@ -10,9 +10,10 @@ local mod = MC.RegisterModule("mounts", {
         showCollected = false,
         collapsed     = {},
     },
-    events = { "NEW_MOUNT_ADDED" },
+    events = { "NEW_MOUNT_ADDED", "COMPANION_LEARNED", "PLAYER_ENTERING_WORLD" },
     onEvent = function(m, event)
-        if event == "NEW_MOUNT_ADDED" then
+        if event == "NEW_MOUNT_ADDED" or event == "COMPANION_LEARNED"
+            or event == "PLAYER_ENTERING_WORLD" then
             MC.ThrottledScan(m)
         end
     end,

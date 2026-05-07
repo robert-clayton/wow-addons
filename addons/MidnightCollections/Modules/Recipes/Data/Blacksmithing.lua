@@ -1,13 +1,6 @@
 local _, MC = ...
 
--- NPC waypoint data: { mapID, x, y, "NPC Name" }
--- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
-local NPC = {
-    Mirvedon       = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Eriden         = { 2393, 0.436, 0.514, "Eriden, Silvermoon City" },
-    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
-    Anomander      = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
-}
+local LOC = MC.LOC
 
 MC.BlacksmithingRecipes = {
     {
@@ -46,15 +39,15 @@ MC.BlacksmithingRecipes = {
     {
         name = "PvP Plate Armor",
         recipes = {
-            { id = 1229634, name = "Thalassian Competitor's Bulwark",           source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229638, name = "Thalassian Competitor's Plate Armguards",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229639, name = "Thalassian Competitor's Plate Waistguard",  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229640, name = "Thalassian Competitor's Plate Pauldrons",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229641, name = "Thalassian Competitor's Plate Helm",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229642, name = "Thalassian Competitor's Plate Gauntlets",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229643, name = "Thalassian Competitor's Plate Sabatons",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229644, name = "Thalassian Competitor's Plate Greaves",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229645, name = "Thalassian Competitor's Plate Breastplate", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229634, name = "Thalassian Competitor's Bulwark",           source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229638, name = "Thalassian Competitor's Plate Armguards",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229639, name = "Thalassian Competitor's Plate Waistguard",  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229640, name = "Thalassian Competitor's Plate Pauldrons",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229641, name = "Thalassian Competitor's Plate Helm",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229642, name = "Thalassian Competitor's Plate Gauntlets",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229643, name = "Thalassian Competitor's Plate Sabatons",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229644, name = "Thalassian Competitor's Plate Greaves",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229645, name = "Thalassian Competitor's Plate Breastplate", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -67,13 +60,13 @@ MC.BlacksmithingRecipes = {
             { id = 1229618, name = "Dawnforged Long Blade",  source = "trainer", sourceInfo = "Trainer (Skill 25)", priority = 1 },
             { id = 1229616, name = "Dawnforged War Mace",    source = "trainer", sourceInfo = "Trainer (Skill 35)", priority = 1 },
             { id = 1229617, name = "Primalforged Knuckles",  source = "trainer", sourceInfo = "Trainer (Skill 40)", priority = 1 },
-            { id = 1229647, name = "Magister's Valediction",  source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229648, name = "Blood Knight's Warblade", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229649, name = "Bloomforged Claw",        source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229650, name = "Magister's Ritual Knife", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229651, name = "Magister's Mana Sword",   source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229652, name = "Blood Knight's Mercy",    source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1229654, name = "Magister's Cleaver",      source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
+            { id = 1229647, name = "Magister's Valediction",  source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229648, name = "Blood Knight's Warblade", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229649, name = "Bloomforged Claw",        source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229650, name = "Magister's Ritual Knife", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229651, name = "Magister's Mana Sword",   source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229652, name = "Blood Knight's Mercy",    source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1229654, name = "Magister's Cleaver",      source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
             { id = 1229646, name = "Farstrider's Chopper",      source = "specialization", sourceInfo = "Weaponsmithing - Axes & Polearms", priority = 3 },
             { id = 1229656, name = "Spellbreaker's Ultimatum",  source = "specialization", sourceInfo = "Weaponsmithing - Maces",           priority = 3 },
             { id = 1229657, name = "Spellbreaker's Warglaive",  source = "specialization", sourceInfo = "Weaponsmithing - Blades",          priority = 3 },
@@ -86,13 +79,13 @@ MC.BlacksmithingRecipes = {
     {
         name = "PvP Weapons",
         recipes = {
-            { id = 1229630, name = "Thalassian Competitor's Sword",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229631, name = "Thalassian Competitor's Greatsword", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229632, name = "Thalassian Competitor's Skewer",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229633, name = "Thalassian Competitor's Splitter",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229635, name = "Thalassian Competitor's Maxim",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229636, name = "Thalassian Competitor's Knife",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229637, name = "Thalassian Competitor's Pickaxe",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229630, name = "Thalassian Competitor's Sword",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229631, name = "Thalassian Competitor's Greatsword", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229632, name = "Thalassian Competitor's Skewer",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229633, name = "Thalassian Competitor's Splitter",   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229635, name = "Thalassian Competitor's Maxim",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229636, name = "Thalassian Competitor's Knife",      source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229637, name = "Thalassian Competitor's Pickaxe",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -124,14 +117,14 @@ MC.BlacksmithingRecipes = {
     {
         name = "Profession Tools - Sunforged",
         recipes = {
-            { id = 1230769, name = "Sunforged Blacksmith's Hammer",     source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1262899, name = "Sunforged Leatherworker's Knife",   source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1262905, name = "Sunforged Skinning Knife",          source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1262919, name = "Sunforged Pickaxe",                 source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1264644, name = "Sunforged Blacksmith's Toolbox",    source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1264645, name = "Sunforged Leatherworker's Toolset", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1264646, name = "Sunforged Needle Set",              source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
-            { id = 1264651, name = "Sunforged Sickle",                  source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
+            { id = 1230769, name = "Sunforged Blacksmith's Hammer",     source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1262899, name = "Sunforged Leatherworker's Knife",   source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1262905, name = "Sunforged Skinning Knife",          source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1262919, name = "Sunforged Pickaxe",                 source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1264644, name = "Sunforged Blacksmith's Toolbox",    source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1264645, name = "Sunforged Leatherworker's Toolset", source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1264646, name = "Sunforged Needle Set",              source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
+            { id = 1264651, name = "Sunforged Sickle",                  source = "vendor", sourceInfo = "Eriden (150 Moxie)", priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
         },
     },
     {
@@ -140,7 +133,7 @@ MC.BlacksmithingRecipes = {
             { id = 1230764, name = "Refulgent Repair Hammer",         source = "trainer",        sourceInfo = "Trainer (Skill 5)",                    priority = 1 },
             { id = 1230759, name = "Refulgent Weightstone",           source = "trainer",        sourceInfo = "Trainer (Skill 40)",                   priority = 1 },
             { id = 1230760, name = "Refulgent Razorstone",            source = "trainer",        sourceInfo = "Trainer (Skill 45)",                   priority = 1 },
-            { id = 1265906, name = "Thalassian Skeleton Key",         source = "vendor",         sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
+            { id = 1265906, name = "Thalassian Skeleton Key",         source = "vendor",         sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
             { id = 1230758, name = "Refulgent Whetstone",             source = "specialization", sourceInfo = "Weaponsmithing - Weaponstones",        priority = 3 },
             { id = 1230765, name = "Thalassian Master Repair Hammer", source = "specialization", sourceInfo = "Armorsmithing/Weaponsmithing Capstone", priority = 3 },
             { id = 1230768, name = "Murder Row Fishhook",             source = "drop",           sourceInfo = "Drop: Lithiel Cinderfury",             priority = 4 },
@@ -149,10 +142,10 @@ MC.BlacksmithingRecipes = {
     {
         name = "Housing Decor",
         recipes = {
-            { id = 1276108, name = "Gilded Silvermoon Anvil",      source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3257, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1276110, name = "Gilded Silvermoon Hanger",     source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3257, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1276111, name = "Ren'dorei Anvil",              source = "vendor", sourceInfo = "Anomander (150 Moxie)",                priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3257, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1276112, name = "Masterwork Crafting Hammer",   source = "vendor", sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = NPC.Eriden, cost = { currency = { 3257, 150 } } },
+            { id = 1276108, name = "Gilded Silvermoon Anvil",      source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1276110, name = "Gilded Silvermoon Hanger",     source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1276111, name = "Ren'dorei Anvil",              source = "vendor", sourceInfo = "Anomander (150 Moxie)",                priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1276112, name = "Masterwork Crafting Hammer",   source = "vendor", sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
             { id = 1276109, name = "Ornamental Silvermoon Hanger", source = "drop",   sourceInfo = "World Treasures (Eversong Woods)",     priority = 4, dropInfo = { rate = "~3%" } },
         },
     },

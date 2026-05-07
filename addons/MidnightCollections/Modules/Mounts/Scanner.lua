@@ -9,38 +9,32 @@ Scanner.results = {}
 function Scanner:Scan()
     if not MC.MountData then return end
 
-    wipe(self.results)
-
     local result = {
-        total          = 0,
-        collectedCount = 0,
+        total            = 0,
+        collectedCount   = 0,
         uncollectedCount = 0,
-        bySource       = {},
-        collected      = {},
+        bySource         = {},
+        collected        = {},
     }
 
     local playerFaction = UnitFactionGroup("player")
+    local hasJournal = C_MountJournal and C_MountJournal.GetMountInfoByID
     for _, group in ipairs(MC.MountData) do
         for _, mount in ipairs(group.mounts) do
             -- PvP faction filtering: skip mounts not for this player's faction
-            if mount.faction and mount.faction ~= playerFaction then
-                -- skip entirely
-            else
+            if not (mount.faction and mount.faction ~= playerFaction) then
                 result.total = result.total + 1
 
                 local isCollected = false
                 local icon = nil
                 local mountName = mount.name
 
-                -- Collection check via C_MountJournal
-                if mount.mountID and mount.mountID > 0 and C_MountJournal and C_MountJournal.GetMountInfoByID then
-                    local ok, name, spellID, mountIcon, _, _, _, _, _, _, _, collected
-                        = pcall(C_MountJournal.GetMountInfoByID, mount.mountID)
-                    if ok then
-                        if collected ~= nil then isCollected = collected end
-                        if mountIcon and mountIcon ~= 0 then icon = mountIcon end
-                        if name and name ~= "" then mountName = name end
-                    end
+                if hasJournal and mount.mountID and mount.mountID > 0 then
+                    local name, _, mountIcon, _, _, _, _, _, _, _, collected
+                        = C_MountJournal.GetMountInfoByID(mount.mountID)
+                    if collected ~= nil then isCollected = collected end
+                    if mountIcon and mountIcon ~= 0 then icon = mountIcon end
+                    if name and name ~= "" then mountName = name end
                 end
 
                 local entry = {
@@ -48,7 +42,8 @@ function Scanner:Scan()
                     name          = mountName,
                     source        = mount.source,
                     sourceInfo    = mount.sourceInfo,
-                    waypoint      = mount.waypoint,
+                    waypoint         = mount.waypoint,
+                    overworldWaypoint = mount.overworldWaypoint,
                     cost          = mount.cost,
                     dropInfo      = mount.dropInfo,
                     achievementID = mount.achievementID,

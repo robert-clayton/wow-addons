@@ -1,16 +1,6 @@
 local _, MC = ...
 
--- NPC waypoint data: { mapID, x, y, "NPC Name" }
--- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
-local NPC = {
-    Mirvedon       = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Lyrendal       = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
-    ConstructVanore = { 2393, 0.557, 0.657, "Construct V'anore, Silvermoon City" },
-    Magovu         = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
-    Naynar         = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander      = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
-    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
-}
+local LOC = MC.LOC
 
 MC.InscriptionRecipes = {
     {
@@ -31,9 +21,9 @@ MC.InscriptionRecipes = {
             { id = 1230023, name = "Sin'dorei Rolling Pin",             source = "specialization", sourceInfo = "Blueprints",                            priority = 3 },
             { id = 1230024, name = "Sin'dorei Alchemist's Mixing Rod",  source = "specialization", sourceInfo = "Blueprints",                            priority = 3 },
             { id = 1230025, name = "Sin'dorei Quill",                   source = "specialization", sourceInfo = "Blueprints (Market Research)",           priority = 3 },
-            { id = 1264550, name = "Gilded Alchemist's Mixing Rod",     source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1264551, name = "Gilded Sin'dorei Rolling Pin",      source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1264552, name = "Gilded Sin'dorei Quill",            source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
+            { id = 1264550, name = "Gilded Alchemist's Mixing Rod",     source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1264551, name = "Gilded Sin'dorei Rolling Pin",      source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1264552, name = "Gilded Sin'dorei Quill",            source = "vendor",         sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
         },
     },
     {
@@ -66,13 +56,13 @@ MC.InscriptionRecipes = {
     {
         name = "Profession Missives",
         recipes = {
-            { id = 1230043, name = "Thalassian Missive of Deftness",        source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230044, name = "Thalassian Missive of Perception",      source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230045, name = "Thalassian Missive of Finesse",         source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230046, name = "Thalassian Missive of Crafting Speed",  source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230047, name = "Thalassian Missive of Multicraft",      source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230048, name = "Thalassian Missive of Resourcefulness", source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1230049, name = "Thalassian Missive of Ingenuity",       source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
+            { id = 1230043, name = "Thalassian Missive of Deftness",        source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230044, name = "Thalassian Missive of Perception",      source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230045, name = "Thalassian Missive of Finesse",         source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230046, name = "Thalassian Missive of Crafting Speed",  source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230047, name = "Thalassian Missive of Multicraft",      source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230048, name = "Thalassian Missive of Resourcefulness", source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1230049, name = "Thalassian Missive of Ingenuity",       source = "vendor", sourceInfo = "Lyrendal (Skill 50)",                    priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
         },
     },
     {
@@ -84,10 +74,10 @@ MC.InscriptionRecipes = {
     {
         name = "Contracts",
         recipes = {
-            { id = 1230052, name = "Contract: The Amani Tribe",      source = "vendor", sourceInfo = "Magovu (Amani Renown 5)",        priority = 1, waypoint = NPC.Magovu, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1230054, name = "Contract: The Singularity",      source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)", priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1241690, name = "Contract: The Silvermoon Court",  source = "vendor", sourceInfo = "Caeris Fairdawn (Court Renown 5)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1241985, name = "Contract: The Hara'ti",          source = "vendor", sourceInfo = "Naynar (Hara'ti Renown 5)",       priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1230052, name = "Contract: The Amani Tribe",      source = "vendor", sourceInfo = "Magovu (Amani Renown 5)",        priority = 1, waypoint = LOC.Magovu, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1230054, name = "Contract: The Singularity",      source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)", priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1241690, name = "Contract: The Silvermoon Court",  source = "vendor", sourceInfo = "Caeris Fairdawn (Court Renown 5)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1241985, name = "Contract: The Hara'ti",          source = "vendor", sourceInfo = "Naynar (Hara'ti Renown 5)",       priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
         },
     },
     {
@@ -106,13 +96,13 @@ MC.InscriptionRecipes = {
     {
         name = "PvP Gear",
         recipes = {
-            { id = 1230064, name = "Thalassian Competitor's Lamp",                    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1230065, name = "Thalassian Competitor's Staff",                   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1230066, name = "Thalassian Competitor's Pillar",                  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1230067, name = "Thalassian Competitor's Emblem",                  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1230068, name = "Thalassian Competitor's Insignia of Alacrity",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1230069, name = "Thalassian Competitor's Medallion",               source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1260760, name = "Thalassian Competitor's Bow",                    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1230064, name = "Thalassian Competitor's Lamp",                    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1230065, name = "Thalassian Competitor's Staff",                   source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1230066, name = "Thalassian Competitor's Pillar",                  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1230067, name = "Thalassian Competitor's Emblem",                  source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1230068, name = "Thalassian Competitor's Insignia of Alacrity",    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1230069, name = "Thalassian Competitor's Medallion",               source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1260760, name = "Thalassian Competitor's Bow",                    source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -139,17 +129,17 @@ MC.InscriptionRecipes = {
     {
         name = "Housing Decor",
         recipes = {
-            { id = 1248619, name = "Sturdy Ren'dorei Cask",          source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 }, currency2 = { 3392, 500 } } },
-            { id = 1248621, name = "Floating Void-Touched Tome",     source = "vendor", sourceInfo = "Anomander, Voidstorm",                   priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1248622, name = "Homely Sin'dorei Shelf",         source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",   priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1248623, name = "Lively Songwriter's Quill",      source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1248624, name = "Opened Sin'dorei Scroll",        source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",   priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1248625, name = "Gilded Eversong Book",           source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3261, 150 } } },
-            { id = 1248626, name = "Sin'dorei Phoenix Quill",        source = "vendor", sourceInfo = "Ranger Allorn, Eversong Woods",           priority = 1, cost = { currency = { 3261, 150 } } },
-            { id = 1248627, name = "Homely Wall Shelves",            source = "vendor", sourceInfo = "150 Artisan Scribe's Moxie",              priority = 1, cost = { currency = { 3261, 150 } } },
-            { id = 1248628, name = "Wild Hanging Scroll",            source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3261, 150 }, currency2 = { 3392, 500 } } },
-            { id = 1248630, name = "Harandar Signpost",              source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1248631, name = "Magnificent Towering Bookcase",  source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3261, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1248619, name = "Sturdy Ren'dorei Cask",          source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = LOC.ConstructVanore, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.RemnantOfAnguish, 500 } } },
+            { id = 1248621, name = "Floating Void-Touched Tome",     source = "vendor", sourceInfo = "Anomander, Voidstorm",                   priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1248622, name = "Homely Sin'dorei Shelf",         source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",   priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248623, name = "Lively Songwriter's Quill",      source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248624, name = "Opened Sin'dorei Scroll",        source = "vendor", sourceInfo = "Lyrendal (150 Artisan Scribe's Moxie)",   priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248625, name = "Gilded Eversong Book",           source = "vendor", sourceInfo = "Lyrendal, Silvermoon City",               priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248626, name = "Sin'dorei Phoenix Quill",        source = "vendor", sourceInfo = "Ranger Allorn, Eversong Woods",           priority = 1, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248627, name = "Homely Wall Shelves",            source = "vendor", sourceInfo = "150 Artisan Scribe's Moxie",              priority = 1, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 } } },
+            { id = 1248628, name = "Wild Hanging Scroll",            source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",      priority = 1, waypoint = LOC.ConstructVanore, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.RemnantOfAnguish, 500 } } },
+            { id = 1248630, name = "Harandar Signpost",              source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1248631, name = "Magnificent Towering Bookcase",  source = "vendor", sourceInfo = "Naynar (150 Artisan Scribe's Moxie)",     priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1248620, name = "Restful Bronze Bench",           source = "drop",   sourceInfo = "Victorious Stormarion Pinnacle Cache",     priority = 4, dropInfo = { rate = "~1%" } },
         },
     },

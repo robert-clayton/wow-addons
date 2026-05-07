@@ -1,7 +1,5 @@
 local _, MC = ...
 
-local MUI = LibStub("MidnightUI-1.0")
-
 MC.MinimapButton = {}
 local MB = MC.MinimapButton
 
@@ -20,23 +18,27 @@ function MB:Init()
             if button == "LeftButton" then
                 if MC.panel then MC.panel:Toggle() end
             elseif button == "RightButton" then
+                -- Throttled per-module rescan; only enabled modules
                 for _, mod in ipairs(MC.modules) do
-                    if mod.Scanner then mod.Scanner:Scan() end
+                    if MC.IsModuleEnabled(mod.key) and mod.Scanner then
+                        MC.ThrottledScan(mod)
+                    end
                 end
-                MC.RefreshActive()
                 MB:PrintSummary()
             end
         end,
         OnTooltipShow = function(tt)
             tt:AddLine("|cffffcc00Midnight Collections|r")
             for _, mod in ipairs(MC.modules) do
-                if mod.opts.tooltipLines then
-                    mod.opts.tooltipLines(tt, mod)
-                else
-                    local r = mod.Scanner and mod.Scanner.results
-                    if r and r.total then
-                        tt:AddLine(format("  %s: %d / %d",
-                            mod.label, r.collectedCount or 0, r.total), 0.7, 0.7, 0.7)
+                if MC.IsModuleEnabled(mod.key) then
+                    if mod.opts.tooltipLines then
+                        mod.opts.tooltipLines(tt, mod)
+                    else
+                        local r = mod.Scanner and mod.Scanner.results
+                        if r and r.total then
+                            tt:AddLine(format("  %s: %d / %d",
+                                mod.label, r.collectedCount or 0, r.total), 0.7, 0.7, 0.7)
+                        end
                     end
                 end
             end
@@ -61,13 +63,15 @@ end
 
 function MB:PrintSummary()
     for _, mod in ipairs(MC.modules) do
-        if mod.opts.printSummary then
-            mod.opts.printSummary(mod)
-        else
-            local r = mod.Scanner and mod.Scanner.results
-            if r and r.total then
-                print(format("%s [%s] %d / %d collected (%d remaining)",
-                    MC.PREFIX, mod.label, r.collectedCount or 0, r.total, r.uncollectedCount or 0))
+        if MC.IsModuleEnabled(mod.key) then
+            if mod.opts.printSummary then
+                mod.opts.printSummary(mod)
+            else
+                local r = mod.Scanner and mod.Scanner.results
+                if r and r.total then
+                    print(format("%s [%s] %d / %d collected (%d remaining)",
+                        MC.PREFIX, mod.label, r.collectedCount or 0, r.total, r.uncollectedCount or 0))
+                end
             end
         end
     end

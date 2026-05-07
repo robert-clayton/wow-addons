@@ -19,13 +19,11 @@ local dataSets = {
 }
 
 function Scanner:IsRecipeKnown(recipeID)
-    local ok, result = pcall(IsPlayerSpell, recipeID)
-    return ok and result
+    return IsPlayerSpell(recipeID) and true or false
 end
 
 function Scanner:Scan()
     wipe(self.results)
-
     if not mod.professions then return end
     for skillLine in pairs(mod.professions) do
         local recipes = MC[dataSets[skillLine]]

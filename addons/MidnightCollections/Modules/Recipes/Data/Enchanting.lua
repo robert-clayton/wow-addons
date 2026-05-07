@@ -1,16 +1,6 @@
 local _, MC = ...
 
--- NPC waypoint data: { mapID, x, y, "NPC Name" }
--- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
-local NPC = {
-    ConstructVanore = { 2393, 0.557, 0.657, "Construct V'anore, Silvermoon City" },
-    Lyna            = { 2393, 0.478, 0.534, "Lyna, Silvermoon City" },
-    CaerisFairdawn  = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
-    Neriv           = { 2395, 0.434, 0.474, "Neriv, Eversong Woods" },
-    Magovu          = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
-    Naynar          = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander       = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
-}
+local LOC = MC.LOC
 
 MC.EnchantingRecipes = {
     {
@@ -20,9 +10,9 @@ MC.EnchantingRecipes = {
             { id = 1236097, name = "Enchant Weapon - Arcane Mastery",            source = "trainer",  sourceInfo = "Trainer (Skill 40)",             priority = 1 },
             { id = 1236066, name = "Enchant Weapon - Jan'alai's Precision",      source = "trainer",  sourceInfo = "Trainer (Skill 55)",             priority = 1 },
             { id = 1236080, name = "Enchant Weapon - Worldsoul Aegis",           source = "trainer",  sourceInfo = "Trainer (Skill 55)",             priority = 1 },
-            { id = 1236095, name = "Enchant Weapon - Acuity of the Ren'dorei",   source = "vendor",   sourceInfo = "Void Researcher Anomander",     priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1236065, name = "Enchant Weapon - Strength of Halazzi",       source = "vendor",   sourceInfo = "Magovu, Zul'Aman",              priority = 1, waypoint = NPC.Magovu, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1236081, name = "Enchant Weapon - Worldsoul Tenacity",        source = "vendor",   sourceInfo = "Naynar, Harandar",              priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1236095, name = "Enchant Weapon - Acuity of the Ren'dorei",   source = "vendor",   sourceInfo = "Void Researcher Anomander",     priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1236065, name = "Enchant Weapon - Strength of Halazzi",       source = "vendor",   sourceInfo = "Magovu, Zul'Aman",              priority = 1, waypoint = LOC.Magovu, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1236081, name = "Enchant Weapon - Worldsoul Tenacity",        source = "vendor",   sourceInfo = "Naynar, Harandar",              priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1236094, name = "Enchant Weapon - Flames of the Sin'dorei",   source = "drop",     sourceInfo = "Degentrius, Magisters' Terrace", priority = 4 },
             { id = 1236079, name = "Enchant Weapon - Worldsoul Cradle",          source = "drop",     sourceInfo = "Chimaerus, The Dreamrift",       priority = 4 },
         },
@@ -30,7 +20,7 @@ MC.EnchantingRecipes = {
     {
         name = "Boot Enchants",
         recipes = {
-            { id = 1236085, name = "Enchant Boots - Farstrider's Hunt",      source = "vendor",         sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 }, currency2 = { 3392, 500 } } },
+            { id = 1236085, name = "Enchant Boots - Farstrider's Hunt",      source = "vendor",         sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = LOC.ConstructVanore, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.RemnantOfAnguish, 500 } } },
             { id = 1236057, name = "Enchant Boots - Lynx's Dexterity",       source = "specialization", sourceInfo = "Amani Augments",                    priority = 3 },
             { id = 1236072, name = "Enchant Boots - Shaladrassil's Roots",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",              priority = 4 },
         },
@@ -38,7 +28,7 @@ MC.EnchantingRecipes = {
     {
         name = "Chest Enchants",
         recipes = {
-            { id = 1236068, name = "Enchant Chest - Mark of the Rootwarden",  source = "vendor",         sourceInfo = "Naynar, Harandar",                priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1236068, name = "Enchant Chest - Mark of the Rootwarden",  source = "vendor",         sourceInfo = "Naynar, Harandar",                priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1236069, name = "Enchant Chest - Mark of the Worldsoul",   source = "specialization", sourceInfo = "Haranir Heightening",             priority = 3 },
             { id = 1236082, name = "Enchant Chest - Mark of the Magister",    source = "drop",           sourceInfo = "Degentrius, Magisters' Terrace",  priority = 4 },
             { id = 1236054, name = "Enchant Chest - Mark of Nalorakk",        source = "drop",           sourceInfo = "Den of Nalorakk (Treasure Chest)", priority = 4 },
@@ -73,7 +63,7 @@ MC.EnchantingRecipes = {
             { id = 1236087, name = "Enchant Ring - Thalassian Versatility",   source = "trainer",        sourceInfo = "Trainer (Skill 5)",                priority = 1 },
             { id = 1236073, name = "Enchant Ring - Nature's Wrath",           source = "trainer",        sourceInfo = "Trainer (Skill 25)",               priority = 1 },
             { id = 1236058, name = "Enchant Ring - Amani Mastery",            source = "trainer",        sourceInfo = "Trainer (Skill 45)",               priority = 1 },
-            { id = 1236089, name = "Enchant Ring - Silvermoon's Tenacity",    source = "vendor",         sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1236089, name = "Enchant Ring - Silvermoon's Tenacity",    source = "vendor",         sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1236088, name = "Enchant Ring - Silvermoon's Alacrity",    source = "specialization", sourceInfo = "Thalassian Talents",               priority = 3 },
             { id = 1236060, name = "Enchant Ring - Zul'jin's Mastery",        source = "specialization", sourceInfo = "Amani Augments",                   priority = 3 },
             { id = 1236074, name = "Enchant Ring - Nature's Fury",            source = "drop",           sourceInfo = "Heavy Trunk (Delves)",             priority = 4 },
@@ -83,9 +73,9 @@ MC.EnchantingRecipes = {
     {
         name = "Tool Enchants",
         recipes = {
-            { id = 1236063, name = "Enchant Tool - Amani Perception",        source = "vendor",         sourceInfo = "Magovu, Zul'Aman",            priority = 1, waypoint = NPC.Magovu, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1236078, name = "Enchant Tool - Haranir Multicrafting",   source = "vendor",         sourceInfo = "Naynar, Harandar",             priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1236093, name = "Enchant Tool - Ren'dorei Ingenuity",     source = "vendor",         sourceInfo = "Void Researcher Anomander",    priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1236063, name = "Enchant Tool - Amani Perception",        source = "vendor",         sourceInfo = "Magovu, Zul'Aman",            priority = 1, waypoint = LOC.Magovu, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1236078, name = "Enchant Tool - Haranir Multicrafting",   source = "vendor",         sourceInfo = "Naynar, Harandar",             priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1236093, name = "Enchant Tool - Ren'dorei Ingenuity",     source = "vendor",         sourceInfo = "Void Researcher Anomander",    priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1236064, name = "Enchant Tool - Amani Resourcefulness",   source = "specialization", sourceInfo = "Amani Augments",               priority = 3 },
             { id = 1236077, name = "Enchant Tool - Haranir Finesse",         source = "specialization", sourceInfo = "Haranir Heightening",          priority = 3 },
             { id = 1236092, name = "Enchant Tool - Sin'dorei Deftness",      source = "specialization", sourceInfo = "Thalassian Talents",           priority = 3 },
@@ -103,7 +93,7 @@ MC.EnchantingRecipes = {
         name = "Profession Rods",
         recipes = {
             { id = 1236486, name = "Runed Refulgent Copper Rod",   source = "trainer",        sourceInfo = "Trainer (Skill 1)",                      priority = 1 },
-            { id = 1236488, name = "Runed Dazzling Thorium Rod",   source = "vendor",         sourceInfo = "Lyna, Silvermoon City",                  priority = 1, waypoint = NPC.Lyna, cost = { currency = { 3258, 150 } } },
+            { id = 1236488, name = "Runed Dazzling Thorium Rod",   source = "vendor",         sourceInfo = "Lyna, Silvermoon City",                  priority = 1, waypoint = LOC.Lyna, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 } } },
             { id = 1236487, name = "Runed Brilliant Silver Rod",   source = "specialization", sourceInfo = "Transitories, Tonics, and Tools",        priority = 3 },
         },
     },
@@ -126,7 +116,7 @@ MC.EnchantingRecipes = {
         name = "Illusions",
         recipes = {
             { id = 1236098, name = "Illusory Adornment - Blooming Light",   source = "trainer", sourceInfo = "Trainer (Skill 25)",                 priority = 1 },
-            { id = 1236099, name = "Illusory Adornment - Nature's Embrace", source = "vendor",  sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = NPC.ConstructVanore, cost = { currency = { 3258, 150 }, currency2 = { 3392, 500 } } },
+            { id = 1236099, name = "Illusory Adornment - Nature's Embrace", source = "vendor",  sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = LOC.ConstructVanore, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.RemnantOfAnguish, 500 } } },
             { id = 1236100, name = "Illusory Adornment - Voidtouched",      source = "drop",    sourceInfo = "Victorious Stormarion Pinnacle Cache", priority = 4, dropInfo = { rate = "~2%" } },
         },
     },
@@ -157,7 +147,7 @@ MC.EnchantingRecipes = {
             { id = 1236468, name = "Gleeful Glamour - Goblin",               source = "trainer", sourceInfo = "Trainer (Skill 50)", priority = 1 },
             { id = 1236473, name = "Gleeful Glamour - Mag'har Orc",          source = "trainer", sourceInfo = "Trainer (Skill 55)", priority = 1 },
             { id = 1236474, name = "Gleeful Glamour - Mechagnome",           source = "trainer", sourceInfo = "Trainer (Skill 55)", priority = 1 },
-            { id = 1236464, name = "Gleeful Glamour - Haranir",              source = "vendor",  sourceInfo = "Naynar, Harandar",   priority = 1, waypoint = NPC.Naynar, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1236464, name = "Gleeful Glamour - Haranir",              source = "vendor",  sourceInfo = "Naynar, Harandar",   priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
         },
     },
     {
@@ -165,13 +155,13 @@ MC.EnchantingRecipes = {
         recipes = {
             { id = 1246904, name = "Ensorcelled Broom",                       source = "trainer", sourceInfo = "Trainer (Skill 80)",                priority = 1 },
             { id = 1246905, name = "Font of Gleaming Water",                  source = "trainer", sourceInfo = "Trainer (Skill 80)",                priority = 1 },
-            { id = 1246906, name = "Animated Sin'dorei Hammer",               source = "vendor",  sourceInfo = "World Vendor, Eversong Woods",     priority = 1, cost = { currency = { 3258, 150 } } },
-            { id = 1246902, name = "Animated Sin'dorei Pick",                 source = "vendor",  sourceInfo = "World Vendor, Eversong Woods",     priority = 1, cost = { currency = { 3258, 150 } } },
-            { id = 1281342, name = "Endless Codex of Blooming Light",         source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1281348, name = "Endless Codex of Nature's Grace",         source = "vendor",  sourceInfo = "Magovu, Zul'Aman",                 priority = 1, waypoint = NPC.Magovu, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1281349, name = "Endless Codex of the Voidtouched",        source = "vendor",  sourceInfo = "Void Researcher Anomander",        priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
-            { id = 1246909, name = "Self-Pouring Thalassian Sunwine",         source = "vendor",  sourceInfo = "Neriv, Eversong Woods",            priority = 1, waypoint = NPC.Neriv, cost = { currency = { 3258, 150 } } },
-            { id = 1246907, name = "Spellbound Tome of Thalassian Magics",    source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3258, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1246906, name = "Animated Sin'dorei Hammer",               source = "vendor",  sourceInfo = "World Vendor, Eversong Woods",     priority = 1, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 } } },
+            { id = 1246902, name = "Animated Sin'dorei Pick",                 source = "vendor",  sourceInfo = "World Vendor, Eversong Woods",     priority = 1, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 } } },
+            { id = 1281342, name = "Endless Codex of Blooming Light",         source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1281348, name = "Endless Codex of Nature's Grace",         source = "vendor",  sourceInfo = "Magovu, Zul'Aman",                 priority = 1, waypoint = LOC.Magovu, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1281349, name = "Endless Codex of the Voidtouched",        source = "vendor",  sourceInfo = "Void Researcher Anomander",        priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1246909, name = "Self-Pouring Thalassian Sunwine",         source = "vendor",  sourceInfo = "Neriv, Eversong Woods",            priority = 1, waypoint = LOC.Neriv, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 } } },
+            { id = 1246907, name = "Spellbound Tome of Thalassian Magics",    source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1246908, name = "Rootflame Campfire",                      source = "drop",    sourceInfo = "Master Tailor's Surplus Reagents",  priority = 4, dropInfo = { rate = "~20%" } },
             { id = 1246903, name = "Ren'dorei Postal Repository",            source = "drop",    sourceInfo = "Voidstorm (Treasure Drop)",         priority = 4 },
         },

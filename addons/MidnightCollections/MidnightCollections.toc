@@ -1,9 +1,10 @@
-## Interface: 120001
+## Interface: 120005
 ## Title: Midnight Collections
 ## Notes: Tracks uncollected recipes, pets, mounts, and decorations from Midnight
 ## Author: robert-clayton
-## Version: 1.0.0
+## Version: 1.1.0
 ## SavedVariables: MidnightCollectionsDB
+## SavedVariablesPerCharacter: MidnightCollectionsCharDB
 ## OptionalDeps: TomTom
 
 # Libraries
@@ -15,6 +16,7 @@ Libs\MidnightUI-1.0\MidnightUI-1.0.xml
 
 # Core framework
 Core.lua
+Data\Constants.lua
 Data\Locations.lua
 TabBar.lua
 MinimapButton.lua
@@ -36,6 +38,12 @@ Modules\Decorations\Data\Decorations.lua
 Modules\Decorations\Init.lua
 Modules\Decorations\Scanner.lua
 Modules\Decorations\UI.lua
+
+# Toys module
+Modules\Toys\Data\Toys.lua
+Modules\Toys\Init.lua
+Modules\Toys\Scanner.lua
+Modules\Toys\UI.lua
 
 # Recipes module
 Modules\Recipes\Data\Alchemy.lua

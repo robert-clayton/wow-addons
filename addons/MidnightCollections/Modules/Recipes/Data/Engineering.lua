@@ -1,11 +1,6 @@
 local _, MC = ...
 
--- NPC waypoint data: { mapID, x, y, "NPC Name" }
--- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
-local NPC = {
-    Mirvedon = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Lyrendal = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
-}
+local LOC = MC.LOC
 
 MC.EngineeringRecipes = {
     {
@@ -35,7 +30,7 @@ MC.EngineeringRecipes = {
         name = "Guns",
         recipes = {
             { id = 1282455, name = "Evercore Dome Dinger",          source = "trainer",        sourceInfo = "Trainer (Skill 20)",     priority = 1 },
-            { id = 1282457, name = "Thalassian Competitor's Rifle", source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",  priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1282457, name = "Thalassian Competitor's Rifle", source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",  priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
             { id = 1282456, name = "P.O.W. x3",                    source = "specialization", sourceInfo = "Combat Analytics - Guns", priority = 3 },
         },
     },
@@ -54,10 +49,10 @@ MC.EngineeringRecipes = {
             { id = 1229870, name = "Aetherlume Eye Wrap",                     source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
             { id = 1229872, name = "Aetherlume Vision Shroud",                source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
             { id = 1229873, name = "Aetherlume Sun Guard",                    source = "specialization", sourceInfo = "Combat Analytics - Goggles",  priority = 3 },
-            { id = 1229908, name = "Thalassian Competitor's Cloth Goggles",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229909, name = "Thalassian Competitor's Leather Optics",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229910, name = "Thalassian Competitor's Mail Visor",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229911, name = "Thalassian Competitor's Plate Guard",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229908, name = "Thalassian Competitor's Cloth Goggles",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229909, name = "Thalassian Competitor's Leather Optics",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229910, name = "Thalassian Competitor's Mail Visor",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229911, name = "Thalassian Competitor's Plate Guard",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -75,10 +70,10 @@ MC.EngineeringRecipes = {
             { id = 1229875, name = "Aetherlume Bands",                        source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
             { id = 1229876, name = "Aetherlume Bracelets",                    source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
             { id = 1229877, name = "Aetherlume Guards",                       source = "specialization", sourceInfo = "Combat Analytics - Bracers",  priority = 3 },
-            { id = 1229912, name = "Thalassian Competitor's Cloth Cuffs",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229913, name = "Thalassian Competitor's Leather Bands",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229914, name = "Thalassian Competitor's Mail Links",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1229915, name = "Thalassian Competitor's Plate Bindings",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1229912, name = "Thalassian Competitor's Cloth Cuffs",     source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229913, name = "Thalassian Competitor's Leather Bands",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229914, name = "Thalassian Competitor's Mail Links",      source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1229915, name = "Thalassian Competitor's Plate Bindings",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",       priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -96,10 +91,10 @@ MC.EngineeringRecipes = {
             { id = 1229879, name = "Aetherlume Runners",                       source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
             { id = 1229880, name = "Aetherlume Clonkers",                      source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
             { id = 1229881, name = "Aetherlume Stompers",                      source = "specialization", sourceInfo = "Combat Analytics - Boots",   priority = 3 },
-            { id = 1261490, name = "Thalassian Competitor's Cloth Tip-Toes",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1261491, name = "Thalassian Competitor's Leather Sliders",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1261492, name = "Thalassian Competitor's Mail Footlinks",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1261493, name = "Thalassian Competitor's Plate Dunkers",    source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1261490, name = "Thalassian Competitor's Cloth Tip-Toes",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1261491, name = "Thalassian Competitor's Leather Sliders",  source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1261492, name = "Thalassian Competitor's Mail Footlinks",   source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1261493, name = "Thalassian Competitor's Plate Dunkers",    source = "vendor",         sourceInfo = "Mirvedon (7500 Honor)",      priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -154,13 +149,13 @@ MC.EngineeringRecipes = {
             { id = 1229902, name = "Sin'dorei Angler's Rod",          source = "specialization", sourceInfo = "Market Mobility - Fishing Rods",  priority = 3 },
             { id = 1229907, name = "Sin'dorei Snippers",              source = "specialization", sourceInfo = "Market Mobility - Tailoring",     priority = 3 },
             { id = 1229905, name = "Sin'dorei Clampers",              source = "specialization", sourceInfo = "Market Mobility - JC Tools",      priority = 3 },
-            { id = 1264529, name = "Turbo-Junker's Multitool v9",     source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264523, name = "Head-Mounted Beam Bummer",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264524, name = "Rock Bonkin' Hardhat",            source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264525, name = "Heavy-Duty Rock Assister",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264526, name = "Self-Sharpening Sin'dorei Snippers", source = "vendor",      sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264527, name = "Sin'dorei Reeler's Rod",          source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
-            { id = 1264528, name = "Giga-Gem Grippers",               source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3259, 150 } } },
+            { id = 1264529, name = "Turbo-Junker's Multitool v9",     source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264523, name = "Head-Mounted Beam Bummer",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264524, name = "Rock Bonkin' Hardhat",            source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264525, name = "Heavy-Duty Rock Assister",        source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264526, name = "Self-Sharpening Sin'dorei Snippers", source = "vendor",      sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264527, name = "Sin'dorei Reeler's Rod",          source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
+            { id = 1264528, name = "Giga-Gem Grippers",               source = "vendor",         sourceInfo = "Lyrendal (150 Artisan's Moxie)",  priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.EngineeringMoxie, 150 } } },
         },
     },
     {

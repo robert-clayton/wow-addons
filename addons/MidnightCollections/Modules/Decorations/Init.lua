@@ -21,12 +21,11 @@ local mod = MC.RegisterModule("decorations", {
     },
     events = HOUSING_EVENTS,
     onEvent = function(m, event)
-        -- All housing/bag events trigger a rescan
-        for _, ev in ipairs(HOUSING_EVENTS) do
-            if event == ev then
-                MC.ThrottledScan(m)
-                return
-            end
+        if event == "BAG_UPDATE_DELAYED" then
+            -- 3s throttle: chatty during raid/loot
+            MC.ThrottledScan(m, 3)
+        else
+            MC.ThrottledScan(m)
         end
     end,
     tooltipLines = function(tt, m)

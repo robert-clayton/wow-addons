@@ -28,13 +28,13 @@ local function AlertForPet(speciesID, db)
 
     -- Check if already collected
     if C_PetJournal and C_PetJournal.GetNumCollectedInfo then
-        local ok, nc = pcall(C_PetJournal.GetNumCollectedInfo, speciesID)
-        if ok and nc and nc > 0 then return end
+        local nc = C_PetJournal.GetNumCollectedInfo(speciesID)
+        if nc and nc > 0 then return end
     end
 
     alertedThisSession[speciesID] = true
-    local msg = format("|cff40e840[Midnight Collections]|r Uncollected wild pet nearby: |cffffffff%s|r (%s)", pet.name, pet.zone or "")
-    print(msg)
+    print(format("%s Uncollected wild pet nearby: |cffffffff%s|r (%s)",
+        MC.PREFIX, pet.name, pet.zone or ""))
     if RaidNotice_AddMessage then
         RaidNotice_AddMessage(RaidWarningFrame, format("Uncollected pet: %s", pet.name), ChatTypeInfo["RAID_WARNING"])
     end
@@ -61,6 +61,12 @@ local function OnMouseoverUnit(db)
     end
 end
 
+-- Public: clear "already alerted" cache. Called when wildAlerts toggles back on
+-- so the user can re-discover pets they already saw this session.
+function MC.ClearPetAlertCache()
+    wipe(alertedThisSession)
+end
+
 --------------------------------------------------------------------------
 -- Module registration
 --------------------------------------------------------------------------
@@ -76,17 +82,21 @@ local mod = MC.RegisterModule("pets", {
         wildAlerts      = true,
         collapsed       = {},
     },
-    events = { "PET_JOURNAL_LIST_UPDATE", "NAME_PLATE_UNIT_ADDED", "UPDATE_MOUSEOVER_UNIT", "ZONE_CHANGED_NEW_AREA" },
+    events = { "NEW_PET_ADDED", "PET_JOURNAL_LIST_UPDATE", "BAG_UPDATE_DELAYED",
+               "NAME_PLATE_UNIT_ADDED", "UPDATE_MOUSEOVER_UNIT", "ZONE_CHANGED_NEW_AREA" },
     onLogin = function(m)
         BuildWildSpeciesLookup()
     end,
     onEvent = function(m, event, arg1)
-        if event == "PET_JOURNAL_LIST_UPDATE" then
+        if event == "NEW_PET_ADDED" or event == "PET_JOURNAL_LIST_UPDATE" then
             MC.ThrottledScan(m)
+        elseif event == "BAG_UPDATE_DELAYED" then
+            -- 3s throttle: BAG_UPDATE_DELAYED storms during raid/loot showers
+            MC.ThrottledScan(m, 3)
         elseif event == "NAME_PLATE_UNIT_ADDED" then
-            OnNameplateAdded(arg1, m.db)
+            if m.db and m.db.wildAlerts then OnNameplateAdded(arg1, m.db) end
         elseif event == "UPDATE_MOUSEOVER_UNIT" then
-            OnMouseoverUnit(m.db)
+            if m.db and m.db.wildAlerts then OnMouseoverUnit(m.db) end
         elseif event == "ZONE_CHANGED_NEW_AREA" then
             wipe(alertedThisSession)
         end

@@ -61,8 +61,6 @@ end
 function Scanner:Scan()
     if not MC.DecorationData then return end
 
-    wipe(self.results)
-
     local result = {
         total            = 0,
         collectedCount   = 0,
@@ -73,52 +71,50 @@ function Scanner:Scan()
 
     local hideTradingPost = mod.db and mod.db.hideTradingPost
     for _, group in ipairs(MC.DecorationData) do
-        if hideTradingPost and group.source == "tradingpost" then
-            -- skip entirely
-        else
-        for _, deco in ipairs(group.decorations) do
-            result.total = result.total + 1
+        if not (hideTradingPost and group.source == "tradingpost") then
+            for _, deco in ipairs(group.decorations) do
+                result.total = result.total + 1
 
-            local isCollected, catalogInfo = self:CheckCollected(deco.decorID, deco.itemID)
-            local icon = self:GetIcon(deco.decorID, deco.itemID)
-            local decoName = self:GetName(deco.decorID, deco.itemID, deco.name)
+                local isCollected, catalogInfo = self:CheckCollected(deco.decorID, deco.itemID)
+                local icon = self:GetIcon(deco.decorID, deco.itemID)
+                local decoName = self:GetName(deco.decorID, deco.itemID, deco.name)
 
-            if catalogInfo then
-                if catalogInfo.iconTexture and catalogInfo.iconTexture ~= 0 then
-                    icon = icon or catalogInfo.iconTexture
+                if catalogInfo then
+                    if catalogInfo.iconTexture and catalogInfo.iconTexture ~= 0 then
+                        icon = icon or catalogInfo.iconTexture
+                    end
+                    if catalogInfo.name and catalogInfo.name ~= "" then
+                        decoName = catalogInfo.name
+                    end
                 end
-                if catalogInfo.name and catalogInfo.name ~= "" then
-                    decoName = catalogInfo.name
+
+                local entry = {
+                    decorID       = deco.decorID,
+                    itemID        = deco.itemID,
+                    name          = decoName,
+                    source        = deco.source,
+                    sourceInfo    = deco.sourceInfo,
+                    skillLine     = deco.skillLine,
+                    waypoint      = deco.waypoint,
+                    cost          = deco.cost,
+                    dropInfo      = deco.dropInfo,
+                    achievementID = deco.achievementID,
+                    zone          = deco.zone,
+                    renown        = deco.renown,
+                    icon          = icon,
+                    collected     = isCollected,
+                }
+
+                if isCollected then
+                    result.collectedCount = result.collectedCount + 1
+                    result.collected[#result.collected + 1] = entry
+                else
+                    result.uncollectedCount = result.uncollectedCount + 1
+                    local src = deco.source
+                    if not result.bySource[src] then result.bySource[src] = {} end
+                    result.bySource[src][#result.bySource[src] + 1] = entry
                 end
             end
-
-            local entry = {
-                decorID       = deco.decorID,
-                itemID        = deco.itemID,
-                name          = decoName,
-                source        = deco.source,
-                sourceInfo    = deco.sourceInfo,
-                skillLine     = deco.skillLine,
-                waypoint      = deco.waypoint,
-                cost          = deco.cost,
-                dropInfo      = deco.dropInfo,
-                achievementID = deco.achievementID,
-                zone          = deco.zone,
-                renown        = deco.renown,
-                icon          = icon,
-                collected     = isCollected,
-            }
-
-            if isCollected then
-                result.collectedCount = result.collectedCount + 1
-                result.collected[#result.collected + 1] = entry
-            else
-                result.uncollectedCount = result.uncollectedCount + 1
-                local src = deco.source
-                if not result.bySource[src] then result.bySource[src] = {} end
-                result.bySource[src][#result.bySource[src] + 1] = entry
-            end
-        end
         end
     end
 

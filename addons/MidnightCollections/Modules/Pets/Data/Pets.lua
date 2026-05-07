@@ -80,29 +80,44 @@ MC.PetData = {
         pets = {
             -- Renown vendors (Voidlight Marl, currency 3316)
             { speciesID = 4952, npcID = 256271, name = "Blitzcreek",            petType = 8,  source = "vendor", sourceInfo = "Void Researcher Anomander - Renown 14, The Singularity", canBattle = true,  waypoint = LOC.Anomander, zone = "Voidstorm",
-              cost = { currency = { 3316, 2500 } }, renown = { factionID = 2699, level = 14, factionName = "The Singularity" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.Singularity, level = 14, factionName = "The Singularity" } },
             { speciesID = 4928, npcID = 255257, name = "Dragonhawk Munchkin",   petType = 2,  source = "vendor", sourceInfo = "Caeris Fairdawn - Renown 12, Silvermoon Court",          canBattle = true,  waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
-              cost = { currency = { 3316, 2500 } }, renown = { factionID = 2710, level = 12, factionName = "Silvermoon Court" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 12, factionName = "Silvermoon Court" } },
             { speciesID = 4984, npcID = 257802, name = "Medusa",                petType = 6,  source = "vendor", sourceInfo = "Thraxadar - Revered, Slayer's Duellum",                  canBattle = false, waypoint = LOC.Thraxadar, zone = "Voidstorm",
-              cost = { currency = { 3316, 2500 } }, renown = { factionID = 2770, standing = "Revered", factionName = "Slayer's Duellum" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Revered", factionName = "Slayer's Duellum" } },
             { speciesID = 4929, npcID = 255295, name = "Munchy",                petType = 8,  source = "vendor", sourceInfo = "Naynar - Renown 12, Hara'ti",                            canBattle = true,  waypoint = LOC.Naynar, zone = "Harandar",
-              cost = { currency = { 3316, 2500 } }, renown = { factionID = 2704, level = 12, factionName = "Hara'ti" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.Harati, level = 12, factionName = "Hara'ti" } },
             { speciesID = 4888, npcID = 250583, name = "Naloki",                petType = 5,  source = "vendor", sourceInfo = "Magovu - Renown 12, Amani Tribe",                        canBattle = false, waypoint = LOC.Magovu, zone = "Zul'Aman",
-              cost = { currency = { 3316, 2500 } }, renown = { factionID = 2696, level = 12, factionName = "Amani Tribe" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 12, factionName = "Amani Tribe" } },
 
             -- Brimming Arcana vendor (currency 3379)
             { speciesID = 4982, npcID = 257857, name = "Flicker",               petType = 8,  source = "vendor", sourceInfo = "Apprentice Diell - Luminary rank, Magisters",             canBattle = false, waypoint = LOC.ApprenticeDiell, zone = "Eversong Woods",
-              cost = { currency = { 3379, 200 } } },
+              cost = { currency = { MC.CURRENCY.BrimmingArcana, 200 } } },
 
             -- Preyseeker's Journey vendors (Remnant of Anguish, currency 3392)
             { speciesID = 4930, npcID = 255522, name = "Lil' Preyseeker",       petType = 6,  source = "vendor", sourceInfo = "Construct V'anore - Preyseeker's Journey Rank 9",         canBattle = true,  waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
-              cost = { currency = { 3392, 1200 } } },
+              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 1200 } } },
             { speciesID = 4976, npcID = 257546, name = "Voldy",                 petType = 7,  source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",                      canBattle = false, waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
-              cost = { currency = { 3392, 800 } } },
+              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 800 } } },
 
             -- Undercoin vendor (currency 2803)
             { speciesID = 4955, npcID = 256272, name = "Kreepah'zoyd",          petType = 8,  source = "vendor", sourceInfo = "Naleidea Rivergleam - 10,000 Undercoin",                  canBattle = false, waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City",
-              cost = { currency = { 2803, 10000 } } },
+              cost = { currency = { MC.CURRENCY.Undercoin, 10000 } } },
+
+            -- Patch 12.0.5: Sergeant Vornin (Voidlight Marl, currency 3316)
+            { speciesID = 5039, npcID = 262787, name = "Cappy",                    petType = 8, source = "vendor", sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl (after Cosmic Exterminator)",
+              canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } }, achievementID = 62518 },
+            { speciesID = 5036, npcID = 262422, name = "Rescued Dragonhawk Chick", petType = 2, source = "vendor", sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl",
+              canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } } },
+            { speciesID = 5037, npcID = 262427, name = "Void-Infused Mindbreaker Fry", petType = 6, source = "vendor", sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl",
+              canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } } },
+            -- Patch 12.0.5: Depthdiver Tu'nakit (Angler Pearls, currency 3373)
+            { speciesID = 5065, npcID = 264933, name = "Ka'bubb",                  petType = 3, source = "vendor", sourceInfo = "Depthdiver Tu'nakit - 2,400 Angler Pearls (Abyss Anglers)",
+              canBattle = false, waypoint = LOC.DepthdiverTunakit, zone = "Zul'Aman",
+              cost = { currency = { MC.CURRENCY.AnglerPearls, 2400 } } },
         },
     },
 
@@ -118,6 +133,14 @@ MC.PetData = {
               dropInfo = { mob = "Stormarion Assault event cache", zone = "Voidstorm" } },
             { speciesID = 4981, npcID = 257695, name = "Nova",                  petType = 5,  source = "drop", sourceInfo = "Slayer's Duellum Trove (Paragon cache)",   canBattle = false, zone = "Voidstorm",
               dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" } },
+
+            -- Patch 12.0.5: Void Assault Wriggling Field Pouch drops
+            { speciesID = 5040, npcID = 262788, name = "Curious Lynx Kitten",  petType = 8,  source = "drop", sourceInfo = "Wriggling Field Pouch (Void Assault, Eversong Woods)", canBattle = true, zone = "Eversong Woods",
+              dropInfo = { mob = "Wriggling Field Pouch", zone = "Eversong Woods" } },
+            { speciesID = 5038, npcID = 262786, name = "Wriggling Capybara",   petType = 8,  source = "drop", sourceInfo = "Wriggling Field Pouch (Void Assault, Zul'Aman)",        canBattle = true, zone = "Zul'Aman",
+              dropInfo = { mob = "Wriggling Field Pouch", zone = "Zul'Aman" } },
+            { speciesID = 5020, npcID = 262066, name = "Overloaded Manaling",  petType = 6,  source = "drop", sourceInfo = "Mana-Gorged Greatwyrm (rare elite, Void Assault)",     canBattle = true, zone = "Eversong Woods",
+              dropInfo = { mob = "Mana-Gorged Greatwyrm", zone = "Eversong Woods" } },
         },
     },
 
@@ -152,6 +175,23 @@ MC.PetData = {
             { speciesID = 4906, npcID = 253399, name = "Scruffbeak",            petType = 5,  source = "treasure", sourceInfo = "Abandoned Nest, Zul'Aman - 72hr egg hatch (42.6, 52.4)",                     canBattle = false, waypoint = LOC.AbandonedNest, zone = "Zul'Aman" },
             { speciesID = 5003, npcID = 259728, name = "Sunwing Hatchling",     petType = 2,  source = "treasure", sourceInfo = "Rookery Cache, Silvermoon City (key + puzzle, 24.3, 69.3)",                   canBattle = false, waypoint = LOC.RookeryCache, zone = "Silvermoon City" },
             { speciesID = 4972, npcID = 256985, name = "Willie",                petType = 8,  source = "treasure", sourceInfo = "Half-Digested Viscera, Voidstorm (38.0, 68.8)",                               canBattle = false, waypoint = LOC.HalfDigestedVisc, zone = "Voidstorm" },
+
+            -- Patch 12.0.5: Ritual Site treasures (instanced — coords are in-instance)
+            { speciesID = 5021, npcID = 262089, name = "Void-Corrupted Snapdragon", petType = 9, source = "treasure",
+              sourceInfo = "Loot Soggy Lynx Toy from kelp mobs at Daggerspine Point, then use it at Soggy Nest to spawn the Void-Corrupted Snapdragon NPC and click it",
+              canBattle = true, waypoint = LOC.SoggyNest, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods" },
+            { speciesID = 5022, npcID = 262090, name = "Void-Touched Chick", petType = 5, source = "treasure",
+              sourceInfo = "Swim to the white egg in the river at Daggerspine Point and loot it directly (no prerequisite)",
+              canBattle = true, waypoint = LOC.DaggerspineRiverEgg, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods" },
+            { speciesID = 5023, npcID = 262092, name = "Void-Touched Lynx Kitten", petType = 8, source = "treasure",
+              sourceInfo = "Daggerspine Point Tier 4+ only — find the single Rustling Bush (8 possible spawns) and interact",
+              canBattle = true, waypoint = LOC.DaggerspineRustlingBush, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods" },
+            { speciesID = 5019, npcID = 261684, name = "Chubs", petType = 8, source = "treasure",
+              sourceInfo = "Broken Throne Tier 2+ — find the stealthed Lost Bear Cub and feed Practically Pork (drops from beasts) or Sin'dorei Swarmer (fishing)",
+              canBattle = true, waypoint = LOC.LostBearCub, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman" },
+            { speciesID = 5017, npcID = 261676, name = "Void-Scarred Eaglet", petType = 2, source = "treasure",
+              sourceInfo = "Earn the Void-Corrupted Hex Eagle mount first; mount it to follow the Void-Tainted Feather trail and ride the wind gale up to loot the Void-Tainted Nest",
+              canBattle = true, waypoint = LOC.VoidTaintedNest, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman" },
         },
     },
 
@@ -222,6 +262,9 @@ MC.PetData = {
             { speciesID = 4913, name = "Moon Darter",  petType = 2, source = "event", sourceInfo = "Family Battler of Kalimdor",          canBattle = false },
             { speciesID = 3519, name = "Byrn",         petType = 7, source = "event", sourceInfo = "Family Battler of Eastern Kingdoms",   canBattle = false },
             { speciesID = 4475, name = "Webbers",      petType = 4, source = "event", sourceInfo = "Family Battler of Northrend",          canBattle = true },
+
+            -- Patch 12.0.5: Blizzard Gear Store promotion (Apr 13 – May 15, 2026)
+            { speciesID = 4968, npcID = 256663, name = "Lil' Staropod", petType = 6, source = "event", sourceInfo = "Blizzard Gear Store: Lil' Staropod collection (Apr 13 – May 15, 2026)", canBattle = true },
         },
     },
 }

@@ -304,6 +304,22 @@ function PanelProto:CreateResizeDragger()
     end)
 
     local dragStartW, dragStartH, dragStartX, dragStartY
+
+    -- OnUpdate is bound only during an active drag (cleared on MouseUp)
+    -- so an idle dragger doesn't burn a per-frame callback.
+    local function onDragUpdate()
+        local cx, cy = GetCursorPosition()
+        local scale = f:GetEffectiveScale()
+        cx = cx / scale
+        cy = cy / scale
+        local dx = cx - dragStartX
+        local dy = dragStartY - cy
+        local newW = math.max(minW, math.min(maxW, dragStartW + dx))
+        local newH = math.max(minH, math.min(maxH, dragStartH + dy))
+        f:SetWidth(newW)
+        f:SetHeight(newH)
+    end
+
     dragger:SetScript("OnMouseDown", function(_, button)
         if button == "LeftButton" and not db.locked then
             local left = f:GetLeft()
@@ -319,11 +335,13 @@ function PanelProto:CreateResizeDragger()
             dragStartX = dragStartX / scale
             dragStartY = dragStartY / scale
             dragger._dragging = true
+            dragger:SetScript("OnUpdate", onDragUpdate)
         end
     end)
     dragger:SetScript("OnMouseUp", function(_, button)
         if button == "LeftButton" and dragger._dragging then
             dragger._dragging = false
+            dragger:SetScript("OnUpdate", nil)
             local newW = math.max(minW, math.min(maxW, math.floor(f:GetWidth())))
             local newH = math.max(minH, math.min(maxH, math.floor(f:GetHeight())))
             db.panelWidth = newW
@@ -338,21 +356,8 @@ function PanelProto:CreateResizeDragger()
             if panel.opts.onRefresh then panel.opts.onRefresh(panel) end
         end
     end)
-    dragger:SetScript("OnUpdate", function()
-        if not dragger._dragging then return end
-        local cx, cy = GetCursorPosition()
-        local scale = f:GetEffectiveScale()
-        cx = cx / scale
-        cy = cy / scale
-        local dx = cx - dragStartX
-        local dy = dragStartY - cy
-        local newW = math.max(minW, math.min(maxW, dragStartW + dx))
-        local newH = math.max(minH, math.min(maxH, dragStartH + dy))
-        f:SetWidth(newW)
-        f:SetHeight(newH)
-    end)
 
-    if db.locked then dragger:Hide() end
+    if db.locked or db.minimized then dragger:Hide() end
     f.dragger = dragger
 end
 

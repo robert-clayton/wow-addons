@@ -1,13 +1,18 @@
 local addonName, MC = ...
 
 MC.name = addonName
-MC.version = C_AddOns and C_AddOns.GetAddOnMetadata(addonName, "Version")
-              or GetAddOnMetadata and GetAddOnMetadata(addonName, "Version")
-              or "dev"
+MC.version = (C_AddOns and C_AddOns.GetAddOnMetadata
+                and C_AddOns.GetAddOnMetadata(addonName, "Version")) or "dev"
 
-local MUI = LibStub("MidnightUI-1.0")
+local MUI = LibStub("MidnightUI-1.0", true)
+if not MUI then
+    error(addonName .. ": failed to load MidnightUI-1.0 library")
+end
 local PREFIX = MUI.ChatPrefix("Midnight Collections")
 MC.PREFIX = PREFIX
+
+-- Schema version for SavedVariables migrations
+local DB_VERSION = 1
 
 --------------------------------------------------------------------------
 -- Deep merge (single shared copy)
@@ -47,9 +52,10 @@ function MC.RegisterModule(key, opts)
 end
 
 --------------------------------------------------------------------------
--- Core defaults (panel-level settings)
+-- Core defaults (panel-level settings, account-wide)
 --------------------------------------------------------------------------
 local coreDefaults = {
+    dbVersion        = DB_VERSION,
     minimap          = { minimapPos = 225, hide = false },
     position         = { point = "CENTER", x = 0, y = 0 },
     locked           = false,
@@ -59,8 +65,12 @@ local coreDefaults = {
     frameScale       = 1.0,
     panelWidth       = 380,
     panelHeight      = 560,
-    activeTab        = "mounts",
     disabledModules  = {},
+}
+
+-- Per-character defaults (active tab — alts often focus on different collections)
+local charDefaults = {
+    activeTab        = "mounts",
 }
 
 --------------------------------------------------------------------------
@@ -77,18 +87,68 @@ function MC.FirstEnabledModule()
 end
 
 function MC.SetModuleEnabled(key, enabled)
-    MC.db.disabledModules[key] = (not enabled) or nil
+    if enabled then
+        MC.db.disabledModules[key] = nil
+    else
+        MC.db.disabledModules[key] = true
+    end
     if MC.TabBar then MC.TabBar:Reflow() end
+
     if enabled then
         local mod = MC.modulesByKey[key]
-        if mod and mod.Scanner then mod.Scanner:Scan() end
+        if mod then
+            -- Register module's events on enable
+            if mod.opts.events and MC.eventFrame then
+                for _, ev in ipairs(mod.opts.events) do
+                    pcall(MC.eventFrame.RegisterEvent, MC.eventFrame, ev)
+                end
+                MC._RebuildEventMap()
+            end
+            if mod.Scanner then
+                mod.Scanner:Scan()
+                -- Refresh UI if this module is active
+                if MC.activeModule == key and mod.UI then
+                    MC.RefreshActive()
+                end
+            end
+        end
     end
+
     -- If the active tab was just disabled, switch to the first enabled one
     if not enabled and MC.activeModule == key then
         local first = MC.FirstEnabledModule()
-        if first then MC.SwitchTab(first) end
+        if first then
+            MC.SwitchTab(first)
+        else
+            -- All modules disabled — clear UI and show placeholder
+            MC.activeModule = nil
+            if MC.panel and MC.panel.scrollChild and MC.panel.scrollChild._children then
+                for _, child in pairs(MC.panel.scrollChild._children) do
+                    if child.Hide then child:Hide() end
+                end
+            end
+            MC._ShowAllDisabledPlaceholder()
+        end
     end
-    MC.BuildConfig()
+
+    -- Defer config rebuild to avoid mutating defs mid-iteration
+    C_Timer.After(0, MC.BuildConfig)
+end
+
+function MC._ShowAllDisabledPlaceholder()
+    if not MC.panel or not MC.panel.scrollChild then return end
+    local theme = MUI.Theme
+    local fs = MUI.GetOrCreate(MC.panel.scrollChild, "allDisabledText", function(p)
+        local t = p:CreateFontString(nil, "OVERLAY")
+        t:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        return t
+    end)
+    fs:ClearAllPoints()
+    fs:SetPoint("TOP", MC.panel.scrollChild, "TOP", 0, -20)
+    fs:SetText("All modules disabled. Enable one in options.")
+    fs:SetTextColor(0.7, 0.7, 0.7)
+    fs:Show()
+    if MC.panel.titleProgressText then MC.panel.titleProgressText:SetText("") end
 end
 
 --------------------------------------------------------------------------
@@ -131,56 +191,85 @@ function MC.HideInfoTooltip()
 end
 
 --------------------------------------------------------------------------
+-- Currency info cache (invalidated on CURRENCY_DISPLAY_UPDATE)
+--------------------------------------------------------------------------
+local currencyCache = {}
+function MC.InvalidateCurrencyCache() wipe(currencyCache) end
+
+local function GetCachedCurrencyInfo(currID)
+    local hit = currencyCache[currID]
+    if hit ~= nil then return hit or nil end
+    local ok, info = pcall(C_CurrencyInfo.GetCurrencyInfo, currID)
+    info = ok and info or false
+    currencyCache[currID] = info
+    return info or nil
+end
+
+--------------------------------------------------------------------------
+-- Standing → numeric order (hoisted; immutable)
+--------------------------------------------------------------------------
+local STANDING_ORDER = {
+    Hated = 1, Hostile = 2, Unfriendly = 3, Neutral = 4,
+    Friendly = 5, Honored = 6, Revered = 7, Exalted = 8,
+}
+local STANDINGS = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
+
+--------------------------------------------------------------------------
 -- Shared info tooltip builder
 --------------------------------------------------------------------------
+local theme = MUI.Theme
+local C = theme.colors
+
 function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     local tt = MC.GetInfoTooltip()
-    tt:SetOwner(owner, "ANCHOR_PRESERVE")
+    tt:SetOwner(owner, "ANCHOR_NONE")
     tt:ClearAllPoints()
-    tt:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT", 2, 0)
+    -- Anchor to row owner so tooltip follows the row, not GameTooltip
+    tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
 
-    local MUI = LibStub("MidnightUI-1.0")
-    local theme = MUI.Theme
-    local c = theme.colors
-
-    tt:AddLine("Midnight Collections", c.ttTitle[1], c.ttTitle[2], c.ttTitle[3])
-    tt:AddDoubleLine("Source:", sourceLabel or item.source, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], sr or 0.7, sg or 0.7, sb or 0.7)
+    tt:AddLine("Midnight Collections", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
+    tt:AddDoubleLine("Source:", sourceLabel or item.source or "Unknown",
+        C.ttLabel[1], C.ttLabel[2], C.ttLabel[3],
+        sr or 0.7, sg or 0.7, sb or 0.7)
 
     if item.sourceInfo then
-        tt:AddLine(item.sourceInfo, 1, 1, 1)
+        tt:AddLine(item.sourceInfo, 1, 1, 1, true)
     end
 
     -- Pet type + battle capability (Pets only)
     if item.petType then
         local typeName = MC.PetTypeNames and MC.PetTypeNames[item.petType] or ("Type " .. (item.petType or "?"))
-        tt:AddDoubleLine("Pet type:", typeName, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+        tt:AddDoubleLine("Pet type:", typeName, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
     end
     if item.canBattle ~= nil then
         local battleStr = item.canBattle and "Yes" or "No"
         local br, bg, bb = 0.5, 0.8, 0.5
         if not item.canBattle then br, bg, bb = 0.8, 0.5, 0.5 end
-        tt:AddDoubleLine("Can battle:", battleStr, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], br, bg, bb)
+        tt:AddDoubleLine("Can battle:", battleStr, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], br, bg, bb)
     end
 
     -- Profession label (Decorations crafted items)
     if item.skillLine and MC.DecoProfLabels and MC.DecoProfLabels[item.skillLine] then
         local pr, pg, pb = theme:ProfAccentColor(item.skillLine)
-        tt:AddDoubleLine("Profession:", MC.DecoProfLabels[item.skillLine], c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], pr, pg, pb)
+        tt:AddDoubleLine("Profession:", MC.DecoProfLabels[item.skillLine], C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], pr, pg, pb)
     end
 
-    -- Location from waypoint / zone fallback
-    if item.waypoint then
-        local wp = item.waypoint
+    -- Location from waypoint / zone fallback. Uses GetSmartWaypoint so
+    -- Ritual Site entries show the entrance coords from the overworld
+    -- and the in-instance coords once you're inside.
+    local resolvedWp = MC.GetSmartWaypoint(item)
+    if resolvedWp then
+        local wp = resolvedWp
         if wp[1] and wp[1] > 0 then
             local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(wp[1])
             local mapName = mapInfo and mapInfo.name or ("Map " .. wp[1])
-            tt:AddDoubleLine("Zone:", mapName, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            tt:AddDoubleLine("Zone:", mapName, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
             if wp[2] and wp[3] then
-                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
             end
         end
     elseif item.zone then
-        tt:AddDoubleLine("Zone:", item.zone, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+        tt:AddDoubleLine("Zone:", item.zone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
     end
 
     -- Renown / reputation requirement
@@ -204,18 +293,18 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
             if C_Reputation and C_Reputation.GetFactionDataByID then
                 local ok, data = pcall(C_Reputation.GetFactionDataByID, req.factionID)
                 if ok and data and data.reaction then
-                    local standings = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
-                    current = standings[data.reaction] or tostring(data.reaction)
-                    local standingOrder = { Hated = 1, Hostile = 2, Unfriendly = 3, Neutral = 4, Friendly = 5, Honored = 6, Revered = 7, Exalted = 8 }
-                    metReq = data.reaction >= (standingOrder[req.standing] or 0)
+                    current = STANDINGS[data.reaction] or tostring(data.reaction)
+                    metReq = data.reaction >= (STANDING_ORDER[req.standing] or 0)
                 end
             end
             local name = req.factionName or ("Faction " .. req.factionID)
             reqLabel = format("%s %s (%s)", name, current, req.standing)
         end
-        local rr, rg, rb = c.ttCostBad[1], c.ttCostBad[2], c.ttCostBad[3]
-        if metReq then rr, rg, rb = 0.5, 0.8, 0.5 end
-        tt:AddLine(reqLabel, rr, rg, rb)
+        if reqLabel ~= "" then
+            local rr, rg, rb = C.ttCostBad[1], C.ttCostBad[2], C.ttCostBad[3]
+            if metReq then rr, rg, rb = 0.5, 0.8, 0.5 end
+            tt:AddLine(reqLabel, rr, rg, rb)
+        end
     end
 
     -- Vendor cost (gold + currency)
@@ -223,25 +312,25 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         if item.cost.gold then
             local playerGold = GetMoney and GetMoney() or 0
             local gr, gg, gb = 1, 1, 1
-            if playerGold < item.cost.gold then gr, gg, gb = c.ttCostBad[1], c.ttCostBad[2], c.ttCostBad[3] end
-            tt:AddDoubleLine("Cost:", MUI.FormatGold(item.cost.gold), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], gr, gg, gb)
+            if playerGold < item.cost.gold then gr, gg, gb = C.ttCostBad[1], C.ttCostBad[2], C.ttCostBad[3] end
+            tt:AddDoubleLine("Cost:", MUI.FormatGold(item.cost.gold), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], gr, gg, gb)
         end
         local parts = {}
         for _, key in ipairs({"currency", "currency2"}) do
             local cur = item.cost[key]
             if cur then
                 local currID, amount = cur[1], cur[2]
-                local info = C_CurrencyInfo and C_CurrencyInfo.GetCurrencyInfo(currID)
+                local info = GetCachedCurrencyInfo(currID)
                 local icon = info and info.iconFileID
                 local name = info and info.name or ("Currency " .. currID)
-                local owned = info and info.quantity or 0
+                local owned = (info and info.quantity) or 0
                 local color = owned >= amount and "" or "|cffff4d4d"
                 local costLabel = icon and (amount .. " |T" .. icon .. ":0|t") or (amount .. " " .. name)
                 parts[#parts + 1] = color .. costLabel .. "|r"
             end
         end
         if #parts > 0 then
-            tt:AddDoubleLine("Cost:", table.concat(parts, "  "), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], 1, 1, 1)
+            tt:AddDoubleLine("Cost:", table.concat(parts, "  "), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], 1, 1, 1)
         end
     end
 
@@ -249,16 +338,16 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     if item.dropInfo then
         local di = item.dropInfo
         if di.mob then
-            tt:AddDoubleLine("Drops from:", di.mob, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttDropMob[1], c.ttDropMob[2], c.ttDropMob[3])
+            tt:AddDoubleLine("Drops from:", di.mob, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttDropMob[1], C.ttDropMob[2], C.ttDropMob[3])
         end
         if di.zone then
-            tt:AddDoubleLine("Zone:", di.zone, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttValue[1], c.ttValue[2], c.ttValue[3])
+            tt:AddDoubleLine("Zone:", di.zone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
         end
         if di.rate then
-            tt:AddDoubleLine("Drop rate:", di.rate, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttDropRate[1], c.ttDropRate[2], c.ttDropRate[3])
+            tt:AddDoubleLine("Drop rate:", di.rate, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttDropRate[1], C.ttDropRate[2], C.ttDropRate[3])
         end
         if di.boss then
-            tt:AddLine("Boss drop", c.ttBoss[1], c.ttBoss[2], c.ttBoss[3])
+            tt:AddLine("Boss drop", C.ttBoss[1], C.ttBoss[2], C.ttBoss[3])
         end
     end
 
@@ -266,49 +355,103 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     if item.specInfo then
         local si = item.specInfo
         if si.tree then
-            tt:AddDoubleLine("Spec tree:", si.tree, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttSpec[1], c.ttSpec[2], c.ttSpec[3])
+            tt:AddDoubleLine("Spec tree:", si.tree, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttSpec[1], C.ttSpec[2], C.ttSpec[3])
         end
         if si.node then
-            tt:AddDoubleLine("Node:", si.node, c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], c.ttSpec[1], c.ttSpec[2], c.ttSpec[3])
+            tt:AddDoubleLine("Node:", si.node, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttSpec[1], C.ttSpec[2], C.ttSpec[3])
         end
         if si.points then
-            tt:AddDoubleLine("Points:", tostring(si.points), c.ttLabel[1], c.ttLabel[2], c.ttLabel[3], 1, 1, 1)
+            tt:AddDoubleLine("Points:", tostring(si.points), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], 1, 1, 1)
         end
     end
 
     -- Click hints
     tt:AddLine(" ")
-    if item.waypoint then
-        tt:AddLine("Click to set TomTom waypoint", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
+    if resolvedWp then
+        tt:AddLine("Click to set waypoint", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     elseif item.achievementID and item.achievementID > 0 then
-        tt:AddLine("Click to open achievement", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
+        tt:AddLine("Click to open achievement", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     elseif item.skillLine or item.specInfo then
-        tt:AddLine("Click to open profession", c.ttHintGreen[1], c.ttHintGreen[2], c.ttHintGreen[3])
+        tt:AddLine("Click to open profession", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     end
-    tt:AddLine("Shift-click to copy Wowhead URL", c.ttHintBlue[1], c.ttHintBlue[2], c.ttHintBlue[3])
+    tt:AddLine("Shift-click to copy Wowhead URL", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
 
     tt:Show()
 end
 
 --------------------------------------------------------------------------
--- Shared Wowhead URL opener
+-- Shared Wowhead URL opener (with combat guard + integer coercion)
 --------------------------------------------------------------------------
 function MC.OpenItemWowhead(item)
+    if InCombatLockdown() then
+        print(PREFIX .. " Cannot open URL popup during combat.")
+        return
+    end
     local url
     if item.mountID then
-        url = "https://www.wowhead.com/mount/" .. item.mountID
+        url = "https://www.wowhead.com/mount/" .. tonumber(item.mountID)
     elseif item.speciesID then
-        url = "https://www.wowhead.com/battle-pet/" .. item.speciesID
+        url = "https://www.wowhead.com/battle-pet/" .. tonumber(item.speciesID)
     elseif item.decorID and item.decorID > 0 then
-        url = "https://www.wowhead.com/decor=" .. item.decorID
+        url = "https://www.wowhead.com/decor=" .. tonumber(item.decorID)
     elseif item.itemID and item.itemID > 0 then
-        url = "https://www.wowhead.com/item=" .. item.itemID
+        url = "https://www.wowhead.com/item=" .. tonumber(item.itemID)
     elseif item.id then
-        url = "https://www.wowhead.com/spell=" .. item.id
+        url = "https://www.wowhead.com/spell=" .. tonumber(item.id)
     end
     if url then
         StaticPopup_Show("MIDNIGHTCOLLECTIONS_WOWHEAD", nil, nil, url)
     end
+end
+
+--------------------------------------------------------------------------
+-- Smart-waypoint resolver. Items with both `waypoint` and `overworldWaypoint`
+-- are typically Ritual Site entries: the in-instance coord is precise, but
+-- only useful once the player is actually inside the instance map. From the
+-- overworld we route to the entrance Obelisk instead.
+--------------------------------------------------------------------------
+function MC.GetSmartWaypoint(item)
+    local wp  = item.waypoint
+    local owp = item.overworldWaypoint
+    if not wp and not owp then return nil end
+    if not owp then return wp end
+    if not wp  then return owp end
+    -- Both present — pick the one matching the current map
+    local currentMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    if currentMap == wp[1] then
+        return wp
+    end
+    return owp
+end
+
+--------------------------------------------------------------------------
+-- Waypoint provider abstraction (TomTom; falls back to Blizzard map pin)
+--------------------------------------------------------------------------
+local _warnedNoWaypointProvider = false
+function MC.AddWaypoint(mapID, x, y, title)
+    if not (mapID and x and y) or mapID <= 0 then return false end
+    title = title or "Midnight Collections waypoint"
+    if TomTom and TomTom.AddWaypoint then
+        TomTom:AddWaypoint(mapID, x, y, { title = title })
+        print(format("%s Waypoint set: %s", PREFIX, title))
+        return true
+    end
+    if C_Map and C_Map.SetUserWaypoint and UiMapPoint then
+        local pt = UiMapPoint.CreateFromCoordinates(mapID, x, y)
+        local ok = pcall(C_Map.SetUserWaypoint, pt)
+        if ok then
+            if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
+                pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true)
+            end
+            print(format("%s Map pin set: %s", PREFIX, title))
+            return true
+        end
+    end
+    if not _warnedNoWaypointProvider then
+        _warnedNoWaypointProvider = true
+        print(PREFIX .. " Install TomTom for waypoint support.")
+    end
+    return false
 end
 
 --------------------------------------------------------------------------
@@ -319,18 +462,9 @@ function MC.DoItemAction(item, skillLine)
         MC.OpenItemWowhead(item)
         return
     end
-    local src = item.source
-    if item.waypoint then
-        local wp = item.waypoint
-        if wp[1] and wp[1] > 0 then
-            if TomTom then
-                local title = wp[4] or item.sourceInfo or item.name
-                TomTom:AddWaypoint(wp[1], wp[2], wp[3], { title = title })
-                print(format("%s Waypoint set: %s", PREFIX, title))
-            else
-                print(PREFIX .. " TomTom addon required for waypoints.")
-            end
-        end
+    local wp = MC.GetSmartWaypoint(item)
+    if wp then
+        MC.AddWaypoint(wp[1], wp[2], wp[3], wp[4] or item.sourceInfo or item.name)
     elseif item.achievementID and item.achievementID > 0 then
         if InCombatLockdown() then
             print(PREFIX .. " Cannot open achievements during combat.")
@@ -361,15 +495,22 @@ function MC.DoItemAction(item, skillLine)
 end
 
 --------------------------------------------------------------------------
--- ThrottledScan (per-module)
+-- ThrottledScan (per-module). Optional `delay` overrides the default 0.5s
+-- (used for BAG_UPDATE_DELAYED storms in Pets/Decorations).
 --------------------------------------------------------------------------
-function MC.ThrottledScan(mod)
+function MC.ThrottledScan(mod, delay)
     if mod._scanPending then return end
     mod._scanPending = true
-    C_Timer.After(0.5, function()
+    C_Timer.After(delay or 0.5, function()
         mod._scanPending = false
+        -- Skip if module was disabled while throttle was pending
+        if not MC.IsModuleEnabled(mod.key) then return end
         if mod.Scanner then
-            mod.Scanner:Scan()
+            local ok, err = pcall(mod.Scanner.Scan, mod.Scanner)
+            if not ok then
+                print(format("%s Scan error in %s: %s", PREFIX, mod.key, tostring(err)))
+                return
+            end
             if MC.activeModule == mod.key and mod.UI and MC.panel
                 and MC.panel.frame and MC.panel.frame:IsShown() then
                 mod.UI:Refresh()
@@ -379,11 +520,70 @@ function MC.ThrottledScan(mod)
 end
 
 --------------------------------------------------------------------------
+-- Event dispatch map (built at PLAYER_LOGIN). Each event dispatches only
+-- to interested, enabled modules — avoids iterating all modules per event.
+--------------------------------------------------------------------------
+MC._eventHandlers = {}
+
+function MC._RebuildEventMap()
+    wipe(MC._eventHandlers)
+    for _, mod in ipairs(MC.modules) do
+        if mod.opts.events then
+            for _, ev in ipairs(mod.opts.events) do
+                if not MC._eventHandlers[ev] then
+                    MC._eventHandlers[ev] = {}
+                end
+                MC._eventHandlers[ev][#MC._eventHandlers[ev] + 1] = mod
+            end
+        end
+    end
+end
+
+--------------------------------------------------------------------------
+-- Schema migrations
+--------------------------------------------------------------------------
+local function MigrateDB(db)
+    -- Migration from pre-merge standalone addons: import their saved vars.
+    -- Pre-merge DBs: MidnightRecipesDB / MidnightPetsDB / MidnightMountsDB / MidnightDecorationsDB.
+    if not db.dbVersion then
+        local function importLegacy(legacyName, modKey)
+            local legacy = _G[legacyName]
+            if type(legacy) == "table" and not db[modKey] then
+                db[modKey] = legacy
+                print(format("%s Imported legacy %s settings.", PREFIX, modKey))
+            end
+        end
+        importLegacy("MidnightRecipesDB",     "recipes")
+        importLegacy("MidnightPetsDB",        "pets")
+        importLegacy("MidnightMountsDB",      "mounts")
+        importLegacy("MidnightDecorationsDB", "decorations")
+        db.dbVersion = 1
+    end
+    -- Future migrations: bump DB_VERSION and add a block here.
+end
+
+--------------------------------------------------------------------------
+-- Position validation: snap back to CENTER if saved coords are off-screen
+-- (resolution change since last session can leave the panel inaccessible)
+--------------------------------------------------------------------------
+local function ValidatePosition(pos)
+    if not pos then return end
+    local w = UIParent and UIParent:GetWidth() or 1920
+    local h = UIParent and UIParent:GetHeight() or 1080
+    if math.abs(pos.x or 0) > w or math.abs(pos.y or 0) > h then
+        pos.point = "CENTER"
+        pos.x, pos.y = 0, 0
+    end
+end
+
+--------------------------------------------------------------------------
 -- Event frame
 --------------------------------------------------------------------------
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+frame:RegisterEvent("UNIT_FACTION")
 MC.eventFrame = frame
 
 frame:SetScript("OnEvent", function(_, event, ...)
@@ -392,8 +592,18 @@ frame:SetScript("OnEvent", function(_, event, ...)
         frame:UnregisterEvent("ADDON_LOADED")
 
         if not MidnightCollectionsDB then MidnightCollectionsDB = {} end
+        if not MidnightCollectionsCharDB then MidnightCollectionsCharDB = {} end
+        MigrateDB(MidnightCollectionsDB)
+        -- One-time copy of legacy account-wide activeTab into per-character DB
+        if MidnightCollectionsDB.activeTab and not MidnightCollectionsCharDB.activeTab then
+            MidnightCollectionsCharDB.activeTab = MidnightCollectionsDB.activeTab
+            MidnightCollectionsDB.activeTab = nil
+        end
         MC.DeepMergeDefaults(MidnightCollectionsDB, coreDefaults)
+        MC.DeepMergeDefaults(MidnightCollectionsCharDB, charDefaults)
+        ValidatePosition(MidnightCollectionsDB.position)
         MC.db = MidnightCollectionsDB
+        MC.cdb = MidnightCollectionsCharDB
 
         -- Init per-module sub-tables
         for _, mod in ipairs(MC.modules) do
@@ -412,22 +622,31 @@ frame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
 
-        -- Register per-module events (pcall-wrapped)
+        -- Register events only for ENABLED modules
         for _, mod in ipairs(MC.modules) do
-            if mod.opts.events then
+            if MC.IsModuleEnabled(mod.key) and mod.opts.events then
                 for _, ev in ipairs(mod.opts.events) do
                     pcall(frame.RegisterEvent, frame, ev)
                 end
             end
         end
+        MC._RebuildEventMap()
 
-        -- Call each module's onLogin + initial scan
+        -- onLogin runs for all (cheap), but defer first scan: journal APIs
+        -- aren't fully populated at PLAYER_LOGIN.
         for _, mod in ipairs(MC.modules) do
-            if mod.opts.onLogin then
+            if MC.IsModuleEnabled(mod.key) and mod.opts.onLogin then
                 mod.opts.onLogin(mod)
             end
-            if mod.Scanner then mod.Scanner:Scan() end
         end
+        C_Timer.After(2, function()
+            for _, mod in ipairs(MC.modules) do
+                if MC.IsModuleEnabled(mod.key) and mod.Scanner then
+                    pcall(mod.Scanner.Scan, mod.Scanner)
+                end
+            end
+            if MC.activeModule then MC.RefreshActive() end
+        end)
 
         -- Create the unified panel
         MC.CreatePanel()
@@ -436,15 +655,31 @@ frame:SetScript("OnEvent", function(_, event, ...)
         if MC.MinimapButton then MC.MinimapButton:Init() end
 
         -- Activate saved tab (or first enabled module)
-        local tabKey = MC.db.activeTab
+        local tabKey = MC.cdb.activeTab
         if not MC.modulesByKey[tabKey] or not MC.IsModuleEnabled(tabKey) then
             tabKey = MC.FirstEnabledModule()
         end
-        if tabKey then MC.SwitchTab(tabKey) end
+        if tabKey then
+            MC.SwitchTab(tabKey)
+        else
+            MC._ShowAllDisabledPlaceholder()
+        end
+
+    elseif event == "CURRENCY_DISPLAY_UPDATE" then
+        MC.InvalidateCurrencyCache()
+
+    elseif event == "UNIT_FACTION" and arg1 == "player" then
+        -- Faction-change mid-session: rescan Mounts so PvP filter updates
+        local mounts = MC.modulesByKey["mounts"]
+        if mounts and MC.IsModuleEnabled("mounts") then
+            MC.ThrottledScan(mounts)
+        end
 
     else
-        -- Dispatch to modules (skip disabled)
-        for _, mod in ipairs(MC.modules) do
+        -- Per-event dispatch — only modules registered for this event
+        local handlers = MC._eventHandlers[event]
+        if not handlers then return end
+        for _, mod in ipairs(handlers) do
             if MC.IsModuleEnabled(mod.key) and mod.opts.onEvent then
                 mod.opts.onEvent(mod, event, ...)
             end
@@ -491,7 +726,11 @@ function MC.SwitchTab(key)
     if not mod or not MC.IsModuleEnabled(key) then return end
 
     MC.activeModule = key
-    MC.db.activeTab = key
+    if MC.cdb then MC.cdb.activeTab = key end
+
+    -- Hide tooltips before refreshing — row references go stale
+    MC.HideInfoTooltip()
+    if GameTooltip then GameTooltip:Hide() end
 
     if MC.TabBar then MC.TabBar:SetActive(key) end
 
@@ -517,12 +756,16 @@ function MC.SwitchTab(key)
 end
 
 --------------------------------------------------------------------------
--- Refresh active module
+-- Refresh active module. Hides any open tooltip first so that stale
+-- references to row frames (which are about to be released back to the pool)
+-- don't leave a visibly-pinned tooltip pointing at an obsolete item.
 --------------------------------------------------------------------------
 function MC.RefreshActive()
     if not MC.panel or not MC.panel.scrollChild then return end
     local mod = MC.modulesByKey[MC.activeModule]
     if not mod or not mod.UI then return end
+    MC.HideInfoTooltip()
+    if GameTooltip then GameTooltip:Hide() end
     mod.UI:Refresh()
 end
 
@@ -560,13 +803,25 @@ function MC.BuildConfig()
             if MC.MinimapButton and MC.MinimapButton.Update then MC.MinimapButton:Update() end
         end }
 
-    -- Per-module settings (only enabled modules)
+    -- Per-module settings (only enabled modules). Auto-inject the "Show Collected"
+    -- checkbox from opts.collectedKey/collectedLabel so modules don't have to
+    -- duplicate it in GetConfigDefs.
     for _, mod in ipairs(MC.modules) do
-        if MC.IsModuleEnabled(mod.key) and mod.UI and mod.UI.GetConfigDefs then
+        if MC.IsModuleEnabled(mod.key) and mod.UI then
             defs[#defs + 1] = { type = "divider" }
             defs[#defs + 1] = { type = "section", label = strupper(mod.label) }
-            for _, def in ipairs(mod.UI:GetConfigDefs()) do
-                defs[#defs + 1] = def
+            local key   = mod.opts.collectedKey or "showCollected"
+            local label = mod.opts.collectedLabel or "collected"
+            defs[#defs + 1] = {
+                type = "checkbox",
+                label = "Show " .. label:gsub("^%l", string.upper),
+                get = function() return mod.db[key] end,
+                set = function(v) mod.db[key] = v; MC.RefreshActive() end,
+            }
+            if mod.UI.GetConfigDefs then
+                for _, def in ipairs(mod.UI:GetConfigDefs()) do
+                    defs[#defs + 1] = def
+                end
             end
         end
     end
@@ -598,39 +853,83 @@ end
 --------------------------------------------------------------------------
 SLASH_MIDNIGHTCOLLECTIONS1 = "/mc"
 SLASH_MIDNIGHTCOLLECTIONS2 = "/midnightcollections"
-SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
-    msg = strlower(strtrim(msg))
 
-    -- /mc <module> → switch tab + show
-    if MC.modulesByKey[msg] then
-        MC.SwitchTab(msg)
+local function PrintHelp()
+    print(PREFIX .. " Commands:")
+    print("  /mc - toggle panel")
+    local keys = {}
+    for _, mod in ipairs(MC.modules) do keys[#keys + 1] = mod.key end
+    print("  /mc <module> - switch tab (" .. table.concat(keys, ", ") .. ")")
+    print("  /mc scan - rescan enabled modules")
+    print("  /mc collected [module] - toggle collected/learned display")
+    print("  /mc reset - reset panel position + size")
+    print("  /mc version - show addon version")
+    print("  /mc help - show this help")
+end
+
+SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
+    msg = strlower(strtrim(msg or "", " \t\r\n"))
+
+    if msg == "" then
+        if MC.panel then MC.panel:Toggle() end
+        return
+    end
+
+    local cmd, arg = strsplit(" ", msg, 2)
+
+    -- /mc <module>
+    if MC.modulesByKey[cmd] then
+        if not MC.IsModuleEnabled(cmd) then
+            print(format("%s Module '%s' is disabled.", PREFIX, cmd))
+            return
+        end
+        MC.SwitchTab(cmd)
         if MC.panel then MC.panel:Show() end
         return
     end
 
-    if msg == "scan" then
+    if cmd == "scan" then
         for _, mod in ipairs(MC.modules) do
-            if mod.Scanner then mod.Scanner:Scan() end
+            if MC.IsModuleEnabled(mod.key) and mod.Scanner then
+                pcall(mod.Scanner.Scan, mod.Scanner)
+            end
         end
         MC.RefreshActive()
-        print(MC.PREFIX .. " All modules scanned.")
-    elseif msg == "collected" or msg == "learned" then
-        local mod = MC.modulesByKey[MC.activeModule]
-        if mod and mod.db then
-            local key = mod.opts.collectedKey or "showCollected"
-            mod.db[key] = not mod.db[key]
-            print(MC.PREFIX .. format(" [%s] Show %s: %s",
-                mod.label, mod.opts.collectedLabel or "collected", tostring(mod.db[key])))
-            MC.RefreshActive()
+        print(PREFIX .. " Enabled modules scanned.")
+    elseif cmd == "collected" or cmd == "learned" then
+        local target = (arg and MC.modulesByKey[arg]) and arg or MC.activeModule
+        local mod = MC.modulesByKey[target]
+        if not mod or not mod.db then
+            print(format("%s No module to toggle. Try '/mc collected pets'.", PREFIX))
+            return
         end
-    elseif msg == "help" then
-        print(MC.PREFIX .. " Available commands:")
-        print("  /mc - Toggle panel")
-        print("  /mc <module> - Switch to module (recipes, pets, mounts, decorations)")
-        print("  /mc scan - Force rescan all modules")
-        print("  /mc collected - Toggle collected display for active module")
-        print("  /mc help - Show this help")
+        local key = mod.opts.collectedKey or "showCollected"
+        mod.db[key] = not mod.db[key]
+        print(format("%s [%s] Show %s: %s",
+            PREFIX, mod.label, mod.opts.collectedLabel or "collected", tostring(mod.db[key])))
+        if MC.activeModule == target then MC.RefreshActive() end
+    elseif cmd == "reset" then
+        if MC.db.position then
+            MC.db.position.point = "CENTER"
+            MC.db.position.x = 0
+            MC.db.position.y = 0
+        end
+        MC.db.panelWidth = 380
+        MC.db.panelHeight = 560
+        MC.db.frameAlpha = 1.0
+        MC.db.frameScale = 1.0
+        if MC.panel and MC.panel.frame then
+            MC.panel.frame:ClearAllPoints()
+            MC.panel.frame:SetPoint("CENTER")
+            MC.panel.frame:SetSize(MC.db.panelWidth, MC.db.panelHeight)
+            MC.panel.frame:SetScale(1.0)
+        end
+        print(PREFIX .. " Panel reset.")
+    elseif cmd == "version" then
+        print(format("%s Midnight Collections v%s", PREFIX, MC.version))
+    elseif cmd == "help" then
+        PrintHelp()
     else
-        if MC.panel then MC.panel:Toggle() end
+        print(format("%s Unknown command '%s'. Type /mc help.", PREFIX, cmd))
     end
 end

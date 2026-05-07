@@ -1,11 +1,12 @@
-local MAJOR, MINOR = "MidnightUI-1.0", 1
+local MAJOR, MINOR = "MidnightUI-1.0", 20260506
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
 --------------------------------------------------------------------------
--- Theme
+-- Theme — preserve identity across lib reloads so existing local refs stay valid
 --------------------------------------------------------------------------
-lib.Theme = {
+lib.Theme = lib.Theme or {}
+local _ThemeRebuild = {
     font = STANDARD_TEXT_FONT,
     fontSize = 11,
 
@@ -79,15 +80,38 @@ lib.Theme = {
         ttCostBad   = { 1, 0.30, 0.25 },
         -- Chat prefix color (warm gold)
         chat           = { 0.85, 0.65, 0.22 },
-        -- Source colors
+        -- Source colors (covers Recipes, Mounts, Pets, Decorations sources)
         source = {
+            -- Recipes
             trainer        = { 0.35, 0.78, 0.30 },
-            vendor         = { 0.35, 0.62, 0.98 },
             discovery      = { 0.90, 0.68, 0.20 },
             specialization = { 0.78, 0.50, 0.88 },
+            -- Shared
+            vendor         = { 0.35, 0.62, 0.98 },
             drop           = { 0.90, 0.38, 0.28 },
             quest          = { 0.90, 0.78, 0.20 },
+            achievement    = { 0.90, 0.70, 0.20 },
+            -- Mounts
+            renown         = { 0.30, 0.60, 1.00 },
+            reputation     = { 0.20, 0.50, 0.90 },
+            delve          = { 0.55, 0.75, 0.90 },
+            prey           = { 0.80, 0.30, 0.50 },
+            dungeon        = { 0.70, 0.50, 0.90 },
+            raid           = { 0.90, 0.40, 0.60 },
+            pvp            = { 0.85, 0.30, 0.30 },
+            worldevent     = { 0.70, 0.70, 0.70 },
+            profession     = { 0.80, 0.50, 0.90 },
+            prepatch       = { 0.60, 0.60, 0.60 },
+            -- Pets
+            wild           = { 0.40, 0.90, 0.40 },
+            treasure       = { 0.85, 0.65, 0.30 },
+            tradingpost    = { 0.90, 0.55, 0.80 },
+            event          = { 0.70, 0.70, 0.70 },
+            -- Decorations
+            crafted        = { 0.80, 0.50, 0.90 },
         },
+        -- Dim "secondary" text on rows
+        infoText        = { 0.45, 0.45, 0.45 },
     },
 
     backdrop = {
@@ -100,6 +124,8 @@ lib.Theme = {
         bgFile   = "Interface\\Buttons\\WHITE8x8",
     },
 }
+-- Merge fresh theme into the persistent table so existing locals stay valid
+for k, v in pairs(_ThemeRebuild) do lib.Theme[k] = v end
 
 function lib.ChatPrefix(name)
     local c = lib.Theme.colors.chat
@@ -417,4 +443,193 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     header:SetScript("OnLeave", function() hoverTex:SetColorTexture(1, 1, 1, 0) end)
 
     return header, collapsed, yOff + opts.height + 2
+end
+
+--------------------------------------------------------------------------
+-- RenderItemRow — shared row scaffold for Mounts/Pets/Decorations/Recipes.
+--
+-- opts:
+--   height, indent (default 8), padding (default 6)
+--   leading = { kind = "icon"|"dot", size, texture, color = {r,g,b}, fallback }
+--   name (string), info (optional right-aligned string)
+--   isCollected (bool) — applies dim text + strikethrough + alpha
+--   onEnter, onLeave (optional, additional handlers run after default hover)
+--   onClick (optional) — only attached when not isCollected
+--
+-- Returns the new yOff.
+--------------------------------------------------------------------------
+function lib.RenderItemRow(pool, parent, yOff, opts)
+    local pad = opts.padding or 6
+    local indent = opts.indent or 8
+    local height = opts.height or 22
+
+    local row = pool:Acquire(parent)
+    row:SetHeight(height)
+    row:SetPoint("TOPLEFT", parent, "TOPLEFT", indent, -yOff)
+    row:SetPoint("RIGHT", parent, "RIGHT", 0, 0)
+
+    -- Hover background
+    local rc = lib.Theme.colors.rowHover
+    local hoverTex = lib.GetOrCreate(row, "hover", function(p)
+        return p:CreateTexture(nil, "BACKGROUND", nil, 1)
+    end)
+    hoverTex:SetAllPoints()
+    hoverTex:SetColorTexture(1, 1, 1, 0)
+
+    -- Leading element (icon or color dot)
+    local nameOffset = pad
+    local leading = opts.leading
+    if leading then
+        if leading.kind == "icon" then
+            local sz = leading.size or 20
+            local iconTex = lib.GetOrCreate(row, "icon", function(p)
+                local t = p:CreateTexture(nil, "ARTWORK")
+                return t
+            end)
+            iconTex:SetSize(sz, sz)
+            iconTex:SetPoint("LEFT", row, "LEFT", pad, 0)
+            iconTex:SetTexture(leading.texture or leading.fallback or "Interface\\Icons\\INV_Misc_QuestionMark")
+            if opts.isCollected then
+                iconTex:SetDesaturated(true)
+                iconTex:SetAlpha(0.5)
+            else
+                iconTex:SetDesaturated(false)
+                iconTex:SetAlpha(1)
+            end
+            -- Hide the dot if it was previously rendered on this pooled row
+            local oldDot = row._children and row._children.dot
+            if oldDot then oldDot:Hide() end
+            nameOffset = pad + sz + 4
+        elseif leading.kind == "dot" then
+            local sz = leading.size or 6
+            local dot = lib.GetOrCreate(row, "dot", function(p)
+                local t = p:CreateTexture(nil, "ARTWORK")
+                return t
+            end)
+            dot:SetSize(sz, sz)
+            dot:SetPoint("LEFT", row, "LEFT", pad, 0)
+            local color = leading.color or { 0.7, 0.7, 0.7 }
+            dot:SetColorTexture(color[1], color[2], color[3], color[4] or 1)
+            local oldIcon = row._children and row._children.icon
+            if oldIcon then oldIcon:Hide() end
+            nameOffset = pad + sz + 6
+        end
+    end
+
+    -- Name
+    local theme = lib.Theme
+    local nameFs = lib.GetOrCreate(row, "name", function(p)
+        local fs = p:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        return fs
+    end)
+    nameFs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+    nameFs:SetJustifyH("LEFT")
+    nameFs:SetWordWrap(false)
+    nameFs:SetPoint("LEFT", row, "LEFT", nameOffset, 0)
+    nameFs:SetPoint("RIGHT", row, "RIGHT", opts.info and -50 or 0, 0)
+    nameFs:SetText(opts.name or "")
+    if opts.isCollected then
+        nameFs:SetTextColor(unpack(theme.colors.textDim))
+    else
+        nameFs:SetTextColor(unpack(theme.colors.text))
+    end
+
+    -- Info (right side, dim)
+    if opts.info and opts.info ~= "" then
+        local infoFs = lib.GetOrCreate(row, "info", function(p)
+            local fs = p:CreateFontString(nil, "OVERLAY")
+            fs:SetFont(theme.font, theme.fontSize - 2, "OUTLINE")
+            return fs
+        end)
+        infoFs:SetFont(theme.font, theme.fontSize - 2, "OUTLINE")
+        infoFs:SetJustifyH("RIGHT")
+        infoFs:ClearAllPoints()
+        infoFs:SetPoint("RIGHT", row, "RIGHT", -pad, 0)
+        infoFs:SetText(opts.info)
+        infoFs:SetTextColor(unpack(theme.colors.infoText))
+    elseif row._children and row._children.info then
+        row._children.info:Hide()
+    end
+
+    -- Strikethrough
+    local strike = lib.GetOrCreate(row, "strike", function(p)
+        local t = p:CreateTexture(nil, "ARTWORK")
+        t:SetHeight(1)
+        return t
+    end)
+    if opts.isCollected then
+        strike:ClearAllPoints()
+        strike:SetPoint("LEFT", nameFs, "LEFT", 0, 0)
+        strike:SetPoint("RIGHT", nameFs, "RIGHT", 0, 0)
+        local td = theme.colors.textDim
+        strike:SetColorTexture(td[1], td[2], td[3], 0.5)
+        strike:Show()
+    else
+        strike:Hide()
+    end
+
+    -- Hover handlers
+    row:SetScript("OnEnter", function(r)
+        hoverTex:SetColorTexture(rc[1], rc[2], rc[3], rc[4])
+        if opts.onEnter then opts.onEnter(r) end
+    end)
+    row:SetScript("OnLeave", function(r)
+        hoverTex:SetColorTexture(1, 1, 1, 0)
+        if opts.onLeave then opts.onLeave(r) end
+    end)
+
+    if opts.onClick and not opts.isCollected then
+        row:SetScript("OnMouseUp", function(_, button)
+            if button == "LeftButton" then opts.onClick() end
+        end)
+    end
+
+    return yOff + height
+end
+
+--------------------------------------------------------------------------
+-- Standard zone-grouping helper used by Mounts and Pets
+--------------------------------------------------------------------------
+lib.MidnightZoneOrder = {
+    "Eversong Woods", "Silvermoon City", "Harandar", "Voidstorm",
+    "Zul'Aman", "Isle of Quel'Danas",
+}
+local _zoneSet = {}
+for _, z in ipairs(lib.MidnightZoneOrder) do _zoneSet[z] = true end
+lib.MidnightZoneSet = _zoneSet
+
+function lib.GroupByField(entries, field, fallback)
+    local groups = {}
+    for _, item in ipairs(entries) do
+        local k = item[field] or fallback or "Unknown"
+        if not groups[k] then groups[k] = {} end
+        groups[k][#groups[k] + 1] = item
+    end
+    return groups
+end
+
+--------------------------------------------------------------------------
+-- Show/hide an empty-state message on a parent. Pooled by key "emptyText".
+--------------------------------------------------------------------------
+function lib.ShowEmptyMessage(parent, text, color)
+    local theme = lib.Theme
+    local fs = lib.GetOrCreate(parent, "emptyText", function(p)
+        local f = p:CreateFontString(nil, "OVERLAY")
+        f:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        return f
+    end)
+    fs:ClearAllPoints()
+    fs:SetPoint("TOP", parent, "TOP", 0, -20)
+    fs:SetText(text)
+    local c = color or theme.colors.countDim
+    fs:SetTextColor(c[1], c[2], c[3])
+    fs:Show()
+    return 60
+end
+
+function lib.HideEmptyMessage(parent)
+    if parent._children and parent._children.emptyText then
+        parent._children.emptyText:Hide()
+    end
 end

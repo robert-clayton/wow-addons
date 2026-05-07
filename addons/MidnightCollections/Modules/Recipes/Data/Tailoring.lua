@@ -1,15 +1,6 @@
 local _, MC = ...
 
--- NPC waypoint data: { mapID, x, y, "NPC Name" }
--- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405
-local NPC = {
-    Mirvedon       = { 2393, 0.340, 0.812, "Mirvedon, Silvermoon City" },
-    Lyrendal       = { 2393, 0.450, 0.554, "Lyrendal, Silvermoon City" },
-    CaerisFairdawn = { 2395, 0.435, 0.474, "Caeris Fairdawn, Eversong Woods" },
-    Magovu         = { 2437, 0.460, 0.659, "Magovu, Zul'Aman" },
-    Naynar         = { 2413, 0.510, 0.508, "Naynar, Harandar" },
-    Anomander      = { 2405, 0.526, 0.729, "Void Researcher Anomander, Voidstorm" },
-}
+local LOC = MC.LOC
 
 MC.TailoringRecipes = {
     {
@@ -84,7 +75,7 @@ MC.TailoringRecipes = {
         name = "Spellthreads",
         recipes = {
             { id = 1228976, name = "Bright Linen Spellthread",    source = "trainer", sourceInfo = "Trainer (Skill 35)",                          priority = 1 },
-            { id = 1228975, name = "Arcanoweave Spellthread",      source = "vendor",  sourceInfo = "Caeris Fairdawn (Silvermoon Court Renown 5)", priority = 1, waypoint = NPC.CaerisFairdawn, cost = { currency = { 3266, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1228975, name = "Arcanoweave Spellthread",      source = "vendor",  sourceInfo = "Caeris Fairdawn (Silvermoon Court Renown 5)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1228974, name = "Sunfire Silk Spellthread",     source = "drop",    sourceInfo = "Fallen-King Salhadaar, The Voidspire",        priority = 4 },
         },
     },
@@ -111,36 +102,36 @@ MC.TailoringRecipes = {
     {
         name = "Elegant Artisan's Profession Gear",
         recipes = {
-            { id = 1228962, name = "Elegant Artisan's Alchemy Coveralls", source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1228963, name = "Elegant Artisan's Cooking Hat",       source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1228964, name = "Elegant Artisan's Enchanting Hat",    source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1228965, name = "Elegant Artisan's Fishing Hat",       source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1228966, name = "Elegant Artisan's Herbalism Hat",     source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1228967, name = "Elegant Artisan's Tailoring Robe",    source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
+            { id = 1228962, name = "Elegant Artisan's Alchemy Coveralls", source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1228963, name = "Elegant Artisan's Cooking Hat",       source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1228964, name = "Elegant Artisan's Enchanting Hat",    source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1228965, name = "Elegant Artisan's Fishing Hat",       source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1228966, name = "Elegant Artisan's Herbalism Hat",     source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1228967, name = "Elegant Artisan's Tailoring Robe",    source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
         },
     },
     {
         name = "Thalassian Profession Gear",
         recipes = {
-            { id = 1279123, name = "Thalassian Alchemy Coveralls",    source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 200 } } },
-            { id = 1279124, name = "Thalassian Chef's Chapeau",       source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 200 } } },
-            { id = 1279125, name = "Thalassian Enchanter's Bonnet",   source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 200 } } },
-            { id = 1279128, name = "Thalassian Herbalist's Cowl",     source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 200 } } },
-            { id = 1279129, name = "Thalassian Tailor's Threads",     source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 200 } } },
+            { id = 1279123, name = "Thalassian Alchemy Coveralls",    source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 200 } } },
+            { id = 1279124, name = "Thalassian Chef's Chapeau",       source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 200 } } },
+            { id = 1279125, name = "Thalassian Enchanter's Bonnet",   source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 200 } } },
+            { id = 1279128, name = "Thalassian Herbalist's Cowl",     source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 200 } } },
+            { id = 1279129, name = "Thalassian Tailor's Threads",     source = "vendor", sourceInfo = "Lyrendal (200 Artisan Moxie)", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 200 } } },
         },
     },
     {
         name = "PvP Competitor's Cloth",
         recipes = {
-            { id = 1228989, name = "Thalassian Competitor's Cloth Bands",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228990, name = "Thalassian Competitor's Cloth Cloak",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228991, name = "Thalassian Competitor's Cloth Gloves",       source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228992, name = "Thalassian Competitor's Cloth Hood",         source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228993, name = "Thalassian Competitor's Cloth Leggings",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228994, name = "Thalassian Competitor's Cloth Sash",         source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228995, name = "Thalassian Competitor's Cloth Shoulderpads", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228996, name = "Thalassian Competitor's Cloth Treads",       source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
-            { id = 1228997, name = "Thalassian Competitor's Cloth Tunic",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = NPC.Mirvedon, cost = { currency = { 1792, 7500 } } },
+            { id = 1228989, name = "Thalassian Competitor's Cloth Bands",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228990, name = "Thalassian Competitor's Cloth Cloak",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228991, name = "Thalassian Competitor's Cloth Gloves",       source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228992, name = "Thalassian Competitor's Cloth Hood",         source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228993, name = "Thalassian Competitor's Cloth Leggings",     source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228994, name = "Thalassian Competitor's Cloth Sash",         source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228995, name = "Thalassian Competitor's Cloth Shoulderpads", source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228996, name = "Thalassian Competitor's Cloth Treads",       source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
+            { id = 1228997, name = "Thalassian Competitor's Cloth Tunic",        source = "vendor", sourceInfo = "Mirvedon (7500 Honor)", priority = 1, waypoint = LOC.Mirvedon, cost = { currency = { MC.CURRENCY.Honor, 7500 } } },
         },
     },
     {
@@ -158,10 +149,10 @@ MC.TailoringRecipes = {
         name = "Housing Decor",
         recipes = {
             { id = 1229000, name = "Silvermoon Curtains",                  source = "quest",  sourceInfo = "Quest: Clothes Make the Man (Eversong)", priority = 4 },
-            { id = 1229001, name = "Lush Telogrus Carpet",                source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)",       priority = 1, waypoint = NPC.Anomander, cost = { currency = { 3266, 150 }, currency2 = { 3316, 1500 } } },
+            { id = 1229001, name = "Lush Telogrus Carpet",                source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)",       priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1229002, name = "Luxurious Silvermoon Lounge Cushion", source = "drop",   sourceInfo = "Eversong Treasures",                     priority = 4 },
-            { id = 1229003, name = "Plush Silvermoon Bed",                source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
-            { id = 1246919, name = "Chic Silvermoon Pillow",              source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = NPC.Lyrendal, cost = { currency = { 3266, 150 } } },
+            { id = 1229003, name = "Plush Silvermoon Bed",                source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
+            { id = 1246919, name = "Chic Silvermoon Pillow",              source = "vendor", sourceInfo = "Lyrendal (150 Artisan Moxie)",           priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 } } },
             { id = 1246929, name = "Voidstrider Saddlebag",               source = "drop",   sourceInfo = "Victorious Stormarion Cache",             priority = 4, dropInfo = { rate = "~1%" } },
         },
     },

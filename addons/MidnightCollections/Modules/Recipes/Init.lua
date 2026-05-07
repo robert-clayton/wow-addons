@@ -1,18 +1,10 @@
 local _, MC = ...
 
-local CRAFT_SKILLS = {
-    [171] = true,   -- Alchemy
-    [164] = true,   -- Blacksmithing
-    [185] = true,   -- Cooking
-    [333] = true,   -- Enchanting
-    [202] = true,   -- Engineering
-    [773] = true,   -- Inscription
-    [755] = true,   -- Jewelcrafting
-    [165] = true,   -- Leatherworking
-    [197] = true,   -- Tailoring
-}
+-- Recipes covers all 9 crafting professions
+MC.RecipeProfOrder = MC.PROFESSION_ORDER
 
-MC.RecipeProfOrder = { 171, 164, 185, 333, 202, 773, 755, 165, 197 }
+local CRAFT_SKILLS = {}
+for _, sl in ipairs(MC.PROFESSION_ORDER) do CRAFT_SKILLS[sl] = true end
 
 local function DetectProfessions(mod)
     wipe(mod.professions)
@@ -40,14 +32,14 @@ end
 local mod = MC.RegisterModule("recipes", {
     label          = "Recipes",
     icon           = "Interface\\Icons\\INV_Scroll_03",
-    order          = 4,
+    order          = 5,
     collectedKey   = "showLearned",
     collectedLabel = "learned",
     defaults       = {
         showLearned = false,
         collapsed   = {},
     },
-    events = { "TRADE_SKILL_LIST_UPDATE", "SPELLS_CHANGED", "SKILL_LINES_CHANGED" },
+    events = { "TRADE_SKILL_LIST_UPDATE", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "NEW_RECIPE_LEARNED" },
     onLogin = function(m)
         m.professions = {}
         DetectProfessions(m)
@@ -56,7 +48,7 @@ local mod = MC.RegisterModule("recipes", {
         if event == "SKILL_LINES_CHANGED" then
             DetectProfessions(m)
             MC.ThrottledScan(m)
-        elseif event == "TRADE_SKILL_LIST_UPDATE" or event == "SPELLS_CHANGED" then
+        else
             MC.ThrottledScan(m)
         end
     end,
