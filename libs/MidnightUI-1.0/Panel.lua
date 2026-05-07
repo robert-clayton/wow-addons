@@ -121,11 +121,23 @@ function PanelProto:CreateTitleBar()
     bar:SetScript("OnMouseDown", function(_, button)
         if button == "LeftButton" and not db.locked then f:StartMoving() end
     end)
+    -- Manual double-click detection. WoW's `Frame` doesn't expose
+    -- OnDoubleClick (only `Button` does), so we time successive clicks.
+    local lastClick = 0
     bar:SetScript("OnMouseUp", function(_, button)
         if button == "LeftButton" then
             f:StopMovingOrSizing()
             local point, _, relativePoint, x, y = f:GetPoint()
             db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
+
+            local now = GetTime()
+            if now - lastClick < 0.4 then
+                db.minimized = not db.minimized
+                panel:ApplyMinimizeState()
+                lastClick = 0  -- prevent triple-click from toggling twice
+            else
+                lastClick = now
+            end
         end
     end)
 
