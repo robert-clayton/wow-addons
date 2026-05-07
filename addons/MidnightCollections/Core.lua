@@ -266,13 +266,17 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     -- player would actually be routed if they clicked.
     local resolvedWp = MC.GetSmartWaypoint(item)
     if resolvedWp then
-        local wp = resolvedWp
-        if wp[1] and wp[1] > 0 then
-            local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(wp[1])
-            local mapName = mapInfo and mapInfo.name or ("Map " .. wp[1])
+        local isList = MC._isWaypointList(resolvedWp)
+        local first = isList and resolvedWp[1] or resolvedWp
+        if first[1] and first[1] > 0 then
+            local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(first[1])
+            local mapName = mapInfo and mapInfo.name or ("Map " .. first[1])
             tt:AddDoubleLine("Zone:", mapName, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
-            if wp[2] and wp[3] then
-                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", wp[2] * 100, wp[3] * 100), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
+            if isList then
+                tt:AddDoubleLine("Spawns:", #resolvedWp .. " possible locations",
+                    C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
+            elseif first[2] and first[3] then
+                tt:AddDoubleLine("Coords:", format("%.1f, %.1f", first[2] * 100, first[3] * 100), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
             end
         end
     elseif item.zone then
@@ -373,7 +377,11 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 
     tt:AddLine(" ")
     if resolvedWp then
-        tt:AddLine("Click to set waypoint", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
+        local hint = "Click to set waypoint"
+        if MC._isWaypointList(resolvedWp) then
+            hint = format("Click to set %d waypoints", #resolvedWp)
+        end
+        tt:AddLine(hint, C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     elseif item.achievementID and item.achievementID > 0 then
         tt:AddLine("Click to open achievement", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
     elseif item.skillLine or item.specInfo then
@@ -411,8 +419,23 @@ function MC.OpenItemWowhead(item)
 end
 
 --------------------------------------------------------------------------
+-- A waypoint is either a single tuple { mapID, x, y, name } or a list of
+-- those tuples for items with multiple spawn points (e.g. 8 Rustling Bushes).
+-- Detect by checking if the first element is itself a table.
+--------------------------------------------------------------------------
+local function isWaypointList(wp)
+    return wp ~= nil and type(wp[1]) == "table"
+end
+
+local function waypointMapID(wp)
+    if not wp then return nil end
+    if isWaypointList(wp) then return wp[1][1] end
+    return wp[1]
+end
+
+--------------------------------------------------------------------------
 -- Pick the right waypoint for where the player is right now.
--- Inside the instance? Precise spawn coords.
+-- Inside the instance? Precise spawn coords (might be a list of spawns).
 -- In the target zone? Direct waypoint.
 -- In a hub with a portal to the target zone? Route to that portal first.
 -- Otherwise just send them to wherever they should end up; TomTom queues it.
@@ -423,11 +446,12 @@ function MC.GetSmartWaypoint(item)
     if not wp and not owp then return nil end
 
     local currentMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    local wpMapID = waypointMapID(wp)
 
-    if wp and currentMap == wp[1] then return wp end
+    if wp and currentMap == wpMapID then return wp end
 
-    -- Target zone: instanced content uses owp[1], everything else wp[1].
-    local targetZone = (owp and owp[1]) or (wp and wp[1])
+    -- Target zone: instanced content uses owp[1], everything else wp's mapID.
+    local targetZone = (owp and owp[1]) or wpMapID
 
     if currentMap == targetZone then return owp or wp end
 
@@ -440,6 +464,8 @@ function MC.GetSmartWaypoint(item)
 
     return owp or wp
 end
+
+MC._isWaypointList = isWaypointList
 
 --------------------------------------------------------------------------
 -- TomTom if available, Blizzard's user map pin if not.
@@ -482,7 +508,24 @@ function MC.DoItemAction(item, skillLine)
     end
     local wp = MC.GetSmartWaypoint(item)
     if wp then
-        MC.AddWaypoint(wp[1], wp[2], wp[3], wp[4] or item.sourceInfo or item.name)
+        if MC._isWaypointList(wp) then
+            -- Multi-spawn: drop a TomTom marker at each. The Blizzard map-pin
+            -- fallback only holds one at a time, so we warn and pin the first.
+            if TomTom and TomTom.AddWaypoint then
+                for _, w in ipairs(wp) do
+                    TomTom:AddWaypoint(w[1], w[2], w[3], { title = w[4] or item.name })
+                end
+                print(format("%s Set %d waypoints for %s.", PREFIX, #wp, item.name))
+            else
+                local first = wp[1]
+                MC.AddWaypoint(first[1], first[2], first[3],
+                    format("%s (1 of %d spawns)", item.name, #wp))
+                print(format("%s Install TomTom to mark all %d spawns at once.",
+                    PREFIX, #wp))
+            end
+        else
+            MC.AddWaypoint(wp[1], wp[2], wp[3], wp[4] or item.sourceInfo or item.name)
+        end
     elseif item.achievementID and item.achievementID > 0 then
         if InCombatLockdown() then
             print(PREFIX .. " Cannot open achievements during combat.")

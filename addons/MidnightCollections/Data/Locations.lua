@@ -40,7 +40,7 @@ MC.LOC = {
     VoidstormHarandarPortal   = { MC.MAP.Voidstorm, 0.517, 0.704, "Portal to Harandar (Howling Ridge)" },
 
     -- 12.0.5 Ritual Site Obelisks (overworld entrance).
-    DaggerspinePointEntrance = { MC.MAP.Eversong, 0.349, 0.654, "Daggerspine Point Obelisk (Eversong Woods)" },
+    DaggerspinePointEntrance = { MC.MAP.Eversong, 0.376, 0.653, "Daggerspine Point Obelisk (Eversong Woods)" },
     BrokenThroneEntrance     = { MC.MAP.ZulAman,  0.297, 0.782, "Broken Throne Obelisk (Zul'Aman)" },
 
     -- 12.0.5 Ritual Site spawn / interaction points. The mapIDs are
@@ -49,7 +49,8 @@ MC.LOC = {
     SoggyNest          = { MC.MAP.DaggerspinePoint, 0.300, 0.631, "Soggy Nest (Daggerspine Point)" },
     DaggerspineRiverEgg = { MC.MAP.DaggerspinePoint, 0.652, 0.454, "White egg in river (Daggerspine Point)" },
     DaggerspineKelpPiles = { MC.MAP.DaggerspinePoint, 0.660, 0.738, "Washed-Up Kelp pile (one of several, Daggerspine Point)" },
-    DaggerspineRustlingBush = { MC.MAP.DaggerspinePoint, 0.664, 0.524, "Rustling Bush (one of several, Daggerspine Point — Tier 4+)" },
+    -- Rustling Bush has 8 possible spawn points, listed inline on the
+    -- Void-Touched Lynx Kitten entry instead of as a single LOC.
     -- Broken Throne (Zul'Aman Ritual Site, mapID 2585)
     LostBearCub        = { MC.MAP.BrokenThrone, 0.558, 0.496, "Lost Bear Cub (Broken Throne)" },
     AmaniWarbearPile   = { MC.MAP.BrokenThrone, 0.557, 0.389, "Angry Amani Warbear bone pile (Broken Throne)" },
