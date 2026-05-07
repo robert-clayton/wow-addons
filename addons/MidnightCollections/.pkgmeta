@@ -18,3 +18,4 @@ ignore:
     - "*.md"
     - "Media/icon-source.png"
     - "Media/curseforge-logo.png"
+    - "Media/screenshot*.png"

@@ -32,13 +32,12 @@ MC.LOC = {
     -- Silvermoon City portals to other Midnight zones (used by MC.PORTALS routing)
     SilvermoonHarandarPortal  = { MC.MAP.Silvermoon, 0.367, 0.686, "Portal to Harandar (Gardens of Remembrance)" },
     SilvermoonVoidstormPortal = { MC.MAP.Silvermoon, 0.353, 0.657, "Portal to Voidstorm (above Gardens of Remembrance)" },
-    -- Return portals at The Den (Harandar) and Howling Ridge (Voidstorm).
-    -- Coords are approximated to the local quartermaster since the exact
-    -- portal coords aren't published anywhere I could find.
-    HarandarSilvermoonPortal  = { MC.MAP.Harandar, 0.510, 0.510, "Portal to Silvermoon (The Den)" },
-    HarandarVoidstormPortal   = { MC.MAP.Harandar, 0.512, 0.510, "Portal to Voidstorm (The Den)" },
-    VoidstormSilvermoonPortal = { MC.MAP.Voidstorm, 0.526, 0.728, "Portal to Silvermoon (Howling Ridge)" },
-    VoidstormHarandarPortal   = { MC.MAP.Voidstorm, 0.524, 0.728, "Portal to Harandar (Howling Ridge)" },
+    -- Return portals at The Den (Harandar sub-map 2576) and Howling Ridge
+    -- (which is part of the Voidstorm map, not a separate sub-zone).
+    HarandarSilvermoonPortal  = { MC.MAP.HarandarDen, 0.631, 0.715, "Portal to Silvermoon (The Den)" },
+    HarandarVoidstormPortal   = { MC.MAP.HarandarDen, 0.631, 0.715, "Portal to Voidstorm (The Den)" },
+    VoidstormSilvermoonPortal = { MC.MAP.Voidstorm, 0.516, 0.703, "Portal to Silvermoon (Howling Ridge)" },
+    VoidstormHarandarPortal   = { MC.MAP.Voidstorm, 0.517, 0.704, "Portal to Harandar (Howling Ridge)" },
 
     -- 12.0.5 Ritual Site Obelisks (overworld entrance).
     DaggerspinePointEntrance = { MC.MAP.Eversong, 0.349, 0.654, "Daggerspine Point Obelisk (Eversong Woods)" },
@@ -145,6 +144,15 @@ MC.PORTALS = {
     -- Walking-back-to-Silvermoon zones are reached by taking the
     -- "to Silvermoon" portal first.
     [MC.MAP.Harandar] = {
+        [MC.MAP.Silvermoon]      = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.Voidstorm]       = LOC.HarandarVoidstormPortal,
+        [MC.MAP.Eversong]        = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.ZulAman]         = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.IsleOfQuelDanas] = LOC.HarandarSilvermoonPortal,
+    },
+    -- The Den is a sub-map of Harandar; same routing applies so portals work
+    -- whether the player is standing in the overworld zone or the hub itself.
+    [MC.MAP.HarandarDen] = {
         [MC.MAP.Silvermoon]      = LOC.HarandarSilvermoonPortal,
         [MC.MAP.Voidstorm]       = LOC.HarandarVoidstormPortal,
         [MC.MAP.Eversong]        = LOC.HarandarSilvermoonPortal,
