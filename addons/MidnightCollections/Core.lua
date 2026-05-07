@@ -158,13 +158,22 @@ StaticPopupDialogs["MIDNIGHTCOLLECTIONS_WOWHEAD"] = {
     button1 = CLOSE,
     hasEditBox = true,
     editBoxWidth = 280,
+    -- StaticPopup_Show stashes the data argument on the dialog frame as
+    -- self.data, regardless of whether OnShow gets it as a second argument
+    -- (Blizzard has changed that signature between versions).
     OnShow = function(self, data)
-        local editBox = self.editBox
-        editBox:SetText(data)
-        editBox:HighlightText()
-        editBox:SetFocus()
+        local url = data or self.data or ""
+        local editBox = self.editBox or self.EditBox
+        if editBox then
+            editBox:SetText(url)
+            editBox:HighlightText()
+            editBox:SetFocus()
+        end
     end,
     EditBoxOnEscapePressed = function(self)
+        self:GetParent():Hide()
+    end,
+    EditBoxOnEnterPressed = function(self)
         self:GetParent():Hide()
     end,
     timeout = 0,
