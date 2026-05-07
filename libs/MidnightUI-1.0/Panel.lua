@@ -40,7 +40,10 @@ function PanelProto:Create()
 
     local pos = db.position
     f:ClearAllPoints()
-    f:SetPoint(pos.point or "CENTER", UIParent, pos.point or "CENTER", pos.x or 0, pos.y or 0)
+    -- relativePoint defaults to point for backwards compat with old saves
+    -- that didn't store it (CENTER->CENTER and TOPLEFT->TOPLEFT both work).
+    local relPoint = pos.relativePoint or pos.point or "CENTER"
+    f:SetPoint(pos.point or "CENTER", UIParent, relPoint, pos.x or 0, pos.y or 0)
 
     -- Apply scale
     if db.frameScale and db.frameScale ~= 1.0 then
@@ -82,7 +85,7 @@ function PanelProto:ApplyMinimizeState()
         if left and top then
             f:ClearAllPoints()
             f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
-            db.position = { point = "TOPLEFT", x = left, y = top }
+            db.position = { point = "TOPLEFT", relativePoint = "BOTTOMLEFT", x = left, y = top }
         end
         if f.scrollFrame then f.scrollFrame:Hide() end
         if f.scrollTrack then f.scrollTrack:Hide() end
@@ -121,8 +124,8 @@ function PanelProto:CreateTitleBar()
     bar:SetScript("OnMouseUp", function(_, button)
         if button == "LeftButton" then
             f:StopMovingOrSizing()
-            local point, _, _, x, y = f:GetPoint()
-            db.position = { point = point, x = x, y = y }
+            local point, _, relativePoint, x, y = f:GetPoint()
+            db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
         end
     end)
 
@@ -334,8 +337,8 @@ function PanelProto:CreateResizeDragger()
             db.panelHeight = newH
             f:SetWidth(newW)
             f:SetHeight(newH)
-            local point, _, _, x, y = f:GetPoint()
-            db.position = { point = point, x = x, y = y }
+            local point, _, relativePoint, x, y = f:GetPoint()
+            db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
             if f.scrollChild then
                 f.scrollChild:SetWidth(newW - 9)
             end

@@ -571,18 +571,9 @@ local function MigrateDB(db)
     -- Future schema bumps go here.
 end
 
--- A resolution change between sessions can leave saved coords pointing
--- somewhere off-screen. Snap to CENTER if that happens so the user can
--- still drag the panel.
-local function ValidatePosition(pos)
-    if not pos then return end
-    local w = UIParent and UIParent:GetWidth() or 1920
-    local h = UIParent and UIParent:GetHeight() or 1080
-    if math.abs(pos.x or 0) > w or math.abs(pos.y or 0) > h then
-        pos.point = "CENTER"
-        pos.x, pos.y = 0, 0
-    end
-end
+-- (Position recovery is now handled by SetClampedToScreen on the panel frame.
+-- The earlier ValidatePosition routine was clobbering valid positions when
+-- UIParent wasn't sized at ADDON_LOADED time.)
 
 --------------------------------------------------------------------------
 -- Event frame
@@ -609,7 +600,6 @@ frame:SetScript("OnEvent", function(_, event, ...)
         end
         MC.DeepMergeDefaults(MidnightCollectionsDB, coreDefaults)
         MC.DeepMergeDefaults(MidnightCollectionsCharDB, charDefaults)
-        ValidatePosition(MidnightCollectionsDB.position)
         MC.db = MidnightCollectionsDB
         MC.cdb = MidnightCollectionsCharDB
 
