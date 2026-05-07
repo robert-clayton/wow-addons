@@ -105,7 +105,8 @@ end
 -- Add new entries as players spot rares with `waypoint: none` in the ctrl-click
 -- output: the key is the criterion's name, the value is the HandyNotes name.
 local NAME_ALIASES = {
-    ["Mrrlok"] = "Mrrlokk",
+    ["Mrrlok"]              = "Mrrlokk",
+    ["Ash'an the Empowered"] = "Asha the Empowered",
 }
 for criterion, handyName in pairs(NAME_ALIASES) do
     MC.RareCoords[criterion] = MC.RareCoords[handyName]

@@ -1,5 +1,9 @@
 local addonName, MC = ...
 
+-- Expose the namespace as a global so /run scripts and other addons can
+-- reach it. Using the addon's full name avoids colliding with anything else.
+_G.MidnightCollections = MC
+
 MC.name = addonName
 MC.version = (C_AddOns and C_AddOns.GetAddOnMetadata
                 and C_AddOns.GetAddOnMetadata(addonName, "Version")) or "dev"
