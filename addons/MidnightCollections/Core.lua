@@ -11,11 +11,11 @@ end
 local PREFIX = MUI.ChatPrefix("Midnight Collections")
 MC.PREFIX = PREFIX
 
--- Schema version for SavedVariables migrations
+-- Bumped when SavedVariables shape changes; MigrateDB reads it.
 local DB_VERSION = 1
 
 --------------------------------------------------------------------------
--- Deep merge (single shared copy)
+-- Deep-merge defaults into a saved DB without overwriting existing values.
 --------------------------------------------------------------------------
 function MC.DeepMergeDefaults(target, source)
     for k, v in pairs(source) do
@@ -52,7 +52,7 @@ function MC.RegisterModule(key, opts)
 end
 
 --------------------------------------------------------------------------
--- Core defaults (panel-level settings, account-wide)
+-- Account-wide defaults
 --------------------------------------------------------------------------
 local coreDefaults = {
     dbVersion        = DB_VERSION,
@@ -68,7 +68,7 @@ local coreDefaults = {
     disabledModules  = {},
 }
 
--- Per-character defaults (active tab — alts often focus on different collections)
+-- Per-character. Alts tend to care about different tabs.
 local charDefaults = {
     activeTab        = "mounts",
 }
@@ -97,7 +97,6 @@ function MC.SetModuleEnabled(key, enabled)
     if enabled then
         local mod = MC.modulesByKey[key]
         if mod then
-            -- Register module's events on enable
             if mod.opts.events and MC.eventFrame then
                 for _, ev in ipairs(mod.opts.events) do
                     pcall(MC.eventFrame.RegisterEvent, MC.eventFrame, ev)
@@ -106,7 +105,6 @@ function MC.SetModuleEnabled(key, enabled)
             end
             if mod.Scanner then
                 mod.Scanner:Scan()
-                -- Refresh UI if this module is active
                 if MC.activeModule == key and mod.UI then
                     MC.RefreshActive()
                 end
@@ -114,13 +112,13 @@ function MC.SetModuleEnabled(key, enabled)
         end
     end
 
-    -- If the active tab was just disabled, switch to the first enabled one
+    -- Active tab disabled? Fall back to the first enabled module, or
+    -- show a placeholder if everything is off.
     if not enabled and MC.activeModule == key then
         local first = MC.FirstEnabledModule()
         if first then
             MC.SwitchTab(first)
         else
-            -- All modules disabled — clear UI and show placeholder
             MC.activeModule = nil
             if MC.panel and MC.panel.scrollChild and MC.panel.scrollChild._children then
                 for _, child in pairs(MC.panel.scrollChild._children) do
@@ -131,7 +129,8 @@ function MC.SetModuleEnabled(key, enabled)
         end
     end
 
-    -- Defer config rebuild to avoid mutating defs mid-iteration
+    -- Deferred so we don't mutate defs mid-iteration if the toggle came
+    -- from clicking a checkbox in the config panel.
     C_Timer.After(0, MC.BuildConfig)
 end
 
@@ -152,7 +151,7 @@ function MC._ShowAllDisabledPlaceholder()
 end
 
 --------------------------------------------------------------------------
--- Shared Wowhead URL popup
+-- Shift-click popup that lets the user copy a Wowhead URL
 --------------------------------------------------------------------------
 StaticPopupDialogs["MIDNIGHTCOLLECTIONS_WOWHEAD"] = {
     text = "Copy Wowhead URL:",
@@ -174,7 +173,7 @@ StaticPopupDialogs["MIDNIGHTCOLLECTIONS_WOWHEAD"] = {
 }
 
 --------------------------------------------------------------------------
--- Shared info tooltip
+-- Single shared info tooltip — created once and reused by every row hover
 --------------------------------------------------------------------------
 local infoTooltip
 
@@ -191,7 +190,8 @@ function MC.HideInfoTooltip()
 end
 
 --------------------------------------------------------------------------
--- Currency info cache (invalidated on CURRENCY_DISPLAY_UPDATE)
+-- Currency info cache. C_CurrencyInfo.GetCurrencyInfo gets called on every
+-- tooltip hover, and currency data only changes on CURRENCY_DISPLAY_UPDATE.
 --------------------------------------------------------------------------
 local currencyCache = {}
 function MC.InvalidateCurrencyCache() wipe(currencyCache) end
@@ -205,9 +205,7 @@ local function GetCachedCurrencyInfo(currID)
     return info or nil
 end
 
---------------------------------------------------------------------------
--- Standing → numeric order (hoisted; immutable)
---------------------------------------------------------------------------
+-- Standing names <-> reaction index, file-scoped so they're not rebuilt per hover.
 local STANDING_ORDER = {
     Hated = 1, Hostile = 2, Unfriendly = 3, Neutral = 4,
     Friendly = 5, Honored = 6, Revered = 7, Exalted = 8,
@@ -215,7 +213,7 @@ local STANDING_ORDER = {
 local STANDINGS = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
 
 --------------------------------------------------------------------------
--- Shared info tooltip builder
+-- The big info tooltip (renown, cost, drop info, click hints)
 --------------------------------------------------------------------------
 local theme = MUI.Theme
 local C = theme.colors
@@ -224,7 +222,8 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     local tt = MC.GetInfoTooltip()
     tt:SetOwner(owner, "ANCHOR_NONE")
     tt:ClearAllPoints()
-    -- Anchor to row owner so tooltip follows the row, not GameTooltip
+    -- Anchor to the row, not GameTooltip. If we anchored to GameTooltip
+    -- and another addon hid it, this one would float off-screen.
     tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
 
     tt:AddLine("Midnight Collections", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
@@ -236,7 +235,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         tt:AddLine(item.sourceInfo, 1, 1, 1, true)
     end
 
-    -- Pet type + battle capability (Pets only)
+    -- Pets only
     if item.petType then
         local typeName = MC.PetTypeNames and MC.PetTypeNames[item.petType] or ("Type " .. (item.petType or "?"))
         tt:AddDoubleLine("Pet type:", typeName, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
@@ -248,15 +247,14 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         tt:AddDoubleLine("Can battle:", battleStr, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], br, bg, bb)
     end
 
-    -- Profession label (Decorations crafted items)
+    -- Crafted decorations
     if item.skillLine and MC.DecoProfLabels and MC.DecoProfLabels[item.skillLine] then
         local pr, pg, pb = theme:ProfAccentColor(item.skillLine)
         tt:AddDoubleLine("Profession:", MC.DecoProfLabels[item.skillLine], C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], pr, pg, pb)
     end
 
-    -- Location from waypoint / zone fallback. Uses GetSmartWaypoint so
-    -- Ritual Site entries show the entrance coords from the overworld
-    -- and the in-instance coords once you're inside.
+    -- Use GetSmartWaypoint so the displayed coords match wherever the
+    -- player would actually be routed if they clicked.
     local resolvedWp = MC.GetSmartWaypoint(item)
     if resolvedWp then
         local wp = resolvedWp
@@ -272,7 +270,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         tt:AddDoubleLine("Zone:", item.zone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
     end
 
-    -- Renown / reputation requirement
+    -- Renown / rep requirement (red until met, green when met)
     if item.renown then
         local req = item.renown
         local metReq = false
@@ -307,7 +305,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         end
     end
 
-    -- Vendor cost (gold + currency)
+    -- Currency / gold cost. Red if you can't afford it.
     if item.cost then
         if item.cost.gold then
             local playerGold = GetMoney and GetMoney() or 0
@@ -334,7 +332,6 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         end
     end
 
-    -- Drop info
     if item.dropInfo then
         local di = item.dropInfo
         if di.mob then
@@ -351,7 +348,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         end
     end
 
-    -- Specialization info (Recipes only)
+    -- Recipes only
     if item.specInfo then
         local si = item.specInfo
         if si.tree then
@@ -365,7 +362,6 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         end
     end
 
-    -- Click hints
     tt:AddLine(" ")
     if resolvedWp then
         tt:AddLine("Click to set waypoint", C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
@@ -380,7 +376,8 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 end
 
 --------------------------------------------------------------------------
--- Shared Wowhead URL opener (with combat guard + integer coercion)
+-- Shift-click handler that opens the Wowhead URL popup.
+-- Combat-guarded because StaticPopup_Show can taint UIParent.
 --------------------------------------------------------------------------
 function MC.OpenItemWowhead(item)
     if InCombatLockdown() then
@@ -405,27 +402,38 @@ function MC.OpenItemWowhead(item)
 end
 
 --------------------------------------------------------------------------
--- Smart-waypoint resolver. Items with both `waypoint` and `overworldWaypoint`
--- are typically Ritual Site entries: the in-instance coord is precise, but
--- only useful once the player is actually inside the instance map. From the
--- overworld we route to the entrance Obelisk instead.
+-- Pick the right waypoint for where the player is right now.
+-- Inside the instance? Precise spawn coords.
+-- In the target zone? Direct waypoint.
+-- In a hub with a portal to the target zone? Route to that portal first.
+-- Otherwise just send them to wherever they should end up; TomTom queues it.
 --------------------------------------------------------------------------
 function MC.GetSmartWaypoint(item)
     local wp  = item.waypoint
     local owp = item.overworldWaypoint
     if not wp and not owp then return nil end
-    if not owp then return wp end
-    if not wp  then return owp end
-    -- Both present — pick the one matching the current map
+
     local currentMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    if currentMap == wp[1] then
-        return wp
+
+    if wp and currentMap == wp[1] then return wp end
+
+    -- Target zone: instanced content uses owp[1], everything else wp[1].
+    local targetZone = (owp and owp[1]) or (wp and wp[1])
+
+    if currentMap == targetZone then return owp or wp end
+
+    if MC.PORTALS and currentMap and targetZone then
+        local portalsFromHere = MC.PORTALS[currentMap]
+        if portalsFromHere and portalsFromHere[targetZone] then
+            return portalsFromHere[targetZone]
+        end
     end
-    return owp
+
+    return owp or wp
 end
 
 --------------------------------------------------------------------------
--- Waypoint provider abstraction (TomTom; falls back to Blizzard map pin)
+-- TomTom if available, Blizzard's user map pin if not.
 --------------------------------------------------------------------------
 local _warnedNoWaypointProvider = false
 function MC.AddWaypoint(mapID, x, y, title)
@@ -455,7 +463,8 @@ function MC.AddWaypoint(mapID, x, y, title)
 end
 
 --------------------------------------------------------------------------
--- Shared click action handler
+-- Row click handler. Shift-click for Wowhead, plain click sets a waypoint
+-- (or opens the achievement / profession if there's no waypoint).
 --------------------------------------------------------------------------
 function MC.DoItemAction(item, skillLine)
     if IsShiftKeyDown() then
@@ -495,15 +504,15 @@ function MC.DoItemAction(item, skillLine)
 end
 
 --------------------------------------------------------------------------
--- ThrottledScan (per-module). Optional `delay` overrides the default 0.5s
--- (used for BAG_UPDATE_DELAYED storms in Pets/Decorations).
+-- Coalesces a flurry of events into one scan. Pets and Decorations pass
+-- a longer delay for BAG_UPDATE_DELAYED, which fires constantly during loot.
 --------------------------------------------------------------------------
 function MC.ThrottledScan(mod, delay)
     if mod._scanPending then return end
     mod._scanPending = true
     C_Timer.After(delay or 0.5, function()
         mod._scanPending = false
-        -- Skip if module was disabled while throttle was pending
+        -- Module might have been disabled while we were waiting.
         if not MC.IsModuleEnabled(mod.key) then return end
         if mod.Scanner then
             local ok, err = pcall(mod.Scanner.Scan, mod.Scanner)
@@ -520,8 +529,8 @@ function MC.ThrottledScan(mod, delay)
 end
 
 --------------------------------------------------------------------------
--- Event dispatch map (built at PLAYER_LOGIN). Each event dispatches only
--- to interested, enabled modules — avoids iterating all modules per event.
+-- event -> { module, module, ... } so chatty events (BAG_UPDATE_DELAYED,
+-- NAME_PLATE_UNIT_ADDED, etc) don't iterate every registered module.
 --------------------------------------------------------------------------
 MC._eventHandlers = {}
 
@@ -543,8 +552,8 @@ end
 -- Schema migrations
 --------------------------------------------------------------------------
 local function MigrateDB(db)
-    -- Migration from pre-merge standalone addons: import their saved vars.
-    -- Pre-merge DBs: MidnightRecipesDB / MidnightPetsDB / MidnightMountsDB / MidnightDecorationsDB.
+    -- v0 -> v1: pull in saved vars from the four standalone addons that
+    -- were merged into this one.
     if not db.dbVersion then
         local function importLegacy(legacyName, modKey)
             local legacy = _G[legacyName]
@@ -559,13 +568,12 @@ local function MigrateDB(db)
         importLegacy("MidnightDecorationsDB", "decorations")
         db.dbVersion = 1
     end
-    -- Future migrations: bump DB_VERSION and add a block here.
+    -- Future schema bumps go here.
 end
 
---------------------------------------------------------------------------
--- Position validation: snap back to CENTER if saved coords are off-screen
--- (resolution change since last session can leave the panel inaccessible)
---------------------------------------------------------------------------
+-- A resolution change between sessions can leave saved coords pointing
+-- somewhere off-screen. Snap to CENTER if that happens so the user can
+-- still drag the panel.
 local function ValidatePosition(pos)
     if not pos then return end
     local w = UIParent and UIParent:GetWidth() or 1920
@@ -594,7 +602,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         if not MidnightCollectionsDB then MidnightCollectionsDB = {} end
         if not MidnightCollectionsCharDB then MidnightCollectionsCharDB = {} end
         MigrateDB(MidnightCollectionsDB)
-        -- One-time copy of legacy account-wide activeTab into per-character DB
+        -- activeTab used to be account-wide; move it to the char DB once.
         if MidnightCollectionsDB.activeTab and not MidnightCollectionsCharDB.activeTab then
             MidnightCollectionsCharDB.activeTab = MidnightCollectionsDB.activeTab
             MidnightCollectionsDB.activeTab = nil
@@ -605,7 +613,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         MC.db = MidnightCollectionsDB
         MC.cdb = MidnightCollectionsCharDB
 
-        -- Init per-module sub-tables
+        -- Each module gets its own sub-table for settings and collapsed state.
         for _, mod in ipairs(MC.modules) do
             local moduleDefaults = mod.opts.defaults or {}
             if not moduleDefaults.collapsed then
@@ -622,7 +630,6 @@ frame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
 
-        -- Register events only for ENABLED modules
         for _, mod in ipairs(MC.modules) do
             if MC.IsModuleEnabled(mod.key) and mod.opts.events then
                 for _, ev in ipairs(mod.opts.events) do
@@ -632,13 +639,13 @@ frame:SetScript("OnEvent", function(_, event, ...)
         end
         MC._RebuildEventMap()
 
-        -- onLogin runs for all (cheap), but defer first scan: journal APIs
-        -- aren't fully populated at PLAYER_LOGIN.
         for _, mod in ipairs(MC.modules) do
             if MC.IsModuleEnabled(mod.key) and mod.opts.onLogin then
                 mod.opts.onLogin(mod)
             end
         end
+        -- C_PetJournal/C_MountJournal aren't fully populated at PLAYER_LOGIN,
+        -- so the first scan is deferred a couple of seconds.
         C_Timer.After(2, function()
             for _, mod in ipairs(MC.modules) do
                 if MC.IsModuleEnabled(mod.key) and mod.Scanner then
@@ -648,13 +655,9 @@ frame:SetScript("OnEvent", function(_, event, ...)
             if MC.activeModule then MC.RefreshActive() end
         end)
 
-        -- Create the unified panel
         MC.CreatePanel()
-
-        -- Init minimap button
         if MC.MinimapButton then MC.MinimapButton:Init() end
 
-        -- Activate saved tab (or first enabled module)
         local tabKey = MC.cdb.activeTab
         if not MC.modulesByKey[tabKey] or not MC.IsModuleEnabled(tabKey) then
             tabKey = MC.FirstEnabledModule()
@@ -669,14 +672,13 @@ frame:SetScript("OnEvent", function(_, event, ...)
         MC.InvalidateCurrencyCache()
 
     elseif event == "UNIT_FACTION" and arg1 == "player" then
-        -- Faction-change mid-session: rescan Mounts so PvP filter updates
+        -- Player swapped factions; PvP-filtered mount list needs a rescan.
         local mounts = MC.modulesByKey["mounts"]
         if mounts and MC.IsModuleEnabled("mounts") then
             MC.ThrottledScan(mounts)
         end
 
     else
-        -- Per-event dispatch — only modules registered for this event
         local handlers = MC._eventHandlers[event]
         if not handlers then return end
         for _, mod in ipairs(handlers) do
@@ -709,12 +711,9 @@ function MC.CreatePanel()
 
     MC.panel = panel
 
-    -- Create tab bar between title bar and scroll area
     if MC.TabBar then
         MC.TabBar:Create(panel, MC.modules, function(key) MC.SwitchTab(key) end)
     end
-
-    -- Build aggregated config
     MC.BuildConfig()
 end
 
@@ -728,26 +727,25 @@ function MC.SwitchTab(key)
     MC.activeModule = key
     if MC.cdb then MC.cdb.activeTab = key end
 
-    -- Hide tooltips before refreshing — row references go stale
+    -- Tooltip and row frames are about to be reused by the new tab.
     MC.HideInfoTooltip()
     if GameTooltip then GameTooltip:Hide() end
 
     if MC.TabBar then MC.TabBar:SetActive(key) end
 
-    -- Ensure module UI is initialized
     if mod.UI and not mod.UI._initialized then
         mod.UI:Init(MC.panel, mod)
         mod.UI._initialized = true
     end
 
-    -- Hide stale GetOrCreate children (progress bars, emptyText, etc.)
+    -- Hide stale GetOrCreate children left behind by the previous tab
+    -- (progress bars, emptyText, etc).
     if MC.panel and MC.panel.scrollChild and MC.panel.scrollChild._children then
         for _, child in pairs(MC.panel.scrollChild._children) do
             if child.Hide then child:Hide() end
         end
     end
 
-    -- Reset scroll position to top
     if MC.panel and MC.panel.scrollFrame then
         MC.panel.scrollFrame:SetVerticalScroll(0)
     end
@@ -755,11 +753,8 @@ function MC.SwitchTab(key)
     MC.RefreshActive()
 end
 
---------------------------------------------------------------------------
--- Refresh active module. Hides any open tooltip first so that stale
--- references to row frames (which are about to be released back to the pool)
--- don't leave a visibly-pinned tooltip pointing at an obsolete item.
---------------------------------------------------------------------------
+-- Refresh hides the tooltip first, otherwise it can stay pinned to a row
+-- that's about to be released back to the pool.
 function MC.RefreshActive()
     if not MC.panel or not MC.panel.scrollChild then return end
     local mod = MC.modulesByKey[MC.activeModule]
@@ -770,14 +765,13 @@ function MC.RefreshActive()
 end
 
 --------------------------------------------------------------------------
--- Config panel (aggregated)
+-- Build the unified options panel from each module's config defs.
 --------------------------------------------------------------------------
 function MC.BuildConfig()
     if not MC.panel then return end
 
     local defs = {}
 
-    -- Module toggles
     defs[#defs + 1] = { type = "section", label = "MODULES" }
     for _, mod in ipairs(MC.modules) do
         local key = mod.key
@@ -786,7 +780,6 @@ function MC.BuildConfig()
             set = function(v) MC.SetModuleEnabled(key, v) end }
     end
 
-    -- Global settings
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "DISPLAY" }
     defs[#defs + 1] = { type = "checkbox", label = "Lock Frame",
@@ -803,9 +796,8 @@ function MC.BuildConfig()
             if MC.MinimapButton and MC.MinimapButton.Update then MC.MinimapButton:Update() end
         end }
 
-    -- Per-module settings (only enabled modules). Auto-inject the "Show Collected"
-    -- checkbox from opts.collectedKey/collectedLabel so modules don't have to
-    -- duplicate it in GetConfigDefs.
+    -- Inject the "Show Collected" checkbox automatically from each module's
+    -- collectedKey/collectedLabel; modules only have to declare extras.
     for _, mod in ipairs(MC.modules) do
         if MC.IsModuleEnabled(mod.key) and mod.UI then
             defs[#defs + 1] = { type = "divider" }
@@ -826,7 +818,6 @@ function MC.BuildConfig()
         end
     end
 
-    -- Appearance
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "APPEARANCE" }
     defs[#defs + 1] = { type = "slider", label = "Background Opacity", min = 0.1, max = 1.0, step = 0.05,
@@ -877,7 +868,6 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
 
     local cmd, arg = strsplit(" ", msg, 2)
 
-    -- /mc <module>
     if MC.modulesByKey[cmd] then
         if not MC.IsModuleEnabled(cmd) then
             print(format("%s Module '%s' is disabled.", PREFIX, cmd))

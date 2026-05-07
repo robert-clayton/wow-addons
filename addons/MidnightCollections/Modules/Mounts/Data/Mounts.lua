@@ -15,21 +15,14 @@ MC.MountSourceLabels = {
 
 local LOC = MC.LOC
 
--- Mount data organized by source type
--- Fields: mountID, name, source, sourceInfo,
---         waypoint (optional), cost (optional), zone (optional),
---         renown (optional), achievementID (optional), dropInfo (optional),
---         faction (optional)
---
--- mountID values are C_MountJournal mount IDs (from Wowhead /mount/NNNN).
--- These are NOT spell IDs or NPC IDs.
--- Data sourced from Wowhead (wowhead.com), March 2026.
+-- Mount entry shape: { mountID, name, source, sourceInfo,
+--   [waypoint], [overworldWaypoint], [cost], [zone], [renown],
+--   [achievementID], [dropInfo], [faction] }
+-- mountID is the C_MountJournal id (Wowhead /mount/NNNN), not spell or NPC id.
 
 MC.MountData = {
-    -------------------------------------------------------------------------
     -- Renown Vendor Mounts (Voidlight Marl, currency 3316)
     -- 4 factions × 2 mounts each
-    -------------------------------------------------------------------------
     {
         source = "renown",
         mounts = {
@@ -73,9 +66,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Reputation — Slayer's Duellum (factionID 2770)
-    -------------------------------------------------------------------------
     {
         source = "reputation",
         mounts = {
@@ -91,9 +82,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Rare Drops (world rares, by zone)
-    -------------------------------------------------------------------------
     {
         source = "drop",
         mounts = {
@@ -146,9 +135,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Achievement Mounts
-    -------------------------------------------------------------------------
     {
         source = "achievement",
         mounts = {
@@ -179,9 +166,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Quest Mounts
-    -------------------------------------------------------------------------
     {
         source = "quest",
         mounts = {
@@ -192,9 +177,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Delve Mounts
-    -------------------------------------------------------------------------
     {
         source = "delve",
         mounts = {
@@ -207,9 +190,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Prey System Mounts (Remnant of Anguish, currency 3392)
-    -------------------------------------------------------------------------
     {
         source = "prey",
         mounts = {
@@ -223,9 +204,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Dungeon Mounts
-    -------------------------------------------------------------------------
     {
         source = "dungeon",
         mounts = {
@@ -236,9 +215,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Raid Mounts
-    -------------------------------------------------------------------------
     {
         source = "raid",
         mounts = {
@@ -247,9 +224,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- PvP Mounts (filtered by player faction at scan time)
-    -------------------------------------------------------------------------
     {
         source = "pvp",
         mounts = {
@@ -260,10 +235,8 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- World Event Mounts (Abundance event, Unalloyed Abundance currency;
     -- 12.0.5: Decor Duels, Void Assaults)
-    -------------------------------------------------------------------------
     {
         source = "worldevent",
         mounts = {
@@ -281,9 +254,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Profession Mounts
-    -------------------------------------------------------------------------
     {
         source = "profession",
         mounts = {
@@ -296,9 +267,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Vendor Mounts (Luminous Dust, Mothkeeper Wew'tam)
-    -------------------------------------------------------------------------
     {
         source = "vendor",
         mounts = {
@@ -307,9 +276,7 @@ MC.MountData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Pre-Patch Mounts
-    -------------------------------------------------------------------------
     {
         source = "prepatch",
         mounts = {

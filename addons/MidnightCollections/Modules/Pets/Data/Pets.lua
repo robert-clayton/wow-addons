@@ -16,23 +16,16 @@ MC.PetSourceLabels = {
 
 local LOC = MC.LOC
 
--- Pet data organized by source type
--- Fields: speciesID, name, petType (1-10), source, sourceInfo,
---         waypoint (optional), cost (optional), dropInfo (optional),
---         achievementID (optional), canBattle, zone (optional),
---         npcID (optional - the NPC ID for the pet creature itself)
---
--- Data sourced from Wowhead (wowhead.com), March 2026.
--- IMPORTANT: Most Midnight "wild" pets are companion-only (cannot battle).
--- Only a handful of Midnight pets can actually enter pet battles.
--- canBattle is set accurately based on Wowhead data.
+-- Pet entry shape: { speciesID, name, petType (1-10), source, sourceInfo,
+--   [waypoint], [overworldWaypoint], [cost], [dropInfo], [achievementID],
+--   canBattle, [zone], [npcID] }
+-- Note: most Midnight "wild" pets are companion-only and can't enter pet
+-- battles, even though they live in the wild-pet group.
 
 MC.PetData = {
-    -------------------------------------------------------------------------
     -- Wild Pets (Companion-only - caught by right-clicking in the world)
     -- 21 achievement pets + 1 bonus (Silvermoon Broom). All cannot battle.
     -- Required for the Midnight Safari achievement (ID 61091).
-    -------------------------------------------------------------------------
     {
         source = "wild",
         pets = {
@@ -72,9 +65,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Vendor Pets
-    -------------------------------------------------------------------------
     {
         source = "vendor",
         pets = {
@@ -121,9 +112,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Drop Pets
-    -------------------------------------------------------------------------
     {
         source = "drop",
         pets = {
@@ -144,9 +133,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Quest Pets
-    -------------------------------------------------------------------------
     {
         source = "quest",
         pets = {
@@ -161,9 +148,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Treasure Pets (found in world treasure objects)
-    -------------------------------------------------------------------------
     {
         source = "treasure",
         pets = {
@@ -195,9 +180,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Achievement Pets
-    -------------------------------------------------------------------------
     {
         source = "achievement",
         pets = {
@@ -207,9 +190,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Delve Pets (End-of-run Nemesis Strongbox + Nullaeus nemesis drop)
-    -------------------------------------------------------------------------
     {
         source = "delve",
         pets = {
@@ -228,9 +209,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Profession Pets
-    -------------------------------------------------------------------------
     {
         source = "profession",
         pets = {
@@ -238,9 +217,7 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Trading Post Pets (Trader's Tender, rotates monthly)
-    -------------------------------------------------------------------------
     {
         source = "tradingpost",
         pets = {
@@ -251,10 +228,8 @@ MC.PetData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Event / Promotional Pets
     -- Not obtainable through normal Midnight content. Included for reference.
-    -------------------------------------------------------------------------
     {
         source = "event",
         pets = {

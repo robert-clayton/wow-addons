@@ -1,6 +1,6 @@
 local _, MC = ...
 
--- Major Faction IDs (used by C_MajorFactions.GetMajorFactionData and renown blocks)
+-- Major faction IDs. Used by C_MajorFactions.GetMajorFactionData.
 MC.FACTION = {
     AmaniTribe      = 2696,
     Singularity     = 2699,
@@ -10,7 +10,7 @@ MC.FACTION = {
     RitualSites     = 2792,  -- 12.0.5
 }
 
--- Currency IDs (used by C_CurrencyInfo.GetCurrencyInfo and cost blocks)
+-- Currency IDs. Used by C_CurrencyInfo.GetCurrencyInfo and cost = { ... } blocks.
 MC.CURRENCY = {
     Honor              = 1792,
     Undercoin          = 2803,
@@ -32,7 +32,7 @@ MC.CURRENCY = {
     IllusionaryCoin    = 3393,  -- 12.0.5 Decor Duels
 }
 
--- Profession skill line IDs (WoW internal IDs, stable across patches)
+-- Profession skill line IDs.
 MC.PROFESSION = {
     Alchemy        = 171,
     Blacksmithing  = 164,
@@ -45,7 +45,7 @@ MC.PROFESSION = {
     Tailoring      = 197,
 }
 
--- Display order: by skillLine ID, alphabetical for the player-facing list
+-- Display order (alphabetical) for the Recipes tab.
 MC.PROFESSION_ORDER = {
     MC.PROFESSION.Alchemy,
     MC.PROFESSION.Blacksmithing,
@@ -70,7 +70,7 @@ MC.PROFESSION_LABELS = {
     [MC.PROFESSION.Tailoring]      = "Tailoring",
 }
 
--- WoW uiMapIDs for Midnight zones
+-- uiMapIDs for Midnight zones.
 MC.MAP = {
     Silvermoon       = 2393,
     Eversong         = 2395,
@@ -78,7 +78,9 @@ MC.MAP = {
     Harandar         = 2413,
     IsleOfQuelDanas  = 2424,
     ZulAman          = 2437,
-    -- 12.0.5 Ritual Sites (instanced — own mapIDs separate from overworld)
-    BrokenThrone     = 2585,  -- Zul'Aman Ritual Site
-    DaggerspinePoint = 2594,  -- Eversong Ritual Site
+    -- 12.0.5 Ritual Sites are instanced and have their own mapIDs.
+    BrokenThrone     = 2585,
+    DaggerspinePoint = 2594,
 }
+
+-- MC.PORTALS is defined at the bottom of Data/Locations.lua (it needs MC.LOC).

@@ -3,9 +3,7 @@ if not lib then return end
 
 local theme = lib.Theme
 
---------------------------------------------------------------------------
 -- Panel prototype
---------------------------------------------------------------------------
 local PanelProto = {}
 PanelProto.__index = PanelProto
 
@@ -18,9 +16,7 @@ function lib:CreatePanel(opts)
     return panel
 end
 
---------------------------------------------------------------------------
 -- Create main frame
---------------------------------------------------------------------------
 function PanelProto:Create()
     local opts = self.opts
     local db = self.db
@@ -62,9 +58,7 @@ function PanelProto:Create()
     end
 end
 
---------------------------------------------------------------------------
 -- Backdrop
---------------------------------------------------------------------------
 function PanelProto:ApplyBackdrop()
     local f = self.frame
     local v = self.db.frameAlpha or 1.0
@@ -77,9 +71,7 @@ function PanelProto:ApplyBackdrop()
     end
 end
 
---------------------------------------------------------------------------
 -- Minimize state
---------------------------------------------------------------------------
 function PanelProto:ApplyMinimizeState()
     local f = self.frame
     if not f then return end
@@ -108,9 +100,7 @@ function PanelProto:ApplyMinimizeState()
     if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
 end
 
---------------------------------------------------------------------------
 -- Title bar
---------------------------------------------------------------------------
 function PanelProto:CreateTitleBar()
     local f = self.frame
     local db = self.db
@@ -213,9 +203,7 @@ function PanelProto:CreateTitleBar()
     f.titleBar = bar
 end
 
---------------------------------------------------------------------------
 -- Scroll frame
---------------------------------------------------------------------------
 function PanelProto:CreateScrollFrame()
     local f = self.frame
     local db = self.db
@@ -272,9 +260,7 @@ function PanelProto:CreateScrollFrame()
     self.scrollChild = content
 end
 
---------------------------------------------------------------------------
 -- Resize dragger
---------------------------------------------------------------------------
 function PanelProto:CreateResizeDragger()
     local f = self.frame
     local db = self.db
@@ -370,9 +356,7 @@ function PanelProto:UpdateDraggerVisibility()
     end
 end
 
---------------------------------------------------------------------------
 -- Show / Hide / Toggle
---------------------------------------------------------------------------
 function PanelProto:Show()
     self.frame:Show()
     self.db.panelShown = true
@@ -397,9 +381,7 @@ function PanelProto:Toggle()
     end
 end
 
---------------------------------------------------------------------------
 -- Config frame
---------------------------------------------------------------------------
 function PanelProto:BuildConfigFrame()
     local panel = self
     local f = CreateFrame("Frame", (self.opts.name or "MidnightUIPanel") .. "ConfigFrame", UIParent, "BackdropTemplate")
@@ -498,9 +480,7 @@ function PanelProto:_PopulateConfigBody(defs)
     end
 end
 
---------------------------------------------------------------------------
 -- Scroll content helpers
---------------------------------------------------------------------------
 function PanelProto:RefreshScrollContent(height)
     if self.scrollChild then
         self.scrollChild:SetHeight(math.max(height, 1))
@@ -517,9 +497,7 @@ function PanelProto:RefreshScrollContent(height)
     end
 end
 
---------------------------------------------------------------------------
 -- RenderHeader convenience wrapper
---------------------------------------------------------------------------
 function PanelProto:RenderHeader(parent, yOff, opts)
     return lib.RenderCollapsibleHeader(self.pool, parent, yOff, opts, self.db, function()
         if self.opts.onRefresh then self.opts.onRefresh(self) end

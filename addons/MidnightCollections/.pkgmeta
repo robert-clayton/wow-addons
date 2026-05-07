@@ -1,0 +1,20 @@
+# BigWigs packager manifest — https://github.com/BigWigsMods/packager
+#
+# Used by .github/workflows/release.yml to build a release zip on tag push
+# and upload to CurseForge / Wago / WoWInterface.
+#
+# Layout note: `Libs/MidnightUI-1.0` is a symlink to `libs/MidnightUI-1.0`
+# at the repo root. The release workflow resolves the symlink with
+# `rsync -aL` before invoking the packager so the shipped zip contains a
+# real copy. Locally, scripts/symlink.sh handles the symlink for dev.
+
+package-as: MidnightCollections
+
+# Files to keep out of the shipped zip — users don't need them.
+ignore:
+    - .pkgmeta
+    - .github
+    - .gitignore
+    - "*.md"
+    - "Media/icon-source.png"
+    - "Media/curseforge-logo.png"

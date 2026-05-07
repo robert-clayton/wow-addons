@@ -1,12 +1,9 @@
 local _, MC = ...
 
--- All NPC and location waypoint data: { mapID, x, y, "Display Name" }
--- Map IDs are pulled from MC.MAP (Data/Constants.lua).
+-- Waypoint table: { mapID, x, y, "Display Name" }. mapIDs come from MC.MAP.
 
 MC.LOC = {
-    ---------------------------------------------------------------------------
     -- Vendor NPCs (shared across modules)
-    ---------------------------------------------------------------------------
     CaerisFairdawn     = { MC.MAP.Eversong, 0.435, 0.474, "Caeris Fairdawn, Saltheril's Haven" },
     Magovu             = { MC.MAP.ZulAman, 0.460, 0.659, "Magovu, Zul'Aman" },
     Naynar             = { MC.MAP.Harandar, 0.510, 0.508, "Naynar, Harandar" },
@@ -24,9 +21,7 @@ MC.LOC = {
     CamberonsCauldron  = { MC.MAP.Silvermoon, 0.470, 0.520, "Camberon's Cauldron, Silvermoon City" },
     Lyna               = { MC.MAP.Silvermoon, 0.478, 0.534, "Lyna, Silvermoon City" },
 
-    ---------------------------------------------------------------------------
-    -- Patch 12.0.5 NPCs
-    ---------------------------------------------------------------------------
+    -- 12.0.5 NPCs
     SergeantVornin           = { MC.MAP.Silvermoon, 0.486, 0.506, "Sergeant Vornin, Silvermoon City" },
     GamesmasterFleurin       = { MC.MAP.Silvermoon, 0.316, 0.767, "Gamesmaster Fleurin, Falconwing Square" },
     DisguisedDecorDuelVendor = { MC.MAP.Silvermoon, 0.316, 0.767, "Disguised Decor Duel Vendor, Falconwing Square" },
@@ -34,17 +29,23 @@ MC.LOC = {
     MarenSilverwing          = { MC.MAP.Silvermoon, 0.482, 0.496, "Maren Silverwing, Silvermoon City Bazaar" },
     DepthdiverTunakit        = { MC.MAP.ZulAman, 0.682, 0.200, "Depthdiver Tu'nakit, Zul'Aman" },
 
-    ---------------------------------------------------------------------------
-    -- Patch 12.0.5 Ritual Site OVERWORLD entrances (Curious Obelisk).
-    -- Used as the fallback waypoint when the player is not inside the instance.
-    ---------------------------------------------------------------------------
+    -- Silvermoon City portals to other Midnight zones (used by MC.PORTALS routing)
+    SilvermoonHarandarPortal  = { MC.MAP.Silvermoon, 0.367, 0.686, "Portal to Harandar (Gardens of Remembrance)" },
+    SilvermoonVoidstormPortal = { MC.MAP.Silvermoon, 0.353, 0.657, "Portal to Voidstorm (above Gardens of Remembrance)" },
+    -- Return portals at The Den (Harandar) and Howling Ridge (Voidstorm).
+    -- Coords are approximated to the local quartermaster since the exact
+    -- portal coords aren't published anywhere I could find.
+    HarandarSilvermoonPortal  = { MC.MAP.Harandar, 0.510, 0.510, "Portal to Silvermoon (The Den)" },
+    HarandarVoidstormPortal   = { MC.MAP.Harandar, 0.512, 0.510, "Portal to Voidstorm (The Den)" },
+    VoidstormSilvermoonPortal = { MC.MAP.Voidstorm, 0.526, 0.728, "Portal to Silvermoon (Howling Ridge)" },
+    VoidstormHarandarPortal   = { MC.MAP.Voidstorm, 0.524, 0.728, "Portal to Harandar (Howling Ridge)" },
+
+    -- 12.0.5 Ritual Site Obelisks (overworld entrance).
     DaggerspinePointEntrance = { MC.MAP.Eversong, 0.349, 0.654, "Daggerspine Point Obelisk (Eversong Woods)" },
     BrokenThroneEntrance     = { MC.MAP.ZulAman,  0.297, 0.782, "Broken Throne Obelisk (Zul'Aman)" },
 
-    ---------------------------------------------------------------------------
-    -- Patch 12.0.5 Ritual Site spawn / interaction points
-    -- Instance mapIDs — only valid inside the ritual site, not the overworld.
-    ---------------------------------------------------------------------------
+    -- 12.0.5 Ritual Site spawn / interaction points. The mapIDs are
+    -- instance-only; these only resolve once the player is inside.
     -- Daggerspine Point (Eversong Woods Ritual Site, mapID 2594)
     SoggyNest          = { MC.MAP.DaggerspinePoint, 0.300, 0.631, "Soggy Nest (Daggerspine Point)" },
     DaggerspineRiverEgg = { MC.MAP.DaggerspinePoint, 0.652, 0.454, "White egg in river (Daggerspine Point)" },
@@ -62,9 +63,7 @@ MC.LOC = {
     -- TelemancerAstrandis = { 0, 0, 0, "Telemancer Astrandis" },
     -- Kuri                = { 0, 0, 0, "Kuri" },
 
-    ---------------------------------------------------------------------------
-    -- Wild pet spawn coordinates (center of spawn area from Wowhead data)
-    ---------------------------------------------------------------------------
+    -- Wild pet spawn centers (from Wowhead spawn maps)
     -- Eversong Woods (mapID 2395)
     AmberTreeflitter   = { MC.MAP.Eversong, 0.508, 0.634, "Amber Treeflitter" },        -- 27 spawns, zone-wide
     VibrantManaling    = { MC.MAP.Eversong, 0.462, 0.546, "Vibrant Manaling" },         -- 27 spawns, zone-wide
@@ -94,9 +93,7 @@ MC.LOC = {
     NetherFamiliar     = { MC.MAP.IsleOfQuelDanas, 0.424, 0.282, "Nether Familiar" },          -- 43 spawns, northern area
     WrathfulWyrm       = { MC.MAP.IsleOfQuelDanas, 0.436, 0.290, "Wrathful Wyrm" },            -- 25 spawns, Sunwell bridge path
 
-    ---------------------------------------------------------------------------
     -- Treasure locations
-    ---------------------------------------------------------------------------
     -- Pet treasures
     BurblingPaintPot   = { MC.MAP.Eversong, 0.487, 0.754, "Burbling Paint Pot, Eversong Woods" },
     RookeryCache       = { MC.MAP.Silvermoon, 0.243, 0.693, "Rookery Cache, Silvermoon City" },
@@ -112,15 +109,11 @@ MC.LOC = {
     SporespawnedCache    = { MC.MAP.Harandar, 0.467, 0.678, "Sporespawned Cache, Harandar" },
     FinalClutchPredaxas  = { MC.MAP.Voidstorm, 0.489, 0.783, "Final Clutch of Predaxas, Voidstorm" },
 
-    ---------------------------------------------------------------------------
     -- Drop mob locations
-    ---------------------------------------------------------------------------
     DameBloodshed      = { MC.MAP.Eversong, 0.453, 0.387, "Dame Bloodshed, Eversong Woods" },
     StormarionAssault  = { MC.MAP.Voidstorm, 0.264, 0.676, "Stormarion Assault, Voidstorm" },
 
-    ---------------------------------------------------------------------------
     -- Quest chain start NPCs
-    ---------------------------------------------------------------------------
     Neytar             = { MC.MAP.Harandar, 0.696, 0.506, "Ney'tar, Harandar" },                     -- chain start: Drift Them Away (92864)
     ZurasharKassameh   = { MC.MAP.Harandar, 0.542, 0.530, "Zur'ashar Kassameh, Harandar" },          -- chain start: The Listener (90733)
     Chana              = { MC.MAP.ZulAman, 0.454, 0.697, "Chana, Zul'Aman" },                       -- chain start: The Path of Mourning (89565)
@@ -129,4 +122,40 @@ MC.LOC = {
     VaelithSunplume    = { MC.MAP.Eversong, 0.568, 0.356, "Vaelith Sunplume, Eversong Woods" },      -- chain start: One Adventurous Hatchling (89383)
     Hannan             = { MC.MAP.Harandar, 0.314, 0.648, "Hannan, Harandar" },                      -- chain start: Light Disturbance (92732)
     InstructorAntheol  = { MC.MAP.Eversong, 0.444, 0.454, "Instructor Antheol, Eversong Woods" },    -- chain start: Second Time's a Choice (94388)
+}
+
+-- Portal table read by MC.GetSmartWaypoint.
+-- MC.PORTALS[fromMap][toMap] = the portal you'd take. After clicking once and
+-- using the portal, the next click resolves to the actual NPC/spawn.
+-- Eversong, Zul'Aman, and Isle of Quel'Danas all share Silvermoon's portals
+-- since they're contiguous with it.
+
+local LOC = MC.LOC
+local SilvermoonPortals = {
+    [MC.MAP.Harandar]  = LOC.SilvermoonHarandarPortal,
+    [MC.MAP.Voidstorm] = LOC.SilvermoonVoidstormPortal,
+}
+
+MC.PORTALS = {
+    [MC.MAP.Silvermoon]      = SilvermoonPortals,
+    [MC.MAP.Eversong]        = SilvermoonPortals,
+    [MC.MAP.ZulAman]         = SilvermoonPortals,
+    [MC.MAP.IsleOfQuelDanas] = SilvermoonPortals,
+
+    -- Walking-back-to-Silvermoon zones are reached by taking the
+    -- "to Silvermoon" portal first.
+    [MC.MAP.Harandar] = {
+        [MC.MAP.Silvermoon]      = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.Voidstorm]       = LOC.HarandarVoidstormPortal,
+        [MC.MAP.Eversong]        = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.ZulAman]         = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.IsleOfQuelDanas] = LOC.HarandarSilvermoonPortal,
+    },
+    [MC.MAP.Voidstorm] = {
+        [MC.MAP.Silvermoon]      = LOC.VoidstormSilvermoonPortal,
+        [MC.MAP.Harandar]        = LOC.VoidstormHarandarPortal,
+        [MC.MAP.Eversong]        = LOC.VoidstormSilvermoonPortal,
+        [MC.MAP.ZulAman]         = LOC.VoidstormSilvermoonPortal,
+        [MC.MAP.IsleOfQuelDanas] = LOC.VoidstormSilvermoonPortal,
+    },
 }

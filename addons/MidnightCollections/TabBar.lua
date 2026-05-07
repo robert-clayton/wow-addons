@@ -126,8 +126,8 @@ function TabBar:Create(panel, modules, onSwitch)
     self:Reflow()
 end
 
--- Lay out enabled tabs with width sized to fit the container.
--- Drops labels (icon-only) when per-tab width falls below TAB_MIN + label slack.
+-- Size enabled tabs to fill the container. Below a threshold the labels
+-- get dropped and tabs become icon-only with a hover tooltip.
 function TabBar:Reflow()
     if not self.container then return end
     local containerW = self.container:GetWidth()

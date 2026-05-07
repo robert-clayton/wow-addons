@@ -2,9 +2,8 @@ local MAJOR, MINOR = "MidnightUI-1.0", 20260506
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
---------------------------------------------------------------------------
--- Theme — preserve identity across lib reloads so existing local refs stay valid
---------------------------------------------------------------------------
+-- Reusing the same Theme table across lib reloads so consumers that cached
+-- `local theme = lib.Theme` don't end up pointing at a stale copy.
 lib.Theme = lib.Theme or {}
 local _ThemeRebuild = {
     font = STANDARD_TEXT_FONT,
@@ -124,7 +123,6 @@ local _ThemeRebuild = {
         bgFile   = "Interface\\Buttons\\WHITE8x8",
     },
 }
--- Merge fresh theme into the persistent table so existing locals stay valid
 for k, v in pairs(_ThemeRebuild) do lib.Theme[k] = v end
 
 function lib.ChatPrefix(name)
@@ -159,9 +157,7 @@ function lib.Theme:CreateStyledFrame(parent, w, h, frameless)
     return f
 end
 
---------------------------------------------------------------------------
 -- Pool class
---------------------------------------------------------------------------
 lib.Pool = {}
 lib.Pool.__index = lib.Pool
 
@@ -204,9 +200,7 @@ function lib.Pool:ReleaseAll()
     end
 end
 
---------------------------------------------------------------------------
 -- GetOrCreate: caches children keyed by parent
---------------------------------------------------------------------------
 function lib.GetOrCreate(parent, key, createFn)
     if not parent._children then parent._children = {} end
     if not parent._children[key] then
@@ -220,9 +214,7 @@ function lib.GetOrCreate(parent, key, createFn)
     return child
 end
 
---------------------------------------------------------------------------
 -- CountColor (green if done, orange if partial, grey if 0)
---------------------------------------------------------------------------
 function lib.CountColor(done, total)
     local colors = lib.Theme.colors
     if done >= total then
@@ -234,9 +226,7 @@ function lib.CountColor(done, total)
     end
 end
 
---------------------------------------------------------------------------
 -- FormatGold
---------------------------------------------------------------------------
 function lib.FormatGold(copper)
     local gold = math.floor(copper / 10000)
     local silver = math.floor((copper % 10000) / 100)
@@ -248,9 +238,7 @@ function lib.FormatGold(copper)
     return table.concat(parts, " ")
 end
 
---------------------------------------------------------------------------
 -- MakeHeaderBtn (text label button)
---------------------------------------------------------------------------
 function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip)
     local theme = lib.Theme
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
@@ -284,9 +272,7 @@ function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip)
     return btn
 end
 
---------------------------------------------------------------------------
 -- MakeHeaderIconBtn (texture icon button)
---------------------------------------------------------------------------
 function lib.MakeHeaderIconBtn(parent, texPath, iconSize, fgColor, hoverBg, hoverBd, tooltip)
     local theme = lib.Theme
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
@@ -320,15 +306,11 @@ function lib.MakeHeaderIconBtn(parent, texPath, iconSize, fgColor, hoverBg, hove
     return btn
 end
 
---------------------------------------------------------------------------
--- RenderCollapsibleHeader (parameterized)
---------------------------------------------------------------------------
+-- Render a collapsible group header.
+--   opts: { height, indent, collKey, accentR/G/B, label, labelColor, count,
+--           countColor, [icon], [fontSize], [countFontSize] }
+--   db.collapsed[collKey] holds the collapsed state; refreshCb fires on toggle.
 function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
-    -- pool: lib.Pool instance
-    -- opts: { height, indent, collKey, accentR, accentG, accentB,
-    --         label, labelColor, count, countColor, icon, fontSize, countFontSize }
-    -- db: addon saved variables (reads db.collapsed[collKey], db.frameAlpha)
-    -- refreshCb: function() called on collapse toggle
     local theme = lib.Theme
     local collapsed = db.collapsed[opts.collKey] == true
 
@@ -445,19 +427,12 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     return header, collapsed, yOff + opts.height + 2
 end
 
---------------------------------------------------------------------------
--- RenderItemRow — shared row scaffold for Mounts/Pets/Decorations/Recipes.
---
--- opts:
---   height, indent (default 8), padding (default 6)
---   leading = { kind = "icon"|"dot", size, texture, color = {r,g,b}, fallback }
---   name (string), info (optional right-aligned string)
---   isCollected (bool) — applies dim text + strikethrough + alpha
---   onEnter, onLeave (optional, additional handlers run after default hover)
---   onClick (optional) — only attached when not isCollected
---
+-- Shared row scaffold used by every module's UI.
+--   opts = { height, indent, padding,
+--            leading = { kind = "icon"|"dot", size, texture, color, fallback },
+--            name, info, isCollected,
+--            onEnter, onLeave, onClick }
 -- Returns the new yOff.
---------------------------------------------------------------------------
 function lib.RenderItemRow(pool, parent, yOff, opts)
     local pad = opts.padding or 6
     local indent = opts.indent or 8
@@ -588,9 +563,7 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
     return yOff + height
 end
 
---------------------------------------------------------------------------
--- Standard zone-grouping helper used by Mounts and Pets
---------------------------------------------------------------------------
+-- Zone display order used by the zone sub-grouping in Mounts/Pets.
 lib.MidnightZoneOrder = {
     "Eversong Woods", "Silvermoon City", "Harandar", "Voidstorm",
     "Zul'Aman", "Isle of Quel'Danas",
@@ -609,9 +582,7 @@ function lib.GroupByField(entries, field, fallback)
     return groups
 end
 
---------------------------------------------------------------------------
--- Show/hide an empty-state message on a parent. Pooled by key "emptyText".
---------------------------------------------------------------------------
+-- Empty-state placeholder. Pooled per-parent under the key "emptyText".
 function lib.ShowEmptyMessage(parent, text, color)
     local theme = lib.Theme
     local fs = lib.GetOrCreate(parent, "emptyText", function(p)

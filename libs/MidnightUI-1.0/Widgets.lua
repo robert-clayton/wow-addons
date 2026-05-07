@@ -3,9 +3,7 @@ if not lib then return end
 
 local theme = lib.Theme
 
---------------------------------------------------------------------------
 -- File-local widget helpers
---------------------------------------------------------------------------
 local function OptionsDivider(body, yOff)
     local fr = CreateFrame("Frame", nil, body, "BackdropTemplate")
     fr:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
@@ -90,11 +88,8 @@ local function OptionsSlider(body, yOff, label, min, max, step, getVal, setVal, 
     return yOff - 18
 end
 
---------------------------------------------------------------------------
--- Pooled-widget config builder: each "type+slot" is created once and reused
--- across rebuilds. Frames in WoW cannot be GC'd, so re-creating CheckButtons
--- and Sliders on every settings rebuild is a real frame leak.
---------------------------------------------------------------------------
+-- WoW frames can't be GC'd. Pool each widget type by index so toggling a
+-- setting 50 times in a session doesn't leak 50 sets of CheckButtons.
 local function getPool(panel)
     if not panel._cfgPools then
         panel._cfgPools = {
@@ -252,9 +247,7 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
     return yOff - 18
 end
 
---------------------------------------------------------------------------
 -- PopulateConfig implementation (called by PanelProto:_PopulateConfigBody)
---------------------------------------------------------------------------
 lib._populateConfigBody = function(panel, defs)
     local cfgFrame = panel.cfgFrame
     if not cfgFrame or not cfgFrame.body then return end

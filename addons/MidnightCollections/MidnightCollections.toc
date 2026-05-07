@@ -1,6 +1,6 @@
 ## Interface: 120005
 ## Title: Midnight Collections
-## Notes: Tracks uncollected recipes, pets, mounts, and decorations from Midnight
+## Notes: Tracks the mounts, pets, toys, housing decor, and recipes you're missing from Midnight in one panel.
 ## Author: robert-clayton
 ## Version: 1.1.0
 ## SavedVariables: MidnightCollectionsDB

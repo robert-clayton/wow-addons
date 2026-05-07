@@ -19,19 +19,13 @@ MC.ToySourceLabels = {
 
 local LOC = MC.LOC
 
--- Toy data organized by source type.
--- Fields: itemID, name, source, sourceInfo,
---         waypoint (optional), cost (optional), zone (optional),
---         renown (optional), achievementID (optional), dropInfo (optional)
---
--- itemID values are the WoW item IDs used by `PlayerHasToy(itemID)` and
--- `C_ToyBox.GetToyInfo(itemID)`. Sourced from Wowhead, May 2026 — needs
--- in-game verification on a few entries (zone field marked TBD where unknown).
+-- Toy entry shape: { itemID, name, source, sourceInfo,
+--   [waypoint], [overworldWaypoint], [cost], [zone], [renown],
+--   [achievementID], [dropInfo] }
+-- itemID is the same number you'd pass to PlayerHasToy / C_ToyBox.GetToyInfo.
 
 MC.ToyData = {
-    -------------------------------------------------------------------------
     -- Renown vendor toys (Voidlight Marl)
-    -------------------------------------------------------------------------
     {
         source = "renown",
         toys = {
@@ -58,9 +52,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Achievement toys (zone treasure meta-achievements + hidden FoS)
-    -------------------------------------------------------------------------
     {
         source = "achievement",
         toys = {
@@ -86,9 +78,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Quest toys (campaign rewards)
-    -------------------------------------------------------------------------
     {
         source = "quest",
         toys = {
@@ -118,9 +108,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Zone treasure toys (single chest / interaction loot, not meta-rewards)
-    -------------------------------------------------------------------------
     {
         source = "treasure",
         toys = {
@@ -142,9 +130,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Drop toys (transformations — chest / rare drops)
-    -------------------------------------------------------------------------
     {
         source = "drop",
         toys = {
@@ -161,9 +147,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Dungeon / Raid drops
-    -------------------------------------------------------------------------
     {
         source = "dungeon",
         toys = {
@@ -181,10 +165,8 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Vendor toys (Decor Duels — Illusionary Coin; Abyss Anglers — Angler Pearls;
     -- Delves — Voidlight Marl)
-    -------------------------------------------------------------------------
     {
         source = "vendor",
         toys = {
@@ -223,9 +205,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Profession-crafted toys
-    -------------------------------------------------------------------------
     {
         source = "profession",
         toys = {
@@ -234,9 +214,7 @@ MC.ToyData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- World event toys (seasonal events with Midnight-era additions)
-    -------------------------------------------------------------------------
     {
         source = "worldevent",
         toys = {

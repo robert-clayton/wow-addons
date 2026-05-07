@@ -10,8 +10,8 @@ local mod = MC.RegisterModule("toys", {
         showCollected = false,
         collapsed     = {},
     },
-    -- NEW_TOY_ADDED is the canonical "I just learned a toy" event (8.1.5+).
-    -- TOYS_UPDATED fires on filter / journal changes — debounced via ThrottledScan.
+    -- NEW_TOY_ADDED fires on collect; TOYS_UPDATED catches filter / journal
+    -- updates we'd otherwise miss. Both go through ThrottledScan.
     events = { "NEW_TOY_ADDED", "TOYS_UPDATED" },
     onEvent = function(m, event)
         if event == "NEW_TOY_ADDED" or event == "TOYS_UPDATED" then

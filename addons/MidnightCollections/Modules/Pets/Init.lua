@@ -1,8 +1,7 @@
 local _, MC = ...
 
---------------------------------------------------------------------------
--- Wild pet proximity alerts
---------------------------------------------------------------------------
+-- Wild-pet proximity alerts: ping the player when an uncollected pet is on
+-- the nameplate or under the mouse cursor.
 local wildSpeciesLookup
 local alertedThisSession = {}
 
@@ -61,15 +60,12 @@ local function OnMouseoverUnit(db)
     end
 end
 
--- Public: clear "already alerted" cache. Called when wildAlerts toggles back on
--- so the user can re-discover pets they already saw this session.
+-- Reset the "already alerted" set. UI toggle calls this when the user
+-- re-enables alerts so previously-seen pets can ping again.
 function MC.ClearPetAlertCache()
     wipe(alertedThisSession)
 end
 
---------------------------------------------------------------------------
--- Module registration
---------------------------------------------------------------------------
 local mod = MC.RegisterModule("pets", {
     label          = "Pets",
     icon           = "Interface\\Icons\\INV_Pet_BabyBlizzardBear",
@@ -91,7 +87,7 @@ local mod = MC.RegisterModule("pets", {
         if event == "NEW_PET_ADDED" or event == "PET_JOURNAL_LIST_UPDATE" then
             MC.ThrottledScan(m)
         elseif event == "BAG_UPDATE_DELAYED" then
-            -- 3s throttle: BAG_UPDATE_DELAYED storms during raid/loot showers
+            -- BAG_UPDATE_DELAYED storms during loot, so use a longer window.
             MC.ThrottledScan(m, 3)
         elseif event == "NAME_PLATE_UNIT_ADDED" then
             if m.db and m.db.wildAlerts then OnNameplateAdded(arg1, m.db) end

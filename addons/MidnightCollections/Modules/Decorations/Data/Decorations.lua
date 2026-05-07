@@ -29,22 +29,15 @@ MC.DecoProfLabels = MC.PROFESSION_LABELS
 
 local LOC = MC.LOC
 
--- Decoration data organized by source type
--- Fields: decorID (housing catalog record ID), itemID (WoW item ID, crafted only),
---         name, source, sourceInfo, skillLine (crafted only),
---         waypoint (optional), cost (optional), zone (optional),
---         renown (optional), achievementID (optional), dropInfo (optional)
---
--- decorID values are housing catalog record IDs (from Wowhead /decor=NNNN).
--- itemID values are WoW item IDs (from Wowhead /item=NNNN), used for crafted items.
--- Collection check: C_HousingCatalog.GetCatalogEntryInfoByRecordID (decorID)
---                   or C_HousingCatalog.GetCatalogEntryInfoByItem (itemID fallback)
--- Data sourced from Wowhead (wowhead.com), March 2026.
+-- Decoration entry shape: { decorID, [itemID], name, source, sourceInfo,
+--   [skillLine], [waypoint], [cost], [zone], [renown], [achievementID],
+--   [dropInfo] }
+-- decorID is the housing catalog record id (Wowhead /decor=NNNN).
+-- itemID is only present on crafted entries; the scanner falls back to it
+-- via C_HousingCatalog.GetCatalogEntryInfoByItem when decorID lookup fails.
 
 MC.DecorationData = {
-    -------------------------------------------------------------------------
     -- Crafted — Alchemy (skillLine 171)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -57,9 +50,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Blacksmithing (skillLine 164)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -71,9 +62,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Enchanting (skillLine 333)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -91,9 +80,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Engineering (skillLine 202)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -107,9 +94,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Inscription (skillLine 773)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -128,9 +113,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Jewelcrafting (skillLine 755)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -143,9 +126,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Leatherworking (skillLine 165)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -158,9 +139,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Crafted — Tailoring (skillLine 197)
-    -------------------------------------------------------------------------
     {
         source = "crafted",
         decorations = {
@@ -173,10 +152,8 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Renown — Silvermoon Court (Caeris Fairdawn, factionID 2710)
     -- Currency: Voidlight Marl (3316)
-    -------------------------------------------------------------------------
     {
         source = "renown",
         decorations = {
@@ -213,10 +190,8 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Renown — Amani Tribe (Magovu, factionID 2696)
     -- Currency: Voidlight Marl (3316)
-    -------------------------------------------------------------------------
     {
         source = "renown",
         decorations = {
@@ -253,10 +228,8 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Renown — Hara'ti (Naynar, factionID 2704)
     -- Currency: Voidlight Marl (3316)
-    -------------------------------------------------------------------------
     {
         source = "renown",
         decorations = {
@@ -289,10 +262,8 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Renown — The Singularity (Anomander, factionID 2699)
     -- Currency: Voidlight Marl (3316)
-    -------------------------------------------------------------------------
     {
         source = "renown",
         decorations = {
@@ -327,9 +298,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Vendor — Miscellaneous (Delves, Prey, Slayer's Duellum, Paintings)
-    -------------------------------------------------------------------------
     {
         source = "vendor",
         decorations = {
@@ -385,9 +354,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Quest — Midnight Zones
-    -------------------------------------------------------------------------
     {
         source = "quest",
         decorations = {
@@ -446,9 +413,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Achievement — Exploration, Profession Signs, Questing
-    -------------------------------------------------------------------------
     {
         source = "achievement",
         decorations = {
@@ -487,9 +452,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- Drop — Delves, Dungeons, Raids, Treasures
-    -------------------------------------------------------------------------
     {
         source = "drop",
         decorations = {
@@ -561,9 +524,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- World Event — Pre-Patch: Twilight Ascension
-    -------------------------------------------------------------------------
     {
         source = "worldevent",
         decorations = {
@@ -576,9 +537,7 @@ MC.DecorationData = {
         },
     },
 
-    -------------------------------------------------------------------------
     -- World Event — Abundance (Chel the Chip)
-    -------------------------------------------------------------------------
     {
         source = "worldevent",
         decorations = {

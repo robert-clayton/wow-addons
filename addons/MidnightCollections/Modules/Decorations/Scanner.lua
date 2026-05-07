@@ -6,7 +6,6 @@ local Scanner = mod.Scanner
 
 Scanner.results = {}
 
--- Housing catalog entry type for decor
 local DECOR_ENTRY_TYPE = 1 -- Enum.HousingCatalogEntryType.Decor
 
 function Scanner:CheckCollected(decorID, itemID)
