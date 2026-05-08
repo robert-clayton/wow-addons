@@ -34,6 +34,18 @@ local mod = MC.RegisterModule("roster", {
         -- guild member list current for "who's online" rendering.
     end,
     onLogin = function(m)
+        -- One-time cleanup of bad keys from earlier 1.6.x builds, where
+        -- a failed BNet sender resolution stored entries under literal
+        -- "BNet" instead of the friend's Name-Realm. Drop anything that
+        -- doesn't look like a Name-Realm so the Roster tab is clean.
+        if MC.RosterDB then
+            for k in pairs(MC.RosterDB) do
+                if type(k) ~= "string" or not k:find("-", 1, true) then
+                    MC.RosterDB[k] = nil
+                end
+            end
+        end
+
         -- Stagger the initial broadcast so we don't fight for addon
         -- bandwidth with every other addon's login chatter.
         C_Timer.After(5, function() MC.RosterBroadcastIfChanged() end)

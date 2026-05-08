@@ -164,18 +164,28 @@ listener:SetScript("OnEvent", function(_, event, ...)
         if prefix ~= PREFIX then return end
         dispatch(channel, body, sender)
     elseif event == "BN_CHAT_MSG_ADDON" then
-        -- BN_CHAT_MSG_ADDON args: prefix, body, _, presenceID/gameAccID
-        local prefix, body, _, gameAccountID = ...
+        -- BN_CHAT_MSG_ADDON args (retail): prefix, body, channel, presenceID
+        -- presenceID is a BNet account ID, NOT a gameAccountID. To get the
+        -- currently-active character we look up the BN account info, which
+        -- carries an embedded gameAccountInfo with characterName/realmName.
+        local prefix, body, _, presenceID = ...
         if prefix ~= PREFIX then return end
-        -- Resolve to a Name-Realm string the same way GUILD messages come
-        -- in, so receivers don't need to know the message came over BNET.
-        local sender = "BNet"
-        if C_BattleNet and C_BattleNet.GetGameAccountInfoByID then
-            local info = C_BattleNet.GetGameAccountInfoByID(gameAccountID)
-            if info and info.characterName then
-                sender = info.characterName .. "-" .. (info.realmName or ""):gsub("%s+", "")
+
+        local sender
+        if C_BattleNet and C_BattleNet.GetAccountInfoByID then
+            local acct = C_BattleNet.GetAccountInfoByID(presenceID)
+            local g = acct and acct.gameAccountInfo
+            if g and g.characterName and g.realmName then
+                sender = g.characterName .. "-" .. (g.realmName:gsub("%s+", ""))
             end
         end
+
+        -- If we can't resolve the BNet sender to a Name-Realm we drop the
+        -- message rather than store under a generic "BNet" key — that key
+        -- would never dedupe with the guild copy of the same friend, and
+        -- the row would be useless without a real name attached anyway.
+        if not sender then return end
+
         dispatch("BNET", body, sender)
     elseif event == "ENCOUNTER_START" then
         Comms.encounterPause = true
