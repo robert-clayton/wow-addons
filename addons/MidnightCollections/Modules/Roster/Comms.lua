@@ -1,26 +1,18 @@
 local _, MC = ...
 
---------------------------------------------------------------------------
--- Roster comms: single CHAT_MSG_ADDON listener with sub-prefix routing
--- under the "MC" addon prefix. Outgoing messages sit on a throttled queue
--- so login storms in a 500-person guild don't disconnect anyone.
+-- Single CHAT_MSG_ADDON listener under the "MC" prefix; sub-prefix
+-- routing is ours. Outbound messages get queued and rate-limited so
+-- login storms don't disconnect.
 --
--- Wire format: "MC|<protoVer>|<sub>|<payload>"
---   <sub> = u (update), v (version), r (request), b (bitmap, v2 only)
---
--- Adapted from AstralKeys' AstralComs pattern. We register one global
--- prefix ("MC") and dispatch by sub-prefix ourselves.
---------------------------------------------------------------------------
+-- Wire: "MC|<proto>|<sub>|<payload>". Subs: u=update, v=version,
+-- r=request, b=bitmap (v2).
 
 local PROTO_VERSION = 2
 local PREFIX = "MC"
-
--- Highest proto version this client speaks. v1 was counts-only; v2
--- adds the bitmap subprefix and BNET friend routing.
 local MAX_PROTO = 2
 
--- Throttle: 0.3s default with ±0.03s jitter so peers don't all try to
--- send on the same boundary tick. 1s during raid encounters.
+-- Throttle base + jitter so a guild-wide login storm doesn't all hit
+-- the same tick. Slower in raids since key sync can wait but DCs can't.
 local SEND_INTERVAL_NORMAL = 0.3
 local SEND_INTERVAL_RAID   = 1.0
 
@@ -32,9 +24,7 @@ Comms.encounterPause = false
 
 MC.Comms = Comms
 
---------------------------------------------------------------------------
 -- Handler registration
---------------------------------------------------------------------------
 function Comms:RegisterPrefix(channel, sub, fn)
     if not self.handlers[channel] then self.handlers[channel] = {} end
     self.handlers[channel][sub] = fn
@@ -44,9 +34,7 @@ function Comms:UnregisterPrefix(channel, sub)
     if self.handlers[channel] then self.handlers[channel][sub] = nil end
 end
 
---------------------------------------------------------------------------
 -- Outgoing queue
---------------------------------------------------------------------------
 function Comms:Send(sub, payload, channel, target)
     if self.encounterPause then return end
     if channel == "GUILD" and not IsInGuild() then return end
@@ -66,10 +54,7 @@ function Comms:Send(sub, payload, channel, target)
     self.frame:Show()
 end
 
---------------------------------------------------------------------------
--- BNet friend broadcast. Walks the friend list, looks up each WoW
--- account, and queues a BNSendGameData message per online WoW friend.
---------------------------------------------------------------------------
+-- Broadcast to every online BNet friend who's in WoW.
 function Comms:BroadcastBNet(sub, payload)
     if self.encounterPause then return end
     if not (BNGetNumFriends and BNSendGameData and BNConnected) then return end
@@ -98,10 +83,7 @@ function Comms:BroadcastBNet(sub, payload)
     self.frame:Show()
 end
 
---------------------------------------------------------------------------
--- Throttled send pump. Fires off one queued message per tick; idles
--- itself when the queue empties.
---------------------------------------------------------------------------
+-- Throttled send pump. One queued message per tick; idle when empty.
 local elapsed = 0
 Comms.frame:Hide()
 Comms.frame:SetScript("OnUpdate", function(self, dt)
@@ -132,25 +114,16 @@ Comms.frame:SetScript("OnUpdate", function(self, dt)
     end
 end)
 
---------------------------------------------------------------------------
--- Incoming dispatcher
---------------------------------------------------------------------------
+-- Inbound dispatch.
 local function dispatch(channel, body, sender)
-    -- Body shape: "MC|<proto>|<sub>|<payload>"
     local p, proto, sub, payload = strsplit("|", body, 4)
     if p ~= PREFIX then return end
     proto = tonumber(proto)
     if not proto or proto > MAX_PROTO then return end
-
-    local channelHandlers = Comms.handlers[channel]
-    if not channelHandlers then return end
-    local fn = channelHandlers[sub]
-    if not fn then return end
-
-    -- Strip the realm-on-self suffix some servers add for guild messages.
-    -- AstralKeys uses Ambiguate("guild") for display; we keep the full
-    -- "Name-Realm" form internally and ambiguate at render time.
-    fn(payload or "", sender, proto)
+    local hs = Comms.handlers[channel]
+    if not hs then return end
+    local fn = hs[sub]
+    if fn then fn(payload or "", sender, proto) end
 end
 
 local listener = CreateFrame("Frame", "MidnightCollectionsCommsListener")
@@ -164,10 +137,9 @@ listener:SetScript("OnEvent", function(_, event, ...)
         if prefix ~= PREFIX then return end
         dispatch(channel, body, sender)
     elseif event == "BN_CHAT_MSG_ADDON" then
-        -- BN_CHAT_MSG_ADDON args (retail): prefix, body, channel, presenceID
-        -- presenceID is a BNet account ID, NOT a gameAccountID. To get the
-        -- currently-active character we look up the BN account info, which
-        -- carries an embedded gameAccountInfo with characterName/realmName.
+        -- BNet's 4th arg is a presenceID, not a gameAccountID. Resolve
+        -- it to Name-Realm via the account info so this lines up with
+        -- the guild dedup keying.
         local prefix, body, _, presenceID = ...
         if prefix ~= PREFIX then return end
 
@@ -180,10 +152,8 @@ listener:SetScript("OnEvent", function(_, event, ...)
             end
         end
 
-        -- If we can't resolve the BNet sender to a Name-Realm we drop the
-        -- message rather than store under a generic "BNet" key — that key
-        -- would never dedupe with the guild copy of the same friend, and
-        -- the row would be useless without a real name attached anyway.
+        -- Drop unresolved senders rather than store a generic "BNet"
+        -- entry that would never dedupe with the guild copy.
         if not sender then return end
 
         dispatch("BNET", body, sender)
@@ -194,22 +164,16 @@ listener:SetScript("OnEvent", function(_, event, ...)
     end
 end)
 
--- Register the addon prefix at module load. Safe to call before PLAYER_LOGIN.
+-- Safe to register before PLAYER_LOGIN.
 if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
     C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
 end
 
---------------------------------------------------------------------------
--- Convenience: same-shape sender for the standard channels.
---------------------------------------------------------------------------
 function Comms:Broadcast(sub, payload)
     if IsInGuild() then self:Send(sub, payload, "GUILD") end
 end
 
 function Comms:GetMaxProto() return MAX_PROTO end
-
--- v2 will bump MAX_PROTO via this hook so the dispatcher accepts proto-2
--- messages once the bitmap module is loaded.
 function Comms:_BumpMaxProto(n)
     if n > MAX_PROTO then MAX_PROTO = n end
 end

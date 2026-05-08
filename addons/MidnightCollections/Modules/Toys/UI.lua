@@ -7,8 +7,8 @@ local UI = mod.UI
 local MUI = LibStub("MidnightUI-1.0")
 
 local SECTION_PAD = 8
-local ROW_HEIGHT  = 20
-local ICON_SIZE   = 20
+local ROW_HEIGHT  = 22
+local ICON_SIZE   = 24
 
 local SOURCE_SET = {}
 for _, s in ipairs(MC.ToySourceOrder) do SOURCE_SET[s] = true end
@@ -19,8 +19,16 @@ function UI:Init(panel, m)
 end
 
 function UI:GetConfigDefs()
-    -- Show Collected toggle is auto-injected by Core.BuildConfig
-    return {}
+    local db = mod.db
+    return {
+        { type = "checkbox", label = "Hide unavailable toys",
+            get = function() return db.hideUnavailable ~= false end,
+            set = function(v)
+                db.hideUnavailable = v
+                if mod.Scanner then mod.Scanner:Scan() end
+                MC.RefreshActive()
+            end },
+    }
 end
 
 function UI:Refresh()

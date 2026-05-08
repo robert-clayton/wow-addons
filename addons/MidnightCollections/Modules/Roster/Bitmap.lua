@@ -1,48 +1,26 @@
 local _, MC = ...
 
---------------------------------------------------------------------------
--- Bitmap encoding for per-item ownership sync (v2 wire format).
+-- v2 per-item ownership bitmap. Each module assigns one bit per
+-- collectible (declaration order). Owned-set is packed -> base64 ->
+-- shipped as "MC|2|b|<fingerprint>|<sections>".
 --
--- Each module has a stable bit-index assigned to every collectible based
--- on declaration order in MC.<Module>Data. A peer's owned-set is packed
--- into a bitstring, base64-encoded, and broadcast as a single
--- "MC|2|b|<fingerprint>|<payload>" message.
---
--- A protoFingerprint of the bit-layout (cheap hash of all collectible IDs
--- in order) gates compatibility: a peer with a different addon version
--- whose data files have shifted item ordering will compute a different
--- fingerprint and ignore the payload, since the bit indices won't line up.
---
--- Total bit budget for current Midnight content (~620 collectibles):
---   ~620 / 8 = ~78 bytes raw -> ~104 chars base64
---   "MC|2|b|<8-char-fp>|<104 chars>" ~= 124 bytes total — fits in one
---   addon message comfortably under the 255-byte cap.
---------------------------------------------------------------------------
+-- The fingerprint hashes the ID order so peers running different addon
+-- versions silently ignore each other's bitmaps instead of misreading
+-- bit positions. ~620 bits today fits in a single message.
 
 local Bitmap = {}
 MC.Bitmap = Bitmap
 
--- Module key -> sub-key (a single char in the wire so we can pack
--- multiple modules into one bitmap message later if needed).
+-- Recipes left out — recipe.id is a spell ID that revs between patches
+-- and the scanner keys by skillLine, so it's a poor fit for a static
+-- bit index.
 local MODULE_SECTIONS = { "mounts", "pets", "toys", "decorations", "rares", "treasures" }
--- Recipes deliberately omitted: their key is recipe.id (spell IDs that
--- can rev across patches) and the result table is keyed by skillLine.
--- Keep the bitmap to the modules with stable, declaration-order IDs.
 
---------------------------------------------------------------------------
--- Build a per-module index lookup. Each module contributes:
---   ids[modKey][i] = canonical-ID of the i-th collectible (1-based)
---   indexOf[modKey][canonicalID] = i (reverse lookup)
--- Canonical-ID picks the first stable identifier present on the entry:
---   mountID > speciesID > itemID > decorID > npcID > criteriaIndex
--- For rares we use npcID; for treasures we use criterion-name (no
--- numeric ID, but Treasures Scanner exposes them in a known order via
--- MC.TreasureCoords).
---------------------------------------------------------------------------
+-- Per-module ID list (declaration-order). ids[modKey][i] -> canonical
+-- ID; indexOf[modKey] is the reverse.
 local function push(out, id)
-    -- Skip nil/empty IDs so bit-positions stay stable across peers running
-    -- the same addon version. A nil entry would silently shift every later
-    -- bit by one and corrupt cross-peer ownership lookups.
+    -- Skip falsy IDs — a nil hole here would shift every later bit and
+    -- corrupt cross-peer ownership lookups.
     if id ~= nil and id ~= "" and id ~= 0 then
         out[#out + 1] = id
     end
@@ -100,12 +78,7 @@ local function buildIndex()
     end
 end
 
---------------------------------------------------------------------------
--- Fingerprint: cheap hash of every section's ID list joined together.
--- Different addon-versions with reordered/added items produce a
--- different fingerprint, so peers running mismatched data ignore each
--- other's bitmaps instead of mis-interpreting bit positions.
---------------------------------------------------------------------------
+-- Cheap hash; collision-resistant isn't needed, just stability.
 local function cheapHash(s)
     local h = 5381
     for i = 1, #s do
@@ -127,9 +100,7 @@ end
 
 function Bitmap:GetFingerprint() return self.fingerprint end
 
---------------------------------------------------------------------------
--- Owned-set extraction from current Scanner results.
---------------------------------------------------------------------------
+-- Per-module ownership probes — one function per section.
 local function isMountCollected(mountID)
     if not (mountID and C_MountJournal) then return false end
     local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mountID)
@@ -148,9 +119,8 @@ local function isToyCollected(itemID)
 end
 
 local function isDecorCollected(decorID)
-    -- The Decorations Scanner has the canonical "is this decor owned?"
-    -- check (correct API signature for GetCatalogEntryInfoByRecordID +
-    -- handles the numPlaced/quantity ownership semantics). Reuse it.
+    -- Defer to the Decorations Scanner — it has the right API call
+    -- shape and the numPlaced/quantity ownership semantics.
     local mod = MC.modulesByKey and MC.modulesByKey["decorations"]
     if mod and mod.Scanner and mod.Scanner.CheckCollected then
         local ok, owned = pcall(mod.Scanner.CheckCollected, mod.Scanner, decorID, nil)
@@ -160,8 +130,8 @@ local function isDecorCollected(decorID)
 end
 
 local function isRareKilled(npcID)
-    -- Rares are tracked via achievement criteria; the Rares scanner
-    -- already publishes a per-rare collected flag in its results.
+    -- Rare scanner already maintains per-rare collected state from the
+    -- achievement criteria; just look in there.
     local mod = MC.modulesByKey and MC.modulesByKey["rares"]
     if not (mod and mod.Scanner and mod.Scanner.results) then return false end
     local r = mod.Scanner.results
@@ -200,9 +170,7 @@ local SECTION_PROBE = {
     treasures   = isTreasureLooted,
 }
 
---------------------------------------------------------------------------
--- Pack a 0/1 array (1-indexed) into a byte string.
---------------------------------------------------------------------------
+-- 0/1 array <-> byte string.
 local function packBits(bits)
     local n = #bits
     local bytes = {}
@@ -230,9 +198,7 @@ local function unpackBits(s, count)
     return bits
 end
 
---------------------------------------------------------------------------
--- Base64 (URL-safe alphabet so the message can be wire-clean).
---------------------------------------------------------------------------
+-- URL-safe base64 so the payload survives chat-message escaping.
 local B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 local B64_INDEX = {}
 for i = 1, #B64 do B64_INDEX[B64:sub(i, i)] = i - 1 end
@@ -271,9 +237,7 @@ local function b64Decode(s)
     return table.concat(out)
 end
 
---------------------------------------------------------------------------
--- Build current owned-bitmap for broadcast.
---------------------------------------------------------------------------
+-- Build the current owned-bitmap for broadcast.
 function Bitmap:Build()
     if not self.ids then return nil end
     local sectionParts = {}
@@ -286,13 +250,11 @@ function Bitmap:Build()
         end
         sectionParts[#sectionParts + 1] = b64Encode(packBits(bits)) .. "/" .. tostring(#ids)
     end
-    -- Sections separated by ';'. Section format: <base64>/<bitCount>.
+    -- Sections joined by ';', each "<base64>/<bitCount>".
     return table.concat(sectionParts, ";")
 end
 
---------------------------------------------------------------------------
--- Decode a peer's bitmap into a per-module set keyed by canonical ID.
---------------------------------------------------------------------------
+-- Decode a peer's bitmap into per-module sets keyed by canonical ID.
 function Bitmap:Decode(payload)
     if not payload or payload == "" then return nil end
     local owned = {}
@@ -312,19 +274,16 @@ function Bitmap:Decode(payload)
                     end
                     owned[modKey] = set
                 end
-                -- If the per-section bit count doesn't match what we
-                -- expect for this module, silently drop that section
-                -- (peer's data file has different ordering).
+                -- Skip silently when bit counts disagree — peer's data
+                -- file has a different ordering than ours.
             end
         end
     end
     return owned
 end
 
---------------------------------------------------------------------------
--- Lookup helper used by the tooltip extension. Returns a list of peer
--- character names whose decoded bitmap contains the given module/id.
---------------------------------------------------------------------------
+-- Used by the tooltip "Owned by:" line. Returns peer names whose
+-- bitmap contains the given module/id.
 function Bitmap:OwnersOf(modKey, canonicalID)
     if not (MC.RosterDB and self.fingerprint) then return {} end
     local owners = {}
@@ -340,10 +299,8 @@ function Bitmap:OwnersOf(modKey, canonicalID)
     return owners
 end
 
---------------------------------------------------------------------------
--- Initialization. Build the index after PLAYER_LOGIN so all module data
--- files are loaded.
---------------------------------------------------------------------------
+-- Build the index after PLAYER_LOGIN, once all module data files are
+-- loaded into MC.<Module>Data.
 function Bitmap:Init()
     buildIndex()
     computeFingerprint()

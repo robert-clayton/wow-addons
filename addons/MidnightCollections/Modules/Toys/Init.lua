@@ -7,8 +7,9 @@ local mod = MC.RegisterModule("toys", {
     collectedKey   = "showCollected",
     collectedLabel = "collected",
     defaults       = {
-        showCollected = false,
-        collapsed     = {},
+        showCollected   = false,
+        hideUnavailable = true,
+        collapsed       = {},
     },
     -- NEW_TOY_ADDED fires on collect; TOYS_UPDATED catches filter / journal
     -- updates we'd otherwise miss. Both go through ThrottledScan.

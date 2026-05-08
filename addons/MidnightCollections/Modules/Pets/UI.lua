@@ -7,8 +7,8 @@ local UI = mod.UI
 local MUI = LibStub("MidnightUI-1.0")
 
 local SECTION_PAD = 8
-local ROW_HEIGHT  = 20
-local ICON_SIZE   = 16
+local ROW_HEIGHT  = 22
+local ICON_SIZE   = 24
 
 local SOURCE_SET = {}
 for _, s in ipairs(MC.PetSourceOrder) do SOURCE_SET[s] = true end
@@ -31,6 +31,13 @@ function UI:GetConfigDefs()
             get = function() return db.hideTradingPost end,
             set = function(v)
                 db.hideTradingPost = v
+                if mod.Scanner then mod.Scanner:Scan() end
+                MC.RefreshActive()
+            end },
+        { type = "checkbox", label = "Hide unavailable pets",
+            get = function() return db.hideUnavailable ~= false end,
+            set = function(v)
+                db.hideUnavailable = v
                 if mod.Scanner then mod.Scanner:Scan() end
                 MC.RefreshActive()
             end },

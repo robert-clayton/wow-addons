@@ -2,7 +2,7 @@ local _, MC = ...
 
 local mod = MC.RegisterModule("treasures", {
     label          = "Treasures",
-    icon           = "Interface\\Icons\\INV_Misc_Treasurechest_06",
+    icon           = "Interface\\Icons\\INV_Misc_Map_01",
     order          = 7,
     collectedKey   = "showCollected",
     collectedLabel = "looted",

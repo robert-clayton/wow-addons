@@ -614,12 +614,12 @@ MC.DecorationData = {
     {
         source = "worldevent",
         decorations = {
-            { decorID = 714, name = "Silvermoon Wooden Chair", source = "worldevent", sourceInfo = "Dethelin - 3000 Resonance Crystals",
-              cost = { currency = { MC.CURRENCY.ResonanceCrystals, 3000 } } },
-            { decorID = 1236, name = "Enchanted Blood Elven Candelabra", source = "worldevent", sourceInfo = "Dethelin - 3000 Resonance Crystals",
-              cost = { currency = { MC.CURRENCY.ResonanceCrystals, 3000 } } },
-            { decorID = 1227, name = "Sin'dorei Winged Chaise", source = "worldevent", sourceInfo = "Dethelin - 5000 Resonance Crystals",
-              cost = { currency = { MC.CURRENCY.ResonanceCrystals, 5000 } } },
+            { decorID = 714, name = "Silvermoon Wooden Chair", source = "worldevent", sourceInfo = "Dethelin - 3000 Twilight's Blade Insignia",
+              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 3000 } } },
+            { decorID = 1236, name = "Enchanted Blood Elven Candelabra", source = "worldevent", sourceInfo = "Dethelin - 3000 Twilight's Blade Insignia",
+              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 3000 } } },
+            { decorID = 1227, name = "Sin'dorei Winged Chaise", source = "worldevent", sourceInfo = "Dethelin - 5000 Twilight's Blade Insignia",
+              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 5000 } } },
         },
     },
 

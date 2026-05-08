@@ -90,13 +90,14 @@ MC.ToyData = {
               sourceInfo = "Pinterest x WoW promotion (Feat of Strength)" },
             -- Pre-patch Family Battler chain (added in Midnight pre-patch)
             { itemID = 251491, name = "Magical Pet Clicker", source = "achievement",
-              sourceInfo = "Old World Family Battler chain (Midnight pre-patch)",
+              sourceInfo = "Achievement: Old World Family Battler",
               achievementID = 61094 },
             { itemID = 266370, name = "Dundun's Abundant Travel Method", source = "achievement",
               sourceInfo = "Achievement: Abundance: Azeroth Runs on Dundun (teleports to current Abundant location)",
               achievementID = 42283, taskList = ABUNDANCE_TASKS },
             { itemID = 272339, name = "Umbral Champion's Illustrious Banner", source = "achievement",
-              sourceInfo = "WoW Esports / AWC participation OR Time Trial Keystones (Midnight Season 1)" },
+              sourceInfo = "WoW Esports / AWC participation reward (not normally obtainable)",
+              unavailable = true },
         },
     },
 
@@ -121,12 +122,6 @@ MC.ToyData = {
             { itemID = 263198, name = "Valdekar's Special", source = "quest",
               sourceInfo = "Quest: Lost in Light",
               zone = "Eversong Woods" },
-            { itemID = 260427, name = "Nahuut's Second-Favorite Chew Toy", source = "quest",
-              sourceInfo = "Quest: Leave Your Mark (A Goblin in Harandar storyline)",
-              zone = "Harandar" },
-            { itemID = 264183, name = "Kelum'ko's Generous Aromatic Gift", source = "quest",
-              sourceInfo = "Quest: Unlikely Friends (Zul'Aman Sojourner storyline)",
-              zone = "Zul'Aman" },
         },
     },
 
@@ -135,7 +130,7 @@ MC.ToyData = {
         source = "treasure",
         toys = {
             { itemID = 258963, name = "Shroom Jumper's Parachute", source = "treasure",
-              sourceInfo = "Failed Shroom Jumper's Satchel (cliff in NE Harandar)",
+              sourceInfo = "Failed Shroom Jumper's Satchel (cliff in NE Harandar) — usable only in outdoor Midnight zones",
               zone = "Harandar",
               dropInfo = { mob = "Failed Shroom Jumper's Satchel", zone = "Harandar" } },
             { itemID = 259084, name = "Gift of the Cycle", source = "treasure",
@@ -161,8 +156,8 @@ MC.ToyData = {
               zone = "Zul'Aman",
               dropInfo = { mob = "Sturdy Chest", zone = "Atal'Aman delve", rate = "Guaranteed (one-time)" } },
             { itemID = 251903, name = "Potatoad Egg", source = "drop",
-              sourceInfo = "Use Hexed Potatoad Mucus first, then interact with Gravid Potatoad in Blinding Vale while transformed",
-              dropInfo = { mob = "Gravid Potatoad", zone = "The Blinding Vale", rate = "Guaranteed" } },
+              sourceInfo = "Use Hexed Potatoad Mucus first, then interact with Gravid Potatoad in The Binding Vale while transformed",
+              dropInfo = { mob = "Gravid Potatoad", zone = "The Binding Vale", rate = "Guaranteed" } },
             { itemID = 264805, name = "Brann-O-Vision 3000", source = "drop",
               sourceInfo = "Sturdy Chest (delve loot)",
               dropInfo = { mob = "Sturdy Chest", zone = "Delves" } },
@@ -174,8 +169,8 @@ MC.ToyData = {
         source = "dungeon",
         toys = {
             { itemID = 268728, name = "Saptor Salve", source = "dungeon",
-              sourceInfo = "Ziekket (Mythic), The Blinding Vale",
-              dropInfo = { mob = "Ziekket", zone = "The Blinding Vale", boss = true } },
+              sourceInfo = "Ziekket (Mythic), The Binding Vale",
+              dropInfo = { mob = "Ziekket", zone = "The Binding Vale", boss = true } },
         },
     },
     {
@@ -201,16 +196,6 @@ MC.ToyData = {
               sourceInfo = "Gamesmaster Fleurin - 200 Illusionary Coins (Decor Duels)",
               waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.IllusionaryCoin, 200 } } },
-            { itemID = 239018, name = "Winner's Podium", source = "vendor",
-              sourceInfo = "Gamesmaster Fleurin - 200 Illusionary Coins (Decor Duels)",
-              waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
-              cost = { currency = { MC.CURRENCY.IllusionaryCoin, 200 } } },
-            -- Abyss Anglers (Depthdiver Tu'nakit)
-            { itemID = 265749, name = "Idol of the Depths", source = "vendor",
-              sourceInfo = "Depthdiver Tu'nakit - 1500 Angler Pearls (after meta-achievement)",
-              waypoint = LOC.DepthdiverTunakit, zone = "Zul'Aman",
-              cost = { currency = { MC.CURRENCY.AnglerPearls, 1500 } },
-              achievementID = 62217 },
             -- Delves (Telemancer Astrandis / Naleidea Rivergleam)
             { itemID = 264414, name = "Midnight Delver's Flare Gun", source = "vendor",
               sourceInfo = "Telemancer Astrandis - 10 Voidlight Marl, Delver's Journey Rank 7",
@@ -220,11 +205,15 @@ MC.ToyData = {
               sourceInfo = "Naleidea Rivergleam - 10 Voidlight Marl, Delver's Journey Rank 10",
               waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } } },
-            -- Twilight Ascension (pre-patch event, Resonance Crystals 3008)
+            { itemID = 262431, name = "Bouncy Mushroom", source = "vendor",
+              sourceInfo = "Naleidea Rivergleam - 5,000 Undercoin (Delve HQ); usable only in outdoor Midnight zones",
+              waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City",
+              cost = { currency = { MC.CURRENCY.Undercoin, 5000 } } },
+            -- Twilight Ascension (pre-patch event)
             { itemID = 249468, name = "Twilight's Blade Top Secret Strategy Training Guide", source = "vendor",
-              sourceInfo = "Materialist Ophinell - 30 Resonance Crystals (pre-patch event; Twilight Highlands)",
+              sourceInfo = "Materialist Ophinell - 30 Twilight's Blade Insignia (pre-patch event; Twilight Highlands)",
               waypoint = LOC.MaterialistOphinell,
-              cost = { currency = { MC.CURRENCY.ResonanceCrystals, 30 } } },
+              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 30 } } },
         },
     },
 
@@ -241,6 +230,8 @@ MC.ToyData = {
     {
         source = "worldevent",
         toys = {
+            { itemID = 239018, name = "Winner's Podium", source = "worldevent",
+              sourceInfo = "Dastardly Duos weekly quest reward (returns for Decor Duel in 12.0.5)" },
             { itemID = 272287, name = "Nap Mat", source = "worldevent",
               sourceInfo = "Children's Week 2026 vendor reward (Well-loved Figurine token)" },
         },

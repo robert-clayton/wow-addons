@@ -7,8 +7,9 @@ local mod = MC.RegisterModule("mounts", {
     collectedKey   = "showCollected",
     collectedLabel = "collected",
     defaults       = {
-        showCollected = false,
-        collapsed     = {},
+        showCollected   = false,
+        hideUnavailable = true,
+        collapsed       = {},
     },
     events = { "NEW_MOUNT_ADDED", "COMPANION_LEARNED", "PLAYER_ENTERING_WORLD" },
     onEvent = function(m, event)

@@ -14,7 +14,7 @@ MC.FACTION = {
 MC.CURRENCY = {
     Honor              = 1792,
     Undercoin          = 2803,
-    ResonanceCrystals  = 3008,  -- pre-patch
+    TwilightsBladeInsignia = 3319,  -- pre-patch event
     -- Per-profession Artisan's Moxie variants
     AlchemyMoxie       = 3256,
     BlacksmithingMoxie = 3257,

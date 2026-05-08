@@ -171,9 +171,13 @@ local function acquireCheckbox(panel, body, yOff, def)
         local lbl = fr:CreateFontString(nil, "OVERLAY")
         lbl:SetFont(theme.font, 10, "OUTLINE")
         lbl:SetTextColor(0.88, 0.88, 0.88)
-        lbl:SetPoint("LEFT", fr, "RIGHT", 0, 0)
-        -- Reorder buttons (up + down). Created lazily; only shown when
-        -- the def includes a `reorder` table.
+        -- Anchor both LEFT and RIGHT so long labels wrap inside the
+        -- options column instead of running off the right edge. Top
+        -- alignment keeps the first line lined up with the checkbox.
+        lbl:SetPoint("TOPLEFT", fr, "TOPRIGHT", 4, -2)
+        lbl:SetWordWrap(true)
+        lbl:SetJustifyH("LEFT")
+        lbl:SetJustifyV("TOP")
         local upBtn = CreateFrame("Button", nil, fr, "UIPanelButtonTemplate")
         upBtn:SetSize(20, 16)
         upBtn:SetText("^")
@@ -187,15 +191,14 @@ local function acquireCheckbox(panel, body, yOff, def)
     end
     w.frame:ClearAllPoints()
     w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 6, yOff)
-    w.lbl:SetText(def.label)
     w.frame:SetChecked(def.get())
     w.frame:SetScript("OnClick", function(s)
         def.set(s:GetChecked())
         if def.onRefresh then def.onRefresh() end
     end)
 
-    -- Reorder controls. Anchored to the right edge of the body; rendered
-    -- only if the def carries a `reorder` table from the caller.
+    -- Reorder buttons appear at the right edge when the def carries a
+    -- `reorder` table. The label width must leave room for them.
     local r = def.reorder
     if r then
         w.dnBtn:ClearAllPoints()
@@ -215,8 +218,24 @@ local function acquireCheckbox(panel, body, yOff, def)
         w.dnBtn:Hide()
     end
 
+    -- Anchor label LEFT to checkbox and RIGHT to body so it fills the
+    -- column width at draw time. body:GetWidth() returns 0 here because
+    -- BuildConfig runs before cfgFrame:Show(), so SetWidth() would clamp
+    -- to the floor and wrap after a few chars.
+    local rightReserve = r and 50 or 6
+    w.lbl:ClearAllPoints()
+    w.lbl:SetPoint("TOPLEFT", w.frame, "TOPRIGHT", 4, -2)
+    w.lbl:SetPoint("RIGHT", body, "RIGHT", -rightReserve, 0)
+    w.lbl:SetWidth(0)  -- clear any prior fixed width so the L+R anchors win
+    w.lbl:SetText(def.label)
+
     w.frame:Show()
-    return yOff - 22
+
+    -- Row height grows with the wrapped label so two-line labels don't
+    -- overlap the next widget. GetStringHeight returns the wrapped
+    -- height once SetText has run against the resolved anchor width.
+    local lh = w.lbl:GetStringHeight() or 12
+    return yOff - math.max(22, lh + 8)
 end
 
 local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, setVal, fillR, fillG, fillB)

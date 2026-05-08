@@ -1,66 +1,84 @@
 local _, MC = ...
 
---------------------------------------------------------------------------
--- Roster: tracks guildies who run MidnightCollections and surfaces their
--- per-module collection counts. v1 broadcasts only count summaries; v2
--- adds a bitmap of which specific items each player owns.
+-- Roster: track guildies + BNet friends running the addon and surface
+-- their collection progress. Used to be a tab; now lives behind the
+-- "X peers" indicator on the main panel and the Collection Inspector
+-- popup.
 --
--- Broadcast triggers:
---   * PLAYER_LOGIN + 5s — once per session
---   * Any module's count changes — debounced 30s, suppressed if the
---     hash of our outbound payload hasn't changed since last send
---   * /mc roster announce — manual force-broadcast
---   * /mc roster sync — request peers re-broadcast theirs
---------------------------------------------------------------------------
+-- Settings: MC.db.rosterEnabled (master on/off), MC.db.roster (sub-
+-- toggles for share/items/bnet, plus skip-if-unchanged caches).
+--
+-- Broadcasts:
+--   PLAYER_LOGIN + 5s   one-shot, gated on rosterEnabled
+--   Counts changed      debounced 30s, suppressed when payload hash matches
+--   /mc roster announce force broadcast
+--   /mc roster sync     ask peers to re-broadcast
 
-local mod = MC.RegisterModule("roster", {
-    label    = "Roster",
-    icon     = "Interface\\Icons\\Achievement_GuildPerk_EverybodysFriend",
-    order    = 8,
-    -- Roster is not a collectible tracker; skip collectedKey/Label.
-    defaults = {
-        share          = true,            -- Broadcast our counts to guild
-        shareParty     = false,           -- (Reserved for future use)
-        shareItems     = true,            -- Broadcast per-item bitmap (v2)
-        shareBNet      = true,            -- Broadcast to BNet WoW friends (v2)
-        autoForgetDays = 30,              -- Garbage-collect peers older than this
-        lastBroadcast  = {},              -- channel -> last hash sent (skip-if-unchanged)
-        lastBitmap     = {},              -- channel -> last bitmap fingerprint
-        collapsed      = {},
-    },
-    events = { "PLAYER_GUILD_UPDATE", "GUILD_ROSTER_UPDATE" },
-    onEvent = function(m, event)
-        -- These are passive — Roster doesn't scan, just keeps the live
-        -- guild member list current for "who's online" rendering.
-    end,
-    onLogin = function(m)
-        -- Cleanup runs regardless of the module's enabled state so a user
-        -- who had the module on briefly and then disabled it still ends up
-        -- with a clean RosterDB.
-        if MC.RosterDB then
-            for k in pairs(MC.RosterDB) do
-                if type(k) ~= "string" or not k:find("-", 1, true) then
-                    MC.RosterDB[k] = nil
-                end
+-- Standin so the rest of the file can keep referring to mod.db.
+-- RosterInit fills it in at ADDON_LOADED.
+local mod = { db = nil }
+MC.Roster = mod
+
+local DEFAULTS = {
+    share          = true,            -- Broadcast our counts to guild
+    shareParty     = false,           -- (Reserved for future use)
+    shareItems     = true,            -- Broadcast per-item bitmap (v2)
+    shareBNet      = true,            -- Broadcast to BNet WoW friends (v2)
+    autoForgetDays = 30,              -- Garbage-collect peers older than this
+    lastBroadcast  = {},              -- channel -> last hash sent
+    lastBitmap     = {},              -- channel -> last bitmap fingerprint
+}
+
+-- Wired up from Core.lua at ADDON_LOADED.
+function MC.RosterInit()
+    if not MC.db then return end
+
+    MC.db.roster = MC.db.roster or {}
+    for k, v in pairs(DEFAULTS) do
+        if MC.db.roster[k] == nil then
+            MC.db.roster[k] = type(v) == "table" and CopyTable(v) or v
+        end
+    end
+    mod.db = MC.db.roster
+
+    -- Old "Roster module disabled" -> new rosterEnabled = false.
+    if MC.db.rosterEnabled == nil then
+        if MC.db.disabledModules and MC.db.disabledModules.roster then
+            MC.db.rosterEnabled = false
+        else
+            MC.db.rosterEnabled = true
+        end
+    end
+end
+
+-- Wired up from Core.lua at PLAYER_LOGIN.
+function MC.RosterPostLogin()
+    -- Always run cleanup so a user who briefly had the feature on
+    -- ends up with a clean DB even if they later turn it off.
+    if MC.RosterDB then
+        for k, v in pairs(MC.RosterDB) do
+            if type(k) ~= "string" or not k:find("-", 1, true) then
+                MC.RosterDB[k] = nil
+            elseif type(v) == "table" and not v.name then
+                -- Back-fill name on records stored before the field was set.
+                v.name = k
             end
         end
+    end
 
-        -- Skip the broadcast if Roster is disabled. The non-Roster
-        -- modules' onLogin runs unconditionally so their counts populate
-        -- the Me row, but the comms half of Roster only fires when
-        -- Roster itself is enabled.
-        if not MC.IsModuleEnabled("roster") then return end
+    if not (MC.db and MC.db.rosterEnabled) then return end
+    C_Timer.After(5, function()
+        -- Force-announce ourselves: clears the unchanged-hash guard so
+        -- peers see us after our /reload even when our counts didn't move.
+        MC.RosterForceBroadcast("GUILD")
+        -- Also ask online peers to re-broadcast their counts. Without
+        -- this, after /reload we only show whatever's in the saved file
+        -- and never learn about peers whose counts haven't changed.
+        if MC.Comms then MC.Comms:Send("r", "", "GUILD") end
+    end)
+end
 
-        -- Stagger the initial broadcast so we don't fight for addon
-        -- bandwidth with every other addon's login chatter.
-        C_Timer.After(5, function() MC.RosterBroadcastIfChanged() end)
-    end,
-})
-
---------------------------------------------------------------------------
--- Wire format helpers (v1: counts only)
---------------------------------------------------------------------------
--- Module-key -> single-char wire code. Single chars keep messages short.
+-- Wire format helpers. Single-char codes keep messages compact.
 local WIRE_KEY = {
     mounts      = "m",
     pets        = "p",
@@ -71,9 +89,8 @@ local WIRE_KEY = {
     treasures   = "x",
 }
 
--- Walk the scanners and produce a per-module {collected, total} table.
--- Used both for the wire payload (BuildPayload) and for rendering the
--- "Me" row/column in the Roster tab and PeerPanel.
+-- Per-module {collected, total} from the live scanners. Shared by the
+-- wire payload and the "Me" entry rendered in the Inspector.
 local function BuildLocalCounts()
     local counts = {}
     for _, m in ipairs(MC.modules) do
@@ -115,9 +132,8 @@ local function BuildPayload()
     return table.concat(parts, ",")
 end
 
--- Roster-shaped entry for the local player, suitable for rendering by
--- the Roster UI and PeerPanel. Mirrors the per-peer record shape so
--- consumers can use a single code path.
+-- Local player rendered into a peer-shaped record so the Inspector can
+-- treat us the same as everyone else.
 function MC.GetMeRosterEntry()
     local _, classToken = UnitClass("player")
     local me = UnitName("player")
@@ -137,8 +153,7 @@ local function GetClassToken()
     return classToken or "UNKNOWN"
 end
 
--- A throwaway hash for "did our payload change?". Doesn't need to be
--- collision-resistant; it just needs to differ when the counts differ.
+-- "Did our payload change?" hash. Cheap, not collision-safe.
 local function cheapHash(s)
     local h = 0
     for i = 1, #s do
@@ -147,11 +162,10 @@ local function cheapHash(s)
     return h
 end
 
---------------------------------------------------------------------------
--- Broadcast (skip-if-unchanged)
---------------------------------------------------------------------------
+-- Broadcast, suppressed when our payload hasn't changed.
 function MC.RosterBroadcastIfChanged(channel)
     channel = channel or "GUILD"
+    if not (MC.db and MC.db.rosterEnabled) then return end
     if not mod.db or not mod.db.share then return end
     if not MC.Comms then return end
 
@@ -168,8 +182,8 @@ function MC.RosterBroadcastIfChanged(channel)
         end
     end
 
-    -- v2: also broadcast the per-item bitmap. Skipped if disabled or if
-    -- the bitmap module didn't initialize (no PLAYER_LOGIN yet).
+    -- v2: also broadcast the per-item bitmap. Skip when disabled or
+    -- before Bitmap:Init has run.
     if mod.db.shareItems and MC.Bitmap and MC.Bitmap.fingerprint then
         local bmp = MC.Bitmap:Build()
         if bmp then
@@ -186,7 +200,7 @@ function MC.RosterBroadcastIfChanged(channel)
     end
 end
 
--- Force-broadcast (used by /mc roster announce). Skips the unchanged check.
+-- /mc roster announce: bypass the skip-if-unchanged guard.
 function MC.RosterForceBroadcast(channel)
     channel = channel or "GUILD"
     if not MC.Comms then return end
@@ -195,8 +209,7 @@ function MC.RosterForceBroadcast(channel)
     MC.Comms:Send("u", payload, channel)
 end
 
--- Debounced version: bound to scanner-finished hooks. Coalesces multiple
--- rapid count changes into one broadcast every 30s.
+-- 30s debounce for scanner-finished hooks.
 local broadcastPending = false
 function MC.RosterDebouncedBroadcast()
     if broadcastPending then return end
@@ -207,9 +220,7 @@ function MC.RosterDebouncedBroadcast()
     end)
 end
 
---------------------------------------------------------------------------
--- Receive handlers
---------------------------------------------------------------------------
+-- Inbound handlers
 local function ParseUpdate(payload)
     -- payload: "m:47/62,p:30/82,...|CLASS|version"
     local counts, class, version = strsplit("|", payload, 3)
@@ -239,15 +250,15 @@ local function OnUpdateReceived(payload, sender)
     if sender == myKey or sender == me then return end
 
     MC.RosterDB[sender] = {
+        name     = sender,
         class    = parsed.class,
         version  = parsed.version,
         counts   = parsed.counts,
         lastSeen = time(),
     }
 
-    if MC.activeModule == "roster" and MC.RefreshActive then
-        MC.RefreshActive()
-    end
+    if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
+    if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
 end
 
 local function OnRequestReceived(_, sender)
@@ -273,6 +284,7 @@ local function OnBitmapReceived(payload, sender)
     if sender == (me .. "-" .. meRealm) or sender == me then return end
 
     local rec = MC.RosterDB[sender] or {}
+    rec.name = sender
     rec.bitmap = { fingerprint = fp, owned = owned, when = time() }
     rec.lastSeen = time()
     MC.RosterDB[sender] = rec
@@ -302,10 +314,7 @@ function MC.RosterPrune()
     end
 end
 
---------------------------------------------------------------------------
--- Slash-command handlers (registered against the existing /mc dispatcher
--- via MC.RegisterRosterSlash, called from Core after both load).
---------------------------------------------------------------------------
+-- /mc roster <subcommand> dispatcher.
 function MC.RosterSlashHandler(arg)
     arg = (arg or ""):lower()
     if arg == "" or arg == "status" then
@@ -313,31 +322,36 @@ function MC.RosterSlashHandler(arg)
         if MC.RosterDB then
             for _ in pairs(MC.RosterDB) do count = count + 1 end
         end
-        print(format("%s Roster: sharing %s, %d peers tracked.",
-            MC.PREFIX, mod.db and mod.db.share and "ON" or "OFF", count))
+        print(format("%s Sharing: %s, %d peer%s tracked.",
+            MC.PREFIX,
+            (MC.db and MC.db.rosterEnabled) and "ON" or "OFF",
+            count, count == 1 and "" or "s"))
     elseif arg == "on" then
-        if mod.db then mod.db.share = true end
-        print(MC.PREFIX .. " Roster sharing turned ON.")
+        if MC.db then MC.db.rosterEnabled = true end
+        print(MC.PREFIX .. " Sharing turned ON.")
+        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
         MC.RosterForceBroadcast("GUILD")
     elseif arg == "off" then
-        if mod.db then mod.db.share = false end
-        print(MC.PREFIX .. " Roster sharing turned OFF.")
+        if MC.db then MC.db.rosterEnabled = false end
+        print(MC.PREFIX .. " Sharing turned OFF.")
+        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     elseif arg == "announce" then
         MC.RosterForceBroadcast("GUILD")
-        print(MC.PREFIX .. " Roster: broadcast sent to guild.")
+        print(MC.PREFIX .. " Sharing: broadcast sent to guild.")
     elseif arg == "sync" then
         if MC.Comms then
             MC.Comms:Send("r", "", "GUILD")
-            print(MC.PREFIX .. " Roster: requested updates from guild.")
+            print(MC.PREFIX .. " Sharing: requested updates from guild.")
         end
     elseif arg == "prune" then
         MC.RosterPrune()
-        print(MC.PREFIX .. " Roster: pruned stale peers.")
+        print(MC.PREFIX .. " Sharing: pruned stale peers.")
+        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     elseif arg == "clear" then
         if MC.RosterDB then wipe(MC.RosterDB) end
-        if MC.activeModule == "roster" and MC.RefreshActive then MC.RefreshActive() end
-        print(MC.PREFIX .. " Roster: cleared.")
+        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+        print(MC.PREFIX .. " Sharing: cleared.")
     else
-        print(MC.PREFIX .. " /mc roster on|off|announce|sync|prune|clear|status")
+        print(MC.PREFIX .. " /mc sharing on|off|announce|sync|prune|clear|status")
     end
 end

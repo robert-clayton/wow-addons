@@ -1055,6 +1055,12 @@ frame:SetScript("OnEvent", function(_, event, ...)
         MC.snapshotDB = MidnightCollectionsDB
         MC.RosterDB   = MidnightCollectionsRosterDB
 
+        -- Roster is no longer a module — it runs alongside the rest of
+        -- the addon as a standalone feature. Init it now so its settings
+        -- table (MC.db.roster + MC.db.rosterEnabled) is ready before any
+        -- other code reads them.
+        if MC.RosterInit then MC.RosterInit() end
+
         -- Each module gets its own sub-table for settings and collapsed state.
         -- Copy the registration defaults so we don't mutate mod.opts.defaults
         -- in place — DeepMergeDefaults shallow-copies sub-tables and we don't
@@ -1092,13 +1098,16 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- have init logic (Recipes' DetectProfessions, Pets' wild-species
         -- lookup) that the Scanner needs even when the module is disabled,
         -- so the Me row in Roster + the broadcast payload have its counts
-        -- available. Roster's onLogin self-gates its broadcast on
-        -- IsModuleEnabled internally.
+        -- available.
         for _, mod in ipairs(MC.modules) do
             if mod.opts.onLogin then
                 mod.opts.onLogin(mod)
             end
         end
+
+        -- Roster runs outside the module system; it has its own
+        -- post-login init (cleanup + broadcast) gated on rosterEnabled.
+        if MC.RosterPostLogin then MC.RosterPostLogin() end
         -- C_PetJournal/C_MountJournal aren't fully populated at PLAYER_LOGIN,
         -- so the first scan is deferred a couple of seconds. Scan every
         -- module regardless of enabled state — disabling a module hides its
@@ -1191,6 +1200,58 @@ function MC.CreatePanel()
         MC.TabBar:Create(panel, MC.modules, function(key) MC.SwitchTab(key) end)
     end
     MC.BuildConfig()
+
+    -- Peer-count indicator in the title bar. Clickable; opens the
+    -- Collection Inspector. Hidden when Roster is disabled.
+    local bar = panel.frame and panel.frame.titleBar
+    if bar then
+        local peerBtn = CreateFrame("Button", nil, bar)
+        peerBtn:SetHeight(16)
+        local fs = peerBtn:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
+        fs:SetPoint("CENTER")
+        fs:SetTextColor(0.85, 0.85, 0.85)
+        peerBtn:SetFontString(fs)
+        -- Anchor between the addon-progress text and the gear/options button
+        if panel.titleProgressText then
+            peerBtn:SetPoint("RIGHT", panel.titleProgressText, "LEFT", -10, 0)
+        else
+            peerBtn:SetPoint("RIGHT", bar, "RIGHT", -68, 0)
+        end
+        peerBtn:SetScript("OnEnter", function(s)
+            fs:SetTextColor(1, 1, 1)
+            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+            GameTooltip:SetText("Open Collection Inspector")
+            GameTooltip:Show()
+        end)
+        peerBtn:SetScript("OnLeave", function()
+            fs:SetTextColor(0.85, 0.85, 0.85)
+            GameTooltip:Hide()
+        end)
+        peerBtn:SetScript("OnClick", function()
+            if MC.ShowPeerPanel then MC.ShowPeerPanel() end
+        end)
+        MC.peerIndicator = peerBtn
+        MC.RefreshPeerIndicator()
+    end
+end
+
+-- Updates the title-bar peer-count text. Called whenever a new peer is
+-- received, the user toggles Roster on/off, or the Roster is cleared.
+function MC.RefreshPeerIndicator()
+    local btn = MC.peerIndicator
+    if not btn then return end
+    if not (MC.db and MC.db.rosterEnabled) then
+        btn:Hide()
+        return
+    end
+    local count = 0
+    if MC.RosterDB then
+        for _ in pairs(MC.RosterDB) do count = count + 1 end
+    end
+    btn:GetFontString():SetText(format("%d peer%s", count, count == 1 and "" or "s"))
+    btn:SetWidth(btn:GetFontString():GetStringWidth() + 10)
+    btn:Show()
 end
 
 --------------------------------------------------------------------------
@@ -1284,6 +1345,16 @@ function MC.BuildConfig()
             if MC.db.minimap then MC.db.minimap.hide = v end
             if MC.MinimapButton and MC.MinimapButton.Update then MC.MinimapButton:Update() end
         end }
+    defs[#defs + 1] = { type = "divider" }
+    defs[#defs + 1] = { type = "section", label = "SHARING" }
+    defs[#defs + 1] = { type = "checkbox",
+        label = "Enable Sharing",
+        get = function() return MC.db.rosterEnabled and true or false end,
+        set = function(v)
+            MC.db.rosterEnabled = v and true or false
+            if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+            if v and MC.RosterForceBroadcast then MC.RosterForceBroadcast("GUILD") end
+        end }
 
     -- Inject the "Show Collected" checkbox automatically from each module's
     -- collectedKey/collectedLabel; modules only have to declare extras.
@@ -1343,7 +1414,7 @@ local function PrintHelp()
     print("  /mc scan - rescan enabled modules")
     print("  /mc collected [module] - toggle collected/learned display")
     print("  /mc reset - reset panel position + size")
-    print("  /mc roster on|off|announce|sync|prune|status - guild roster")
+    print("  /mc sharing on|off|announce|sync|prune|status - guild sharing")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -1409,11 +1480,11 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
         print(format("%s Midnight Collections v%s", PREFIX, MC.version))
-    elseif cmd == "roster" then
+    elseif cmd == "sharing" or cmd == "roster" then
         if MC.RosterSlashHandler then
             MC.RosterSlashHandler(arg)
         else
-            print(PREFIX .. " Roster module not loaded.")
+            print(PREFIX .. " Sharing not loaded.")
         end
     elseif cmd == "help" then
         PrintHelp()

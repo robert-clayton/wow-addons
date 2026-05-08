@@ -53,9 +53,11 @@ function Scanner:Scan()
                     collected         = isCollected,
                 }
 
-                -- Skip unavailable items the player doesn't already own —
-                -- they can't be earned anymore, no point cluttering the list.
-                if mount.unavailable and not isCollected then
+                -- Hide unavailable items the player doesn't already own
+                -- when the toggle is on (default). Users can flip it off to
+                -- see what they missed.
+                local hideUnavailable = mod.db == nil or mod.db.hideUnavailable ~= false
+                if mount.unavailable and not isCollected and hideUnavailable then
                     -- skip
                 else
                     result.total = result.total + 1

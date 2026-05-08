@@ -19,8 +19,16 @@ function UI:Init(panel, m)
 end
 
 function UI:GetConfigDefs()
-    -- Show Collected toggle is auto-injected by Core.BuildConfig
-    return {}
+    local db = mod.db
+    return {
+        { type = "checkbox", label = "Hide unavailable mounts",
+            get = function() return db.hideUnavailable ~= false end,
+            set = function(v)
+                db.hideUnavailable = v
+                if mod.Scanner then mod.Scanner:Scan() end
+                MC.RefreshActive()
+            end },
+    }
 end
 
 function UI:Refresh()

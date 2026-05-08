@@ -53,7 +53,8 @@ function Scanner:Scan()
                 collected         = isCollected,
             }
 
-            if toy.unavailable and not isCollected then
+            local hideUnavailable = mod.db == nil or mod.db.hideUnavailable ~= false
+            if toy.unavailable and not isCollected and hideUnavailable then
                 -- skip discontinued toys the player doesn't own
             else
                 result.total = result.total + 1

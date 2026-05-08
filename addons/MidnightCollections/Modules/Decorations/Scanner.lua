@@ -8,20 +8,100 @@ Scanner.results = {}
 
 local DECOR_ENTRY_TYPE = 1 -- Enum.HousingCatalogEntryType.Decor
 
+-- The housing catalog needs to be "warmed" before
+-- GetCatalogEntryInfoByRecordID returns populated ownership data —
+-- otherwise it hands back empty tables and every decoration scans as
+-- not collected. Mirrors HomeDecor's bootstrap pattern.
+local catalogReady = false
+local catalogRetries = 0
+local CATALOG_MAX_RETRIES = 6
+-- Held at module scope so the searcher userdata isn't GC'd before its
+-- ResultsUpdated callback fires. With a local-only ref, the searcher
+-- sometimes dies between RunSearch and the callback, leaving the catalog
+-- un-warmed → every decor scans as 0/260.
+local catalogSearcher = nil
+
+local function warmCatalog()
+    if catalogReady then return end
+    catalogRetries = catalogRetries + 1
+    if catalogRetries > CATALOG_MAX_RETRIES then return end
+
+    if not (C_HousingCatalog and C_HousingCatalog.CreateCatalogSearcher) then
+        C_Timer.After(1, warmCatalog)
+        return
+    end
+
+    catalogSearcher = C_HousingCatalog.CreateCatalogSearcher()
+    local s = catalogSearcher
+    if not s then
+        C_Timer.After(1, warmCatalog)
+        return
+    end
+
+    if s.SetOwnedOnly             then s:SetOwnedOnly(false) end
+    if s.SetCollected             then s:SetCollected(true)  end
+    if s.SetUncollected           then s:SetUncollected(true) end
+    if s.SetAutoUpdateOnParamChanges then s:SetAutoUpdateOnParamChanges(false) end
+
+    if s.SetResultsUpdatedCallback then
+        s:SetResultsUpdatedCallback(function()
+            if catalogReady then return end
+            catalogReady = true
+            -- Re-run the decoration scan now that ownership lookups
+            -- will return real data.
+            if Scanner.Scan then
+                pcall(Scanner.Scan, Scanner)
+                if MC.RefreshActive then MC.RefreshActive() end
+                if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+            end
+        end)
+    end
+
+    if s.RunSearch then s:RunSearch() end
+
+    -- Failsafe: if the callback never fires, retry the warmup.
+    C_Timer.After(5, function()
+        if catalogReady then return end
+        warmCatalog()
+    end)
+end
+
+local warmFrame = CreateFrame("Frame")
+warmFrame:RegisterEvent("PLAYER_LOGIN")
+warmFrame:SetScript("OnEvent", function() C_Timer.After(0, warmCatalog) end)
+
+-- Sum the four ownership counters; any one being > 0 means the player
+-- has earned this decor at some point (placed in current/other house,
+-- in storage, or destroyed).
+local function ownedFromInfo(info)
+    if not info then return 0 end
+    return (info.numPlaced or 0)
+         + (info.quantity or 0)
+         + (info.totalNumPlaced or 0)
+         + (info.totalNumStored or 0)
+end
+
 function Scanner:CheckCollected(decorID, itemID)
     if decorID and decorID > 0 and C_HousingCatalog and C_HousingCatalog.GetCatalogEntryInfoByRecordID then
-        local ok, info = pcall(C_HousingCatalog.GetCatalogEntryInfoByRecordID,
-            DECOR_ENTRY_TYPE, decorID, true)
+        -- Wrap the API in a closure rather than passing the function
+        -- reference directly to pcall — some Blizzard C-API functions
+        -- misbehave when their ref is pulled out of the namespace,
+        -- returning empty tables instead of populated data.
+        local ok, info = pcall(function()
+            return C_HousingCatalog.GetCatalogEntryInfoByRecordID(DECOR_ENTRY_TYPE, decorID, true)
+        end)
         if ok and info then
-            local owned = (info.numPlaced or 0) + (info.quantity or 0)
+            local owned = ownedFromInfo(info)
             return owned > 0, info
         end
     end
 
     if itemID and itemID > 0 and C_HousingCatalog and C_HousingCatalog.GetCatalogEntryInfoByItem then
-        local ok, info = pcall(C_HousingCatalog.GetCatalogEntryInfoByItem, itemID, true)
+        local ok, info = pcall(function()
+            return C_HousingCatalog.GetCatalogEntryInfoByItem(itemID, true)
+        end)
         if ok and info then
-            local owned = (info.numPlaced or 0) + (info.quantity or 0)
+            local owned = ownedFromInfo(info)
             return owned > 0, info
         end
     end

@@ -7,8 +7,8 @@ local UI = mod.UI
 local MUI = LibStub("MidnightUI-1.0")
 
 local SECTION_PAD = 8
-local ROW_HEIGHT  = 20
-local ICON_SIZE   = 20
+local ROW_HEIGHT  = 22
+local ICON_SIZE   = 24
 
 local SOURCE_SET = {}
 for _, s in ipairs(MC.DecoSourceOrder) do SOURCE_SET[s] = true end

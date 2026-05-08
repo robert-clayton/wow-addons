@@ -1,21 +1,18 @@
 local _, MC = ...
 
---------------------------------------------------------------------------
--- One-time onboarding frame, shown the first time the user logs in on a
--- given addon-version milestone (currently "1.5.0"). Lets the player
--- toggle each module on/off and confirm they want to share their counts
--- with their guild before the first broadcast goes out.
+-- One-time popup shown on the first login after an addon-version
+-- milestone bump. Lets the player turn off any tracker and decide
+-- whether to share collection counts with their guild before the
+-- first broadcast goes out.
 --
--- StaticPopupDialogs only support one EditBox / two buttons, which is too
--- limited for a multi-checkbox layout — so we build a small custom frame.
---------------------------------------------------------------------------
+-- It's a custom frame because StaticPopupDialogs only support one
+-- editbox / two buttons.
 
 local MUI = LibStub("MidnightUI-1.0", true)
 
 local ONBOARDING_VERSION = "1.5.0"
 
--- Shown text. Avoid making it sound like malware: lead with the user
--- benefit, mention the share toggle plainly.
+-- Lead with the user benefit; mention the share toggle plainly.
 local INTRO_LINES = {
     "Midnight Collections has new features in 1.5.0:",
     " ",
@@ -24,7 +21,7 @@ local INTRO_LINES = {
     "  • Click checklists for prerequisite quest chains",
     " ",
     "Pick which trackers you want enabled, and whether",
-    "to share your collection counts with the guild.",
+    "to enable Sharing (peer counts + Collection Inspector).",
 }
 
 local FRAME
@@ -125,10 +122,8 @@ local function buildFrame()
     return f
 end
 
---------------------------------------------------------------------------
--- Populate the module checkboxes from MC.modules. Has to run after the
--- modules have registered themselves (PLAYER_LOGIN+).
---------------------------------------------------------------------------
+-- Populate the per-module checkboxes. Runs at show time so MC.modules
+-- is fully populated.
 local function populate(f)
     -- Wipe existing checkboxes
     for _, cb in pairs(f.moduleChecks) do cb:Hide() end
@@ -159,25 +154,20 @@ local function populate(f)
     f.shareSection:ClearAllPoints()
     f.shareSection:SetPoint("TOPLEFT", 14, y - 12)
 
-    -- Share toggle
-    if not f.shareCheck then
+    -- Master switch for the Sharing feature (peer counts + Inspector).
+    if not f.rosterCheck then
         local cb = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
         cb:SetSize(22, 22)
         local fs = cb:CreateFontString(nil, "OVERLAY")
         fs:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "")
         fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-        fs:SetText("Share my collection counts with the guild")
+        fs:SetText("Enable Sharing")
         if theme then fs:SetTextColor(unpack(theme.colors.text)) end
-        f.shareCheck = cb
+        f.rosterCheck = cb
     end
-    f.shareCheck:ClearAllPoints()
-    f.shareCheck:SetPoint("TOPLEFT", 14, y - 36)
-    local rosterMod = MC.modulesByKey and MC.modulesByKey["roster"]
-    if rosterMod and rosterMod.db then
-        f.shareCheck:SetChecked(rosterMod.db.share and true or false)
-    else
-        f.shareCheck:SetChecked(true)
-    end
+    f.rosterCheck:ClearAllPoints()
+    f.rosterCheck:SetPoint("TOPLEFT", 14, y - 36)
+    f.rosterCheck:SetChecked((MC.db and MC.db.rosterEnabled ~= false) and true or false)
 end
 
 --------------------------------------------------------------------------
@@ -191,9 +181,9 @@ local function applyChoices(f)
             MC.SetModuleEnabled(key, enabled)
         end
     end
-    local rosterMod = MC.modulesByKey and MC.modulesByKey["roster"]
-    if rosterMod and rosterMod.db then
-        rosterMod.db.share = f.shareCheck:GetChecked() and true or false
+    if MC.db then
+        MC.db.rosterEnabled = f.rosterCheck:GetChecked() and true or false
+        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     end
 end
 

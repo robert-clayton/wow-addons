@@ -75,6 +75,7 @@ local mod = MC.RegisterModule("pets", {
     defaults       = {
         showCollected   = false,
         hideTradingPost = false,
+        hideUnavailable = true,
         wildAlerts      = true,
         collapsed       = {},
     },

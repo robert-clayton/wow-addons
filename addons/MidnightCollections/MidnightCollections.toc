@@ -2,7 +2,7 @@
 ## Title: Midnight Collections
 ## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.6.7
+## Version: 1.5.2
 ## IconTexture: Interface\AddOns\MidnightCollections\Media\icon.tga
 ## SavedVariables: MidnightCollectionsDB, MidnightCollectionsRosterDB
 ## SavedVariablesPerCharacter: MidnightCollectionsCharDB
@@ -73,12 +73,11 @@ Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua
 Modules\Recipes\UI.lua
 
-# Roster module — loads last so it can read other modules' Scanner.results
-# at broadcast time. Comms.lua must precede Init.lua because Init registers
-# subprefix handlers against MC.Comms. Bitmap.lua precedes Init.lua so the
-# bitmap encoder is available when v2 broadcast logic runs.
+# Roster — standalone (no longer a tab module). Loads after the other
+# modules so it can read their Scanner.results at broadcast time. Comms
+# precedes Init because Init registers subprefix handlers against
+# MC.Comms; Bitmap precedes Init so v2 broadcast logic can use it.
 Modules\Roster\Comms.lua
 Modules\Roster\Bitmap.lua
 Modules\Roster\Init.lua
 Modules\Roster\PeerPanel.lua
-Modules\Roster\UI.lua

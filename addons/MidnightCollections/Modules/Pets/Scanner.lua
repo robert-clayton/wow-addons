@@ -55,7 +55,8 @@ function Scanner:Scan()
                     collected         = isCollected,
                 }
 
-                if pet.unavailable and not isCollected then
+                local hideUnavailable = mod.db == nil or mod.db.hideUnavailable ~= false
+                if pet.unavailable and not isCollected and hideUnavailable then
                     -- skip discontinued pets the player doesn't own
                 else
                     result.total = result.total + 1
