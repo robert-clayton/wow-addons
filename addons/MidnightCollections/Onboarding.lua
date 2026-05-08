@@ -206,6 +206,15 @@ function MC.ShowOnboarding()
     f.acceptBtn:SetScript("OnClick", function()
         applyChoices(f)
         f:Hide()
+        -- Write the flag to the per-character DB. The PLAYER_LOGOUT
+        -- snapshot routine in Core.lua copies MC.db -> MidnightCollectionsDB,
+        -- so writing to MidnightCollectionsDB directly here would get
+        -- clobbered every reload. The CharDB-side flag is preserved across
+        -- reloads (saved as part of MidnightCollectionsCharDB) and
+        -- propagates to fresh alts via the snapshot seed.
+        if MC.db then
+            MC.db._onboardingShown = ONBOARDING_VERSION
+        end
         if MidnightCollectionsDB then
             MidnightCollectionsDB._onboardingShown = ONBOARDING_VERSION
         end
@@ -220,8 +229,12 @@ function MC.ShowOnboarding()
 end
 
 function MC.MaybeShowOnboarding()
-    if not MidnightCollectionsDB then return end
-    if MidnightCollectionsDB._onboardingShown == ONBOARDING_VERSION then return end
+    -- Read from CharDB primarily; fall back to the account-wide DB so that
+    -- pre-fix users who already clicked "Got it" once don't re-trigger the
+    -- popup just because their flag landed in the wrong place.
+    local shown = (MC.db and MC.db._onboardingShown)
+                  or (MidnightCollectionsDB and MidnightCollectionsDB._onboardingShown)
+    if shown == ONBOARDING_VERSION then return end
     -- Defer so MC.modules and friends are populated.
     C_Timer.After(2, function() MC.ShowOnboarding() end)
 end
