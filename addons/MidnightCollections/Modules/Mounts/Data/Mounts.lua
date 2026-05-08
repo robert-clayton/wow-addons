@@ -1,5 +1,97 @@
 local _, MC = ...
 
+local M = MC.MAP
+
+-- Shared Ritual Sites gate. Several Ritual-Sites collectibles require both
+-- meta-achievements (Void Response Team + Ritual Site Disruptor) regardless
+-- of renown rank. Define once and reference from every entry that shares it.
+MC.RitualSitesGate = {
+    intro = "Two Ritual Sites meta-achievements gate this collectible.",
+    tasks = {
+        { achievementID = 62563, label = "Void Response Team" },
+        { achievementID = 62561, label = "Ritual Site Disruptor" },
+    },
+}
+
+-- Glory of the Midnight Raider (achievementID 61380) — earns Tenebrous
+-- Harrower mount. 10 sub-achievements across The Voidspire / March on
+-- Quel'Danas / The Dreamrift raids. Verified May 2026 against Wowhead.
+local GLORY_RAIDER_TASKS = {
+    intro = "Earn all 10 Midnight raid feat-of-strength achievements.",
+    tasks = {
+        { achievementID = 62352, label = "Nothing to See Here (Voidspire)" },
+        { achievementID = 62058, label = "Hungry Hungry Hatchlings (Voidspire)" },
+        { achievementID = 61911, label = "Ready, Set, Snap! (Voidspire)" },
+        { achievementID = 61346, label = "We Will, In Fact, See It Again (Voidspire)" },
+        { achievementID = 61381, label = "Eggsistential Crisis (March on Quel'Danas)" },
+        { achievementID = 62106, label = "The Only Winning Move Is Not To Play (Voidspire)" },
+        { achievementID = 61514, label = "It's Treason Then (Voidspire)" },
+        { achievementID = 61936, label = "Aura Farming (Voidspire)" },
+        { achievementID = 61454, label = "Falling Between The Quacks (Dreamrift)" },
+        { achievementID = 62406, label = "All the Things She Said (Midnight Falls)" },
+    },
+}
+
+-- Glory of the Midnight Delver (achievementID 61906) — earns Giganto Manis.
+-- 4 sub-achievements that are themselves often metas (Loremaster, Treasure,
+-- Curio, Nemesis). Nemesis is time-gated to the current delve season.
+local GLORY_DELVER_TASKS = {
+    intro = "Earn all 4 Midnight delve metas (Nemesis is season-gated).",
+    tasks = {
+        { achievementID = 61741, label = "Delve Loremaster: Midnight (10 story arcs)" },
+        { achievementID = 61723, label = "Curio Fanatic: Midnight (Valeera rank 4 curios)" },
+        { achievementID = 61901, label = "Leave No Treasure Unfound (Sturdy Chests in all 10 delves)" },
+        { achievementID = 61797, label = "My Shady Nemesis (defeat Nullaeus before next season)" },
+    },
+}
+
+-- Echo of Aln'sharan questline (mountID 2749) — Kuri in Har'kuai, Harandar.
+-- 5 quests + a 500 Mysterious Skyshards inventory check (item 255826,
+-- Warbound, NOT a tracked currency). Coords from method.gg (May 2026).
+local ALN_SHARAN_TASKS = {
+    intro = "Complete Kuri's questline and collect 500 Mysterious Skyshards.",
+    tasks = {
+        { questID = 90467, label = "Tales of the Sky",
+          waypoint = { M.Harandar, 0.6779, 0.2746, "Kuri (Har'kuai)" } },
+        { questID = 90468, label = "Ugh, Chores!",
+          waypoint = { M.Harandar, 0.6779, 0.2746, "Kuri (Har'kuai)" } },
+        { questID = 90469, label = "Carry On, Wayward Kuri",
+          waypoint = { M.Harandar, 0.6779, 0.2746, "Kuri (Har'kuai)" } },
+        { questID = 90470, label = "Skyglass Scavenging",
+          waypoint = { M.Harandar, 0.6779, 0.2746, "Kuri -> Dreth'amar Cavern" } },
+        { questID = 90474, label = "The Legend of Aln'sharan",
+          waypoint = { M.Harandar, 0.6614, 0.2548, "Kuri (return ritual)" } },
+        { itemID = 255826, itemCount = 500, label = "Collect 500 Mysterious Skyshards",
+          waypoint = { M.Harandar, 0.6614, 0.2548, "Kuri (final turn-in)" } },
+    },
+}
+
+-- Treasures of Harandar (achievement 61263) — earns Vivacious Chloroceros.
+-- Inlining the coords because Mounts loads before the Treasures data file.
+local VIVACIOUS_CHLOROCEROS_TASKS = {
+    intro = "Loot all 9 Harandar treasures to earn the Vivacious Chloroceros mount.",
+    tasks = {
+        { questID = 92424, label = "Failed Shroom Jumper's Satchel",
+          waypoint = { M.Harandar,    0.7168, 0.3100, "Failed Shroom Jumper's Satchel" } },
+        { questID = 92426, label = "Burning Branch of the World Tree",
+          waypoint = { M.Harandar,    0.4706, 0.5025, "Burning Branch of the World Tree" } },
+        { questID = 92427, label = "Sporelord's Fight Prize",
+          waypoint = { M.Harandar,    0.7365, 0.6535, "Sporelord's Fight Prize" } },
+        { questID = 92431, label = "Reliquary's Lost Paintbrush",
+          waypoint = { M.Harandar,    0.6290, 0.5124, "Reliquary's Lost Paintbrush" } },
+        { questID = 92436, label = "Kemet's Simmering Cauldron",
+          waypoint = { M.Harandar,    0.5569, 0.3943, "Kemet's Simmering Cauldron" } },
+        { questID = 93144, label = "Gift of the Cycle",
+          waypoint = { M.HarandarDen, 0.4723, 0.5078, "Gift of the Cycle (The Den)" } },
+        { questID = 93508, label = "Impenetrably Sealed Gourd",
+          waypoint = { M.Harandar,    0.2673, 0.6759, "Impenetrably Sealed Gourd" } },
+        { questID = 93650, label = "Sporespawned Cache",
+          waypoint = { M.Harandar,    0.4665, 0.6778, "Sporespawned Cache" } },
+        { questID = 93587, label = "Peculiar Cauldron",
+          waypoint = { M.Harandar,    0.4064, 0.2802, "Peculiar Cauldron" } },
+    },
+}
+
 MC.MountSourceOrder = {
     "renown", "reputation", "drop", "achievement", "quest",
     "delve", "prey", "dungeon", "raid", "pvp",
@@ -144,15 +236,15 @@ MC.MountData = {
             { mountID = 2756, name = "Crimson Dragonhawk", source = "achievement", sourceInfo = "Midnight Glyph Hunter",
               achievementID = 61584 },
             { mountID = 2912, name = "Vivacious Chloroceros", source = "achievement", sourceInfo = "Treasures of Harandar",
-              achievementID = 61263 },
+              achievementID = 61263, taskList = VIVACIOUS_CHLOROCEROS_TASKS },
             { mountID = 2829, name = "Lab-grown Stormray", source = "achievement", sourceInfo = "Staring Into The Void",
               achievementID = 62385 },
             { mountID = 2616, name = "Ivory Grimlynx", source = "achievement", sourceInfo = "Allied Race: Haranir",
               achievementID = 61506 },
             { mountID = 2831, name = "Tenebrous Harrower", source = "achievement", sourceInfo = "Glory of the Midnight Raider",
-              achievementID = 61380 },
+              achievementID = 61380, taskList = GLORY_RAIDER_TASKS },
             { mountID = 2773, name = "Giganto Manis", source = "achievement", sourceInfo = "Glory of the Midnight Delver",
-              achievementID = 61906 },
+              achievementID = 61906, taskList = GLORY_DELVER_TASKS },
             { mountID = 2842, name = "Arcanovoid Construct", source = "achievement", sourceInfo = "Let Me Solo Him: Nullaeus",
               achievementID = 61799 },
             { mountID = 2733, name = "Calamitous Carrion", source = "achievement", sourceInfo = "Midnight Keystone Master: Season One",
@@ -173,7 +265,7 @@ MC.MountData = {
             { mountID = 2785, name = "Relinquished Scarlet Charger", source = "quest", sourceInfo = "Quest: Relinquishing Relics (Silvermoon City)",
               zone = "Silvermoon City" },
             { mountID = 2749, name = "Echo of Aln'sharan", source = "quest", sourceInfo = "Questline: The Legend of Aln'sharan + 500 Mysterious Skyshards",
-              zone = "Harandar" },
+              zone = "Harandar", taskList = ALN_SHARAN_TASKS },
         },
     },
 
@@ -185,7 +277,7 @@ MC.MountData = {
               waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.Undercoin, 10000 } } },
             { mountID = 2840, name = "Silvermoon's Arcane Defender", source = "delve", sourceInfo = "Telemancer Astrandis - 10 Voidlight Marl, Delver's Journey Renown 5",
-              zone = "Silvermoon City",
+              waypoint = LOC.TelemancerAstrandis, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } } },
         },
     },
@@ -240,17 +332,33 @@ MC.MountData = {
     {
         source = "worldevent",
         mounts = {
-            { mountID = 2693, name = "Amani Sunfeather", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance" },
-            { mountID = 2772, name = "Blessed Amani Burrower", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance" },
+            -- Chel the Chip rotates between 4 Abundance event locations weekly;
+            -- multi-waypoint drops a marker at all four so you can hit whichever is active.
+            { mountID = 2693, name = "Amani Sunfeather", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance",
+              waypoint = {
+                  { MC.MAP.Eversong,  0.5678, 0.6579, "Chel the Chip (Watha'nan Crypts)" },
+                  { MC.MAP.ZulAman,   0.3162, 0.2614, "Chel the Chip (Loaknit Den)" },
+                  { MC.MAP.Harandar,  0.6614, 0.6169, "Chel the Chip (Floaret Grotto)" },
+                  { MC.MAP.Voidstorm, 0.3882, 0.5331, "Chel the Chip (Abundant Voidburrow)" },
+              } },
+            { mountID = 2772, name = "Blessed Amani Burrower", source = "worldevent", sourceInfo = "Chel the Chip - 6,400 Unalloyed Abundance",
+              waypoint = {
+                  { MC.MAP.Eversong,  0.5678, 0.6579, "Chel the Chip (Watha'nan Crypts)" },
+                  { MC.MAP.ZulAman,   0.3162, 0.2614, "Chel the Chip (Loaknit Den)" },
+                  { MC.MAP.Harandar,  0.6614, 0.6169, "Chel the Chip (Floaret Grotto)" },
+                  { MC.MAP.Voidstorm, 0.3882, 0.5331, "Chel the Chip (Abundant Voidburrow)" },
+              } },
             -- Patch 12.0.5: Decor Duels
             { mountID = 1763, name = "Magister's Spell Bee", source = "worldevent", sourceInfo = "Gamesmaster Fleurin - 500 Illusionary Coins (Decor Duels)",
               waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.IllusionaryCoin, 500 } } },
             -- Patch 12.0.5: Void Assaults achievement reward
             { mountID = 2176, name = "Unbound Manawyrm", source = "worldevent",
-              sourceInfo = "Sergeant Vornin (Silvermoon Bazaar) - 6,000 Voidlight Marl after earning both Void Response Team (6 Void Assault sub-achievements) and Ritual Site Disruptor",
+              sourceInfo = "Sergeant Vornin (Silvermoon Bazaar) - 6,000 Voidlight Marl after earning both Void Response Team and Ritual Site Disruptor",
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, achievementID = 62563 },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } },
+              achievementID = 62563,
+              taskList = MC.RitualSitesGate },
         },
     },
 
@@ -271,8 +379,10 @@ MC.MountData = {
     {
         source = "vendor",
         mounts = {
-            { mountID = 2913, name = "Vivid Chloroceros", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (50 moths)" },
-            { mountID = 2161, name = "Elder Glowmite", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (120 moths, TWW origin)" },
+            { mountID = 2913, name = "Vivid Chloroceros", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (50 moths)",
+              waypoint = LOC.MothkeeperWewTam, zone = "Harandar" },
+            { mountID = 2161, name = "Elder Glowmite", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (120 moths, TWW origin)",
+              waypoint = LOC.MothkeeperWewTam, zone = "Harandar" },
         },
     },
 

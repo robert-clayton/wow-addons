@@ -18,10 +18,32 @@ MC.ToySourceLabels = {
 }
 
 local LOC = MC.LOC
+local M = MC.MAP
+
+-- Abundance: Azeroth Runs on Dundun (achievement 42283) — visit the weekly
+-- Abundance event in each of 4 zones. Verified May 2026 against Wowhead:
+--   index 1 = Mausoloa (Watha'nan Crypts, Eversong)
+--   index 2 = Loaknit  (Loaknit Den, Zul'Aman)
+--   index 3 = Floaret  (Floaret Grotto, Harandar)
+--   index 4 = Loanite  (Abundant Voidburrow, Voidstorm)
+-- Coords mirror the multi-waypoint Chel the Chip entries in Mounts.lua.
+local ABUNDANCE_TASKS = {
+    intro = "Visit the weekly Abundance event in each of the 4 zones.",
+    tasks = {
+        { achievementID = 42283, criteriaIndex = 1, label = "Watha'nan Crypts (Eversong)",
+          waypoint = { M.Eversong,  0.5678, 0.6579, "Watha'nan Crypts" } },
+        { achievementID = 42283, criteriaIndex = 2, label = "Loaknit Den (Zul'Aman)",
+          waypoint = { M.ZulAman,   0.3162, 0.2614, "Loaknit Den" } },
+        { achievementID = 42283, criteriaIndex = 3, label = "Floaret Grotto (Harandar)",
+          waypoint = { M.Harandar,  0.6614, 0.6169, "Floaret Grotto" } },
+        { achievementID = 42283, criteriaIndex = 4, label = "Abundant Voidburrow (Voidstorm)",
+          waypoint = { M.Voidstorm, 0.3882, 0.5331, "Abundant Voidburrow" } },
+    },
+}
 
 -- Toy entry shape: { itemID, name, source, sourceInfo,
 --   [waypoint], [overworldWaypoint], [cost], [zone], [renown],
---   [achievementID], [dropInfo] }
+--   [achievementID], [taskList], [dropInfo] }
 -- itemID is the same number you'd pass to PlayerHasToy / C_ToyBox.GetToyInfo.
 
 MC.ToyData = {
@@ -72,7 +94,7 @@ MC.ToyData = {
               achievementID = 61094 },
             { itemID = 266370, name = "Dundun's Abundant Travel Method", source = "achievement",
               sourceInfo = "Achievement: Abundance: Azeroth Runs on Dundun (teleports to current Abundant location)",
-              achievementID = 42283 },
+              achievementID = 42283, taskList = ABUNDANCE_TASKS },
             { itemID = 272339, name = "Umbral Champion's Illustrious Banner", source = "achievement",
               sourceInfo = "WoW Esports / AWC participation OR Time Trial Keystones (Midnight Season 1)" },
         },
@@ -192,7 +214,7 @@ MC.ToyData = {
             -- Delves (Telemancer Astrandis / Naleidea Rivergleam)
             { itemID = 264414, name = "Midnight Delver's Flare Gun", source = "vendor",
               sourceInfo = "Telemancer Astrandis - 10 Voidlight Marl, Delver's Journey Rank 7",
-              zone = "Silvermoon City",
+              waypoint = LOC.TelemancerAstrandis, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } } },
             { itemID = 265100, name = "Corewarden's Hearthstone", source = "vendor",
               sourceInfo = "Naleidea Rivergleam - 10 Voidlight Marl, Delver's Journey Rank 10",

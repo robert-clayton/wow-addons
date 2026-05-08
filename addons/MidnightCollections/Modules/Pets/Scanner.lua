@@ -37,21 +37,22 @@ function Scanner:Scan()
                 end
 
                 local entry = {
-                    speciesID     = pet.speciesID,
-                    name          = pet.name,
-                    petType       = petType,
-                    source        = pet.source,
-                    sourceInfo    = pet.sourceInfo,
-                    waypoint         = pet.waypoint,
+                    speciesID         = pet.speciesID,
+                    name              = pet.name,
+                    petType           = petType,
+                    source            = pet.source,
+                    sourceInfo        = pet.sourceInfo,
+                    waypoint          = pet.waypoint,
                     overworldWaypoint = pet.overworldWaypoint,
-                    cost          = pet.cost,
-                    dropInfo      = pet.dropInfo,
-                    achievementID = pet.achievementID,
-                    canBattle     = pet.canBattle,
-                    zone          = pet.zone,
-                    renown        = pet.renown,
-                    icon          = icon,
-                    collected     = isCollected,
+                    cost              = pet.cost,
+                    dropInfo          = pet.dropInfo,
+                    achievementID     = pet.achievementID,
+                    taskList          = pet.taskList,
+                    canBattle         = pet.canBattle,
+                    zone              = pet.zone,
+                    renown            = pet.renown,
+                    icon              = icon,
+                    collected         = isCollected,
                 }
 
                 if pet.unavailable and not isCollected then

@@ -78,6 +78,21 @@ end
 function PanelProto:ApplyMinimizeState()
     local f = self.frame
     if not f then return end
+    -- Resizing/anchoring during combat can taint UIParent. Queue and apply
+    -- the moment combat ends.
+    if InCombatLockdown() then
+        if not self._minimizeQueued then
+            self._minimizeQueued = true
+            local watcher = CreateFrame("Frame")
+            watcher:RegisterEvent("PLAYER_REGEN_ENABLED")
+            watcher:SetScript("OnEvent", function(w)
+                w:UnregisterAllEvents()
+                self._minimizeQueued = false
+                self:ApplyMinimizeState()
+            end)
+        end
+        return
+    end
     local db = self.db
     if db.minimized then
         local left = f:GetLeft()
@@ -118,8 +133,16 @@ function PanelProto:CreateTitleBar()
     bar:SetBackdropColor(theme.colors.titlebar[1], theme.colors.titlebar[2], theme.colors.titlebar[3], v)
     bar:SetBackdropBorderColor(theme.colors.titleBorder[1], theme.colors.titleBorder[2], theme.colors.titleBorder[3], math.max(v, 0.4))
     bar:EnableMouse(true)
+    -- Drag tracking: a release that follows real cursor movement should not
+    -- count as a click for the manual double-click detector below, otherwise
+    -- a quick drag-and-release toggles minimize unintentionally.
+    local downX, downY, didDrag
     bar:SetScript("OnMouseDown", function(_, button)
-        if button == "LeftButton" and not db.locked then f:StartMoving() end
+        if button == "LeftButton" then
+            downX, downY = GetCursorPosition()
+            didDrag = false
+            if not db.locked then f:StartMoving() end
+        end
     end)
     -- Manual double-click detection. WoW's `Frame` doesn't expose
     -- OnDoubleClick (only `Button` does), so we time successive clicks.
@@ -127,16 +150,29 @@ function PanelProto:CreateTitleBar()
     bar:SetScript("OnMouseUp", function(_, button)
         if button == "LeftButton" then
             f:StopMovingOrSizing()
-            local point, _, relativePoint, x, y = f:GetPoint()
-            db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
+            if downX and downY then
+                local cx, cy = GetCursorPosition()
+                local dx, dy = (cx or downX) - downX, (cy or downY) - downY
+                if (dx * dx + dy * dy) > 16 then didDrag = true end
+            end
+            -- Only persist the position if the user actually dragged. A static
+            -- click can otherwise clobber relativePoint with whatever the frame
+            -- happens to be anchored to right now.
+            if didDrag and not db.locked then
+                local point, _, relativePoint, x, y = f:GetPoint()
+                db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
+            end
 
-            local now = GetTime()
-            if now - lastClick < 0.4 then
-                db.minimized = not db.minimized
-                panel:ApplyMinimizeState()
-                lastClick = 0  -- prevent triple-click from toggling twice
-            else
-                lastClick = now
+            if not didDrag then
+                local now = GetTime()
+                if now - lastClick < 0.4 then
+                    -- Combat-safe: ApplyMinimizeState defers when locked down.
+                    db.minimized = not db.minimized
+                    panel:ApplyMinimizeState()
+                    lastClick = 0  -- prevent triple-click from toggling twice
+                else
+                    lastClick = now
+                end
             end
         end
     end)
@@ -343,6 +379,11 @@ function PanelProto:CreateResizeDragger()
         if button == "LeftButton" and dragger._dragging then
             dragger._dragging = false
             dragger:SetScript("OnUpdate", nil)
+            -- Defensive against the rare case the user releases the resize
+            -- handle the same instant a combat-flag flips on. SetWidth/Height
+            -- on non-secure frames is technically allowed in combat, but the
+            -- onRefresh below will rebuild rows and we don't want to rebuild
+            -- mid-combat — defer it.
             local newW = math.max(minW, math.min(maxW, math.floor(f:GetWidth())))
             local newH = math.max(minH, math.min(maxH, math.floor(f:GetHeight())))
             db.panelWidth = newW
@@ -354,7 +395,18 @@ function PanelProto:CreateResizeDragger()
             if f.scrollChild then
                 f.scrollChild:SetWidth(newW - 9)
             end
-            if panel.opts.onRefresh then panel.opts.onRefresh(panel) end
+            if panel.opts.onRefresh then
+                if InCombatLockdown() then
+                    local watcher = CreateFrame("Frame")
+                    watcher:RegisterEvent("PLAYER_REGEN_ENABLED")
+                    watcher:SetScript("OnEvent", function(w)
+                        w:UnregisterAllEvents()
+                        panel.opts.onRefresh(panel)
+                    end)
+                else
+                    panel.opts.onRefresh(panel)
+                end
+            end
         end
     end)
 

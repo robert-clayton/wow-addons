@@ -96,6 +96,7 @@ function Scanner:Scan()
                     cost          = deco.cost,
                     dropInfo      = deco.dropInfo,
                     achievementID = deco.achievementID,
+                    taskList      = deco.taskList,
                     zone          = deco.zone,
                     renown        = deco.renown,
                     icon          = icon,

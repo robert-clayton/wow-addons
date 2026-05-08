@@ -37,18 +37,20 @@ function Scanner:Scan()
             end
 
             local entry = {
-                itemID        = toy.itemID,
-                name          = toyName,
-                source        = toy.source,
-                sourceInfo    = toy.sourceInfo,
-                waypoint      = toy.waypoint,
-                cost          = toy.cost,
-                dropInfo      = toy.dropInfo,
-                achievementID = toy.achievementID,
-                zone          = toy.zone,
-                renown        = toy.renown,
-                icon          = icon,
-                collected     = isCollected,
+                itemID            = toy.itemID,
+                name              = toyName,
+                source            = toy.source,
+                sourceInfo        = toy.sourceInfo,
+                waypoint          = toy.waypoint,
+                overworldWaypoint = toy.overworldWaypoint,
+                cost              = toy.cost,
+                dropInfo          = toy.dropInfo,
+                achievementID     = toy.achievementID,
+                taskList          = toy.taskList,
+                zone              = toy.zone,
+                renown            = toy.renown,
+                icon              = icon,
+                collected         = isCollected,
             }
 
             if toy.unavailable and not isCollected then

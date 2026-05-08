@@ -235,8 +235,9 @@ function UI:RenderRecipeRow(parent, recipe, skillLine, yOff, isLearned)
             GameTooltip:Hide()
             MC.HideInfoTooltip()
         end,
-        onClick = (not isLearned and skillLine)
-            and function() MC.DoItemAction(recipe, skillLine) end
-            or nil,
+        -- Always wire onClick so shift-click (Wowhead) and ctrl-click (info)
+        -- still work on learned recipes. DoItemAction handles the modifiers
+        -- and the skillLine fallback for unlearned ones.
+        onClick = function() MC.DoItemAction(recipe, skillLine) end,
     })
 end

@@ -28,6 +28,8 @@ MC.LOC = {
     TriamDawnsetter          = { MC.MAP.Silvermoon, 0.480, 0.490, "Triam Dawnsetter, Silvermoon City Bazaar" },
     MarenSilverwing          = { MC.MAP.Silvermoon, 0.482, 0.496, "Maren Silverwing, Silvermoon City Bazaar" },
     DepthdiverTunakit        = { MC.MAP.ZulAman, 0.682, 0.200, "Depthdiver Tu'nakit, Zul'Aman" },
+    MothkeeperWewTam         = { MC.MAP.Harandar, 0.492, 0.544, "Mothkeeper Wew'tam, The Den" },
+    TelemancerAstrandis      = { MC.MAP.Silvermoon, 0.522, 0.778, "Telemancer Astrandis, Delver's HQ" },
 
     -- Silvermoon City portals to other Midnight zones (used by MC.PORTALS routing)
     SilvermoonHarandarPortal  = { MC.MAP.Silvermoon, 0.367, 0.686, "Portal to Harandar (Gardens of Remembrance)" },
@@ -57,10 +59,7 @@ MC.LOC = {
     VoidTaintedNest    = { MC.MAP.BrokenThrone, 0.495, 0.779, "Void-Tainted Nest (Broken Throne)" },
     HexEagleRitual     = { MC.MAP.BrokenThrone, 0.506, 0.474, "Hex Eagle ritual circle (Broken Throne)" },
 
-    -- NPCs needing in-game coordinate verification
-    -- MothkeeperWewTam    = { 0, 0, 0, "Mothkeeper Wew'tam" },
-    -- ChelTheChip         = { 0, 0, 0, "Chel the Chip" },
-    -- TelemancerAstrandis = { 0, 0, 0, "Telemancer Astrandis" },
+    -- NPCs still needing coordinate verification
     -- Kuri                = { 0, 0, 0, "Kuri" },
 
     -- Wild pet spawn centers (from Wowhead spawn maps)

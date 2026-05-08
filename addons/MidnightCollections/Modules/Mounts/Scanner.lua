@@ -36,20 +36,21 @@ function Scanner:Scan()
                 end
 
                 local entry = {
-                    mountID       = mount.mountID,
-                    name          = mountName,
-                    source        = mount.source,
-                    sourceInfo    = mount.sourceInfo,
-                    waypoint         = mount.waypoint,
+                    mountID           = mount.mountID,
+                    name              = mountName,
+                    source            = mount.source,
+                    sourceInfo        = mount.sourceInfo,
+                    waypoint          = mount.waypoint,
                     overworldWaypoint = mount.overworldWaypoint,
-                    cost          = mount.cost,
-                    dropInfo      = mount.dropInfo,
-                    achievementID = mount.achievementID,
-                    zone          = mount.zone,
-                    renown        = mount.renown,
-                    faction       = mount.faction,
-                    icon          = icon,
-                    collected     = isCollected,
+                    cost              = mount.cost,
+                    dropInfo          = mount.dropInfo,
+                    achievementID     = mount.achievementID,
+                    taskList          = mount.taskList,
+                    zone              = mount.zone,
+                    renown            = mount.renown,
+                    faction           = mount.faction,
+                    icon              = icon,
+                    collected         = isCollected,
                 }
 
                 -- Skip unavailable items the player doesn't already own —

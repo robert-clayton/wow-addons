@@ -1,10 +1,12 @@
 local _, MC = ...
 
+-- Only events that actually change the player's *known* decor list.
+-- HOUSING_STORAGE_UPDATED / _ENTRY_UPDATED / HOUSE_DECOR_ADDED_TO_CHEST
+-- fire on every chest-stack change, which retriggers a full 260-entry rescan
+-- with hundreds of C_HousingCatalog calls — they don't add information.
 local HOUSING_EVENTS = {
-    "HOUSING_STORAGE_UPDATED",
-    "HOUSING_STORAGE_ENTRY_UPDATED",
+    "HOUSING_DECOR_KNOWN_CHANGED",
     "NEW_HOUSING_ITEM_ACQUIRED",
-    "HOUSE_DECOR_ADDED_TO_CHEST",
     "BAG_UPDATE_DELAYED",
 }
 

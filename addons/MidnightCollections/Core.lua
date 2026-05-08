@@ -17,6 +17,10 @@ MC.PREFIX = PREFIX
 
 -- Bumped when SavedVariables shape changes; MigrateDB reads it.
 local DB_VERSION = 1
+-- Marker we set on the per-character DB the first time the v1->v2 flip runs
+-- (per-character primary, account-wide DB demoted to "last-logged-out snapshot"
+-- used to seed brand-new alts).
+local CHAR_DB_VERSION = 2
 
 --------------------------------------------------------------------------
 -- Deep-merge defaults into a saved DB without overwriting existing values.
@@ -56,12 +60,16 @@ function MC.RegisterModule(key, opts)
 end
 
 --------------------------------------------------------------------------
--- Account-wide defaults
+-- All settings live in the per-character DB (MidnightCollectionsCharDB) as
+-- of v2. The account-wide DB (MidnightCollectionsDB) is now a "last logged-out
+-- snapshot" written on PLAYER_LOGOUT and consumed once when a brand-new alt
+-- first enters the game (so they inherit the most recent character's prefs
+-- instead of starting from defaults).
 --------------------------------------------------------------------------
-local coreDefaults = {
+local charDefaults = {
     dbVersion        = DB_VERSION,
     minimap          = { minimapPos = 225, hide = false },
-    position         = { point = "CENTER", x = 0, y = 0 },
+    position         = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 },
     locked           = false,
     panelShown       = false,
     minimized        = false,
@@ -70,10 +78,6 @@ local coreDefaults = {
     panelWidth       = 380,
     panelHeight      = 560,
     disabledModules  = {},
-}
-
--- Per-character. Alts tend to care about different tabs.
-local charDefaults = {
     activeTab        = "mounts",
 }
 
@@ -194,6 +198,7 @@ function MC.GetInfoTooltip()
     if not infoTooltip then
         infoTooltip = CreateFrame("GameTooltip", "MidnightCollectionsInfoTooltip", UIParent, "GameTooltipTemplate")
         infoTooltip:SetFrameStrata("TOOLTIP")
+        infoTooltip:SetClampedToScreen(true)
     end
     return infoTooltip
 end
@@ -235,9 +240,17 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     local tt = MC.GetInfoTooltip()
     tt:SetOwner(owner, "ANCHOR_NONE")
     tt:ClearAllPoints()
-    -- Anchor to the row, not GameTooltip. If we anchored to GameTooltip
-    -- and another addon hid it, this one would float off-screen.
-    tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
+    -- Anchor below GameTooltip when it's currently hosting our row, so the
+    -- two tooltips don't overlap when the panel is near a screen edge and
+    -- GameTooltip's auto-clamp moves it. Fall back to anchoring directly to
+    -- the row if GameTooltip isn't ours (another addon may have repurposed
+    -- it), so the MC tooltip never floats off-screen.
+    local gt = GameTooltip
+    if gt and gt.IsShown and gt:IsShown() and gt:GetOwner() == owner then
+        tt:SetPoint("TOPLEFT", gt, "BOTTOMLEFT", 0, -4)
+    else
+        tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
+    end
 
     tt:AddLine("Midnight Collections", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
     tt:AddDoubleLine("Source:", sourceLabel or item.source or "Unknown",
@@ -246,6 +259,33 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 
     if item.sourceInfo then
         tt:AddLine(item.sourceInfo, 1, 1, 1, true)
+    end
+
+    -- Step-by-step guide. Used today by treasures that have a puzzle/key
+    -- prerequisite; any item type can populate `steps` to show a how-to block.
+    if item.steps then
+        tt:AddLine(" ")
+        tt:AddLine("How to:", C.ttLabel[1], C.ttLabel[2], C.ttLabel[3])
+        tt:AddLine(item.steps, C.ttValue[1], C.ttValue[2], C.ttValue[3], true)
+    end
+
+    -- Task list with live ✓/✗ progress. A task entry can carry a questID
+    -- (checked via C_QuestLog) or an achievementID (checked via the achievement
+    -- API). DoItemAction routes waypoints to the incomplete steps when the row
+    -- is clicked; tasks may also carry a pickupWaypoint that drops a marker at
+    -- the item-pickup spot in addition to the destination waypoint.
+    if item.taskList and item.taskList.tasks then
+        tt:AddLine(" ")
+        if item.taskList.intro then
+            tt:AddLine(item.taskList.intro, C.ttValue[1], C.ttValue[2], C.ttValue[3], true)
+        end
+        for _, task in ipairs(item.taskList.tasks) do
+            local done = MC.IsTaskCompleted(task)
+            local mark = done and "|cff55cc55[X]|r" or "|cffff5555[ ]|r"
+            local r, g, b = 0.85, 0.85, 0.85
+            if done then r, g, b = 0.55, 0.78, 0.55 end
+            tt:AddLine(mark .. " " .. task.label, r, g, b)
+        end
     end
 
     -- Pets only
@@ -380,7 +420,23 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     end
 
     tt:AddLine(" ")
-    if resolvedWp then
+    -- Pending tasks take priority: clicking the row routes to the prereq
+    -- waypoints rather than the treasure itself until they're all done. A
+    -- task counts as routable if it has either a destination waypoint or a
+    -- pickupWaypoint (item-collection spot).
+    local pendingTasks = 0
+    if item.taskList and item.taskList.tasks then
+        for _, task in ipairs(item.taskList.tasks) do
+            if not MC.IsTaskCompleted(task) and (task.waypoint or task.pickupWaypoint) then
+                pendingTasks = pendingTasks + 1
+            end
+        end
+    end
+    if pendingTasks > 0 then
+        tt:AddLine(format("Click to mark %d pending step%s",
+            pendingTasks, pendingTasks == 1 and "" or "s"),
+            C.ttHintGreen[1], C.ttHintGreen[2], C.ttHintGreen[3])
+    elseif resolvedWp then
         local hint = "Click to set waypoint"
         if MC._isWaypointList(resolvedWp) then
             hint = format("Click to set %d waypoints", #resolvedWp)
@@ -417,6 +473,8 @@ function MC.OpenItemWowhead(item)
         url = "https://www.wowhead.com/item=" .. tonumber(item.itemID)
     elseif item.id then
         url = "https://www.wowhead.com/spell=" .. tonumber(item.id)
+    elseif item.objectID and item.objectID > 0 then
+        url = "https://www.wowhead.com/object=" .. tonumber(item.objectID)
     elseif item.npcID then
         url = "https://www.wowhead.com/npc=" .. tonumber(item.npcID)
     elseif item.achievementID then
@@ -424,13 +482,16 @@ function MC.OpenItemWowhead(item)
     end
     if url then
         StaticPopup_Show("MIDNIGHTCOLLECTIONS_WOWHEAD", nil, nil, url)
+    else
+        print(PREFIX .. " No Wowhead link available for this entry.")
     end
 end
 
 --------------------------------------------------------------------------
 -- A waypoint is either a single tuple { mapID, x, y, name } or a list of
 -- those tuples for items with multiple spawn points (e.g. 8 Rustling Bushes).
--- Detect by checking if the first element is itself a table.
+-- Detect by checking if the first element is itself a table; an empty list
+-- counts as "no waypoint" so we don't crash on wp[1] later.
 --------------------------------------------------------------------------
 local function isWaypointList(wp)
     return wp ~= nil and type(wp[1]) == "table"
@@ -438,7 +499,10 @@ end
 
 local function waypointMapID(wp)
     if not wp then return nil end
-    if isWaypointList(wp) then return wp[1][1] end
+    if isWaypointList(wp) then
+        local first = wp[1]
+        return first and first[1] or nil
+    end
     return wp[1]
 end
 
@@ -455,34 +519,69 @@ local function effectiveMap(m)
     return (MC.MAP_PARENT and MC.MAP_PARENT[m]) or m
 end
 
+-- For a multi-spawn waypoint list, pick the entry whose effective map matches
+-- effCurrent (preferred) or any portal-reachable target. Returns the matching
+-- single tuple, or nil if no entry is in-zone.
+local function pickInZoneEntry(list, currentMap, effCurrent)
+    if not list then return nil end
+    for _, w in ipairs(list) do
+        local m = w[1]
+        if m == currentMap or effectiveMap(m) == effCurrent then
+            return w
+        end
+    end
+    return nil
+end
+
 function MC.GetSmartWaypoint(item)
     local wp  = item.waypoint
     local owp = item.overworldWaypoint
     if not wp and not owp then return nil end
 
     local currentMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    local wpMapID = waypointMapID(wp)
+    local effCurrent = effectiveMap(currentMap)
 
-    if wp and currentMap == wpMapID then return wp end
+    -- If wp is a list and the player is already in one of its zones, prefer
+    -- that exact spawn rather than dropping all of them.
+    if wp and isWaypointList(wp) then
+        local match = pickInZoneEntry(wp, currentMap, effCurrent)
+        if match then return match end
+    elseif wp and currentMap == waypointMapID(wp) then
+        return wp
+    end
 
     -- Target zone: instanced content uses owp[1], everything else wp's mapID.
-    local targetZone = (owp and owp[1]) or wpMapID
-    local effCurrent = effectiveMap(currentMap)
+    local owpMap = owp and (isWaypointList(owp) and owp[1] and owp[1][1] or owp[1]) or nil
+    local targetZone = owpMap or waypointMapID(wp)
     local effTarget  = effectiveMap(targetZone)
 
     -- Already in the target zone (or a sub-map of it)?
-    if currentMap == targetZone or effCurrent == effTarget then
+    if currentMap == targetZone or (effCurrent and effCurrent == effTarget) then
         return owp or wp
     end
 
     -- Portal lookup: try the raw map first, then the rolled-up parent so a
     -- player in The Den can still find Harandar's portals, and so a target
-    -- in Slayer's Rise looks up Voidstorm's portal.
-    if MC.PORTALS and effTarget then
+    -- in Slayer's Rise looks up Voidstorm's portal. For multi-zone waypoint
+    -- lists, try every entry's effective target.
+    if MC.PORTALS then
+        local targets
+        if wp and isWaypointList(wp) then
+            targets = {}
+            for _, w in ipairs(wp) do
+                targets[#targets + 1] = effectiveMap(w[1])
+            end
+        else
+            targets = { effTarget }
+        end
         for _, fromMap in ipairs({ currentMap, effCurrent }) do
             if fromMap and MC.PORTALS[fromMap] then
-                local p = MC.PORTALS[fromMap][effTarget]
-                if p then return p end
+                for _, t in ipairs(targets) do
+                    if t then
+                        local p = MC.PORTALS[fromMap][t]
+                        if p then return p end
+                    end
+                end
             end
         end
     end
@@ -491,6 +590,69 @@ function MC.GetSmartWaypoint(item)
 end
 
 MC._isWaypointList = isWaypointList
+
+--------------------------------------------------------------------------
+-- Task completion check. A task entry can carry one of:
+--   questID                       — C_QuestLog.IsQuestFlaggedCompleted
+--   achievementID                 — GetAchievementInfo (4th return = completed)
+--   achievementID + criteriaIndex — GetAchievementCriteriaInfo (3rd = completed)
+--   speciesID                     — C_PetJournal.GetNumCollectedInfo > 0
+--   itemID [+ itemCount]          — PlayerHasToy / GetItemCount >= itemCount
+--                                    (default itemCount = 1; PlayerHasToy is
+--                                    only consulted when itemCount == 1)
+-- Returns false for unknown shapes so the task always renders as pending.
+--------------------------------------------------------------------------
+function MC.IsTaskCompleted(task)
+    if not task then return false end
+    if task.questID then
+        if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
+            return C_QuestLog.IsQuestFlaggedCompleted(task.questID) and true or false
+        end
+        return false
+    end
+    if task.achievementID and task.criteriaIndex then
+        local getCrit = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfo)
+                          or GetAchievementCriteriaInfo
+        if getCrit then
+            local ok, _, _, completed = pcall(getCrit, task.achievementID, task.criteriaIndex)
+            return ok and (completed and true or false) or false
+        end
+        return false
+    end
+    if task.achievementID then
+        local getInfo = (C_AchievementInfo and C_AchievementInfo.GetAchievementInfo)
+                          or GetAchievementInfo
+        if getInfo then
+            local ok, _, _, _, completed = pcall(getInfo, task.achievementID)
+            return ok and (completed and true or false) or false
+        end
+        return false
+    end
+    if task.speciesID then
+        if C_PetJournal and C_PetJournal.GetNumCollectedInfo then
+            local ok, n = pcall(C_PetJournal.GetNumCollectedInfo, task.speciesID)
+            return ok and (n or 0) > 0 or false
+        end
+        return false
+    end
+    if task.itemID then
+        local needed = task.itemCount or 1
+        -- PlayerHasToy is a binary "is this toy collected?" — only meaningful
+        -- when itemCount is the default 1 and the item is a toy.
+        if needed <= 1 and PlayerHasToy and PlayerHasToy(task.itemID) then
+            return true
+        end
+        local n = 0
+        if C_Item and C_Item.GetItemCount then
+            local ok, count = pcall(C_Item.GetItemCount, task.itemID)
+            n = (ok and count) or 0
+        elseif GetItemCount then
+            n = GetItemCount(task.itemID) or 0
+        end
+        return n >= needed
+    end
+    return false
+end
 
 --------------------------------------------------------------------------
 -- TomTom if available, Blizzard's user map pin if not.
@@ -536,6 +698,7 @@ function MC.PrintItemInfo(item)
     if item.decorID   then print(format("  decorID: %d   wowhead.com/decor=%d",        item.decorID, item.decorID)) end
     if item.itemID    then print(format("  itemID: %d    wowhead.com/item=%d",         item.itemID, item.itemID)) end
     if item.id        then print(format("  spellID: %d   wowhead.com/spell=%d",        item.id, item.id)) end
+    if item.objectID  then print(format("  objectID: %d  wowhead.com/object=%d",       item.objectID, item.objectID)) end
     if item.npcID     then print(format("  npcID: %d     wowhead.com/npc=%d",          item.npcID, item.npcID)) end
     if item.criteriaIndex then print("  criteriaIndex: " .. tostring(item.criteriaIndex)) end
     if item.source     then print("  source: " .. tostring(item.source)) end
@@ -582,6 +745,45 @@ function MC.DoItemAction(item, skillLine)
         MC.PrintItemInfo(item)
         return
     end
+
+    -- Task-list aware: if any prerequisite is incomplete, route to those
+    -- waypoints first. Once all tasks are done, fall through to the regular
+    -- waypoint behavior so the player can navigate to the item itself. Each
+    -- incomplete task contributes its pickupWaypoint AND its waypoint (if it
+    -- has both), so the player gets a marker at the item pickup AND the
+    -- destination/turn-in for every step.
+    if item.taskList and item.taskList.tasks then
+        local pending = {}
+        for _, task in ipairs(item.taskList.tasks) do
+            if not MC.IsTaskCompleted(task) then
+                if task.pickupWaypoint then
+                    pending[#pending + 1] = task.pickupWaypoint
+                end
+                if task.waypoint then
+                    pending[#pending + 1] = task.waypoint
+                end
+            end
+        end
+        if #pending > 0 then
+            if TomTom and TomTom.AddWaypoint then
+                for _, w in ipairs(pending) do
+                    TomTom:AddWaypoint(w[1], w[2], w[3], { title = w[4] or item.name })
+                end
+                print(format("%s Set %d waypoint%s for %s prerequisites.",
+                    PREFIX, #pending, #pending == 1 and "" or "s", item.name))
+            else
+                local first = pending[1]
+                MC.AddWaypoint(first[1], first[2], first[3],
+                    format("%s (1 of %d markers)", first[4] or item.name, #pending))
+                if #pending > 1 then
+                    print(format("%s Install TomTom to mark all %d markers at once.",
+                        PREFIX, #pending))
+                end
+            end
+            return
+        end
+    end
+
     local wp = MC.GetSmartWaypoint(item)
     if wp then
         if MC._isWaypointList(wp) then
@@ -709,6 +911,7 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("PLAYER_LOGOUT")
 frame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 frame:RegisterEvent("UNIT_FACTION")
 MC.eventFrame = frame
@@ -720,20 +923,46 @@ frame:SetScript("OnEvent", function(_, event, ...)
 
         if not MidnightCollectionsDB then MidnightCollectionsDB = {} end
         if not MidnightCollectionsCharDB then MidnightCollectionsCharDB = {} end
+
+        -- v0 -> v1: pull in saved vars from the four standalone addons that
+        -- were merged into this one. Targets the account-wide DB because that's
+        -- where the legacy import lands.
         MigrateDB(MidnightCollectionsDB)
-        -- activeTab used to be account-wide; move it to the char DB once.
+
+        -- v1 -> v2: per-character flip. CharDB becomes the runtime primary;
+        -- the account-wide DB is now just a passive snapshot. This branch only
+        -- runs on a CharDB that hasn't been seeded yet — it copies whatever's
+        -- in the account-wide DB into CharDB so the char inherits the most
+        -- recent settings (their own old prefs on first v2 run; another alt's
+        -- last snapshot for brand-new characters).
+        if (MidnightCollectionsCharDB.charDbVersion or 0) < CHAR_DB_VERSION then
+            MC.DeepMergeDefaults(MidnightCollectionsCharDB, MidnightCollectionsDB)
+            MidnightCollectionsCharDB.charDbVersion = CHAR_DB_VERSION
+        end
+
+        -- One-time fix from v0: activeTab briefly lived in account-wide DB.
         if MidnightCollectionsDB.activeTab and not MidnightCollectionsCharDB.activeTab then
             MidnightCollectionsCharDB.activeTab = MidnightCollectionsDB.activeTab
             MidnightCollectionsDB.activeTab = nil
         end
-        MC.DeepMergeDefaults(MidnightCollectionsDB, coreDefaults)
+
+        -- Defaults merge for any new keys added since this character was last
+        -- seeded. Operates on CharDB (the primary) only.
         MC.DeepMergeDefaults(MidnightCollectionsCharDB, charDefaults)
-        MC.db = MidnightCollectionsDB
-        MC.cdb = MidnightCollectionsCharDB
+
+        -- Runtime aliases. MC.db is the per-char primary; everything reads
+        -- from here. MC.snapshotDB is the account-wide seed pool, written on
+        -- PLAYER_LOGOUT. MC.cdb is kept as a back-compat alias.
+        MC.db         = MidnightCollectionsCharDB
+        MC.cdb        = MidnightCollectionsCharDB
+        MC.snapshotDB = MidnightCollectionsDB
 
         -- Each module gets its own sub-table for settings and collapsed state.
+        -- Copy the registration defaults so we don't mutate mod.opts.defaults
+        -- in place — DeepMergeDefaults shallow-copies sub-tables and we don't
+        -- want the saved DB and the registration default to share refs.
         for _, mod in ipairs(MC.modules) do
-            local moduleDefaults = mod.opts.defaults or {}
+            local moduleDefaults = mod.opts.defaults and CopyTable(mod.opts.defaults) or {}
             if not moduleDefaults.collapsed then
                 moduleDefaults.collapsed = {}
             end
@@ -784,6 +1013,17 @@ frame:SetScript("OnEvent", function(_, event, ...)
             MC.SwitchTab(tabKey)
         else
             MC._ShowAllDisabledPlaceholder()
+        end
+
+    elseif event == "PLAYER_LOGOUT" then
+        -- Snapshot the per-character DB into the account-wide DB so the next
+        -- alt to log in for the first time inherits these settings as their
+        -- seed. /reload also fires PLAYER_LOGOUT, so this stays current.
+        if MC.db and MC.snapshotDB then
+            for k in pairs(MC.snapshotDB) do MC.snapshotDB[k] = nil end
+            for k, v in pairs(MC.db) do
+                MC.snapshotDB[k] = type(v) == "table" and CopyTable(v) or v
+            end
         end
 
     elseif event == "CURRENCY_DISPLAY_UPDATE" then
@@ -1017,18 +1257,20 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             PREFIX, mod.label, mod.opts.collectedLabel or "collected", tostring(mod.db[key])))
         if MC.activeModule == target then MC.RefreshActive() end
     elseif cmd == "reset" then
-        if MC.db.position then
-            MC.db.position.point = "CENTER"
-            MC.db.position.x = 0
-            MC.db.position.y = 0
+        if InCombatLockdown() then
+            print(PREFIX .. " Cannot reset panel during combat.")
+            return
         end
+        -- Replace the whole position table so a stale relativePoint from a
+        -- previous drag doesn't survive the reset and put us off-screen.
+        MC.db.position = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 }
         MC.db.panelWidth = 380
         MC.db.panelHeight = 560
         MC.db.frameAlpha = 1.0
         MC.db.frameScale = 1.0
         if MC.panel and MC.panel.frame then
             MC.panel.frame:ClearAllPoints()
-            MC.panel.frame:SetPoint("CENTER")
+            MC.panel.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
             MC.panel.frame:SetSize(MC.db.panelWidth, MC.db.panelHeight)
             MC.panel.frame:SetScale(1.0)
         end

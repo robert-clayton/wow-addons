@@ -28,10 +28,96 @@ MC.DecoProfOrder = {
 MC.DecoProfLabels = MC.PROFESSION_LABELS
 
 local LOC = MC.LOC
+local M = MC.MAP
+
+--------------------------------------------------------------------------
+-- Shared task lists for meta-achievement decorations. Coords inlined here
+-- (rather than referenced from MC.RareNPCs) because the Rares data file
+-- loads after Decorations in the .toc.
+--------------------------------------------------------------------------
+
+-- Tallest Tree in the Forest (62122) — Zul'Aman rare-kill meta. 15 rares.
+-- Rewards Colossal Amani Stone Visage. Quest IDs verified May 2026 against
+-- Wowhead achievement criteria.
+local TALLEST_TREE_TASKS = {
+    intro = "Defeat all 15 Zul'Aman rares to earn the Colossal Amani Stone Visage.",
+    tasks = {
+        { questID = 89569, label = "Necrohexxer Raz'ka",     waypoint = { M.ZulAman, 0.3441, 0.3305, "Necrohexxer Raz'ka" } },
+        { questID = 89571, label = "Skullcrusher Harak",     waypoint = { M.ZulAman, 0.5185, 0.7291, "Skullcrusher Harak" } },
+        { questID = 91174, label = "Mrrlokk",                waypoint = { M.ZulAman, 0.5087, 0.6514, "Mrrlokk" } },
+        { questID = 89578, label = "Spinefrill",             waypoint = { M.ZulAman, 0.3048, 0.4456, "Spinefrill" } },
+        { questID = 89580, label = "Tiny Vermin",            waypoint = { M.ZulAman, 0.4777, 0.3422, "Tiny Vermin" } },
+        { questID = 89583, label = "The Devouring Invader",  waypoint = { M.ZulAman, 0.3959, 0.2097, "The Devouring Invader" } },
+        { questID = 89573, label = "Depthborn Eelamental",   waypoint = { M.ZulAman, 0.4768, 0.2056, "Depthborn Eelamental" } },
+        { questID = 91073, label = "Asha the Empowered",     waypoint = { M.ZulAman, 0.4529, 0.4170, "Asha the Empowered" } },
+        { questID = 89570, label = "The Snapping Scourge",   waypoint = { M.ZulAman, 0.5180, 0.1862, "The Snapping Scourge" } },
+        { questID = 89575, label = "Lightwood Borer",        waypoint = { M.ZulAman, 0.2895, 0.2444, "Lightwood Borer" } },
+        { questID = 91634, label = "Poacher Rav'ik",         waypoint = { M.ZulAman, 0.3899, 0.4997, "Poacher Rav'ik" } },
+        { questID = 89579, label = "Oophaga",                waypoint = { M.ZulAman, 0.4629, 0.5113, "Oophaga" } },
+        { questID = 89581, label = "Voidtouched Crustacean", waypoint = { M.ZulAman, 0.2130, 0.7055, "Voidtouched Crustacean" } },
+        { questID = 89572, label = "Elder Oaktalon",         waypoint = { M.ZulAman, 0.3371, 0.8897, "Elder Oaktalon" } },
+        { questID = 91072, label = "The Decaying Diamondback", waypoint = { M.ZulAman, 0.4639, 0.4339, "The Decaying Diamondback" } },
+    },
+}
+
+-- The Ultimate Predator (62130) — Voidstorm rare-kill meta. 14 rares,
+-- confirmed against HandyNotes_Midnight criteria links. Rewards Opened
+-- Domanaar Storage Crate. Rakshur and Eruundi are on the SlayersRise
+-- sub-map; MC.MAP_PARENT[2444]=2405 handles portal routing from Silvermoon.
+local ULTIMATE_PREDATOR_TASKS = {
+    intro = "Defeat all Voidstorm rares to earn the Opened Domanaar Storage Crate.",
+    tasks = {
+        { questID = 90805, label = "Sundereth the Caller",     waypoint = { M.Voidstorm,   0.2951, 0.5008, "Sundereth the Caller" } },
+        { questID = 91048, label = "Tremora",                  waypoint = { M.Voidstorm,   0.3616, 0.8355, "Tremora" } },
+        { questID = 93946, label = "Bane of the Vilebloods",   waypoint = { M.Voidstorm,   0.4705, 0.8063, "Bane of the Vilebloods" } },
+        { questID = 93947, label = "Lotus Darkblossom",        waypoint = { M.Voidstorm,   0.3789, 0.7177, "Lotus Darkblossom" } },
+        { questID = 93895, label = "Ravengerus",               waypoint = { M.Voidstorm,   0.4881, 0.5326, "Ravengerus" } },
+        { questID = 93884, label = "Bilemaw the Gluttonous",   waypoint = { M.Voidstorm,   0.3549, 0.5023, "Bilemaw the Gluttonous" } },
+        { questID = 91051, label = "Nightbrood",               waypoint = { M.Voidstorm,   0.4017, 0.4130, "Nightbrood" } },
+        { questID = 91050, label = "Territorial Voidscythe",   waypoint = { M.Voidstorm,   0.3405, 0.8198, "Territorial Voidscythe" } },
+        { questID = 93966, label = "Screammaxa the Matriarch", waypoint = { M.Voidstorm,   0.4366, 0.5154, "Screammaxa the Matriarch" } },
+        { questID = 93944, label = "Aeonelle Blackstar",       waypoint = { M.Voidstorm,   0.3923, 0.6392, "Aeonelle Blackstar" } },
+        { questID = 93934, label = "Queen o' War",             waypoint = { M.Voidstorm,   0.5572, 0.7945, "Queen o' War" } },
+        { questID = 93953, label = "Rakshur the Bonegrinder",  waypoint = { M.SlayersRise, 0.4633, 0.4094, "Rakshur the Bonegrinder" } },
+        { questID = 91047, label = "Eruundi",                  waypoint = { M.SlayersRise, 0.4088, 0.8899, "Eruundi" } },
+        { questID = 93896, label = "Far'thana the Mad",        waypoint = { M.Voidstorm,   0.5394, 0.6272, "Far'thana the Mad" } },
+    },
+}
+
+-- Ever Painting (62185) — 7 paintings from Hesta Forlath in Eversong Woods.
+-- No public quest IDs surfaced; using criteriaIndex 1-7. Coords absent —
+-- player can use the existing Decorations vendor waypoint to reach Hesta.
+local EVER_PAINTING_TASKS = {
+    intro = "Buy all 7 Eversong paintings from Hesta Forlath.",
+    tasks = {
+        { achievementID = 62185, criteriaIndex = 1, label = "Sway of Red and Gold" },
+        { achievementID = 62185, criteriaIndex = 2, label = "Anar'alah Belore" },
+        { achievementID = 62185, criteriaIndex = 3, label = "Babble and Brook" },
+        { achievementID = 62185, criteriaIndex = 4, label = "Elrendar's Song" },
+        { achievementID = 62185, criteriaIndex = 5, label = "Lost Lamppost" },
+        { achievementID = 62185, criteriaIndex = 6, label = "Light Consuming" },
+        { achievementID = 62185, criteriaIndex = 7, label = "Memories of Ghosts" },
+    },
+}
+
+-- Legends Never Die (61574) — 7 Haranir storyline quests. Rewards On'ohia's
+-- Call. Quest IDs interleave two storyline pairs but Wowhead order works.
+local LEGENDS_NEVER_DIE_TASKS = {
+    intro = "Complete all 7 Haranir Legends quests to earn On'ohia's Call.",
+    tasks = {
+        { questID = 88993, label = "Wey'nan's Ward" },
+        { questID = 88995, label = "Aln'hara's Bloom" },
+        { questID = 88997, label = "Russula's Outreach" },
+        { questID = 88999, label = "Sky's Hope" },
+        { questID = 88994, label = "The Cauldron of Echoes" },
+        { questID = 88996, label = "The Echoless Flame" },
+        { questID = 88998, label = "Root of the World" },
+    },
+}
 
 -- Decoration entry shape: { decorID, [itemID], name, source, sourceInfo,
 --   [skillLine], [waypoint], [cost], [zone], [renown], [achievementID],
---   [dropInfo] }
+--   [taskList], [dropInfo] }
 -- decorID is the housing catalog record id (Wowhead /decor=NNNN).
 -- itemID is only present on crafted entries; the scanner falls back to it
 -- via C_HousingCatalog.GetCatalogEntryInfoByItem when decorID lookup fails.
@@ -424,12 +510,12 @@ MC.DecorationData = {
             { decorID = 15890, name = "Void Elf Weapon Rack", source = "achievement", sourceInfo = "Voidstorm: The Highest Peaks", achievementID = 62291 },
             -- Exploration: Other
             { decorID = 11470, name = "Silvermoon Energy Focus", source = "achievement", sourceInfo = "A Bloody Song", achievementID = 61507 },
-            { decorID = 15573, name = "Colossal Amani Stone Visage", source = "achievement", sourceInfo = "Tallest Tree in the Forest", achievementID = 62122 },
+            { decorID = 15573, name = "Colossal Amani Stone Visage", source = "achievement", sourceInfo = "Tallest Tree in the Forest", achievementID = 62122, taskList = TALLEST_TREE_TASKS },
             { decorID = 15501, name = "Lightbloom Moss Mound", source = "achievement", sourceInfo = "Leaf None Behind", achievementID = 61264 },
-            { decorID = 15757, name = "Opened Domanaar Storage Crate", source = "achievement", sourceInfo = "The Ultimate Predator", achievementID = 62130 },
-            { decorID = 1446, name = "Silvermoon Painter's Cushion", source = "achievement", sourceInfo = "Ever Painting", achievementID = 62185 },
+            { decorID = 15757, name = "Opened Domanaar Storage Crate", source = "achievement", sourceInfo = "The Ultimate Predator", achievementID = 62130, taskList = ULTIMATE_PREDATOR_TASKS },
+            { decorID = 1446, name = "Silvermoon Painter's Cushion", source = "achievement", sourceInfo = "Ever Painting", achievementID = 62185, taskList = EVER_PAINTING_TASKS },
             -- Questing
-            { decorID = 15494, name = "On'ohia's Call", source = "achievement", sourceInfo = "Legends Never Die", achievementID = 61574 },
+            { decorID = 15494, name = "On'ohia's Call", source = "achievement", sourceInfo = "Legends Never Die", achievementID = 61574, taskList = LEGENDS_NEVER_DIE_TASKS },
             -- Zone Events
             { decorID = 8872, name = "Eversong Feast Platter", source = "achievement", sourceInfo = "The Party Must Go On", achievementID = 62186 },
             { decorID = 8874, name = "Eversong Dessert Platter", source = "achievement", sourceInfo = "The Party Must Go On", achievementID = 62186 },
@@ -538,13 +624,23 @@ MC.DecorationData = {
     },
 
     -- World Event — Abundance (Chel the Chip)
-    {
-        source = "worldevent",
-        decorations = {
-            { decorID = 11323, name = "Amani Crafter's Tool Rack", source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance" },
-            { decorID = 15851, name = "Amani Slate Bench", source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance" },
-            { decorID = 15484, name = "Woodblock Stool", source = "worldevent", sourceInfo = "Chel the Chip - 1600 Unalloyed Abundance" },
-            { decorID = 15489, name = "Three-Tier Zul'Aman Shelf", source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance" },
-        },
-    },
+    -- Chel rotates between 4 Abundance locations weekly; multi-waypoint
+    -- drops a marker at all four (mirrors the Amani Sunfeather mount).
+    (function()
+        local CHEL_WAYPOINTS = {
+            { MC.MAP.Eversong,  0.5678, 0.6579, "Chel the Chip (Watha'nan Crypts)" },
+            { MC.MAP.ZulAman,   0.3162, 0.2614, "Chel the Chip (Loaknit Den)" },
+            { MC.MAP.Harandar,  0.6614, 0.6169, "Chel the Chip (Floaret Grotto)" },
+            { MC.MAP.Voidstorm, 0.3882, 0.5331, "Chel the Chip (Abundant Voidburrow)" },
+        }
+        return {
+            source = "worldevent",
+            decorations = {
+                { decorID = 11323, name = "Amani Crafter's Tool Rack", source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance", waypoint = CHEL_WAYPOINTS },
+                { decorID = 15851, name = "Amani Slate Bench",          source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance", waypoint = CHEL_WAYPOINTS },
+                { decorID = 15484, name = "Woodblock Stool",            source = "worldevent", sourceInfo = "Chel the Chip - 1600 Unalloyed Abundance", waypoint = CHEL_WAYPOINTS },
+                { decorID = 15489, name = "Three-Tier Zul'Aman Shelf",  source = "worldevent", sourceInfo = "Chel the Chip - 3200 Unalloyed Abundance", waypoint = CHEL_WAYPOINTS },
+            },
+        }
+    end)(),
 }

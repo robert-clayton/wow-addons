@@ -10,6 +10,10 @@
 
 package-as: MidnightCollections
 
+# We vendor libs in Libs/ rather than fetching via externals, so don't build
+# a -nolib variant (it would be broken).
+enable-nolib-creation: no
+
 # Files to keep out of the shipped zip — users don't need them.
 ignore:
     - .pkgmeta

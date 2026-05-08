@@ -1,8 +1,9 @@
 ## Interface: 120005
 ## Title: Midnight Collections
-## Notes: Tracks the mounts, pets, toys, housing decor, and recipes you're missing from Midnight in one panel.
+## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.2.1
+## Version: 1.4.0
+## IconTexture: Interface\AddOns\MidnightCollections\Media\icon.tga
 ## SavedVariables: MidnightCollectionsDB
 ## SavedVariablesPerCharacter: MidnightCollectionsCharDB
 ## OptionalDeps: TomTom
@@ -50,6 +51,12 @@ Modules\Rares\Data\Rares.lua
 Modules\Rares\Init.lua
 Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
+
+# Treasures module
+Modules\Treasures\Data\Treasures.lua
+Modules\Treasures\Init.lua
+Modules\Treasures\Scanner.lua
+Modules\Treasures\UI.lua
 
 # Recipes module
 Modules\Recipes\Data\Alchemy.lua

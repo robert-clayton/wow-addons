@@ -39,7 +39,9 @@ local mod = MC.RegisterModule("recipes", {
         showLearned = false,
         collapsed   = {},
     },
-    events = { "TRADE_SKILL_LIST_UPDATE", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "NEW_RECIPE_LEARNED" },
+    -- SPELLS_CHANGED dropped: it fires on every spell cast / talent swap, far
+    -- noisier than the recipe-specific signals below.
+    events = { "TRADE_SKILL_LIST_UPDATE", "SKILL_LINES_CHANGED", "NEW_RECIPE_LEARNED" },
     onLogin = function(m)
         m.professions = {}
         DetectProfessions(m)

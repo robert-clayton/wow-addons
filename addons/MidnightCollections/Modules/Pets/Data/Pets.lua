@@ -15,12 +15,125 @@ MC.PetSourceLabels = {
 }
 
 local LOC = MC.LOC
+local M = MC.MAP
 
 -- Pet entry shape: { speciesID, name, petType (1-10), source, sourceInfo,
 --   [waypoint], [overworldWaypoint], [cost], [dropInfo], [achievementID],
---   canBattle, [zone], [npcID] }
+--   [taskList], canBattle, [zone], [npcID] }
 -- Note: most Midnight "wild" pets are companion-only and can't enter pet
 -- battles, even though they live in the wild-pet group.
+
+-- Midnight Safari (achievement 61091) — earns Do, Child of Filo. 21 wild
+-- pets, one per task; gated on speciesID (per-pet collection state) so the
+-- ✓/✗ flips immediately when the player captures a pet, before the safari
+-- meta-achievement itself ticks.
+local SAFARI_TASKS = {
+    intro = "Capture all 21 Midnight wild pets to earn Do, Child of Filo.",
+    tasks = {
+        { speciesID = 3277, label = "Amber Treeflitter (Eversong)",      waypoint = LOC.AmberTreeflitter },
+        { speciesID = 4890, label = "Vibrant Manaling (Eversong)",       waypoint = LOC.VibrantManaling },
+        { speciesID = 4877, label = "Violet Chick (Eversong)",           waypoint = LOC.VioletChick },
+        { speciesID = 4882, label = "Azure Sporebat (Harandar)",         waypoint = LOC.AzureSporebat },
+        { speciesID = 4876, label = "Mud Potadpole (Harandar)",          waypoint = LOC.MudPotadpole },
+        { speciesID = 4875, label = "Rootling Nester (Harandar)",        waypoint = LOC.RootlingNester },
+        { speciesID = 4886, label = "Silkcrawler (Harandar)",            waypoint = LOC.Silkcrawler },
+        { speciesID = 4497, label = "Waddles (Harandar)",                waypoint = LOC.Waddles },
+        { speciesID = 4879, label = "Blistercreepling (Voidstorm)",      waypoint = LOC.Blistercreepling },
+        { speciesID = 4790, label = "Devouring Runt (Voidstorm)",        waypoint = LOC.DevouringRunt },
+        { speciesID = 4892, label = "Riftblade Familiar (Voidstorm)",    waypoint = LOC.RiftbladeFamiliar },
+        { speciesID = 4795, label = "Voidcrawler (Voidstorm)",           waypoint = LOC.Voidcrawler },
+        { speciesID = 4874, label = "Akil Fledgling (Zul'Aman)",         waypoint = LOC.AkilFledgling },
+        { speciesID = 4883, label = "Dragonhawk Mosswing (Zul'Aman)",    waypoint = LOC.DragonhawkMosswing },
+        { speciesID = 4878, label = "Ebon Snapling (Zul'Aman)",          waypoint = LOC.EbonSnapling },
+        { speciesID = 4885, label = "Gloom Toad (Zul'Aman)",             waypoint = LOC.GloomToad },
+        { speciesID = 4884, label = "Pangolil (Zul'Aman)",               waypoint = LOC.Pangolil },
+        { speciesID = 3364, label = "Striped Snakebiter (Zul'Aman)",     waypoint = LOC.StripedSnakebiter },
+        { speciesID = 4880, label = "Swamp Biter (Zul'Aman)",            waypoint = LOC.SwampBiter },
+        { speciesID = 4889, label = "Nether Familiar (Quel'Danas)",      waypoint = LOC.NetherFamiliar },
+        { speciesID = 4891, label = "Wrathful Wyrm (Quel'Danas)",        waypoint = LOC.WrathfulWyrm },
+    },
+}
+
+-- Family Battler chains. Each parent achievement aggregates 10 family-of-X
+-- sub-achievements (one per pet family), not individual trainers. Trainers
+-- live one level deeper inside each sub-achievement, so we surface progress
+-- at the family level here. Criterion order is alphabetical, verified in-game
+-- against achievement 61051 (May 2026); EK and Northrend assumed to share the
+-- same alphabetical pattern.
+local FAMILY_BATTLER_KALIMDOR_TASKS = {
+    intro = "Defeat all 10 Kalimdor pet families (parent achievement 61051).",
+    tasks = {
+        { achievementID = 61051, criteriaIndex = 1,  label = "Aquatic Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 2,  label = "Beast Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 3,  label = "Critter Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 4,  label = "Dragonkin Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 5,  label = "Elemental Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 6,  label = "Flying Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 7,  label = "Humanoid Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 8,  label = "Magic Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 9,  label = "Mechanical Battler of Kalimdor" },
+        { achievementID = 61051, criteriaIndex = 10, label = "Undead Battler of Kalimdor" },
+    },
+}
+
+local FAMILY_BATTLER_EK_TASKS = {
+    intro = "Defeat all 10 Eastern Kingdoms pet families (parent achievement 61040).",
+    tasks = {
+        { achievementID = 61040, criteriaIndex = 1,  label = "Aquatic Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 2,  label = "Beast Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 3,  label = "Critter Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 4,  label = "Dragonkin Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 5,  label = "Elemental Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 6,  label = "Flying Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 7,  label = "Humanoid Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 8,  label = "Magic Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 9,  label = "Mechanical Battler of Eastern Kingdoms" },
+        { achievementID = 61040, criteriaIndex = 10, label = "Undead Battler of Eastern Kingdoms" },
+    },
+}
+
+local FAMILY_BATTLER_NORTHREND_TASKS = {
+    intro = "Defeat all 10 Northrend pet families (parent achievement 60956).",
+    tasks = {
+        { achievementID = 60956, criteriaIndex = 1,  label = "Aquatic Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 2,  label = "Beast Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 3,  label = "Critter Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 4,  label = "Dragonkin Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 5,  label = "Elemental Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 6,  label = "Flying Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 7,  label = "Humanoid Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 8,  label = "Magic Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 9,  label = "Mechanical Battler of Northrend" },
+        { achievementID = 60956, criteriaIndex = 10, label = "Undead Battler of Northrend" },
+    },
+}
+
+-- Treasures of Eversong Woods (achievement 61960) — earns the Sootpaw pet.
+-- Inlining the coords here rather than referencing MC.TreasureCoords because
+-- the Pets data file loads before the Treasures data file in the .toc.
+local SOOTPAW_TASKS = {
+    intro = "Loot all 9 Eversong treasures to earn the Sootpaw pet.",
+    tasks = {
+        { questID = 93967, label = "Rookery Cache",
+          waypoint = { M.Silvermoon, 0.2434, 0.6928, "Rookery Cache" } },
+        { questID = 93456, label = "Triple-Locked Safebox",
+          waypoint = { M.Eversong,   0.3889, 0.7606, "Triple-Locked Safebox" } },
+        { questID = 93544, label = "Gift of the Phoenix",
+          waypoint = { M.Eversong,   0.4096, 0.1945, "Gift of the Phoenix" } },
+        { questID = 94747, label = "Forgotten Ink and Quill",
+          waypoint = { M.Eversong,   0.4327, 0.6949, "Forgotten Ink and Quill" } },
+        { questID = 93908, label = "Gilded Armillary Sphere",
+          waypoint = { M.Eversong,   0.4461, 0.4554, "Gilded Armillary Sphere" } },
+        { questID = 93455, label = "Antique Nobleman's Signet Ring",
+          waypoint = { M.Eversong,   0.5234, 0.4543, "Antique Nobleman's Signet Ring" } },
+        { questID = 93457, label = "Farstrider's Lost Quiver",
+          waypoint = { M.Eversong,   0.6068, 0.6729, "Farstrider's Lost Quiver" } },
+        { questID = 86645, label = "Stone Vat of Wine",
+          waypoint = { M.Eversong,   0.4043, 0.6089, "Stone Vat of Wine" } },
+        { questID = 91358, label = "Burbling Paint Pot",
+          waypoint = { M.Eversong,   0.4873, 0.7544, "Burbling Paint Pot" } },
+    },
+}
 
 MC.PetData = {
     -- Wild Pets (Companion-only - caught by right-clicking in the world)
@@ -199,9 +312,9 @@ MC.PetData = {
     {
         source = "achievement",
         pets = {
-            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)",   canBattle = true,  achievementID = 61091 },
+            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)",   canBattle = true,  achievementID = 61091, taskList = SAFARI_TASKS },
             { speciesID = 4803, npcID = 242452, name = "Niblet",                petType = 5,  source = "achievement", sourceInfo = "Midnight Dungeon Hero",                        canBattle = false, achievementID = 61567 },
-            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods",                  canBattle = false, achievementID = 61960 },
+            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods",                  canBattle = false, achievementID = 61960, taskList = SOOTPAW_TASKS },
         },
     },
 
@@ -249,9 +362,9 @@ MC.PetData = {
         source = "event",
         pets = {
             -- Pre-patch Family Battler achievement rewards
-            { speciesID = 4913, name = "Moon Darter",  petType = 2, source = "event", sourceInfo = "Family Battler of Kalimdor",          canBattle = false },
-            { speciesID = 3519, name = "Byrn",         petType = 7, source = "event", sourceInfo = "Family Battler of Eastern Kingdoms",   canBattle = false },
-            { speciesID = 4475, name = "Webbers",      petType = 4, source = "event", sourceInfo = "Family Battler of Northrend",          canBattle = true },
+            { speciesID = 4913, name = "Moon Darter",  petType = 2, source = "event", sourceInfo = "Family Battler of Kalimdor",          canBattle = false, achievementID = 61051, taskList = FAMILY_BATTLER_KALIMDOR_TASKS },
+            { speciesID = 3519, name = "Byrn",         petType = 7, source = "event", sourceInfo = "Family Battler of Eastern Kingdoms", canBattle = false, achievementID = 61040, taskList = FAMILY_BATTLER_EK_TASKS },
+            { speciesID = 4475, name = "Webbers",      petType = 4, source = "event", sourceInfo = "Family Battler of Northrend",         canBattle = true,  achievementID = 60956, taskList = FAMILY_BATTLER_NORTHREND_TASKS },
 
             -- Patch 12.0.5: Blizzard Gear Store promotion (Apr 13 – May 15, 2026)
             { speciesID = 4968, npcID = 256663, name = "Lil' Staropod", petType = 6, source = "event", sourceInfo = "Blizzard Gear Store: Lil' Staropod collection (Apr 13 – May 15, 2026)", canBattle = true },

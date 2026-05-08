@@ -165,23 +165,41 @@ function lib.Pool:New()
     return setmetatable({ inactive = {}, active = {} }, self)
 end
 
+-- Static row script handlers. Bound once at frame creation; they read whatever
+-- callbacks the consumer stashed on the frame for the current refresh. This
+-- avoids allocating a fresh closure per row per refresh (~1800 closures per
+-- full refresh on a fully-expanded view) and lets ReleaseAll skip SetScript
+-- entirely.
+local function _staticOnEnter(self)
+    if self._onEnter then self._onEnter(self) end
+end
+local function _staticOnLeave(self)
+    if self._onLeave then self._onLeave(self) end
+end
+local function _staticOnMouseUp(self, button)
+    if self._onMouseUp then self._onMouseUp(self, button) end
+end
+
 function lib.Pool:Acquire(parent)
     local frame = tremove(self.inactive)
     if not frame then
         frame = CreateFrame("Frame", nil, parent)
         frame:EnableMouse(true)
+        -- One-time bind; consumers populate _onEnter/_onLeave/_onMouseUp.
+        frame:SetScript("OnEnter", _staticOnEnter)
+        frame:SetScript("OnLeave", _staticOnLeave)
+        frame:SetScript("OnMouseUp", _staticOnMouseUp)
     else
         frame:SetParent(parent)
         frame:ClearAllPoints()
-        frame:SetScript("OnEnter", nil)
-        frame:SetScript("OnLeave", nil)
-        frame:SetScript("OnMouseUp", nil)
         if frame._children then
             for _, child in pairs(frame._children) do
                 if child.Hide then child:Hide() end
             end
         end
     end
+    -- Clear stale callbacks; the consumer re-stashes them this refresh.
+    frame._onEnter, frame._onLeave, frame._onMouseUp = nil, nil, nil
     frame:Show()
     self.active[#self.active + 1] = frame
     return frame
@@ -192,9 +210,7 @@ function lib.Pool:ReleaseAll()
         local frame = self.active[i]
         frame:Hide()
         frame:ClearAllPoints()
-        frame:SetScript("OnEnter", nil)
-        frame:SetScript("OnLeave", nil)
-        frame:SetScript("OnMouseUp", nil)
+        frame._onEnter, frame._onLeave, frame._onMouseUp = nil, nil, nil
         self.inactive[#self.inactive + 1] = frame
         self.active[i] = nil
     end
@@ -427,6 +443,22 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     return header, collapsed, yOff + opts.height + 2
 end
 
+-- Static row dispatchers. RenderItemRow stashes the per-refresh callbacks
+-- and the hover-tint texture on the row; these read them off the row at
+-- event time so we never allocate per-row closures during a refresh.
+local function _rowOnEnter(self)
+    local h, c = self._hoverTex, self._hoverColor
+    if h and c then h:SetColorTexture(c[1], c[2], c[3], c[4]) end
+    if self._userOnEnter then self._userOnEnter(self) end
+end
+local function _rowOnLeave(self)
+    if self._hoverTex then self._hoverTex:SetColorTexture(1, 1, 1, 0) end
+    if self._userOnLeave then self._userOnLeave(self) end
+end
+local function _rowOnMouseUp(self, button)
+    if button == "LeftButton" and self._userOnClick then self._userOnClick() end
+end
+
 -- Shared row scaffold used by every module's UI.
 --   opts = { height, indent, padding,
 --            leading = { kind = "icon"|"dot", size, texture, color, fallback },
@@ -544,21 +576,18 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
         strike:Hide()
     end
 
-    -- Hover handlers
-    row:SetScript("OnEnter", function(r)
-        hoverTex:SetColorTexture(rc[1], rc[2], rc[3], rc[4])
-        if opts.onEnter then opts.onEnter(r) end
-    end)
-    row:SetScript("OnLeave", function(r)
-        hoverTex:SetColorTexture(1, 1, 1, 0)
-        if opts.onLeave then opts.onLeave(r) end
-    end)
-
-    if opts.onClick and not opts.isCollected then
-        row:SetScript("OnMouseUp", function(_, button)
-            if button == "LeftButton" then opts.onClick() end
-        end)
-    end
+    -- Stash callbacks on the row so the static OnEnter/OnLeave/OnMouseUp
+    -- handlers in Pool:Acquire can dispatch without allocating closures.
+    row._hoverTex     = hoverTex
+    row._hoverColor   = rc
+    row._userOnEnter  = opts.onEnter
+    row._userOnLeave  = opts.onLeave
+    row._userOnClick  = opts.onClick
+    row._onEnter = _rowOnEnter
+    row._onLeave = _rowOnLeave
+    -- Always wire OnMouseUp so collected rows still respond to shift-click
+    -- (Wowhead) and ctrl-click (info dump). DoItemAction decides what to do.
+    row._onMouseUp = opts.onClick and _rowOnMouseUp or nil
 
     return yOff + height
 end
