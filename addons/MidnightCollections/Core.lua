@@ -929,6 +929,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 
         if not MidnightCollectionsDB then MidnightCollectionsDB = {} end
         if not MidnightCollectionsCharDB then MidnightCollectionsCharDB = {} end
+        if not MidnightCollectionsRosterDB then MidnightCollectionsRosterDB = {} end
 
         -- v0 -> v1: pull in saved vars from the four standalone addons that
         -- were merged into this one. Targets the account-wide DB because that's
@@ -962,6 +963,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         MC.db         = MidnightCollectionsCharDB
         MC.cdb        = MidnightCollectionsCharDB
         MC.snapshotDB = MidnightCollectionsDB
+        MC.RosterDB   = MidnightCollectionsRosterDB
 
         -- Each module gets its own sub-table for settings and collapsed state.
         -- Copy the registration defaults so we don't mutate mod.opts.defaults
@@ -1020,6 +1022,11 @@ frame:SetScript("OnEvent", function(_, event, ...)
         else
             MC._ShowAllDisabledPlaceholder()
         end
+
+        -- One-time onboarding popup at first launch on a new addon-version
+        -- milestone. The onboarding module no-ops if the user has already
+        -- accepted the current milestone.
+        if MC.MaybeShowOnboarding then MC.MaybeShowOnboarding() end
 
     elseif event == "PLAYER_LOGOUT" then
         -- Snapshot the per-character DB into the account-wide DB so the next
@@ -1218,6 +1225,7 @@ local function PrintHelp()
     print("  /mc scan - rescan enabled modules")
     print("  /mc collected [module] - toggle collected/learned display")
     print("  /mc reset - reset panel position + size")
+    print("  /mc roster on|off|announce|sync|prune|status - guild roster")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -1283,6 +1291,12 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
         print(format("%s Midnight Collections v%s", PREFIX, MC.version))
+    elseif cmd == "roster" then
+        if MC.RosterSlashHandler then
+            MC.RosterSlashHandler(arg)
+        else
+            print(PREFIX .. " Roster module not loaded.")
+        end
     elseif cmd == "help" then
         PrintHelp()
     else
