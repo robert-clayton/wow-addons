@@ -60,6 +60,54 @@ function MC.RegisterModule(key, opts)
 end
 
 --------------------------------------------------------------------------
+-- Module reorder. The user can rearrange modules via up/down arrows in
+-- the options panel; the chosen order persists per-character in
+-- MC.db.moduleOrder. ApplyModuleOrder rebuilds the runtime list and
+-- triggers the tab bar to reflow.
+--
+-- The default uses each module's registration `order` value, so newly
+-- registered modules slot in based on their declared order until the
+-- user reorders them.
+--------------------------------------------------------------------------
+function MC.ApplyModuleOrder()
+    if not MC.modules then return end
+    local override = MC.db and MC.db.moduleOrder
+    table.sort(MC.modules, function(a, b)
+        local oa = override and override[a.key] or a.order
+        local ob = override and override[b.key] or b.order
+        if oa == ob then return a.key < b.key end
+        return oa < ob
+    end)
+    if MC.TabBar and MC.TabBar.Reflow then MC.TabBar:Reflow() end
+end
+
+function MC.MoveModule(key, direction)
+    if not (MC.db and MC.modules) then return end
+    -- Find current visible index in MC.modules
+    local idx
+    for i, m in ipairs(MC.modules) do
+        if m.key == key then idx = i; break end
+    end
+    if not idx then return end
+    local target = idx + direction
+    if target < 1 or target > #MC.modules then return end
+    -- Swap by giving the two modules each other's effective order.
+    MC.db.moduleOrder = MC.db.moduleOrder or {}
+    -- Capture the current effective ordering (1..N) into the override so
+    -- subsequent swaps can use it consistently regardless of registration
+    -- order vs prior overrides.
+    for i, m in ipairs(MC.modules) do
+        MC.db.moduleOrder[m.key] = i
+    end
+    -- Now swap the two
+    local a = MC.modules[idx].key
+    local b = MC.modules[target].key
+    MC.db.moduleOrder[a], MC.db.moduleOrder[b] = MC.db.moduleOrder[b], MC.db.moduleOrder[a]
+    MC.ApplyModuleOrder()
+    if MC.BuildConfig then MC.BuildConfig() end
+end
+
+--------------------------------------------------------------------------
 -- All settings live in the per-character DB (MidnightCollectionsCharDB) as
 -- of v2. The account-wide DB (MidnightCollectionsDB) is now a "last logged-out
 -- snapshot" written on PLAYER_LOGOUT and consumed once when a brand-new alt
@@ -1027,6 +1075,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "PLAYER_LOGIN" then
         frame:UnregisterEvent("PLAYER_LOGIN")
 
+        -- Apply the user's saved module order before anything else uses
+        -- the MC.modules array (TabBar:Create, event registration, etc).
+        if MC.ApplyModuleOrder then MC.ApplyModuleOrder() end
+
         for _, mod in ipairs(MC.modules) do
             if MC.IsModuleEnabled(mod.key) and mod.opts.events then
                 for _, ev in ipairs(mod.opts.events) do
@@ -1186,11 +1238,24 @@ function MC.BuildConfig()
     local defs = {}
 
     defs[#defs + 1] = { type = "section", label = "MODULES" }
-    for _, mod in ipairs(MC.modules) do
+    local modCount = #MC.modules
+    for i, mod in ipairs(MC.modules) do
         local key = mod.key
-        defs[#defs + 1] = { type = "checkbox", label = mod.label,
-            get = function() return MC.IsModuleEnabled(key) end,
-            set = function(v) MC.SetModuleEnabled(key, v) end }
+        defs[#defs + 1] = {
+            type    = "checkbox",
+            label   = mod.label,
+            get     = function() return MC.IsModuleEnabled(key) end,
+            set     = function(v) MC.SetModuleEnabled(key, v) end,
+            -- Up/down arrows let the user reorder modules. The buttons
+            -- swap this module with its neighbor and then BuildConfig
+            -- re-runs so the visible position updates immediately.
+            reorder = {
+                isFirst = (i == 1),
+                isLast  = (i == modCount),
+                onUp    = function() MC.MoveModule(key, -1) end,
+                onDown  = function() MC.MoveModule(key,  1) end,
+            },
+        }
     end
 
     defs[#defs + 1] = { type = "divider" }

@@ -2,7 +2,7 @@
 ## Title: Midnight Collections
 ## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.6.3
+## Version: 1.6.4
 ## IconTexture: Interface\AddOns\MidnightCollections\Media\icon.tga
 ## SavedVariables: MidnightCollectionsDB, MidnightCollectionsRosterDB
 ## SavedVariablesPerCharacter: MidnightCollectionsCharDB
@@ -80,4 +80,5 @@ Modules\Recipes\UI.lua
 Modules\Roster\Comms.lua
 Modules\Roster\Bitmap.lua
 Modules\Roster\Init.lua
+Modules\Roster\PeerPanel.lua
 Modules\Roster\UI.lua

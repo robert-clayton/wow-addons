@@ -160,7 +160,7 @@ local function acquireDivider(panel, body, yOff)
     return yOff - 6
 end
 
-local function acquireCheckbox(panel, body, yOff, label, getVal, setVal, onRefresh)
+local function acquireCheckbox(panel, body, yOff, def)
     local pool = getPool(panel).checkbox
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
@@ -172,17 +172,49 @@ local function acquireCheckbox(panel, body, yOff, label, getVal, setVal, onRefre
         lbl:SetFont(theme.font, 10, "OUTLINE")
         lbl:SetTextColor(0.88, 0.88, 0.88)
         lbl:SetPoint("LEFT", fr, "RIGHT", 0, 0)
-        w = { frame = fr, lbl = lbl }
+        -- Reorder buttons (up + down). Created lazily; only shown when
+        -- the def includes a `reorder` table.
+        local upBtn = CreateFrame("Button", nil, fr, "UIPanelButtonTemplate")
+        upBtn:SetSize(20, 16)
+        upBtn:SetText("^")
+        upBtn:Hide()
+        local dnBtn = CreateFrame("Button", nil, fr, "UIPanelButtonTemplate")
+        dnBtn:SetSize(20, 16)
+        dnBtn:SetText("v")
+        dnBtn:Hide()
+        w = { frame = fr, lbl = lbl, upBtn = upBtn, dnBtn = dnBtn }
         pool.items[pool.idx] = w
     end
     w.frame:ClearAllPoints()
     w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 6, yOff)
-    w.lbl:SetText(label)
-    w.frame:SetChecked(getVal())
+    w.lbl:SetText(def.label)
+    w.frame:SetChecked(def.get())
     w.frame:SetScript("OnClick", function(s)
-        setVal(s:GetChecked())
-        if onRefresh then onRefresh() end
+        def.set(s:GetChecked())
+        if def.onRefresh then def.onRefresh() end
     end)
+
+    -- Reorder controls. Anchored to the right edge of the body; rendered
+    -- only if the def carries a `reorder` table from the caller.
+    local r = def.reorder
+    if r then
+        w.dnBtn:ClearAllPoints()
+        w.dnBtn:SetPoint("RIGHT", body, "RIGHT", -8, 0)
+        w.dnBtn:SetPoint("TOP", w.frame, "TOP", 0, -1)
+        w.dnBtn:SetScript("OnClick", function() if r.onDown then r.onDown() end end)
+        if r.isLast then w.dnBtn:Disable() else w.dnBtn:Enable() end
+        w.dnBtn:Show()
+
+        w.upBtn:ClearAllPoints()
+        w.upBtn:SetPoint("RIGHT", w.dnBtn, "LEFT", -2, 0)
+        w.upBtn:SetScript("OnClick", function() if r.onUp then r.onUp() end end)
+        if r.isFirst then w.upBtn:Disable() else w.upBtn:Enable() end
+        w.upBtn:Show()
+    else
+        w.upBtn:Hide()
+        w.dnBtn:Hide()
+    end
+
     w.frame:Show()
     return yOff - 22
 end
@@ -263,7 +295,7 @@ lib._populateConfigBody = function(panel, defs)
         elseif def.type == "divider" then
             yOff = acquireDivider(panel, body, yOff)
         elseif def.type == "checkbox" then
-            yOff = acquireCheckbox(panel, body, yOff, def.label, def.get, def.set, def.onRefresh)
+            yOff = acquireCheckbox(panel, body, yOff, def)
         elseif def.type == "slider" then
             local fc = def.fillColor or { 0.40, 0.40, 0.40 }
             yOff = acquireSlider(panel, body, yOff, def.label, def.min, def.max, def.step,

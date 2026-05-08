@@ -539,6 +539,12 @@ end
 
 function PanelProto:PopulateConfig(defs)
     self.pendingConfigDefs = defs
+    -- If the config panel is already open, re-render immediately so live
+    -- updates (module reorder, module enable/disable) reflect right away
+    -- without the user having to close and reopen the panel.
+    if self.cfgFrame and self.cfgFrame:IsShown() then
+        self:_PopulateConfigBody(defs)
+    end
 end
 
 function PanelProto:_PopulateConfigBody(defs)

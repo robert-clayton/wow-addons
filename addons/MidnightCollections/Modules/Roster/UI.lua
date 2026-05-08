@@ -189,7 +189,7 @@ function UI:RenderRow(parent, entry, yOff)
             GameTooltip:Hide()
         end,
         onClick = function()
-            -- Future: whisper or armory link. For now, no-op.
+            if MC.ShowPeerPanel then MC.ShowPeerPanel(entry.name) end
         end,
     })
 end
