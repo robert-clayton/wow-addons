@@ -449,6 +449,12 @@ end
 -- In a hub with a portal to the target zone? Route to that portal first.
 -- Otherwise just send them to wherever they should end up; TomTom queues it.
 --------------------------------------------------------------------------
+-- Roll a sub-map (The Den, Slayer's Rise, etc.) up to its parent zone.
+local function effectiveMap(m)
+    if not m then return nil end
+    return (MC.MAP_PARENT and MC.MAP_PARENT[m]) or m
+end
+
 function MC.GetSmartWaypoint(item)
     local wp  = item.waypoint
     local owp = item.overworldWaypoint
@@ -461,13 +467,23 @@ function MC.GetSmartWaypoint(item)
 
     -- Target zone: instanced content uses owp[1], everything else wp's mapID.
     local targetZone = (owp and owp[1]) or wpMapID
+    local effCurrent = effectiveMap(currentMap)
+    local effTarget  = effectiveMap(targetZone)
 
-    if currentMap == targetZone then return owp or wp end
+    -- Already in the target zone (or a sub-map of it)?
+    if currentMap == targetZone or effCurrent == effTarget then
+        return owp or wp
+    end
 
-    if MC.PORTALS and currentMap and targetZone then
-        local portalsFromHere = MC.PORTALS[currentMap]
-        if portalsFromHere and portalsFromHere[targetZone] then
-            return portalsFromHere[targetZone]
+    -- Portal lookup: try the raw map first, then the rolled-up parent so a
+    -- player in The Den can still find Harandar's portals, and so a target
+    -- in Slayer's Rise looks up Voidstorm's portal.
+    if MC.PORTALS and effTarget then
+        for _, fromMap in ipairs({ currentMap, effCurrent }) do
+            if fromMap and MC.PORTALS[fromMap] then
+                local p = MC.PORTALS[fromMap][effTarget]
+                if p then return p end
+            end
         end
     end
 

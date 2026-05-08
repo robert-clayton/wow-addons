@@ -2,7 +2,7 @@
 ## Title: Midnight Collections
 ## Notes: Tracks the mounts, pets, toys, housing decor, and recipes you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.2.0
+## Version: 1.2.1
 ## SavedVariables: MidnightCollectionsDB
 ## SavedVariablesPerCharacter: MidnightCollectionsCharDB
 ## OptionalDeps: TomTom

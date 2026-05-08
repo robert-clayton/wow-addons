@@ -86,4 +86,16 @@ MC.MAP = {
     SlayersRise      = 2444,  -- Voidstorm sub-map
 }
 
+-- Sub-map -> parent overworld map. The smart-waypoint resolver rolls
+-- sub-maps up to their parent for portal routing and "are we already
+-- in the target zone?" checks. Without this, clicking a SlayersRise
+-- rare from Silvermoon falls past portal lookup and ports you straight
+-- to a coord that's only valid once you're in Voidstorm.
+MC.MAP_PARENT = {
+    [2576] = 2413,  -- The Den            -> Harandar
+    [2444] = 2405,  -- Slayer's Rise      -> Voidstorm
+    [2585] = 2437,  -- Broken Throne      -> Zul'Aman
+    [2594] = 2395,  -- Daggerspine Point  -> Eversong Woods
+}
+
 -- MC.PORTALS is defined at the bottom of Data/Locations.lua (it needs MC.LOC).
