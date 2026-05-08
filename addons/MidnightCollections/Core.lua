@@ -240,17 +240,10 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     local tt = MC.GetInfoTooltip()
     tt:SetOwner(owner, "ANCHOR_NONE")
     tt:ClearAllPoints()
-    -- Anchor below GameTooltip when it's currently hosting our row, so the
-    -- two tooltips don't overlap when the panel is near a screen edge and
-    -- GameTooltip's auto-clamp moves it. Fall back to anchoring directly to
-    -- the row if GameTooltip isn't ours (another addon may have repurposed
-    -- it), so the MC tooltip never floats off-screen.
-    local gt = GameTooltip
-    if gt and gt.IsShown and gt:IsShown() and gt:GetOwner() == owner then
-        tt:SetPoint("TOPLEFT", gt, "BOTTOMLEFT", 0, -4)
-    else
-        tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
-    end
+    -- Default anchor: to the right of the row, top-aligned. Overlap with
+    -- GameTooltip is corrected after Show() once both tooltips have a
+    -- rendered geometry to compare.
+    tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
 
     tt:AddLine("Midnight Collections", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
     tt:AddDoubleLine("Source:", sourceLabel or item.source or "Unknown",
@@ -451,6 +444,19 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     tt:AddLine("Ctrl-click to print entry info", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
 
     tt:Show()
+
+    -- Overlap correction: if GameTooltip is hosting our row and its rendered
+    -- bottom sits inside our top edge (panel near screen top + WoW auto-clamp
+    -- pushed GameTooltip down into our space), shift our tooltip below it.
+    local gt = GameTooltip
+    if gt and gt.IsShown and gt:IsShown() and gt:GetOwner() == owner then
+        local gtBottom = gt:GetBottom()
+        local ttTop    = tt:GetTop()
+        if gtBottom and ttTop and gtBottom < ttTop then
+            tt:ClearAllPoints()
+            tt:SetPoint("TOPLEFT", gt, "BOTTOMLEFT", 0, -4)
+        end
+    end
 end
 
 --------------------------------------------------------------------------
