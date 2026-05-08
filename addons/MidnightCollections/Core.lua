@@ -443,6 +443,48 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     tt:AddLine("Shift-click to copy Wowhead URL", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
     tt:AddLine("Ctrl-click to print entry info", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
 
+    -- Roster (v2): show which guildies/BNet friends already own this item.
+    if MC.Bitmap and MC.Bitmap.OwnersOf then
+        local modKey, canonicalID
+        if item.mountID then
+            modKey, canonicalID = "mounts", item.mountID
+        elseif item.speciesID then
+            modKey, canonicalID = "pets", item.speciesID
+        elseif item.decorID then
+            modKey, canonicalID = "decorations", item.decorID
+        elseif item.itemID and item.source ~= "drop" and item.source ~= "treasure" then
+            -- Toy itemIDs land here; rare-drop items don't (those aren't in the bitmap).
+            modKey, canonicalID = "toys", item.itemID
+        elseif item.criteriaIndex and item.achievementID then
+            -- Treasures and Rares both expose criteriaIndex but we key
+            -- treasures by name and rares by npcID for stable lookup.
+            if item.npcID then
+                modKey, canonicalID = "rares", item.npcID
+            elseif item.objectID and item.name then
+                modKey, canonicalID = "treasures", item.name
+            end
+        end
+        if modKey and canonicalID then
+            local owners = MC.Bitmap:OwnersOf(modKey, canonicalID)
+            if #owners > 0 then
+                tt:AddLine(" ")
+                local shown = math.min(#owners, 5)
+                local names = {}
+                for i = 1, shown do
+                    -- Strip "-Realm" for display brevity
+                    names[i] = (owners[i]:match("^([^%-]+)") or owners[i])
+                end
+                local label = table.concat(names, ", ")
+                if #owners > shown then
+                    label = label .. format(" (+%d more)", #owners - shown)
+                end
+                tt:AddDoubleLine("Owned by:", label,
+                    C.ttLabel[1], C.ttLabel[2], C.ttLabel[3],
+                    C.ttValue[1], C.ttValue[2], C.ttValue[3], true)
+            end
+        end
+    end
+
     tt:Show()
 
     -- Overlap correction: if GameTooltip is hosting our row and its rendered

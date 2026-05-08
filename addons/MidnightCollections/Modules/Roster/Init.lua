@@ -21,8 +21,11 @@ local mod = MC.RegisterModule("roster", {
     defaults = {
         share          = true,            -- Broadcast our counts to guild
         shareParty     = false,           -- (Reserved for future use)
+        shareItems     = true,            -- Broadcast per-item bitmap (v2)
+        shareBNet      = true,            -- Broadcast to BNet WoW friends (v2)
         autoForgetDays = 30,              -- Garbage-collect peers older than this
         lastBroadcast  = {},              -- channel -> last hash sent (skip-if-unchanged)
+        lastBitmap     = {},              -- channel -> last bitmap fingerprint
         collapsed      = {},
     },
     events = { "PLAYER_GUILD_UPDATE", "GUILD_ROSTER_UPDATE" },
@@ -108,10 +111,30 @@ function MC.RosterBroadcastIfChanged(channel)
 
     local fullPayload = payload .. "|" .. GetClassToken() .. "|" .. (MC.version or "?")
     local h = cheapHash(fullPayload)
-    if mod.db.lastBroadcast[channel] == h then return end
-    mod.db.lastBroadcast[channel] = h
+    if mod.db.lastBroadcast[channel] ~= h then
+        mod.db.lastBroadcast[channel] = h
+        MC.Comms:Send("u", fullPayload, channel)
+        if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
+            MC.Comms:BroadcastBNet("u", fullPayload)
+        end
+    end
 
-    MC.Comms:Send("u", fullPayload, channel)
+    -- v2: also broadcast the per-item bitmap. Skipped if disabled or if
+    -- the bitmap module didn't initialize (no PLAYER_LOGIN yet).
+    if mod.db.shareItems and MC.Bitmap and MC.Bitmap.fingerprint then
+        local bmp = MC.Bitmap:Build()
+        if bmp then
+            local bmpPayload = MC.Bitmap.fingerprint .. "|" .. bmp
+            local bh = cheapHash(bmpPayload)
+            if mod.db.lastBitmap[channel] ~= bh then
+                mod.db.lastBitmap[channel] = bh
+                MC.Comms:Send("b", bmpPayload, channel)
+                if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
+                    MC.Comms:BroadcastBNet("b", bmpPayload)
+                end
+            end
+        end
+    end
 end
 
 -- Force-broadcast (used by /mc roster announce). Skips the unchanged check.
@@ -184,9 +207,37 @@ local function OnRequestReceived(_, sender)
     MC.RosterForceBroadcast("GUILD")
 end
 
+local function OnBitmapReceived(payload, sender)
+    if not (MC.RosterDB and MC.Bitmap) then return end
+    local fp, bmp = strsplit("|", payload, 2)
+    if not (fp and bmp) then return end
+    -- Drop bitmaps from peers whose bit-layout doesn't match ours: their
+    -- IDs would land at different bit positions and we'd report wrong
+    -- ownership. They'll see the same and silently ignore ours.
+    if fp ~= MC.Bitmap.fingerprint then return end
+    local owned = MC.Bitmap:Decode(bmp)
+    if not owned then return end
+
+    -- Discard own echo
+    local me = UnitName("player")
+    local meRealm = GetRealmName():gsub("%s+", "")
+    if sender == (me .. "-" .. meRealm) or sender == me then return end
+
+    local rec = MC.RosterDB[sender] or {}
+    rec.bitmap = { fingerprint = fp, owned = owned, when = time() }
+    rec.lastSeen = time()
+    MC.RosterDB[sender] = rec
+end
+
 if MC.Comms then
+    -- GUILD channel
     MC.Comms:RegisterPrefix("GUILD", "u", OnUpdateReceived)
     MC.Comms:RegisterPrefix("GUILD", "r", OnRequestReceived)
+    MC.Comms:RegisterPrefix("GUILD", "b", OnBitmapReceived)
+    -- BNET friends — same handlers, just routed from BNet
+    MC.Comms:RegisterPrefix("BNET", "u", OnUpdateReceived)
+    MC.Comms:RegisterPrefix("BNET", "r", OnRequestReceived)
+    MC.Comms:RegisterPrefix("BNET", "b", OnBitmapReceived)
 end
 
 --------------------------------------------------------------------------

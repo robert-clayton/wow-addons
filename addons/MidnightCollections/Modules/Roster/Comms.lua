@@ -12,11 +12,12 @@ local _, MC = ...
 -- prefix ("MC") and dispatch by sub-prefix ourselves.
 --------------------------------------------------------------------------
 
-local PROTO_VERSION = 1
+local PROTO_VERSION = 2
 local PREFIX = "MC"
 
--- Highest proto version this client speaks. Bumps with v2.
-local MAX_PROTO = 1
+-- Highest proto version this client speaks. v1 was counts-only; v2
+-- adds the bitmap subprefix and BNET friend routing.
+local MAX_PROTO = 2
 
 -- Throttle: 0.3s default with ±0.03s jitter so peers don't all try to
 -- send on the same boundary tick. 1s during raid encounters.
@@ -52,8 +53,6 @@ function Comms:Send(sub, payload, channel, target)
     if (channel == "PARTY" or channel == "RAID") and not IsInGroup() then return end
 
     local body = format("%s|%d|%s|%s", PREFIX, PROTO_VERSION, sub, payload or "")
-    -- Stay under WoW's 255-byte addon-message ceiling. If a message is too
-    -- big, drop it and log; v2's bitmap path will chunk explicitly.
     if #body > 250 then
         print(format("|cffff8888[MC]|r Dropping oversize comms message (%d bytes): %s", #body, sub))
         return
@@ -64,6 +63,38 @@ function Comms:Send(sub, payload, channel, target)
         channel = channel or "GUILD",
         target  = target,
     }
+    self.frame:Show()
+end
+
+--------------------------------------------------------------------------
+-- BNet friend broadcast. Walks the friend list, looks up each WoW
+-- account, and queues a BNSendGameData message per online WoW friend.
+--------------------------------------------------------------------------
+function Comms:BroadcastBNet(sub, payload)
+    if self.encounterPause then return end
+    if not (BNGetNumFriends and BNSendGameData and BNConnected) then return end
+    if not BNConnected() then return end
+
+    local body = format("%s|%d|%s|%s", PREFIX, PROTO_VERSION, sub, payload or "")
+    if #body > 250 then
+        print(format("|cffff8888[MC]|r Dropping oversize BNET message (%d bytes): %s", #body, sub))
+        return
+    end
+
+    local total = BNGetNumFriends()
+    for i = 1, total do
+        local accountInfo = C_BattleNet and C_BattleNet.GetFriendAccountInfo
+                            and C_BattleNet.GetFriendAccountInfo(i)
+        if accountInfo and accountInfo.gameAccountInfo
+           and accountInfo.gameAccountInfo.clientProgram == "WoW"
+           and accountInfo.gameAccountInfo.isOnline then
+            self.queue[#self.queue + 1] = {
+                body    = body,
+                channel = "BNET",
+                target  = accountInfo.gameAccountInfo.gameAccountID,
+            }
+        end
+    end
     self.frame:Show()
 end
 
@@ -92,7 +123,11 @@ Comms.frame:SetScript("OnUpdate", function(self, dt)
     if msg.channel == "GUILD" and not IsInGuild() then return end
     if (msg.channel == "PARTY" or msg.channel == "RAID") and not IsInGroup() then return end
 
-    if C_ChatInfo and C_ChatInfo.SendAddonMessage then
+    if msg.channel == "BNET" then
+        if BNSendGameData and msg.target then
+            BNSendGameData(msg.target, PREFIX, msg.body)
+        end
+    elseif C_ChatInfo and C_ChatInfo.SendAddonMessage then
         C_ChatInfo.SendAddonMessage(PREFIX, msg.body, msg.channel, msg.target)
     end
 end)
@@ -120,6 +155,7 @@ end
 
 local listener = CreateFrame("Frame", "MidnightCollectionsCommsListener")
 listener:RegisterEvent("CHAT_MSG_ADDON")
+listener:RegisterEvent("BN_CHAT_MSG_ADDON")
 listener:RegisterEvent("ENCOUNTER_START")
 listener:RegisterEvent("ENCOUNTER_END")
 listener:SetScript("OnEvent", function(_, event, ...)
@@ -127,6 +163,20 @@ listener:SetScript("OnEvent", function(_, event, ...)
         local prefix, body, channel, sender = ...
         if prefix ~= PREFIX then return end
         dispatch(channel, body, sender)
+    elseif event == "BN_CHAT_MSG_ADDON" then
+        -- BN_CHAT_MSG_ADDON args: prefix, body, _, presenceID/gameAccID
+        local prefix, body, _, gameAccountID = ...
+        if prefix ~= PREFIX then return end
+        -- Resolve to a Name-Realm string the same way GUILD messages come
+        -- in, so receivers don't need to know the message came over BNET.
+        local sender = "BNet"
+        if C_BattleNet and C_BattleNet.GetGameAccountInfoByID then
+            local info = C_BattleNet.GetGameAccountInfoByID(gameAccountID)
+            if info and info.characterName then
+                sender = info.characterName .. "-" .. (info.realmName or ""):gsub("%s+", "")
+            end
+        end
+        dispatch("BNET", body, sender)
     elseif event == "ENCOUNTER_START" then
         Comms.encounterPause = true
     elseif event == "ENCOUNTER_END" then
