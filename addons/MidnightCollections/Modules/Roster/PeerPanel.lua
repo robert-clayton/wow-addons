@@ -15,8 +15,23 @@ local COLUMN_WIDTH    = 220
 local COLUMN_GAP      = 12
 local TITLE_BAR_H     = 24
 local CONTENT_TOP_PAD = 12
-local FOOTER_H        = 24
+local BOTTOM_PAD      = 14
 local SIDE_PAD        = 14
+
+-- Progress-bar fill colour: full red at 0% -> yellow at 50% -> full
+-- green at 100%, with a smooth lerp between stops.
+local function progressColor(pct)
+    pct = math.max(0, math.min(1, pct or 0))
+    local r, g, b
+    if pct < 0.5 then
+        local t = pct * 2  -- 0..1 across the first half
+        r, g, b = 1, t, 0
+    else
+        local t = (pct - 0.5) * 2  -- 0..1 across the second half
+        r, g, b = 1 - t, 1, 0
+    end
+    return r, g, b
+end
 
 local MOD_DISPLAY_ORDER = { "mounts", "pets", "toys", "decorations", "recipes", "rares", "treasures" }
 local MOD_LABELS = {
@@ -119,14 +134,6 @@ local function build()
 
     tinsert(UISpecialFrames, "MidnightCollectionsPeerPanel")
 
-    -- Footer
-    f.footer = f:CreateFontString(nil, "OVERLAY")
-    f.footer:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 10, "")
-    f.footer:SetPoint("BOTTOMLEFT", SIDE_PAD, 12)
-    f.footer:SetPoint("BOTTOMRIGHT", -SIDE_PAD, 12)
-    f.footer:SetJustifyH("LEFT")
-    if theme then f.footer:SetTextColor(unpack(theme.colors.textDim)) end
-
     f.columns = {}
 
     FRAME = f
@@ -183,7 +190,8 @@ local function acquireRow(col, key, yOff)
         local fill = row.frame:CreateTexture(nil, "OVERLAY")
         fill:SetHeight(2)
         fill:SetPoint("BOTTOMLEFT", row.frame, "BOTTOMLEFT", 0, 0)
-        if theme then fill:SetColorTexture(unpack(theme.colors.progress)) end
+        -- Initial colour is set per-render via progressColor based on
+        -- the current pct; nothing to do at create time.
         row.barFill = fill
         col.rows[key] = row
     end
@@ -225,6 +233,7 @@ local function renderColumn(col, entry)
             local pct = c.total > 0 and (c.collected / c.total) or 0
             local rowW = COLUMN_WIDTH - 8
             row.barFill:SetWidth(math.max(2, rowW * pct))
+            row.barFill:SetColorTexture(progressColor(pct))
             yOff = yOff - 22
         end
     end
@@ -264,21 +273,13 @@ local function rerender(f)
     -- Resize the frame
     local totalW = SIDE_PAD * 2 + n * COLUMN_WIDTH + math.max(0, n - 1) * COLUMN_GAP
     f:SetWidth(totalW)
-    local totalH = TITLE_BAR_H + CONTENT_TOP_PAD + maxContentH + FOOTER_H + 12
+    local totalH = TITLE_BAR_H + CONTENT_TOP_PAD + maxContentH + BOTTOM_PAD
     f:SetHeight(math.max(totalH, 160))
 
-    -- Title
-    if n == 1 then
-        f.title:SetText("Comparing 1 character")
-    else
-        f.title:SetText(format("Comparing %d characters", n))
-    end
+    f.title:SetText("Collection Inspector")
     if MUI and MUI.Theme then
         f.title:SetTextColor(unpack(MUI.Theme.colors.title))
     end
-
-    -- Footer hint reminds the player how to add/remove
-    f.footer:SetText("Click another row to add it · click again to remove")
 end
 
 --------------------------------------------------------------------------

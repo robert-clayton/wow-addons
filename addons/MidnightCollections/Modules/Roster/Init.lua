@@ -34,10 +34,9 @@ local mod = MC.RegisterModule("roster", {
         -- guild member list current for "who's online" rendering.
     end,
     onLogin = function(m)
-        -- One-time cleanup of bad keys from earlier 1.6.x builds, where
-        -- a failed BNet sender resolution stored entries under literal
-        -- "BNet" instead of the friend's Name-Realm. Drop anything that
-        -- doesn't look like a Name-Realm so the Roster tab is clean.
+        -- Cleanup runs regardless of the module's enabled state so a user
+        -- who had the module on briefly and then disabled it still ends up
+        -- with a clean RosterDB.
         if MC.RosterDB then
             for k in pairs(MC.RosterDB) do
                 if type(k) ~= "string" or not k:find("-", 1, true) then
@@ -45,6 +44,12 @@ local mod = MC.RegisterModule("roster", {
                 end
             end
         end
+
+        -- Skip the broadcast if Roster is disabled. The non-Roster
+        -- modules' onLogin runs unconditionally so their counts populate
+        -- the Me row, but the comms half of Roster only fires when
+        -- Roster itself is enabled.
+        if not MC.IsModuleEnabled("roster") then return end
 
         -- Stagger the initial broadcast so we don't fight for addon
         -- bandwidth with every other addon's login chatter.

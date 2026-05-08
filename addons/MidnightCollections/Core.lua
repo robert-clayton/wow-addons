@@ -1088,16 +1088,27 @@ frame:SetScript("OnEvent", function(_, event, ...)
         end
         MC._RebuildEventMap()
 
+        -- Run onLogin for every module, not just enabled ones. Some modules
+        -- have init logic (Recipes' DetectProfessions, Pets' wild-species
+        -- lookup) that the Scanner needs even when the module is disabled,
+        -- so the Me row in Roster + the broadcast payload have its counts
+        -- available. Roster's onLogin self-gates its broadcast on
+        -- IsModuleEnabled internally.
         for _, mod in ipairs(MC.modules) do
-            if MC.IsModuleEnabled(mod.key) and mod.opts.onLogin then
+            if mod.opts.onLogin then
                 mod.opts.onLogin(mod)
             end
         end
         -- C_PetJournal/C_MountJournal aren't fully populated at PLAYER_LOGIN,
-        -- so the first scan is deferred a couple of seconds.
+        -- so the first scan is deferred a couple of seconds. Scan every
+        -- module regardless of enabled state — disabling a module hides its
+        -- tab but its counts should still be available for the Me row in
+        -- Roster + the Roster broadcast payload. Per-event live updates
+        -- still respect IsModuleEnabled (see ThrottledScan), so disabled
+        -- modules just keep their PLAYER_LOGIN snapshot.
         C_Timer.After(2, function()
             for _, mod in ipairs(MC.modules) do
-                if MC.IsModuleEnabled(mod.key) and mod.Scanner then
+                if mod.Scanner then
                     pcall(mod.Scanner.Scan, mod.Scanner)
                 end
             end
