@@ -20,6 +20,21 @@ MC.LOC = {
     Camberon           = { MC.MAP.Silvermoon, 0.470, 0.518, "Camberon, Silvermoon City" },
     CamberonsCauldron  = { MC.MAP.Silvermoon, 0.470, 0.520, "Camberon's Cauldron, Silvermoon City" },
     Lyna               = { MC.MAP.Silvermoon, 0.478, 0.534, "Lyna, Silvermoon City" },
+    -- Saltheril's Haven sub-faction vendors (Brimming Arcana). Ranger Allorn
+    -- is the Farstriders quartermaster; same coord cluster as Apprentice Diell
+    -- and Caeris Fairdawn (all in Saltheril's Haven, Eversong).
+    RangerAllorn       = { MC.MAP.Eversong, 0.434, 0.474, "Ranger Allorn, Saltheril's Haven" },
+    -- Silvermoon Bazaar leatherworking supply vendor (sells the Sin'dorei
+    -- and Thalassian profession-equipment patterns). Approximated to the
+    -- Bazaar cluster around Lyrendal/Lyna; precise spot may vary.
+    Zaralda            = { MC.MAP.Silvermoon, 0.476, 0.545, "Zaralda, Silvermoon Bazaar" },
+    -- Hesta Forlath sells the Artistic Aid endeavor paintings (1,500g each).
+    -- Requires Deed of Patronage prerequisite before purchase.
+    HestaForlath       = { MC.MAP.Silvermoon, 0.4408, 0.6258, "Hesta Forlath, Silvermoon Bazaar" },
+    -- Materialist Ophinell — Twilight Ascension pre-patch event vendor. Lives
+    -- at Elven Resistance Camp in Twilight Highlands (uiMapID 241, outside
+    -- the Midnight portal table — waypoint drops directly without routing).
+    MaterialistOphinell = { 241, 0.496, 0.812, "Materialist Ophinell, Twilight Highlands" },
 
     -- 12.0.5 NPCs
     SergeantVornin           = { MC.MAP.Silvermoon, 0.486, 0.506, "Sergeant Vornin, Silvermoon City" },

@@ -222,7 +222,8 @@ MC.ToyData = {
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } } },
             -- Twilight Ascension (pre-patch event, Resonance Crystals 3008)
             { itemID = 249468, name = "Twilight's Blade Top Secret Strategy Training Guide", source = "vendor",
-              sourceInfo = "Materialist Ophinell - 30 Resonance Crystals (pre-patch event)",
+              sourceInfo = "Materialist Ophinell - 30 Resonance Crystals (pre-patch event; Twilight Highlands)",
+              waypoint = LOC.MaterialistOphinell,
               cost = { currency = { MC.CURRENCY.ResonanceCrystals, 30 } } },
         },
     },
