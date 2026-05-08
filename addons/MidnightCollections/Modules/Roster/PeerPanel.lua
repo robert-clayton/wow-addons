@@ -1,14 +1,22 @@
 local _, MC = ...
 
 --------------------------------------------------------------------------
--- Peer detail popup. Clicking a guildie/friend in the Roster opens this
--- in a separate sticky frame rather than overriding the main MC panel.
--- Single shared frame; subsequent clicks repopulate it.
+-- Peer detail popup. Clicking a Roster row toggles that peer in/out of
+-- the popup. Multiple peers are rendered as side-by-side columns for
+-- direct comparison. Empty selection -> popup hides itself.
 --------------------------------------------------------------------------
 
 local MUI = LibStub("MidnightUI-1.0", true)
 
 local FRAME
+local activePeers = {}  -- ordered list of Name-Realm keys currently shown
+
+local COLUMN_WIDTH    = 220
+local COLUMN_GAP      = 12
+local TITLE_BAR_H     = 24
+local CONTENT_TOP_PAD = 12
+local FOOTER_H        = 24
+local SIDE_PAD        = 14
 
 local MOD_DISPLAY_ORDER = { "mounts", "pets", "toys", "decorations", "recipes", "rares", "treasures" }
 local MOD_LABELS = {
@@ -31,10 +39,6 @@ local function nameOnly(fullName)
     return (fullName or ""):match("^([^%-]+)") or fullName or "?"
 end
 
-local function realmOnly(fullName)
-    return (fullName or ""):match("^[^%-]+%-(.+)$") or ""
-end
-
 local function relTime(ts)
     if not ts then return "" end
     local dt = time() - ts
@@ -44,8 +48,22 @@ local function relTime(ts)
     return math.floor(dt / 86400) .. "d ago"
 end
 
+local function indexOf(t, v)
+    for i, x in ipairs(t) do if x == v then return i end end
+end
+
+-- Special-case "me" so the local player can be added to the popup.
+local function getEntry(name)
+    if not name then return nil end
+    if MC.GetMeRosterEntry then
+        local me = MC.GetMeRosterEntry()
+        if me and me.name == name then return me end
+    end
+    return MC.RosterDB and MC.RosterDB[name]
+end
+
 --------------------------------------------------------------------------
--- Build the frame on first show, reuse afterward.
+-- Frame construction (one-shot).
 --------------------------------------------------------------------------
 local function build()
     if FRAME then return FRAME end
@@ -54,7 +72,7 @@ local function build()
 
     local f = CreateFrame("Frame", "MidnightCollectionsPeerPanel", UIParent, "BackdropTemplate")
     f:SetFrameStrata("DIALOG")
-    f:SetSize(320, 320)
+    f:SetSize(COLUMN_WIDTH + SIDE_PAD * 2, 320)
     f:SetPoint("CENTER")
     f:SetMovable(true)
     f:EnableMouse(true)
@@ -72,7 +90,7 @@ local function build()
 
     -- Title bar
     local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    bar:SetHeight(24)
+    bar:SetHeight(TITLE_BAR_H)
     bar:SetPoint("TOPLEFT")
     bar:SetPoint("TOPRIGHT")
     if theme and theme.backdrop then
@@ -80,17 +98,12 @@ local function build()
         bar:SetBackdropColor(unpack(theme.colors.titlebar))
         bar:SetBackdropBorderColor(unpack(theme.colors.titleBorder))
     end
+    f.titleBar = bar
 
     f.title = bar:CreateFontString(nil, "OVERLAY")
-    f.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 13, "OUTLINE")
+    f.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 12, "OUTLINE")
     f.title:SetPoint("LEFT", 10, 0)
 
-    f.subtitle = bar:CreateFontString(nil, "OVERLAY")
-    f.subtitle:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 10, "OUTLINE")
-    f.subtitle:SetPoint("LEFT", f.title, "RIGHT", 8, -1)
-    if theme then f.subtitle:SetTextColor(unpack(theme.colors.textDim)) end
-
-    -- Close button (uses the existing MUI helper to match the panel style)
     if MUI and MUI.MakeHeaderBtn then
         local close = MUI.MakeHeaderBtn(bar, "x",
             theme.colors.btnCloseFg,
@@ -98,36 +111,61 @@ local function build()
             theme.colors.btnCloseHoverBd,
             "Close")
         close:SetPoint("RIGHT", -4, 0)
-        close:SetScript("OnClick", function() f:Hide() end)
+        close:SetScript("OnClick", function()
+            wipe(activePeers)
+            f:Hide()
+        end)
     end
 
-    -- ESC closes the popup
     tinsert(UISpecialFrames, "MidnightCollectionsPeerPanel")
-
-    -- Module rows are created lazily into f.rows[modKey]
-    f.rows = {}
 
     -- Footer
     f.footer = f:CreateFontString(nil, "OVERLAY")
     f.footer:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 10, "")
-    f.footer:SetPoint("BOTTOMLEFT", 14, 12)
-    f.footer:SetPoint("BOTTOMRIGHT", -14, 12)
+    f.footer:SetPoint("BOTTOMLEFT", SIDE_PAD, 12)
+    f.footer:SetPoint("BOTTOMRIGHT", -SIDE_PAD, 12)
     f.footer:SetJustifyH("LEFT")
     if theme then f.footer:SetTextColor(unpack(theme.colors.textDim)) end
+
+    f.columns = {}
 
     FRAME = f
     return f
 end
 
 --------------------------------------------------------------------------
--- Lazy-create or reuse a row for a given module key.
+-- Per-column factory + render.
 --------------------------------------------------------------------------
-local function acquireRow(f, key, yOff)
+local function acquireColumn(f, idx)
     local theme = MUI and MUI.Theme
-    local row = f.rows[key]
+    local col = f.columns[idx]
+    if not col then
+        col = {}
+        col.frame = CreateFrame("Frame", nil, f)
+        col.title = col.frame:CreateFontString(nil, "OVERLAY")
+        col.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 12, "OUTLINE")
+        col.title:SetPoint("TOPLEFT", col.frame, "TOPLEFT", 0, 0)
+        col.title:SetJustifyH("LEFT")
+        col.subtitle = col.frame:CreateFontString(nil, "OVERLAY")
+        col.subtitle:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 9, "OUTLINE")
+        col.subtitle:SetPoint("TOPLEFT", col.title, "BOTTOMLEFT", 0, -2)
+        col.subtitle:SetJustifyH("LEFT")
+        if theme then col.subtitle:SetTextColor(unpack(theme.colors.textDim)) end
+        col.rows = {}
+        f.columns[idx] = col
+    end
+    col.frame:Show()
+    col.title:Show()
+    col.subtitle:Show()
+    return col
+end
+
+local function acquireRow(col, key, yOff)
+    local theme = MUI and MUI.Theme
+    local row = col.rows[key]
     if not row then
         row = {}
-        row.frame = CreateFrame("Frame", nil, f)
+        row.frame = CreateFrame("Frame", nil, col.frame)
         row.frame:SetHeight(20)
         row.label = row.frame:CreateFontString(nil, "OVERLAY")
         row.label:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
@@ -136,7 +174,6 @@ local function acquireRow(f, key, yOff)
         row.value:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
         row.value:SetPoint("RIGHT", row.frame, "RIGHT", 0, 0)
         row.value:SetJustifyH("RIGHT")
-        -- Thin progress bar background
         local bg = row.frame:CreateTexture(nil, "ARTWORK")
         bg:SetHeight(2)
         bg:SetPoint("BOTTOMLEFT", row.frame, "BOTTOMLEFT", 0, 0)
@@ -148,11 +185,11 @@ local function acquireRow(f, key, yOff)
         fill:SetPoint("BOTTOMLEFT", row.frame, "BOTTOMLEFT", 0, 0)
         if theme then fill:SetColorTexture(unpack(theme.colors.progress)) end
         row.barFill = fill
-        f.rows[key] = row
+        col.rows[key] = row
     end
     row.frame:ClearAllPoints()
-    row.frame:SetPoint("TOPLEFT", f, "TOPLEFT", 14, yOff)
-    row.frame:SetPoint("TOPRIGHT", f, "TOPRIGHT", -14, yOff)
+    row.frame:SetPoint("TOPLEFT", col.frame, "TOPLEFT", 0, yOff)
+    row.frame:SetPoint("TOPRIGHT", col.frame, "TOPRIGHT", 0, yOff)
     row.frame:Show()
     row.label:Show()
     row.value:Show()
@@ -160,75 +197,116 @@ local function acquireRow(f, key, yOff)
     return row
 end
 
-local function hideRow(f, key)
-    local row = f.rows[key]
-    if not row then return end
-    row.frame:Hide()
+local function hideAllRows(col)
+    for _, row in pairs(col.rows) do row.frame:Hide() end
 end
 
---------------------------------------------------------------------------
--- Show: takes a peer-name key from MC.RosterDB and renders the popup.
---------------------------------------------------------------------------
-function MC.ShowPeerPanel(peerName)
-    if not peerName then return end
-    if not (MC.RosterDB and MC.RosterDB[peerName]) then return end
-    local entry = MC.RosterDB[peerName]
-    local f = build()
-
+local function renderColumn(col, entry)
+    local theme = MUI.Theme
     local r, g, b = classRGB(entry.class)
-    f.title:SetText(nameOnly(peerName))
-    f.title:SetTextColor(r, g, b)
-    local realm = realmOnly(peerName)
-    f.subtitle:SetText(realm ~= "" and ("- " .. realm) or "")
+    col.title:SetText(nameOnly(entry.name) .. (entry.isMe and " |cff888888(You)|r" or ""))
+    col.title:SetTextColor(r, g, b)
+    local seen = relTime(entry.lastSeen)
+    local ver  = entry.version and ("v" .. entry.version) or ""
+    local sep  = (seen ~= "" and ver ~= "") and "  ·  " or ""
+    col.subtitle:SetText(seen .. sep .. ver)
 
-    -- Render per-module rows
+    hideAllRows(col)
     local yOff = -36
     for _, key in ipairs(MOD_DISPLAY_ORDER) do
         local c = entry.counts and entry.counts[key]
         if c then
-            local row = acquireRow(f, key, yOff)
+            local row = acquireRow(col, key, yOff)
             row.label:SetText(MOD_LABELS[key])
-            local cr, cg, cb = MUI.CountColor(c.collected, c.total)
             row.label:SetTextColor(0.85, 0.85, 0.85)
+            local cr, cg, cb = MUI.CountColor(c.collected, c.total)
             row.value:SetTextColor(cr, cg, cb)
             row.value:SetText(format("%d / %d", c.collected, c.total))
             local pct = c.total > 0 and (c.collected / c.total) or 0
-            local rowW = f:GetWidth() - 28
+            local rowW = COLUMN_WIDTH - 8
             row.barFill:SetWidth(math.max(2, rowW * pct))
             yOff = yOff - 22
-        else
-            hideRow(f, key)
         end
     end
-    -- Hide any rows for keys that aren't in this peer's data
-    for key in pairs(f.rows) do
-        local hasIt = false
-        for _, k in ipairs(MOD_DISPLAY_ORDER) do
-            if k == key and entry.counts and entry.counts[key] then
-                hasIt = true
-                break
-            end
-        end
-        if not hasIt then hideRow(f, key) end
+    return -yOff
+end
+
+--------------------------------------------------------------------------
+-- Re-render the popup based on the current activePeers list.
+--------------------------------------------------------------------------
+local function rerender(f)
+    -- Hide all columns first; we'll show only the ones we render.
+    for _, col in ipairs(f.columns) do
+        col.frame:Hide()
+        col.title:Hide()
+        col.subtitle:Hide()
+        for _, row in pairs(col.rows) do row.frame:Hide() end
     end
 
-    -- Resize the frame to fit content + footer
-    local contentH = math.abs(yOff) + 32
-    f:SetHeight(math.max(contentH, 160))
+    local n = #activePeers
+    if n == 0 then return end
 
-    -- Footer: last seen + version
-    local seen = relTime(entry.lastSeen)
-    local ver  = entry.version and ("v" .. entry.version) or ""
-    local sep  = (seen ~= "" and ver ~= "") and "  ·  " or ""
-    f.footer:SetText("Last seen: " .. seen .. sep .. ver)
+    local maxContentH = 0
+    for i = 1, n do
+        local entry = getEntry(activePeers[i])
+        if entry then
+            local col = acquireColumn(f, i)
+            col.frame:ClearAllPoints()
+            col.frame:SetPoint("TOPLEFT", f, "TOPLEFT",
+                SIDE_PAD + (i - 1) * (COLUMN_WIDTH + COLUMN_GAP),
+                -TITLE_BAR_H - CONTENT_TOP_PAD)
+            col.frame:SetSize(COLUMN_WIDTH, 1)
+            local h = renderColumn(col, entry)
+            if h > maxContentH then maxContentH = h end
+        end
+    end
 
+    -- Resize the frame
+    local totalW = SIDE_PAD * 2 + n * COLUMN_WIDTH + math.max(0, n - 1) * COLUMN_GAP
+    f:SetWidth(totalW)
+    local totalH = TITLE_BAR_H + CONTENT_TOP_PAD + maxContentH + FOOTER_H + 12
+    f:SetHeight(math.max(totalH, 160))
+
+    -- Title
+    if n == 1 then
+        f.title:SetText("Comparing 1 character")
+    else
+        f.title:SetText(format("Comparing %d characters", n))
+    end
+    if MUI and MUI.Theme then
+        f.title:SetTextColor(unpack(MUI.Theme.colors.title))
+    end
+
+    -- Footer hint reminds the player how to add/remove
+    f.footer:SetText("Click another row to add it · click again to remove")
+end
+
+--------------------------------------------------------------------------
+-- Public API: toggle a peer in/out of the comparison popup.
+--------------------------------------------------------------------------
+function MC.ShowPeerPanel(peerName)
+    if not peerName then return end
+    if not getEntry(peerName) then return end
+
+    local idx = indexOf(activePeers, peerName)
+    if idx then
+        table.remove(activePeers, idx)
+    else
+        table.insert(activePeers, peerName)
+    end
+
+    if #activePeers == 0 then
+        if FRAME then FRAME:Hide() end
+        return
+    end
+
+    local f = build()
+    rerender(f)
     f:Show()
     f:Raise()
 end
 
---------------------------------------------------------------------------
--- Convenience: hide/refresh hooks for reuse.
---------------------------------------------------------------------------
 function MC.HidePeerPanel()
+    wipe(activePeers)
     if FRAME then FRAME:Hide() end
 end

@@ -59,28 +59,47 @@ function UI:GetConfigDefs()
 end
 
 --------------------------------------------------------------------------
--- Sort the roster into a stable display order: total collected (desc),
--- then alphabetical.
+-- Sort the roster into a stable display order: "Me" always first, then
+-- peers sorted by total collected (desc), then alphabetical.
 --------------------------------------------------------------------------
 local function buildSortedList()
     local list = {}
-    if not MC.RosterDB then return list end
-    for name, rec in pairs(MC.RosterDB) do
-        local got, total = totalCounts(rec.counts)
-        list[#list + 1] = {
-            name     = name,
-            class    = rec.class,
-            version  = rec.version,
-            counts   = rec.counts,
-            lastSeen = rec.lastSeen,
-            got      = got,
-            total    = total,
-        }
+    if MC.RosterDB then
+        for name, rec in pairs(MC.RosterDB) do
+            local got, total = totalCounts(rec.counts)
+            list[#list + 1] = {
+                name     = name,
+                class    = rec.class,
+                version  = rec.version,
+                counts   = rec.counts,
+                lastSeen = rec.lastSeen,
+                got      = got,
+                total    = total,
+            }
+        end
     end
     table.sort(list, function(a, b)
         if a.got ~= b.got then return a.got > b.got end
         return (a.name or "") < (b.name or "")
     end)
+    -- Prepend "Me" — local player's own progression, always visible at
+    -- the top regardless of guild/share state.
+    if MC.GetMeRosterEntry then
+        local me = MC.GetMeRosterEntry()
+        if me then
+            local got, total = totalCounts(me.counts)
+            table.insert(list, 1, {
+                name     = me.name,
+                class    = me.class,
+                version  = me.version,
+                counts   = me.counts,
+                lastSeen = me.lastSeen,
+                got      = got,
+                total    = total,
+                isMe     = true,
+            })
+        end
+    end
     return list
 end
 
@@ -139,16 +158,12 @@ function UI:Refresh()
 
     local list = buildSortedList()
 
+    -- "Me" is always first when GetMeRosterEntry is available, so an empty
+    -- list means we couldn't even build a local entry. Render the empty
+    -- message and bail.
     if #list == 0 then
-        local msg
-        if not IsInGuild() then
-            msg = "Not in a guild — Roster needs guild membership to broadcast."
-        elseif not (mod.db and mod.db.share) then
-            msg = "Roster sharing is OFF. Enable in options or run /mc roster on."
-        else
-            msg = "No guildies seen yet. Try /mc roster sync to request updates."
-        end
-        yOff = MUI.ShowEmptyMessage(child, msg)
+        yOff = MUI.ShowEmptyMessage(child,
+            "Roster module not yet initialized. Try /reload.")
         if self.panel.titleProgressText then
             self.panel.titleProgressText:SetText("")
         end
@@ -158,15 +173,50 @@ function UI:Refresh()
         MUI.HideEmptyMessage(child)
     end
 
-    -- Title bar shows "N peers" so the player has a quick read on how
-    -- much of the guild is running the addon.
+    -- Count peers (everyone except Me) for the title and the empty hint.
+    local peerCount = 0
+    for _, e in ipairs(list) do
+        if not e.isMe then peerCount = peerCount + 1 end
+    end
+
     if self.panel.titleProgressText then
         self.panel.titleProgressText:SetText(format("%d peer%s",
-            #list, #list == 1 and "" or "s"))
+            peerCount, peerCount == 1 and "" or "s"))
     end
 
     for _, entry in ipairs(list) do
         yOff = self:RenderRow(child, entry, yOff)
+    end
+
+    -- If only Me is showing, surface a small hint below explaining what
+    -- to do — same idea as the old empty-state message but shown beneath
+    -- the Me row instead of replacing it.
+    if peerCount == 0 then
+        local hint
+        if not IsInGuild() then
+            hint = "Not in a guild — Roster needs guild membership to see others."
+        elseif not (mod.db and mod.db.share) then
+            hint = "Sharing is OFF. Enable in options or run /mc roster on."
+        else
+            hint = "No guildies seen yet. Try /mc roster sync to request updates."
+        end
+        yOff = yOff - 8
+        local theme = MUI.Theme
+        local fs = MUI.GetOrCreate(child, "rosterEmptyHint", function(p)
+            local f = p:CreateFontString(nil, "OVERLAY")
+            f:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
+            return f
+        end)
+        fs:ClearAllPoints()
+        fs:SetPoint("TOPLEFT", child, "TOPLEFT", 14, yOff)
+        fs:SetPoint("TOPRIGHT", child, "TOPRIGHT", -14, yOff)
+        fs:SetJustifyH("LEFT")
+        fs:SetText(hint)
+        fs:SetTextColor(unpack(theme.colors.textDim))
+        fs:Show()
+        yOff = yOff - 24
+    elseif child._children and child._children.rosterEmptyHint then
+        child._children.rosterEmptyHint:Hide()
     end
 
     self.panel:RefreshScrollContent(yOff)
@@ -175,12 +225,14 @@ end
 function UI:RenderRow(parent, entry, yOff)
     local r, g, b = classRGB(entry.class)
     local info = format("%d / %d", entry.got, entry.total)
+    local label = nameOnly(entry.name)
+    if entry.isMe then label = label .. " |cff888888(You)|r" end
 
     return MUI.RenderItemRow(self.panel.pool, parent, yOff, {
         height  = ROW_HEIGHT,
         indent  = 8,
         leading = { kind = "dot", size = 6, color = { r, g, b } },
-        name    = nameOnly(entry.name),
+        name    = label,
         info    = info,
         onEnter = function(row)
             UI:ShowPeerTooltip(row, entry)

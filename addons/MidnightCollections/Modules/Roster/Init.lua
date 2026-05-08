@@ -66,16 +66,16 @@ local WIRE_KEY = {
     treasures   = "x",
 }
 
--- Build the count-summary payload from current scanner results.
-local function BuildPayload()
-    local parts = {}
+-- Walk the scanners and produce a per-module {collected, total} table.
+-- Used both for the wire payload (BuildPayload) and for rendering the
+-- "Me" row/column in the Roster tab and PeerPanel.
+local function BuildLocalCounts()
+    local counts = {}
     for _, m in ipairs(MC.modules) do
-        local code = WIRE_KEY[m.key]
-        local r    = m.Scanner and m.Scanner.results
-        if code and r and r.total and r.total > 0 then
-            -- Recipes' results table is keyed by skill-line, not flat.
-            -- Aggregate it.
+        local r = m.Scanner and m.Scanner.results
+        if WIRE_KEY[m.key] and r and r.total and r.total > 0 then
             if m.key == "recipes" then
+                -- Recipes' results table is keyed by skill-line.
                 local learned, total = 0, 0
                 for _, sub in pairs(r) do
                     if type(sub) == "table" and sub.total then
@@ -84,15 +84,47 @@ local function BuildPayload()
                     end
                 end
                 if total > 0 then
-                    parts[#parts + 1] = format("%s:%d/%d", code, learned, total)
+                    counts[m.key] = { collected = learned, total = total }
                 end
             else
-                parts[#parts + 1] = format("%s:%d/%d", code,
-                    r.collectedCount or 0, r.total)
+                counts[m.key] = {
+                    collected = r.collectedCount or 0,
+                    total     = r.total,
+                }
             end
         end
     end
+    return counts
+end
+
+-- Build the count-summary payload from current scanner results.
+local function BuildPayload()
+    local counts = BuildLocalCounts()
+    local parts = {}
+    for _, m in ipairs(MC.modules) do
+        local c = counts[m.key]
+        if c then
+            parts[#parts + 1] = format("%s:%d/%d", WIRE_KEY[m.key], c.collected, c.total)
+        end
+    end
     return table.concat(parts, ",")
+end
+
+-- Roster-shaped entry for the local player, suitable for rendering by
+-- the Roster UI and PeerPanel. Mirrors the per-peer record shape so
+-- consumers can use a single code path.
+function MC.GetMeRosterEntry()
+    local _, classToken = UnitClass("player")
+    local me = UnitName("player")
+    local meRealm = (GetRealmName() or ""):gsub("%s+", "")
+    return {
+        name     = me .. "-" .. meRealm,
+        class    = classToken or "UNKNOWN",
+        version  = MC.version,
+        counts   = BuildLocalCounts(),
+        lastSeen = time(),
+        isMe     = true,
+    }
 end
 
 local function GetClassToken()
