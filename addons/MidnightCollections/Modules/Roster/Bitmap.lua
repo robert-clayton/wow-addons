@@ -39,40 +39,49 @@ local MODULE_SECTIONS = { "mounts", "pets", "toys", "decorations", "rares", "tre
 -- numeric ID, but Treasures Scanner exposes them in a known order via
 -- MC.TreasureCoords).
 --------------------------------------------------------------------------
+local function push(out, id)
+    -- Skip nil/empty IDs so bit-positions stay stable across peers running
+    -- the same addon version. A nil entry would silently shift every later
+    -- bit by one and corrupt cross-peer ownership lookups.
+    if id ~= nil and id ~= "" and id ~= 0 then
+        out[#out + 1] = id
+    end
+end
+
 local function flattenModuleData(modKey)
     local out = {}
     if modKey == "mounts" then
         for _, group in ipairs(MC.MountData or {}) do
             for _, m in ipairs(group.mounts or {}) do
-                out[#out + 1] = m.mountID or m.itemID
+                push(out, m.mountID or m.itemID)
             end
         end
     elseif modKey == "pets" then
         for _, group in ipairs(MC.PetData or {}) do
             for _, p in ipairs(group.pets or {}) do
-                out[#out + 1] = p.speciesID
+                push(out, p.speciesID)
             end
         end
     elseif modKey == "toys" then
         for _, group in ipairs(MC.ToyData or {}) do
             for _, t in ipairs(group.toys or {}) do
-                out[#out + 1] = t.itemID
+                push(out, t.itemID)
             end
         end
     elseif modKey == "decorations" then
         for _, group in ipairs(MC.DecorationData or {}) do
             for _, d in ipairs(group.decorations or {}) do
-                out[#out + 1] = d.decorID
+                push(out, d.decorID)
             end
         end
     elseif modKey == "rares" then
         for npcID in pairs(MC.RareNPCs or {}) do
-            out[#out + 1] = npcID
+            push(out, npcID)
         end
         table.sort(out)
     elseif modKey == "treasures" then
         for name in pairs(MC.TreasureCoords or {}) do
-            out[#out + 1] = name
+            push(out, name)
         end
         table.sort(out)
     end
@@ -139,10 +148,15 @@ local function isToyCollected(itemID)
 end
 
 local function isDecorCollected(decorID)
-    if not (decorID and C_HousingCatalog) then return false end
-    local info = C_HousingCatalog.GetCatalogEntryInfoByRecordID
-                 and C_HousingCatalog.GetCatalogEntryInfoByRecordID(decorID)
-    return info and info.isOwned or false
+    -- The Decorations Scanner has the canonical "is this decor owned?"
+    -- check (correct API signature for GetCatalogEntryInfoByRecordID +
+    -- handles the numPlaced/quantity ownership semantics). Reuse it.
+    local mod = MC.modulesByKey and MC.modulesByKey["decorations"]
+    if mod and mod.Scanner and mod.Scanner.CheckCollected then
+        local ok, owned = pcall(mod.Scanner.CheckCollected, mod.Scanner, decorID, nil)
+        return ok and owned or false
+    end
+    return false
 end
 
 local function isRareKilled(npcID)
