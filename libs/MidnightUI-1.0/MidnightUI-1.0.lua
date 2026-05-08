@@ -185,10 +185,6 @@ function lib.Pool:Acquire(parent)
     if not frame then
         frame = CreateFrame("Frame", nil, parent)
         frame:EnableMouse(true)
-        -- One-time bind; consumers populate _onEnter/_onLeave/_onMouseUp.
-        frame:SetScript("OnEnter", _staticOnEnter)
-        frame:SetScript("OnLeave", _staticOnLeave)
-        frame:SetScript("OnMouseUp", _staticOnMouseUp)
     else
         frame:SetParent(parent)
         frame:ClearAllPoints()
@@ -198,6 +194,15 @@ function lib.Pool:Acquire(parent)
             end
         end
     end
+    -- Always (re)bind the static dispatchers. Some consumers — notably
+    -- RenderCollapsibleHeader — call SetScript directly with their own
+    -- closures, and that binding survives a release/reacquire cycle. If
+    -- we don't re-bind here, a frame that previously hosted a recipe
+    -- header would still fire the recipe refresh callback when reused
+    -- as a Roster row, and clicks would visit the wrong module.
+    frame:SetScript("OnEnter", _staticOnEnter)
+    frame:SetScript("OnLeave", _staticOnLeave)
+    frame:SetScript("OnMouseUp", _staticOnMouseUp)
     -- Clear stale callbacks; the consumer re-stashes them this refresh.
     frame._onEnter, frame._onLeave, frame._onMouseUp = nil, nil, nil
     frame:Show()
