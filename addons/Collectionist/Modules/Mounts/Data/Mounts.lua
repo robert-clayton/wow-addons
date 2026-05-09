@@ -94,13 +94,15 @@ local VIVACIOUS_CHLOROCEROS_TASKS = {
 
 MC.MountSourceOrder = {
     "renown", "reputation", "drop", "achievement", "quest",
-    "delve", "prey", "dungeon", "raid", "pvp",
+    "delve", "prey", "ritual_sites", "void_assaults",
+    "dungeon", "raid", "pvp",
     "worldevent", "profession", "vendor", "prepatch",
 }
 MC.MountSourceLabels = {
     renown = "Renown", reputation = "Reputation", drop = "Rare Drop",
     achievement = "Achievement", quest = "Quest", delve = "Delve",
-    prey = "Prey System", dungeon = "Dungeon", raid = "Raid", pvp = "PvP",
+    prey = "Prey", ritual_sites = "Ritual Sites", void_assaults = "Void Assaults",
+    dungeon = "Dungeon", raid = "Raid", pvp = "PvP",
     worldevent = "World Event", profession = "Profession",
     vendor = "Vendor", prepatch = "Pre-Patch",
 }
@@ -211,16 +213,24 @@ MC.MountData = {
             -- Voidstorm treasures
             { mountID = 2790, name = "Insatiable Shredclaw", source = "drop", sourceInfo = "Final Clutch of Predaxas (lightning maze)",
               waypoint = LOC.FinalClutchPredaxas, zone = "Voidstorm", dropInfo = { mob = "Final Clutch of Predaxas", zone = "Voidstorm" } },
-            -- Patch 12.0.5: Ritual Sites (instanced — waypoints are in-instance)
-            { mountID = 2779, name = "Witherbark Warbear Mother", source = "drop",
+        },
+    },
+
+    -- Patch 12.0.5: Ritual Site instanced drops (Broken Throne / Daggerspine
+    -- Point). Waypoints land in-instance; overworldWaypoint takes you to the
+    -- portal entrance.
+    {
+        source = "ritual_sites",
+        mounts = {
+            { mountID = 2779, name = "Witherbark Warbear Mother", source = "ritual_sites",
               sourceInfo = "Broken Throne Tier 2+ — get Chubs (pet) first, then bring 5 more Practically Pork to the bone pile, summon Chubs to spawn Angry Amani Warbear, defeat to receive the mount kit",
               waypoint = LOC.AmaniWarbearPile, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman",
               dropInfo = { mob = "Angry Amani Warbear", zone = "Broken Throne Ritual Site", rate = "Guaranteed" } },
-            { mountID = 2961, name = "Void-Corrupted Hex Eagle", source = "drop",
+            { mountID = 2961, name = "Void-Corrupted Hex Eagle", source = "ritual_sites",
               sourceInfo = "Broken Throne Tier 2+ — pick up the Misplaced Ritual Candle under the nearby tree, place it in the empty skull, then click the candle cluster to summon the elite",
               waypoint = LOC.HexEagleRitual, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman",
               dropInfo = { mob = "Void-Corrupted Hex Eagle (elite)", zone = "Broken Throne Ritual Site", rate = "Guaranteed" } },
-            { mountID = 2964, name = "Void-Touched Snapdragon", source = "drop",
+            { mountID = 2964, name = "Void-Touched Snapdragon", source = "ritual_sites",
               sourceInfo = "Daggerspine Point Tier 2+ — loot Washed-Up Kelp piles along the coast (1-2 per instance) for a chance to spawn the rare; otherwise spawns slimes",
               waypoint = LOC.DaggerspineKelpPiles, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods",
               dropInfo = { mob = "Void-Touched Snapdragon (rare)", zone = "Daggerspine Point Ritual Site", rate = "Very rare" } },
@@ -352,8 +362,16 @@ MC.MountData = {
             { mountID = 2933, name = "Magister's Spell Bee", source = "worldevent", sourceInfo = "Gamesmaster Fleurin - 500 Illusionary Coins (Decor Duels)",
               waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.IllusionaryCoin, 500 } } },
-            -- Patch 12.0.5: Void Assaults achievement reward
-            { mountID = 2176, name = "Unbound Manawyrm", source = "worldevent",
+        },
+    },
+
+    -- Patch 12.0.5: Void Assaults / Incursions in Eversong + Zul'Aman.
+    -- Currently a single mount (the meta reward); more may be added in
+    -- future patches.
+    {
+        source = "void_assaults",
+        mounts = {
+            { mountID = 2176, name = "Unbound Manawyrm", source = "void_assaults",
               sourceInfo = "Sergeant Vornin (Silvermoon Bazaar) - 6,000 Voidlight Marl after earning both Void Response Team and Ritual Site Disruptor",
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } },

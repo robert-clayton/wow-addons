@@ -71,7 +71,7 @@ MC.AchievementData = {
                 zone          = "Eversong Woods",
                 description   = "Use the telescope at five lookout points across Eversong Woods.",
                 taskList = {
-                    intro = "Each spot is a fixed telescope on top of a tower or peak. Mount up — they're all flyable.",
+                    intro = "Each is a fixed telescope on top of a tower or peak. All reachable on a flying mount.",
                     tasks = {
                         { achievementID = 62288, criteriaID = 111573, label = "Silvermoon City rooftop telescope",
                           waypoint = { M.Silvermoon, 0.2022, 0.7961, "Silvermoon vista" } },
@@ -92,7 +92,7 @@ MC.AchievementData = {
                 zone          = "Zul'Aman",
                 description   = "Use the telescope at five lookout points across Zul'Aman.",
                 taskList = {
-                    intro = "Each spot is a fixed telescope. Mount up — all reachable by flying.",
+                    intro = "Fixed telescopes at five high points around the zone.",
                     tasks = {
                         { achievementID = 62289, criteriaID = 111578, label = "Northwest Zul'Aman telescope",
                           waypoint = { M.ZulAman, 0.2779, 0.7001, "NW Zul'Aman vista" } },
@@ -113,7 +113,7 @@ MC.AchievementData = {
                 zone          = "Harandar",
                 description   = "Use the telescope at five lookout points across Harandar.",
                 taskList = {
-                    intro = "Each spot is a fixed telescope. All reachable by flying.",
+                    intro = "Each is a telescope perched on a peak or spire.",
                     tasks = {
                         { achievementID = 62290, criteriaID = 111583, label = "East Harandar telescope",
                           waypoint = { M.Harandar, 0.6917, 0.4638, "East Harandar vista" } },
@@ -134,7 +134,7 @@ MC.AchievementData = {
                 zone          = "Voidstorm",
                 description   = "Use the telescope at five lookout points across Voidstorm.",
                 taskList = {
-                    intro = "Each spot is a fixed telescope. All reachable by flying.",
+                    intro = "Five fixed telescopes scattered across the zone.",
                     tasks = {
                         { achievementID = 62291, criteriaID = 111588, label = "North Voidstorm telescope",
                           waypoint = { M.Voidstorm, 0.3968, 0.6116, "North Voidstorm vista" } },
@@ -199,7 +199,7 @@ MC.AchievementData = {
                 zone          = "Zul'Aman",
                 description   = "Collect every Skyriding Glyph in Zul'Aman.",
                 taskList = {
-                    intro = "Each glyph is a glowing floating tome. Skyride up and fly through it.",
+                    intro = "Floating glowing tomes. Skyride through each one.",
                     tasks = {
                         { achievementID = 61581, criteriaID = 110353, label = "Revantusk Sedge",
                           waypoint = { M.ZulAman, 0.1917, 0.7064, "Revantusk Sedge" } },
@@ -232,7 +232,7 @@ MC.AchievementData = {
                 zone          = "Harandar",
                 description   = "Collect every Skyriding Glyph in Harandar.",
                 taskList = {
-                    intro = "Each glyph is a glowing floating tome. Skyride up and fly through it.",
+                    intro = "Skyride up and pass through each glowing tome.",
                     tasks = {
                         { achievementID = 61582, criteriaID = 110364, label = "Blossoming Terrace",
                           waypoint = { M.Harandar, 0.6024, 0.4436, "Blossoming Terrace" } },
@@ -261,7 +261,7 @@ MC.AchievementData = {
                 zone          = "Voidstorm",
                 description   = "Collect every Skyriding Glyph in Voidstorm.",
                 taskList = {
-                    intro = "Each glyph is a glowing floating tome. Skyride up and fly through it.",
+                    intro = "Glowing tomes hovering above the landscape. Skyride through each one to count it.",
                     tasks = {
                         { achievementID = 61583, criteriaID = 110372, label = "The Voidspire",
                           waypoint = { M.Voidstorm, 0.5135, 0.6271, "The Voidspire" } },
@@ -307,7 +307,7 @@ MC.AchievementData = {
                 zone          = "Midnight (all zones)",
                 description   = "Find every lore object in the four Midnight zones.",
                 taskList = {
-                    intro = "Each is a single-use interactable on the ground (tablet, mural, runestone, etc.). They give 250 zone reputation each.",
+                    intro = "Each lore object is a single-use ground interactable (tablet, mural, runestone, plaque). Reading one gives 250 reputation with that zone's faction.",
                     tasks = {
                         -- Eversong Woods (faction 2710 Silvermoon Court)
                         { achievementID = 62104, criteriaID = 111828, label = "Memorial Plaque (Eversong)",
@@ -414,9 +414,9 @@ MC.AchievementData = {
                 achievementID = 62386,
                 name          = "Light Up the Night",
                 zone          = "Midnight (all zones)",
-                description   = "Complete the meta achievement for each Midnight zone. Rewards Brilliant Petalwing mount.",
+                description   = "Complete each of the four zone metas. Rewards the Brilliant Petalwing mount.",
                 taskList = {
-                    intro = "Each zone has its own meta. Knock these out and the mount drops in your bags.",
+                    intro = "One meta per zone. Finish all four and the mount is yours.",
                     tasks = {
                         { achievementID = 62261, label = "Forever Song (Eversong Woods)" },
                         { achievementID = 61453, label = "Making an Amani Out of You (Zul'Aman)" },
@@ -446,7 +446,7 @@ MC.AchievementData = {
                 zone          = "Midnight (all zones)",
                 description   = "Discover every named sub-zone across all four Midnight zones.",
                 taskList = {
-                    intro = "Each zone's Explorer achievement is its own roll-up of sub-zone discoveries.",
+                    intro = "Complete each zone's Explorer achievement.",
                     tasks = {
                         { achievementID = 61855, label = "Explore Eversong Woods" },
                         { achievementID = 61856, label = "Explore Zul'Aman" },
@@ -459,9 +459,9 @@ MC.AchievementData = {
                 achievementID = 62261,
                 name          = "Forever Song",
                 zone          = "Eversong Woods",
-                description   = "The Eversong Woods zone meta. Roll up everything Eversong-related.",
+                description   = "The Eversong Woods meta. Combines every Eversong sub-achievement below.",
                 taskList = {
-                    intro = "All Eversong content combined.",
+                    intro = "Complete each row to finish the meta.",
                     tasks = {
                         { achievementID = 61855, label = "Explore Eversong Woods" },
                         { achievementID = 61960, label = "Treasures of Eversong Woods" },
@@ -476,9 +476,9 @@ MC.AchievementData = {
                 achievementID = 61453,
                 name          = "Making an Amani Out of You",
                 zone          = "Zul'Aman",
-                description   = "The Zul'Aman zone meta.",
+                description   = "The Zul'Aman meta. Finish every Zul'Aman achievement to earn it.",
                 taskList = {
-                    intro = "All Zul'Aman content combined.",
+                    intro = "Hit each row below.",
                     tasks = {
                         { achievementID = 61856, label = "Explore Zul'Aman" },
                         { achievementID = 62125, label = "Treasures of Zul'Aman" },
@@ -492,9 +492,9 @@ MC.AchievementData = {
                 achievementID = 62260,
                 name          = "That's Aln, Folks!",
                 zone          = "Harandar",
-                description   = "The Harandar zone meta.",
+                description   = "The Harandar meta. Wraps up every Harandar achievement at once.",
                 taskList = {
-                    intro = "All Harandar content combined.",
+                    intro = "Each Harandar row below contributes.",
                     tasks = {
                         { achievementID = 61520, label = "Explore Harandar" },
                         { achievementID = 61263, label = "Treasures of Harandar" },
@@ -509,9 +509,9 @@ MC.AchievementData = {
                 achievementID = 62256,
                 name          = "Yelling into the Voidstorm",
                 zone          = "Voidstorm",
-                description   = "The Voidstorm zone meta.",
+                description   = "The Voidstorm meta. Earn it by clearing every Voidstorm achievement.",
                 taskList = {
-                    intro = "All Voidstorm content combined.",
+                    intro = "All four Voidstorm rows below contribute.",
                     tasks = {
                         { achievementID = 61857, label = "Explore Voidstorm" },
                         { achievementID = 62126, label = "Treasures of Voidstorm" },
@@ -574,7 +574,7 @@ MC.AchievementData = {
                 zone          = "Eversong Woods",
                 description   = "Defend each Eversong runestone from the boss that spawns when you tap it.",
                 taskList = {
-                    intro = "Click the runestone to summon its boss, kill the boss, runestone counts.",
+                    intro = "Click a runestone to summon its boss. Kill the boss and that runestone counts.",
                     tasks = {
                         { achievementID = 61961, criteriaID = 111480, label = "Elrendar River Runestone (Sapmaw the Infestor)",
                           waypoint = { M.Eversong, 0.4740, 0.5860, "Elrendar River Runestone" } },
@@ -656,7 +656,7 @@ MC.AchievementData = {
                 zone          = "Harandar",
                 description   = "Read all 21 Haranir lore books across 7 storyline-gated series.",
                 taskList = {
-                    intro = "21 books across 7 series. Each series is gated — if a parent quest below shows |cffff5555[ ]|r, the books for that series won't spawn yet.",
+                    intro = "21 books in 7 series. Each series only spawns its books once you've finished its parent campaign quest. If a parent below shows |cffff5555[ ]|r, that series isn't unlocked yet.",
                     tasks = {
                         -- Series 1: Laments of Wey'nan
                         { questID = 88993, label = "[Parent] Wey'nan's Ward — unlocks Laments of Wey'nan" },
@@ -726,7 +726,7 @@ MC.AchievementData = {
                 achievementID = 61052,
                 name          = "Dust 'Em Off",
                 zone          = "Harandar",
-                description   = "Catch all 120 Glowing Moths across Harandar (renown-gated; tiers unlock at 1/4/9). Far too many to inline — start at Mothkeeper Wew'tam, who tracks your progress.",
+                description   = "Catch all 120 Glowing Moths across Harandar. Moth tiers unlock at Hara'ti Renown 1, 4, and 9. Talk to Mothkeeper Wew'tam to see which moths you still need.",
                 waypoint      = { M.Harandar, 0.4930, 0.5436, "Mothkeeper Wew'tam" },
             },
         },
@@ -857,9 +857,9 @@ MC.AchievementData = {
                 achievementID = 62351,
                 name          = "Preying For Midnight",
                 zone          = "Midnight (all zones)",
-                description   = "Complete every Prey achievement. Reward: Preyseeker title.",
+                description   = "Complete every Prey achievement. Rewards the Preyseeker title.",
                 taskList = {
-                    intro = "Roll-up of every Prey hunt achievement.",
+                    intro = "Each Prey hunt achievement below counts toward the title.",
                     tasks = {
                         { achievementID = 62383, label = "Gotta Hunt Them All" },
                         { achievementID = 62139, label = "Midnight Hunter" },
@@ -928,9 +928,9 @@ MC.AchievementData = {
                 achievementID = 62563,
                 name          = "Void Response Team",
                 zone          = "Eversong + Zul'Aman",
-                description   = "Complete the Void Assault meta. Unlocks Unbound Manawyrm.",
+                description   = "Complete the Void Assault meta. Unlocks the Unbound Manawyrm purchase from Sergeant Vornin.",
                 taskList = {
-                    intro = "Roll-up of Void Assault progression across both zones.",
+                    intro = "Mix of Eversong and Zul'Aman Void Assault tiers, plus the Field Accolade and corrupted-kill counters.",
                     tasks = {
                         { achievementID = 62498, label = "Void Assault: Eversong (1)" },
                         { achievementID = 62508, label = "Void Eradicator: Eversong (25)" },
@@ -980,7 +980,7 @@ MC.AchievementData = {
                 zone          = "Eversong + Zul'Aman",
                 description   = "Complete the Ritual Sites meta.",
                 taskList = {
-                    intro = "Roll-up of Ritual Site progression.",
+                    intro = "You'll need a Tier 3 clear, Renown 8 with the Ritual Sites faction, and all 8 challenges unlocked.",
                     tasks = {
                         { achievementID = 62452, label = "Ritual Sites 320 (Tier 3)" },
                         { achievementID = 62622, label = "Ritual Renown (rank 8)" },

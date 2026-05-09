@@ -10,18 +10,19 @@ local _, MC = ...
 
 local MUI = LibStub("MidnightUI-1.0", true)
 
-local ONBOARDING_VERSION = "1.5.0"
+local ONBOARDING_VERSION = "1.6.0"
 
--- Lead with the user benefit; mention the share toggle plainly.
+-- Plain summary of what the addon does, plus the share opt-in. Avoid
+-- marketing tone — players appreciate "here's what it does" over hype.
 local INTRO_LINES = {
-    "Collectionist has new features in 1.5.0:",
+    "Collectionist tracks what you're missing from Midnight:",
     " ",
-    "  • Roster tab — see your guild's collection progress",
-    "  • Per-treasure step-by-step guides",
-    "  • Click checklists for prerequisite quest chains",
+    "  • Mounts, pets, toys, decor, recipes, rares, treasures, achievements",
+    "  • Click any row to drop waypoints to where you need to go",
+    "  • Optional Sharing lets you compare progress with guildies",
     " ",
-    "Pick which trackers you want enabled, and whether",
-    "to enable Sharing (peer counts + Collection Inspector).",
+    "Turn off any tracker you don't care about, and decide whether",
+    "to share your counts before anything goes out over guild chat.",
 }
 
 local FRAME
@@ -62,7 +63,7 @@ local function buildFrame()
     local title = bar:CreateFontString(nil, "OVERLAY")
     title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 13, "OUTLINE")
     title:SetPoint("LEFT", 10, 0)
-    title:SetText("Collectionist — Welcome to 1.5.0")
+    title:SetText("Collectionist — Welcome to 1.6.0")
     if theme then title:SetTextColor(unpack(theme.colors.title)) end
 
     -- Intro text
@@ -213,7 +214,7 @@ function MC.ShowOnboarding()
         if MC.RosterForceBroadcast then
             C_Timer.After(2, function() MC.RosterForceBroadcast("GUILD") end)
         end
-        print(MC.PREFIX .. " Welcome aboard. Use /mc to open the panel.")
+        print(MC.PREFIX .. " You're set. Type /mc to open the panel.")
     end)
     f:Show()
 end
