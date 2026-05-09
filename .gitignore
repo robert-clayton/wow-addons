@@ -6,3 +6,4 @@ Thumbs.db
 *~
 addons/*/Libs/MidnightUI-1.0
 .claude/settings.local.json
+dist/
