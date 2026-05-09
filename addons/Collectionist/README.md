@@ -1,4 +1,4 @@
-# Midnight Collections
+# Collectionist
 
 Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel. Seven tabs, just click a row to set a waypoint.
 

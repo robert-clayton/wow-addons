@@ -10,9 +10,9 @@ function MB:Init()
     local LDB = LibStub("LibDataBroker-1.1")
     local LDBIcon = LibStub("LibDBIcon-1.0")
 
-    local dataObj = LDB:NewDataObject("MidnightCollections", {
+    local dataObj = LDB:NewDataObject("Collectionist", {
         type = "launcher",
-        text = "Midnight Collections",
+        text = "Collectionist",
         icon = "Interface\\Icons\\INV_Misc_Book_09",
         OnClick = function(_, button)
             if button == "LeftButton" then
@@ -28,7 +28,7 @@ function MB:Init()
             end
         end,
         OnTooltipShow = function(tt)
-            tt:AddLine("|cffffcc00Midnight Collections|r")
+            tt:AddLine("|cffffcc00Collectionist|r")
             for _, mod in ipairs(MC.modules) do
                 if MC.IsModuleEnabled(mod.key) then
                     if mod.opts.tooltipLines then
@@ -48,16 +48,16 @@ function MB:Init()
         end,
     })
 
-    LDBIcon:Register("MidnightCollections", dataObj, MC.db.minimap)
+    LDBIcon:Register("Collectionist", dataObj, MC.db.minimap)
     self.LDBIcon = LDBIcon
 end
 
 function MB:Update()
     if not self.LDBIcon then return end
     if MC.db.minimap and MC.db.minimap.hide then
-        self.LDBIcon:Hide("MidnightCollections")
+        self.LDBIcon:Hide("Collectionist")
     else
-        self.LDBIcon:Show("MidnightCollections")
+        self.LDBIcon:Show("Collectionist")
     end
 end
 

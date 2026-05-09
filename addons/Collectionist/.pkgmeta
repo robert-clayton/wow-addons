@@ -8,7 +8,7 @@
 # `rsync -aL` before invoking the packager so the shipped zip contains a
 # real copy. Locally, scripts/symlink.sh handles the symlink for dev.
 
-package-as: MidnightCollections
+package-as: Collectionist
 
 # We vendor libs in Libs/ rather than fetching via externals, so don't build
 # a -nolib variant (it would be broken).

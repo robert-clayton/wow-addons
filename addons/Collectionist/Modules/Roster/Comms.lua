@@ -19,7 +19,7 @@ local SEND_INTERVAL_RAID   = 1.0
 local Comms = {}
 Comms.queue = {}
 Comms.handlers = {}  -- handlers[channel][sub] = fn(payload, sender)
-Comms.frame = CreateFrame("Frame", "MidnightCollectionsCommsFrame")
+Comms.frame = CreateFrame("Frame", "CollectionistCommsFrame")
 Comms.encounterPause = false
 
 MC.Comms = Comms
@@ -126,7 +126,7 @@ local function dispatch(channel, body, sender)
     if fn then fn(payload or "", sender, proto) end
 end
 
-local listener = CreateFrame("Frame", "MidnightCollectionsCommsListener")
+local listener = CreateFrame("Frame", "CollectionistCommsListener")
 listener:RegisterEvent("CHAT_MSG_ADDON")
 listener:RegisterEvent("BN_CHAT_MSG_ADDON")
 listener:RegisterEvent("ENCOUNTER_START")

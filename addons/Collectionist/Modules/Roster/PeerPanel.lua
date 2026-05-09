@@ -19,6 +19,59 @@ local BOTTOM_PAD      = 14
 local SIDE_PAD        = 14
 local LIST_GAP        = 12
 
+-- Column content height: renderColumn starts at -36 then drops -22 per
+-- module row. Stays constant across peer counts (columns are
+-- side-by-side, not stacked), so the panel only grows in width.
+local COLUMN_CONTENT_H = 36 + 7 * 22
+local DEFAULT_PANEL_H  = TITLE_BAR_H + CONTENT_TOP_PAD + COLUMN_CONTENT_H + BOTTOM_PAD
+
+-- Smooth width/height transitions via OnUpdate lerp. Ease-out cubic so
+-- the resize decelerates into place. Fires onComplete once finished.
+local function startSizeAnim(f, targetW, targetH, duration, onComplete)
+    duration = duration or 0.18
+    local fromW, fromH = f:GetWidth(), f:GetHeight()
+    if math.abs(fromW - targetW) < 0.5 and math.abs(fromH - targetH) < 0.5 then
+        f:SetScript("OnUpdate", nil)
+        f:SetSize(targetW, targetH)
+        if onComplete then onComplete() end
+        return
+    end
+    f._animElapsed = 0
+    f:SetScript("OnUpdate", function(self, dt)
+        self._animElapsed = (self._animElapsed or 0) + dt
+        local t = math.min(self._animElapsed / duration, 1)
+        local e = 1 - (1 - t) ^ 3
+        self:SetSize(fromW + (targetW - fromW) * e, fromH + (targetH - fromH) * e)
+        if t >= 1 then
+            self:SetScript("OnUpdate", nil)
+            if onComplete then onComplete() end
+        end
+    end)
+end
+
+-- Linear alpha lerp via OnUpdate. Fires onComplete when done, used to
+-- hide columns once their fade-out finishes.
+local function startFadeAnim(frame, targetAlpha, duration, onComplete)
+    duration = duration or 0.15
+    local fromAlpha = frame:GetAlpha()
+    if math.abs(fromAlpha - targetAlpha) < 0.01 then
+        frame:SetScript("OnUpdate", nil)
+        frame:SetAlpha(targetAlpha)
+        if onComplete then onComplete() end
+        return
+    end
+    frame._fadeElapsed = 0
+    frame:SetScript("OnUpdate", function(self, dt)
+        self._fadeElapsed = (self._fadeElapsed or 0) + dt
+        local t = math.min(self._fadeElapsed / duration, 1)
+        self:SetAlpha(fromAlpha + (targetAlpha - fromAlpha) * t)
+        if t >= 1 then
+            self:SetScript("OnUpdate", nil)
+            if onComplete then onComplete() end
+        end
+    end)
+end
+
 -- Red at 0%, yellow at 50%, green at 100%.
 local function progressColor(pct)
     pct = math.max(0, math.min(1, pct or 0))
@@ -83,7 +136,10 @@ local function getEntry(name)
     return MC.RosterDB and MC.RosterDB[name]
 end
 
--- "You" first, then alphabetical. Used for the left list.
+-- "You" first, then alphabetical. Used for the left list. Alts that
+-- share a BNet account get collapsed to a single row showing the most-
+-- recently-seen character; characters with no known BNet ID stay as
+-- separate rows.
 local function buildPeerOrder()
     local list = {}
     if MC.GetMeRosterEntry then
@@ -92,14 +148,44 @@ local function buildPeerOrder()
             list[#list + 1] = { name = me.name, isMe = true, entry = me }
         end
     end
-    if MC.RosterDB then
-        local names = {}
-        for k in pairs(MC.RosterDB) do names[#names + 1] = k end
-        table.sort(names, function(a, b) return a:lower() < b:lower() end)
-        for _, n in ipairs(names) do
-            list[#list + 1] = { name = n, isMe = false, entry = MC.RosterDB[n] }
+    if not MC.RosterDB then return list end
+
+    local cache = MC.RosterDB._bnetCache or {}
+    local seenBnet = {}     -- bnetID -> { name = ..., entry = ..., altCount = N }
+    local soloRecords = {}  -- { name, entry } for non-deduped peers
+
+    for k, rec in pairs(MC.RosterDB) do
+        if type(k) == "string" and k:sub(1, 1) ~= "_"
+           and type(rec) == "table" and k:find("-", 1, true) then
+            local bnetID = cache[k]
+            if bnetID then
+                local existing = seenBnet[bnetID]
+                if not existing then
+                    seenBnet[bnetID] = { name = k, entry = rec, altCount = 1 }
+                else
+                    existing.altCount = existing.altCount + 1
+                    -- Most-recently-seen char wins display slot.
+                    if (rec.lastSeen or 0) > (existing.entry.lastSeen or 0) then
+                        existing.name  = k
+                        existing.entry = rec
+                    end
+                end
+            else
+                soloRecords[#soloRecords + 1] = { name = k, entry = rec }
+            end
         end
     end
+
+    local rest = {}
+    for _, g in pairs(seenBnet) do
+        rest[#rest + 1] = { name = g.name, isMe = false, entry = g.entry, altCount = g.altCount }
+    end
+    for _, r in ipairs(soloRecords) do
+        rest[#rest + 1] = { name = r.name, isMe = false, entry = r.entry, altCount = 1 }
+    end
+    table.sort(rest, function(a, b) return a.name:lower() < b.name:lower() end)
+    for _, r in ipairs(rest) do list[#list + 1] = r end
+
     return list
 end
 
@@ -109,9 +195,9 @@ local function build()
 
     local theme = MUI and MUI.Theme
 
-    local f = CreateFrame("Frame", "MidnightCollectionsPeerPanel", UIParent, "BackdropTemplate")
+    local f = CreateFrame("Frame", "CollectionistPeerPanel", UIParent, "BackdropTemplate")
     f:SetFrameStrata("DIALOG")
-    f:SetSize(LIST_WIDTH + LIST_GAP + COLUMN_WIDTH + SIDE_PAD * 2, 360)
+    f:SetSize(LIST_WIDTH + LIST_GAP + COLUMN_WIDTH + SIDE_PAD * 2, DEFAULT_PANEL_H)
     f:SetPoint("CENTER")
     f:SetMovable(true)
     f:EnableMouse(true)
@@ -119,6 +205,9 @@ local function build()
     f:SetScript("OnDragStart", f.StartMoving)
     f:SetScript("OnDragStop",  f.StopMovingOrSizing)
     f:SetClampedToScreen(true)
+    -- Clip children to the panel's current bounds so columns extending
+    -- past the edge during a width-shrink lerp don't visually overflow.
+    if f.SetClipsChildren then f:SetClipsChildren(true) end
     f:Hide()
 
     if theme and theme.backdrop then
@@ -156,9 +245,23 @@ local function build()
             wipe(activePeers)
             f:Hide()
         end)
+
+        -- Clear peer history button. Confirms before wiping so a stray
+        -- click doesn't nuke the list. Wider than the default 16px to
+        -- fit the word.
+        local clear = MUI.MakeHeaderBtn(bar, "Clear",
+            theme.colors.btnCloseFg,
+            theme.colors.btnCloseHoverBg,
+            theme.colors.btnCloseHoverBd,
+            "Clear all peer history")
+        clear:SetSize(48, 16)
+        clear:SetPoint("RIGHT", close, "LEFT", -4, 0)
+        clear:SetScript("OnClick", function()
+            StaticPopup_Show("MIDNIGHTCOLLECTIONS_CLEAR_PEERS")
+        end)
     end
 
-    tinsert(UISpecialFrames, "MidnightCollectionsPeerPanel")
+    tinsert(UISpecialFrames, "CollectionistPeerPanel")
 
     --------------------------------------------------------------------
     -- Left scrollable peer list
@@ -248,7 +351,9 @@ local function renderListRow(row, item, isSelected)
     if item.isMe then label = label .. " |cff888888(You)|r" end
     row.label:SetText(label)
     row.label:SetTextColor(0.85, 0.85, 0.85)
-    row.check:SetText(isSelected and "|cff55cc55✓|r" or "")
+    -- Inline texture, not a font glyph — sidesteps the missing-glyph
+    -- tofu when the panel font doesn't cover U+2713.
+    row.check:SetText(isSelected and "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14|t" or "")
     row.bg:SetColorTexture(1, 1, 1, isSelected and 0.06 or 0)
     -- Capture row.bg via closure; the frame doesn't carry a `bg` field.
     local bg = row.bg
@@ -279,10 +384,12 @@ local function refreshList(f)
     f.listChild:SetHeight(math.max(-yOff, 1))
 end
 
--- Right-side comparison column factory + render.
-local function acquireColumn(f, idx)
+-- Right-side comparison column factory + render. Columns are keyed by
+-- peer name (not slot index) so each peer has a stable visual identity
+-- across reorders — required for fade-in/out without flicker.
+local function acquireColumn(f, peerName)
     local theme = MUI and MUI.Theme
-    local col = f.columns[idx]
+    local col = f.columns[peerName]
     if not col then
         col = {}
         col.frame = CreateFrame("Frame", nil, f)
@@ -296,7 +403,7 @@ local function acquireColumn(f, idx)
         col.subtitle:SetJustifyH("LEFT")
         if theme then col.subtitle:SetTextColor(unpack(theme.colors.textDim)) end
         col.rows = {}
-        f.columns[idx] = col
+        f.columns[peerName] = col
     end
     col.frame:Show()
     col.title:Show()
@@ -369,44 +476,91 @@ local function renderColumn(col, entry)
     return -yOff
 end
 
--- Re-layout based on the current activePeers list.
+-- Re-layout based on the current activePeers list. Animations are
+-- sequenced so content never overflows the panel:
+--   ADD:    size grows, then new column fades in (kept at alpha 0
+--           while outside the in-progress bounds).
+--   REMOVE: column fades to alpha 0 (becomes invisible), then panel
+--           shrinks (so nothing is visible past the new edge).
 local function rerender(f)
     refreshList(f)
 
-    -- Hide all columns first; we'll show only the ones we actually render
-    for _, col in pairs(f.columns) do
-        col.frame:Hide()
-        col.title:Hide()
-        col.subtitle:Hide()
-        for _, row in pairs(col.rows) do row.frame:Hide() end
-    end
+    local activeSet = {}
+    for _, name in ipairs(activePeers) do activeSet[name] = true end
 
     local n = #activePeers
-    local maxContentH = 0
-    if n > 0 then
-        f.emptyText:Hide()
-        for i = 1, n do
-            local entry = getEntry(activePeers[i])
-            if entry then
-                local col = acquireColumn(f, i)
-                col.frame:ClearAllPoints()
-                col.frame:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT",
-                    (i - 1) * (COLUMN_WIDTH + COLUMN_GAP), 0)
-                col.frame:SetSize(COLUMN_WIDTH, 1)
-                local h = renderColumn(col, entry)
-                if h > maxContentH then maxContentH = h end
-            end
-        end
-    else
-        f.emptyText:Show()
-        maxContentH = 24
-    end
-
     local rightWidth = math.max(COLUMN_WIDTH, n * COLUMN_WIDTH + math.max(0, n - 1) * COLUMN_GAP)
     local totalW = SIDE_PAD + LIST_WIDTH + LIST_GAP + rightWidth + SIDE_PAD
-    f:SetWidth(totalW)
-    local totalH = TITLE_BAR_H + CONTENT_TOP_PAD + maxContentH + BOTTOM_PAD
-    f:SetHeight(math.max(totalH, 200))
+    local totalH = DEFAULT_PANEL_H
+
+    -- Identify columns that need to fade out (peer removed).
+    local removing = {}
+    for peerName, col in pairs(f.columns) do
+        if not activeSet[peerName] and col.frame:IsShown() and col.frame:GetAlpha() > 0.01 then
+            removing[#removing + 1] = col
+        end
+    end
+
+    -- Step 3: render active columns and fade in any new ones. Runs
+    -- after size finishes, so new columns appear inside the panel's
+    -- final bounds.
+    local function renderAndFadeIn()
+        if n > 0 then
+            f.emptyText:Hide()
+            for i, peerName in ipairs(activePeers) do
+                local entry = getEntry(peerName)
+                if entry then
+                    local existed = f.columns[peerName]
+                            and f.columns[peerName].frame:IsShown()
+                            and f.columns[peerName].frame:GetAlpha() > 0.01
+                    local col = acquireColumn(f, peerName)
+                    col.frame:ClearAllPoints()
+                    col.frame:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT",
+                        (i - 1) * (COLUMN_WIDTH + COLUMN_GAP), 0)
+                    col.frame:SetSize(COLUMN_WIDTH, 1)
+                    renderColumn(col, entry)
+                    -- Cancel any in-flight fade on this column. If the
+                    -- column was mid-fade-out from a prior remove and the
+                    -- user re-added the peer, the stale OnUpdate would
+                    -- continue ticking and Hide() it after we re-show.
+                    col.frame:SetScript("OnUpdate", nil)
+                    col.frame._fadeElapsed = nil
+                    if not existed then
+                        col.frame:SetAlpha(0)
+                        startFadeAnim(col.frame, 1, 0.18)
+                    else
+                        col.frame:SetAlpha(1)
+                    end
+                end
+            end
+        else
+            f.emptyText:Show()
+        end
+    end
+
+    -- Step 2: animate the panel to its target size, then run step 3.
+    local function animateSize()
+        startSizeAnim(f, totalW, totalH, 0.18, renderAndFadeIn)
+    end
+
+    -- Step 1: fade out any removed columns. Once they're all invisible,
+    -- run step 2. With no removals we skip straight to size+render.
+    if #removing == 0 then
+        animateSize()
+    else
+        local pending = #removing
+        for _, col in ipairs(removing) do
+            local fadingCol = col
+            startFadeAnim(col.frame, 0, 0.15, function()
+                fadingCol.frame:Hide()
+                fadingCol.title:Hide()
+                fadingCol.subtitle:Hide()
+                for _, row in pairs(fadingCol.rows) do row.frame:Hide() end
+                pending = pending - 1
+                if pending == 0 then animateSize() end
+            end)
+        end
+    end
 end
 
 -- Public API.
@@ -417,7 +571,23 @@ function MC.ShowPeerPanel(peerName)
         if idx then
             table.remove(activePeers, idx)
         else
-            table.insert(activePeers, peerName)
+            -- If another alt of the same BNet account is already
+            -- showing, replace it rather than adding a duplicate
+            -- column for the same person.
+            local cache = MC.RosterDB and MC.RosterDB._bnetCache
+            local newBnet = cache and cache[peerName]
+            if newBnet then
+                for i, existingName in ipairs(activePeers) do
+                    if cache[existingName] == newBnet then
+                        activePeers[i] = peerName
+                        idx = i
+                        break
+                    end
+                end
+            end
+            if not idx then
+                table.insert(activePeers, peerName)
+            end
         end
     end
     -- Even with empty activePeers we open the popup so the player can see
@@ -439,3 +609,22 @@ end
 function MC.RefreshPeerPanel()
     if FRAME and FRAME:IsShown() then rerender(FRAME) end
 end
+
+-- Confirmation dialog for the inspector's Clear button.
+StaticPopupDialogs["MIDNIGHTCOLLECTIONS_CLEAR_PEERS"] = {
+    text         = "Clear all tracked peers? This wipes everyone's last-known counts. They'll repopulate as guildies broadcast again.",
+    button1      = "Clear",
+    button2      = "Cancel",
+    OnAccept     = function()
+        -- Wipe the comparison list FIRST so the refresh triggered
+        -- inside RosterClearHistory sees an empty active set and skips
+        -- a redundant column animation pass.
+        wipe(activePeers)
+        if MC.RosterClearHistory then MC.RosterClearHistory() end
+        if FRAME and FRAME:IsShown() then rerender(FRAME) end
+    end,
+    timeout      = 0,
+    whileDead    = true,
+    hideOnEscape = true,
+    preferredIndex = 3,
+}

@@ -2,7 +2,7 @@ local addonName, MC = ...
 
 -- Expose the namespace as a global so /run scripts and other addons can
 -- reach it. Using the addon's full name avoids colliding with anything else.
-_G.MidnightCollections = MC
+_G.Collectionist = MC
 
 MC.name = addonName
 MC.version = (C_AddOns and C_AddOns.GetAddOnMetadata
@@ -12,7 +12,7 @@ local MUI = LibStub("MidnightUI-1.0", true)
 if not MUI then
     error(addonName .. ": failed to load MidnightUI-1.0 library")
 end
-local PREFIX = MUI.ChatPrefix("Midnight Collections")
+local PREFIX = MUI.ChatPrefix("Collectionist")
 MC.PREFIX = PREFIX
 
 -- Bumped when SavedVariables shape changes; MigrateDB reads it.
@@ -108,8 +108,8 @@ function MC.MoveModule(key, direction)
 end
 
 --------------------------------------------------------------------------
--- All settings live in the per-character DB (MidnightCollectionsCharDB) as
--- of v2. The account-wide DB (MidnightCollectionsDB) is now a "last logged-out
+-- All settings live in the per-character DB (CollectionistCharDB) as
+-- of v2. The account-wide DB (CollectionistDB) is now a "last logged-out
 -- snapshot" written on PLAYER_LOGOUT and consumed once when a brand-new alt
 -- first enters the game (so they inherit the most recent character's prefs
 -- instead of starting from defaults).
@@ -244,7 +244,7 @@ local infoTooltip
 
 function MC.GetInfoTooltip()
     if not infoTooltip then
-        infoTooltip = CreateFrame("GameTooltip", "MidnightCollectionsInfoTooltip", UIParent, "GameTooltipTemplate")
+        infoTooltip = CreateFrame("GameTooltip", "CollectionistInfoTooltip", UIParent, "GameTooltipTemplate")
         infoTooltip:SetFrameStrata("TOOLTIP")
         infoTooltip:SetClampedToScreen(true)
     end
@@ -293,7 +293,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     -- rendered geometry to compare.
     tt:SetPoint("TOPLEFT", owner, "TOPRIGHT", 8, 0)
 
-    tt:AddLine("Midnight Collections", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
+    tt:AddLine("Collectionist", C.ttTitle[1], C.ttTitle[2], C.ttTitle[3])
     tt:AddDoubleLine("Source:", sourceLabel or item.source or "Unknown",
         C.ttLabel[1], C.ttLabel[2], C.ttLabel[3],
         sr or 0.7, sg or 0.7, sb or 0.7)
@@ -691,6 +691,9 @@ MC._isWaypointList = isWaypointList
 -- Task completion check. A task entry can carry one of:
 --   questID                       — C_QuestLog.IsQuestFlaggedCompleted
 --   achievementID                 — GetAchievementInfo (4th return = completed)
+--   achievementID + criteriaID    — GetAchievementCriteriaInfoByID (preferred;
+--                                    survives criterion reorderings between
+--                                    patches that would shift criteriaIndex)
 --   achievementID + criteriaIndex — GetAchievementCriteriaInfo (3rd = completed)
 --   speciesID                     — C_PetJournal.GetNumCollectedInfo > 0
 --   itemID [+ itemCount]          — PlayerHasToy / GetItemCount >= itemCount
@@ -703,6 +706,17 @@ function MC.IsTaskCompleted(task)
     if task.questID then
         if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
             return C_QuestLog.IsQuestFlaggedCompleted(task.questID) and true or false
+        end
+        return false
+    end
+    if task.achievementID and task.criteriaID then
+        -- Look up by stable criteria ID (preferred — surviving criterion
+        -- reorderings between patches). Only available via the C_API.
+        local getById = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfoByID)
+                          or GetAchievementCriteriaInfoByID
+        if getById then
+            local ok, _, _, completed = pcall(getById, task.achievementID, task.criteriaID)
+            return ok and (completed and true or false) or false
         end
         return false
     end
@@ -756,7 +770,7 @@ end
 local _warnedNoWaypointProvider = false
 function MC.AddWaypoint(mapID, x, y, title)
     if not (mapID and x and y) or mapID <= 0 then return false end
-    title = title or "Midnight Collections waypoint"
+    title = title or "Collectionist waypoint"
     if TomTom and TomTom.AddWaypoint then
         TomTom:AddWaypoint(mapID, x, y, { title = title })
         print(format("%s Waypoint set: %s", PREFIX, title))
@@ -1017,14 +1031,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" and arg1 == addonName then
         frame:UnregisterEvent("ADDON_LOADED")
 
-        if not MidnightCollectionsDB then MidnightCollectionsDB = {} end
-        if not MidnightCollectionsCharDB then MidnightCollectionsCharDB = {} end
-        if not MidnightCollectionsRosterDB then MidnightCollectionsRosterDB = {} end
+        if not CollectionistDB then CollectionistDB = {} end
+        if not CollectionistCharDB then CollectionistCharDB = {} end
+        if not CollectionistRosterDB then CollectionistRosterDB = {} end
 
         -- v0 -> v1: pull in saved vars from the four standalone addons that
         -- were merged into this one. Targets the account-wide DB because that's
         -- where the legacy import lands.
-        MigrateDB(MidnightCollectionsDB)
+        MigrateDB(CollectionistDB)
 
         -- v1 -> v2: per-character flip. CharDB becomes the runtime primary;
         -- the account-wide DB is now just a passive snapshot. This branch only
@@ -1032,28 +1046,28 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- in the account-wide DB into CharDB so the char inherits the most
         -- recent settings (their own old prefs on first v2 run; another alt's
         -- last snapshot for brand-new characters).
-        if (MidnightCollectionsCharDB.charDbVersion or 0) < CHAR_DB_VERSION then
-            MC.DeepMergeDefaults(MidnightCollectionsCharDB, MidnightCollectionsDB)
-            MidnightCollectionsCharDB.charDbVersion = CHAR_DB_VERSION
+        if (CollectionistCharDB.charDbVersion or 0) < CHAR_DB_VERSION then
+            MC.DeepMergeDefaults(CollectionistCharDB, CollectionistDB)
+            CollectionistCharDB.charDbVersion = CHAR_DB_VERSION
         end
 
         -- One-time fix from v0: activeTab briefly lived in account-wide DB.
-        if MidnightCollectionsDB.activeTab and not MidnightCollectionsCharDB.activeTab then
-            MidnightCollectionsCharDB.activeTab = MidnightCollectionsDB.activeTab
-            MidnightCollectionsDB.activeTab = nil
+        if CollectionistDB.activeTab and not CollectionistCharDB.activeTab then
+            CollectionistCharDB.activeTab = CollectionistDB.activeTab
+            CollectionistDB.activeTab = nil
         end
 
         -- Defaults merge for any new keys added since this character was last
         -- seeded. Operates on CharDB (the primary) only.
-        MC.DeepMergeDefaults(MidnightCollectionsCharDB, charDefaults)
+        MC.DeepMergeDefaults(CollectionistCharDB, charDefaults)
 
         -- Runtime aliases. MC.db is the per-char primary; everything reads
         -- from here. MC.snapshotDB is the account-wide seed pool, written on
         -- PLAYER_LOGOUT. MC.cdb is kept as a back-compat alias.
-        MC.db         = MidnightCollectionsCharDB
-        MC.cdb        = MidnightCollectionsCharDB
-        MC.snapshotDB = MidnightCollectionsDB
-        MC.RosterDB   = MidnightCollectionsRosterDB
+        MC.db         = CollectionistCharDB
+        MC.cdb        = CollectionistCharDB
+        MC.snapshotDB = CollectionistDB
+        MC.RosterDB   = CollectionistRosterDB
 
         -- Roster is no longer a module — it runs alongside the rest of
         -- the addon as a standalone feature. Init it now so its settings
@@ -1181,8 +1195,8 @@ function MC.CreatePanel()
     if MC.panel then return end
 
     local panel = MUI:CreatePanel({
-        name          = "MidnightCollections",
-        title         = "Midnight Collections",
+        name          = "Collectionist",
+        title         = "Collectionist",
         icon          = "Interface\\Icons\\INV_Misc_Book_09",
         db            = MC.db,
         defaultWidth  = 380,
@@ -1247,7 +1261,13 @@ function MC.RefreshPeerIndicator()
     end
     local count = 0
     if MC.RosterDB then
-        for _ in pairs(MC.RosterDB) do count = count + 1 end
+        -- Skip reserved meta keys like _bnetCache so the indicator
+        -- reflects the actual peer count.
+        for k, v in pairs(MC.RosterDB) do
+            if type(k) == "string" and k:sub(1, 1) ~= "_" and type(v) == "table" then
+                count = count + 1
+            end
+        end
     end
     btn:GetFontString():SetText(format("%d peer%s", count, count == 1 and "" or "s"))
     btn:SetWidth(btn:GetFontString():GetStringWidth() + 10)
@@ -1479,7 +1499,7 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         end
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
-        print(format("%s Midnight Collections v%s", PREFIX, MC.version))
+        print(format("%s Collectionist v%s", PREFIX, MC.version))
     elseif cmd == "sharing" or cmd == "roster" then
         if MC.RosterSlashHandler then
             MC.RosterSlashHandler(arg)

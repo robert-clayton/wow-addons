@@ -1,11 +1,11 @@
 ## Interface: 120005
-## Title: Midnight Collections
+## Title: Collectionist
 ## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.5.2
-## IconTexture: Interface\AddOns\MidnightCollections\Media\icon.tga
-## SavedVariables: MidnightCollectionsDB, MidnightCollectionsRosterDB
-## SavedVariablesPerCharacter: MidnightCollectionsCharDB
+## Version: 1.6.0
+## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
+## SavedVariables: CollectionistDB, CollectionistRosterDB
+## SavedVariablesPerCharacter: CollectionistCharDB
 ## OptionalDeps: TomTom
 
 # Libraries
@@ -58,6 +58,12 @@ Modules\Treasures\Data\Treasures.lua
 Modules\Treasures\Init.lua
 Modules\Treasures\Scanner.lua
 Modules\Treasures\UI.lua
+
+# Achievements module
+Modules\Achievements\Data\Achievements.lua
+Modules\Achievements\Init.lua
+Modules\Achievements\Scanner.lua
+Modules\Achievements\UI.lua
 
 # Recipes module
 Modules\Recipes\Data\Alchemy.lua

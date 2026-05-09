@@ -57,17 +57,30 @@ function MC.RosterPostLogin()
     -- ends up with a clean DB even if they later turn it off.
     if MC.RosterDB then
         for k, v in pairs(MC.RosterDB) do
-            if type(k) ~= "string" or not k:find("-", 1, true) then
+            if type(k) == "string" and k:sub(1, 1) == "_" then
+                -- Reserved meta key (e.g. _bnetCache) — leave alone.
+            elseif type(k) ~= "string" or not k:find("-", 1, true) then
                 MC.RosterDB[k] = nil
-            elseif type(v) == "table" and not v.name then
-                -- Back-fill name on records stored before the field was set.
+            elseif type(v) == "table" and (not v.name or v.name == "") then
+                -- Back-fill name on records stored before the field was set,
+                -- or where it was persisted as an empty string.
                 v.name = k
             end
         end
     end
 
+    -- Build the BNet name → account-ID cache from currently online
+    -- friends. Persisted across sessions in CollectionistRosterDB
+    -- so alts seen in earlier sessions can still be deduped.
+    if MC.RosterRefreshBnetCache then MC.RosterRefreshBnetCache() end
+
     if not (MC.db and MC.db.rosterEnabled) then return end
-    C_Timer.After(5, function()
+    -- Randomized 5-30s jitter to spread login storms in big guilds. A
+    -- raid /reload wave with 30 players on the same fixed timer would
+    -- flood guild chat with `r` responses; jitter gives the queue time
+    -- to drain.
+    local delay = 5 + math.random() * 25
+    C_Timer.After(delay, function()
         -- Force-announce ourselves: clears the unchanged-hash guard so
         -- peers see us after our /reload even when our counts didn't move.
         MC.RosterForceBroadcast("GUILD")
@@ -308,10 +321,51 @@ function MC.RosterPrune()
     if not MC.RosterDB or not mod.db then return end
     local cutoff = time() - (mod.db.autoForgetDays or 30) * 86400
     for name, rec in pairs(MC.RosterDB) do
-        if rec.lastSeen and rec.lastSeen < cutoff then
+        if type(name) == "string" and name:sub(1, 1) ~= "_"
+           and type(rec) == "table" and rec.lastSeen and rec.lastSeen < cutoff then
             MC.RosterDB[name] = nil
         end
     end
+end
+
+--------------------------------------------------------------------------
+-- BNet alt-dedup cache. Maps "Char-Realm" → bnetAccountID for any
+-- character we've ever seen attached to a BNet friend's account.
+-- Persists in CollectionistRosterDB._bnetCache so alts seen in
+-- prior sessions still dedupe even when offline now.
+--------------------------------------------------------------------------
+function MC.RosterRefreshBnetCache()
+    if not MC.RosterDB then return end
+    MC.RosterDB._bnetCache = MC.RosterDB._bnetCache or {}
+    if not (BNGetNumFriends and C_BattleNet and C_BattleNet.GetFriendAccountInfo) then return end
+    local total = BNGetNumFriends()
+    for i = 1, total do
+        local acct = C_BattleNet.GetFriendAccountInfo(i)
+        if acct and acct.bnetAccountID and acct.gameAccountInfo then
+            local g = acct.gameAccountInfo
+            if g.characterName and g.realmName and g.clientProgram == "WoW" then
+                local key = g.characterName .. "-" .. g.realmName:gsub("%s+", "")
+                MC.RosterDB._bnetCache[key] = acct.bnetAccountID
+            end
+        end
+    end
+end
+
+-- Wipe peer history but keep the bnet alt cache (it's not personal
+-- data; rebuilding it on next login is wasted work).
+function MC.RosterClearHistory()
+    if not MC.RosterDB then return end
+    for k in pairs(MC.RosterDB) do
+        if type(k) ~= "string" or k:sub(1, 1) ~= "_" then
+            MC.RosterDB[k] = nil
+        end
+    end
+    if mod.db then
+        mod.db.lastBroadcast = {}
+        mod.db.lastBitmap    = {}
+    end
+    if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+    if MC.RefreshPeerPanel    then MC.RefreshPeerPanel()    end
 end
 
 -- /mc roster <subcommand> dispatcher.
@@ -320,7 +374,11 @@ function MC.RosterSlashHandler(arg)
     if arg == "" or arg == "status" then
         local count = 0
         if MC.RosterDB then
-            for _ in pairs(MC.RosterDB) do count = count + 1 end
+            for k, v in pairs(MC.RosterDB) do
+                if type(k) == "string" and k:sub(1, 1) ~= "_" and type(v) == "table" then
+                    count = count + 1
+                end
+            end
         end
         print(format("%s Sharing: %s, %d peer%s tracked.",
             MC.PREFIX,
@@ -348,8 +406,7 @@ function MC.RosterSlashHandler(arg)
         print(MC.PREFIX .. " Sharing: pruned stale peers.")
         if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     elseif arg == "clear" then
-        if MC.RosterDB then wipe(MC.RosterDB) end
-        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+        MC.RosterClearHistory()
         print(MC.PREFIX .. " Sharing: cleared.")
     else
         print(MC.PREFIX .. " /mc sharing on|off|announce|sync|prune|clear|status")

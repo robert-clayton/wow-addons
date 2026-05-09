@@ -59,9 +59,18 @@ local function warmCatalog()
 
     if s.RunSearch then s:RunSearch() end
 
-    -- Failsafe: if the callback never fires, retry the warmup.
+    -- Failsafe: if the callback never fires after 5s, retry the warmup.
+    -- Don't reassign `catalogSearcher` if the previous one still has a
+    -- pending callback — that would orphan it and re-introduce the GC
+    -- race the module-level reference is meant to prevent.
     C_Timer.After(5, function()
         if catalogReady then return end
+        if catalogRetries >= CATALOG_MAX_RETRIES then return end
+        -- Drop the previous searcher's callback so its eventual fire
+        -- is a no-op, then create a fresh one.
+        if catalogSearcher and catalogSearcher.SetResultsUpdatedCallback then
+            pcall(catalogSearcher.SetResultsUpdatedCallback, catalogSearcher, function() end)
+        end
         warmCatalog()
     end)
 end

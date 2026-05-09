@@ -23,3 +23,8 @@ bash scripts/symlink.sh "X:/Program Files/World of Warcraft/_retail_/Interface/A
 - WoW API globals (CreateFrame, LibStub, GameTooltip, etc.) are not available outside the game — `luajit -bl` only validates syntax, not runtime correctness.
 - TOC file load order matters: files are executed top-to-bottom, so dependencies must be listed before dependents.
 - Addon namespace is passed via `local addonName, ns = ...` at the top of each file.
+
+## Versioning
+
+- When bumping the version in `addons/<AddonName>/<AddonName>.toc`, append a humanized changelog entry to `addons/<AddonName>/CHANGELOG.md` describing what changed. Player-facing tone, not commit-message tone — focus on the behavior players will notice, not the implementation.
+- Create the file if it doesn't exist. Newest version on top.

@@ -21,7 +21,7 @@ end
 function UI:GetConfigDefs()
     local db = mod.db
     return {
-        { type = "checkbox", label = "Wild Pet Nearby Alerts",
+        { type = "checkbox", label = "Uncollected Pet Hover Alert",
             get = function() return db.wildAlerts end,
             set = function(v)
                 db.wildAlerts = v

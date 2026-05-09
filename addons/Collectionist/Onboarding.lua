@@ -14,7 +14,7 @@ local ONBOARDING_VERSION = "1.5.0"
 
 -- Lead with the user benefit; mention the share toggle plainly.
 local INTRO_LINES = {
-    "Midnight Collections has new features in 1.5.0:",
+    "Collectionist has new features in 1.5.0:",
     " ",
     "  • Roster tab — see your guild's collection progress",
     "  • Per-treasure step-by-step guides",
@@ -30,7 +30,7 @@ local function buildFrame()
     if FRAME then return FRAME end
 
     local theme = MUI and MUI.Theme
-    local f = CreateFrame("Frame", "MidnightCollectionsOnboarding", UIParent, "BackdropTemplate")
+    local f = CreateFrame("Frame", "CollectionistOnboarding", UIParent, "BackdropTemplate")
     f:SetFrameStrata("DIALOG")
     f:SetSize(420, 460)
     f:SetPoint("CENTER")
@@ -62,7 +62,7 @@ local function buildFrame()
     local title = bar:CreateFontString(nil, "OVERLAY")
     title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 13, "OUTLINE")
     title:SetPoint("LEFT", 10, 0)
-    title:SetText("Midnight Collections — Welcome to 1.5.0")
+    title:SetText("Collectionist — Welcome to 1.5.0")
     if theme then title:SetTextColor(unpack(theme.colors.title)) end
 
     -- Intro text
@@ -197,16 +197,16 @@ function MC.ShowOnboarding()
         applyChoices(f)
         f:Hide()
         -- Write the flag to the per-character DB. The PLAYER_LOGOUT
-        -- snapshot routine in Core.lua copies MC.db -> MidnightCollectionsDB,
-        -- so writing to MidnightCollectionsDB directly here would get
+        -- snapshot routine in Core.lua copies MC.db -> CollectionistDB,
+        -- so writing to CollectionistDB directly here would get
         -- clobbered every reload. The CharDB-side flag is preserved across
-        -- reloads (saved as part of MidnightCollectionsCharDB) and
+        -- reloads (saved as part of CollectionistCharDB) and
         -- propagates to fresh alts via the snapshot seed.
         if MC.db then
             MC.db._onboardingShown = ONBOARDING_VERSION
         end
-        if MidnightCollectionsDB then
-            MidnightCollectionsDB._onboardingShown = ONBOARDING_VERSION
+        if CollectionistDB then
+            CollectionistDB._onboardingShown = ONBOARDING_VERSION
         end
         -- After the user accepts, fire the first broadcast in 2s so it
         -- reflects whichever modules they kept on.
@@ -223,7 +223,7 @@ function MC.MaybeShowOnboarding()
     -- pre-fix users who already clicked "Got it" once don't re-trigger the
     -- popup just because their flag landed in the wrong place.
     local shown = (MC.db and MC.db._onboardingShown)
-                  or (MidnightCollectionsDB and MidnightCollectionsDB._onboardingShown)
+                  or (CollectionistDB and CollectionistDB._onboardingShown)
     if shown == ONBOARDING_VERSION then return end
     -- Defer so MC.modules and friends are populated.
     C_Timer.After(2, function() MC.ShowOnboarding() end)

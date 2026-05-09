@@ -288,7 +288,9 @@ function Bitmap:OwnersOf(modKey, canonicalID)
     if not (MC.RosterDB and self.fingerprint) then return {} end
     local owners = {}
     for name, rec in pairs(MC.RosterDB) do
-        if rec.bitmap and rec.bitmap.fingerprint == self.fingerprint then
+        if type(name) == "string" and name:sub(1, 1) ~= "_"
+           and type(rec) == "table"
+           and rec.bitmap and rec.bitmap.fingerprint == self.fingerprint then
             local set = rec.bitmap.owned and rec.bitmap.owned[modKey]
             if set and set[canonicalID] then
                 owners[#owners + 1] = name
