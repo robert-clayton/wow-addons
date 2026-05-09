@@ -4,7 +4,7 @@
 ### Added
 - New **Achievements** tab tracking Midnight exploration, quest, collection, and feature achievements. Each row shows progress (e.g., "3 / 5"), tooltip lists each criterion with ✓/✗, and clicking drops waypoints for every incomplete criterion.
 - Coverage includes Highest Peaks (Vistas), Skyriding Glyph Hunter, Midnight Lore Hunter, Ever Painting, Runestone Rush, Chronicler of the Haranir (all 21 books across 7 quest-gated series), The Party Must Go On, Sacred Buffet Devotee, Glory of the Midnight Hero/Raider, Midnight Safari, Preying For Midnight, Void Response Team, Ritual Site Disruptor, and many more.
-- Chronicler of the Haranir tooltip shows each series' parent campaign quest as its own row — if a parent shows `[ ]`, that series' books haven't unlocked yet.
+- Chronicler of the Haranir tooltip shows each series' parent campaign quest as its own row.
 - Collection Inspector now de-duplicates alts that share a Battle.net account into one row, showing the most-recently-seen character.
 - "Clear" button in the Inspector header to wipe peer history (with confirmation).
 - Click an achievement row to route waypoints when available; falls back to opening the achievement frame for activity-based achievements (e.g., "complete 100 ambushes").
@@ -18,7 +18,7 @@
 - Treasures tab icon now actually appears in retail clients.
 - Options panel checkboxes word-wrap properly instead of truncating after 5 characters.
 ### Removed
-- Idol of the Depths is no longer in the Toys tracker (it's a quest item, not a toy — the previous data was wrong).
+- Idol of the Depths is no longer in the Toys tracker, not a toy
 
 # 1.5.2
 ### Added
