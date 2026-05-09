@@ -1,3 +1,7 @@
+# 1.6.1
+### Fixed
+- Eight mounts in the Mounts tab were showing wrong icons/tooltips because their journal IDs were mistyped. Corrected: Witherbark Warbear Mother, Void-Corrupted Hex Eagle, Void-Touched Hawkstrider, Void-Touched Snapdragon, Void-Corrupted Lynx, Retrained Skyrazor, Nether-Swept Drake, and Magister's Spell Bee. The right names and icons should now appear in-game.
+
 # 1.6.0
 ### Renamed
 - The addon is now called **Collectionist** (was "Midnight Collections"). The folder, .toc, and saved variables all use the new name. Existing players' saved data does not auto-migrate; if you had counts/peers/options from a previous version, they'll be reset.

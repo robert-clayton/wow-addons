@@ -151,7 +151,7 @@ MC.MountData = {
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Singularity, level = 19, factionName = "The Singularity" } },
 
             -- Patch 12.0.5: Ritual Sites renown (Sergeant Vornin)
-            { mountID = 2182, name = "Void-Touched Hawkstrider", source = "renown", sourceInfo = "Sergeant Vornin - 4,500 Voidlight Marl, Ritual Sites Renown 8",
+            { mountID = 2935, name = "Void-Touched Hawkstrider", source = "renown", sourceInfo = "Sergeant Vornin - 4,500 Voidlight Marl, Ritual Sites Renown 8",
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 4500 } },
               renown = { factionID = MC.FACTION.RitualSites, level = 8, factionName = "Ritual Sites" } },
@@ -212,15 +212,15 @@ MC.MountData = {
             { mountID = 2790, name = "Insatiable Shredclaw", source = "drop", sourceInfo = "Final Clutch of Predaxas (lightning maze)",
               waypoint = LOC.FinalClutchPredaxas, zone = "Voidstorm", dropInfo = { mob = "Final Clutch of Predaxas", zone = "Voidstorm" } },
             -- Patch 12.0.5: Ritual Sites (instanced — waypoints are in-instance)
-            { mountID = 2116, name = "Witherbark Warbear Mother", source = "drop",
+            { mountID = 2779, name = "Witherbark Warbear Mother", source = "drop",
               sourceInfo = "Broken Throne Tier 2+ — get Chubs (pet) first, then bring 5 more Practically Pork to the bone pile, summon Chubs to spawn Angry Amani Warbear, defeat to receive the mount kit",
               waypoint = LOC.AmaniWarbearPile, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman",
               dropInfo = { mob = "Angry Amani Warbear", zone = "Broken Throne Ritual Site", rate = "Guaranteed" } },
-            { mountID = 2183, name = "Void-Corrupted Hex Eagle", source = "drop",
+            { mountID = 2961, name = "Void-Corrupted Hex Eagle", source = "drop",
               sourceInfo = "Broken Throne Tier 2+ — pick up the Misplaced Ritual Candle under the nearby tree, place it in the empty skull, then click the candle cluster to summon the elite",
               waypoint = LOC.HexEagleRitual, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman",
               dropInfo = { mob = "Void-Corrupted Hex Eagle (elite)", zone = "Broken Throne Ritual Site", rate = "Guaranteed" } },
-            { mountID = 2181, name = "Void-Touched Snapdragon", source = "drop",
+            { mountID = 2964, name = "Void-Touched Snapdragon", source = "drop",
               sourceInfo = "Daggerspine Point Tier 2+ — loot Washed-Up Kelp piles along the coast (1-2 per instance) for a chance to spawn the rare; otherwise spawns slimes",
               waypoint = LOC.DaggerspineKelpPiles, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods",
               dropInfo = { mob = "Void-Touched Snapdragon (rare)", zone = "Daggerspine Point Ritual Site", rate = "Very rare" } },
@@ -349,7 +349,7 @@ MC.MountData = {
                   { MC.MAP.Voidstorm, 0.3882, 0.5331, "Chel the Chip (Abundant Voidburrow)" },
               } },
             -- Patch 12.0.5: Decor Duels
-            { mountID = 1763, name = "Magister's Spell Bee", source = "worldevent", sourceInfo = "Gamesmaster Fleurin - 500 Illusionary Coins (Decor Duels)",
+            { mountID = 2933, name = "Magister's Spell Bee", source = "worldevent", sourceInfo = "Gamesmaster Fleurin - 500 Illusionary Coins (Decor Duels)",
               waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.IllusionaryCoin, 500 } } },
             -- Patch 12.0.5: Void Assaults achievement reward
@@ -366,10 +366,10 @@ MC.MountData = {
     {
         source = "profession",
         mounts = {
-            { mountID = 654, name = "Nether-Swept Drake", source = "profession", sourceInfo = "Fishing - Nether-Warped Egg (7 day hatch), Voidstorm",
+            { mountID = 16, name = "Nether-Swept Drake", source = "profession", sourceInfo = "Fishing - Nether-Warped Egg (7 day hatch), Voidstorm",
               zone = "Voidstorm" },
             -- Patch 12.0.5: Leatherworking craft
-            { mountID = 2188, name = "Void-Corrupted Lynx", source = "profession",
+            { mountID = 2965, name = "Void-Corrupted Lynx", source = "profession",
               sourceInfo = "Leatherworking 90 craft — needs Pattern: Rope Lynx Harness + Broken Lynx Leash reagent (both drop from the end-of-run chest at Ritual Sites, guaranteed on Tier 5 first clear)",
               dropInfo = { mob = "End-of-run Ritual Site chest (Tier 5)", zone = "Ritual Sites" } },
         },
@@ -392,7 +392,7 @@ MC.MountData = {
         mounts = {
             { mountID = 2608, name = "Light-Forged Mechsuit", source = "prepatch", sourceInfo = "Two Minutes to Midnight achievement (Twilight Ascension pre-patch event, no longer earnable)",
               achievementID = 42300, unavailable = true },
-            { mountID = 2220, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)",
+            { mountID = 1798, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)",
               unavailable = true },
         },
     },
