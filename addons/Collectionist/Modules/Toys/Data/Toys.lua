@@ -46,7 +46,7 @@ local ABUNDANCE_TASKS = {
 --   [achievementID], [taskList], [dropInfo] }
 -- itemID is the same number you'd pass to PlayerHasToy / C_ToyBox.GetToyInfo.
 
-MC.ToyData = {
+MC.RegisterContent("midnight", "toys", {
     -- Renown vendor toys (Voidlight Marl)
     {
         source = "renown",
@@ -236,4 +236,4 @@ MC.ToyData = {
               sourceInfo = "Children's Week 2026 vendor reward (Well-loved Figurine token)" },
         },
     },
-}
+})

@@ -10,19 +10,20 @@ local _, MC = ...
 
 local MUI = LibStub("MidnightUI-1.0", true)
 
-local ONBOARDING_VERSION = "1.6.0"
+-- Onboarding fires once per account on first install. The flag below
+-- is a sentinel value — once any truthy value is stored on
+-- _onboardingShown, the popup never reappears, even across version
+-- bumps. Existing players upgrading from 1.6.x or earlier (where the
+-- flag was a version string) are also covered: any non-nil value
+-- counts as "shown".
+local ONBOARDING_FLAG = true
 
--- Plain summary of what the addon does, plus the share opt-in. Avoid
--- marketing tone — players appreciate "here's what it does" over hype.
 local INTRO_LINES = {
     "Collectionist tracks what you're missing from Midnight:",
     " ",
     "  • Mounts, pets, toys, decor, recipes, rares, treasures, achievements",
     "  • Click any row to drop waypoints to where you need to go",
     "  • Optional Sharing lets you compare progress with guildies",
-    " ",
-    "Turn off any tracker you don't care about, and decide whether",
-    "to share your counts before anything goes out over guild chat.",
 }
 
 local FRAME
@@ -63,7 +64,7 @@ local function buildFrame()
     local title = bar:CreateFontString(nil, "OVERLAY")
     title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 13, "OUTLINE")
     title:SetPoint("LEFT", 10, 0)
-    title:SetText("Collectionist — Welcome to 1.6.0")
+    title:SetText("Collectionist — Welcome to 1.7.0")
     if theme then title:SetTextColor(unpack(theme.colors.title)) end
 
     -- Intro text
@@ -204,10 +205,10 @@ function MC.ShowOnboarding()
         -- reloads (saved as part of CollectionistCharDB) and
         -- propagates to fresh alts via the snapshot seed.
         if MC.db then
-            MC.db._onboardingShown = ONBOARDING_VERSION
+            MC.db._onboardingShown = ONBOARDING_FLAG
         end
         if CollectionistDB then
-            CollectionistDB._onboardingShown = ONBOARDING_VERSION
+            CollectionistDB._onboardingShown = ONBOARDING_FLAG
         end
         -- After the user accepts, fire the first broadcast in 2s so it
         -- reflects whichever modules they kept on.
@@ -220,12 +221,13 @@ function MC.ShowOnboarding()
 end
 
 function MC.MaybeShowOnboarding()
-    -- Read from CharDB primarily; fall back to the account-wide DB so that
-    -- pre-fix users who already clicked "Got it" once don't re-trigger the
-    -- popup just because their flag landed in the wrong place.
+    -- Any truthy value means the player has accepted the popup at some
+    -- point — never re-show, even across version bumps. Pre-1.7.0 users
+    -- had a version string here ("1.5.0", "1.6.0", etc.) which still
+    -- counts as truthy, so they don't get the popup again either.
     local shown = (MC.db and MC.db._onboardingShown)
                   or (CollectionistDB and CollectionistDB._onboardingShown)
-    if shown == ONBOARDING_VERSION then return end
+    if shown then return end
     -- Defer so MC.modules and friends are populated.
     C_Timer.After(2, function() MC.ShowOnboarding() end)
 end

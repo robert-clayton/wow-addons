@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.6.2
+## Version: 1.9.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -19,6 +19,7 @@ Libs\MidnightUI-1.0\MidnightUI-1.0.xml
 Core.lua
 Data\Constants.lua
 Data\Locations.lua
+Data\Expansions.lua
 TabBar.lua
 MinimapButton.lua
 Onboarding.lua

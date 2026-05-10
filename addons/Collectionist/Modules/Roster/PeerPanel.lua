@@ -9,6 +9,31 @@ local MUI = LibStub("MidnightUI-1.0", true)
 local FRAME
 local activePeers = {}  -- ordered list of Name-Realm keys in comparison
 
+-- Inspector's own expansion filter. Initialized from the panel's
+-- filter each time the inspector opens. Mutating this here doesn't
+-- affect the panel filter (so the user can browse peer comparisons
+-- in a different scope without losing their main view).
+--
+-- When the filter is "single", peer columns display the matching
+-- expansion's slice from `entry.countsByExpansion` (broadcast as 'e'
+-- messages). Falls back to account-wide `entry.counts` if the peer
+-- didn't broadcast that expansion's slice (e.g. they're on an older
+-- version, or they have no data for that expansion).
+local inspectorFilter = nil
+
+local function copyFilter(f)
+    return { mode = f.mode or "current", single = f.single }
+end
+
+local function inspectorFilterLabel()
+    if not inspectorFilter then return "" end
+    if inspectorFilter.mode == "all" then return "All" end
+    local key = inspectorFilter.mode == "single" and inspectorFilter.single
+                or (MC.GetLatestExpansion and MC.GetLatestExpansion())
+    local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
+    return e and e.label or (key or "?")
+end
+
 local LIST_WIDTH      = 180
 local LIST_ROW_H      = 18
 local COLUMN_WIDTH    = 220
@@ -20,9 +45,10 @@ local SIDE_PAD        = 14
 local LIST_GAP        = 12
 
 -- Column content height: renderColumn starts at -36 then drops -22 per
--- module row. Stays constant across peer counts (columns are
--- side-by-side, not stacked), so the panel only grows in width.
-local COLUMN_CONTENT_H = 36 + 7 * 22
+-- module row, plus a Collection Score row (+22, with a 4px gap above).
+-- Stays constant across peer counts (columns are side-by-side, not
+-- stacked), so the panel only grows in width.
+local COLUMN_CONTENT_H = 36 + 7 * 22 + 26
 local DEFAULT_PANEL_H  = TITLE_BAR_H + CONTENT_TOP_PAD + COLUMN_CONTENT_H + BOTTOM_PAD
 
 -- Smooth width/height transitions via OnUpdate lerp. Ease-out cubic so
@@ -243,6 +269,7 @@ local function build()
         close:SetPoint("RIGHT", -4, 0)
         close:SetScript("OnClick", function()
             wipe(activePeers)
+            inspectorFilter = nil
             f:Hide()
         end)
 
@@ -259,6 +286,59 @@ local function build()
         clear:SetScript("OnClick", function()
             StaticPopup_Show("MIDNIGHTCOLLECTIONS_CLEAR_PEERS")
         end)
+
+        -- Inspector-local expansion filter. Defaults to the panel's
+        -- filter at open time; changing it doesn't affect the panel.
+        local filterBtn = MUI.MakeHeaderBtn(bar, "Midnight",
+            theme.colors.btnCloseFg,
+            theme.colors.btnCloseHoverBg,
+            theme.colors.btnCloseHoverBd,
+            "Inspector expansion filter")
+        filterBtn:SetSize(80, 16)
+        filterBtn:SetPoint("RIGHT", clear, "LEFT", -4, 0)
+
+        local popup = MUI.MakeDropdown()
+        local function buildItems()
+            if not inspectorFilter then return {} end
+            local currentKey = inspectorFilter.mode == "single" and inspectorFilter.single
+                               or (MC.GetLatestExpansion and MC.GetLatestExpansion())
+            local items = {
+                { label = "All Expansions",
+                  selected = inspectorFilter.mode == "all",
+                  onClick = function()
+                      inspectorFilter.mode = "all"
+                      if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                      if FRAME and FRAME:IsShown() then rerender(FRAME) end
+                  end },
+            }
+            for _, e in ipairs(MC.EXPANSIONS or {}) do
+                if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+                    local key = e.key
+                    items[#items + 1] = {
+                        label = e.label,
+                        selected = inspectorFilter.mode ~= "all" and currentKey == key,
+                        onClick = function()
+                            inspectorFilter.mode = "single"
+                            inspectorFilter.single = key
+                            if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                            if FRAME and FRAME:IsShown() then rerender(FRAME) end
+                        end,
+                    }
+                end
+            end
+            return items
+        end
+        filterBtn:SetScript("OnClick", function()
+            if popup:IsShown() then popup:Hide(); return end
+            popup:ShowAt(filterBtn, "BOTTOMRIGHT", "TOPRIGHT", buildItems())
+        end)
+
+        -- Re-applies the active filter's label to the button. Called
+        -- on every open (so the label tracks the panel filter) and
+        -- after every selection.
+        function f:RefreshFilterButton()
+            filterBtn:GetFontString():SetText(inspectorFilterLabel())
+        end
     end
 
     tinsert(UISpecialFrames, "CollectionistPeerPanel")
@@ -444,6 +524,23 @@ local function acquireColRow(col, key, yOff)
     return row
 end
 
+-- Picks which {collected, total} to display for a given module on a
+-- given peer entry, respecting the inspector filter:
+--   filter "all" or "current" → account-wide (entry.counts)
+--   filter "single"+expKey    → entry.countsByExpansion[expKey] if the
+--                               peer broadcast it; otherwise fall back
+--                               to account-wide so older peers (and
+--                               peers without that expansion's data)
+--                               still render something useful
+local function pickCounts(entry, modKey)
+    if inspectorFilter and inspectorFilter.mode == "single" then
+        local exp = inspectorFilter.single
+        local byExp = exp and entry.countsByExpansion and entry.countsByExpansion[exp]
+        if byExp and byExp[modKey] then return byExp[modKey] end
+    end
+    return entry.counts and entry.counts[modKey]
+end
+
 local function renderColumn(col, entry)
     local r, g, b = classRGB(entry.class)
     col.title:SetText(nameOnly(entry.name) .. (entry.isMe and " |cff888888(You)|r" or ""))
@@ -457,7 +554,7 @@ local function renderColumn(col, entry)
 
     local yOff = -36
     for _, key in ipairs(MOD_DISPLAY_ORDER) do
-        local c = entry.counts and entry.counts[key]
+        local c = pickCounts(entry, key)
         if c then
             local row = acquireColRow(col, key, yOff)
             row.label:SetText(MOD_LABELS[key])
@@ -472,6 +569,32 @@ local function renderColumn(col, entry)
             row.barFill:SetColorTexture(cr, cg, cb)
             yOff = yOff - 22
         end
+    end
+
+    -- Collection Score row at the bottom of each column. Shows the
+    -- peer's broadcast totalScore, plus legacy count if non-zero.
+    -- For "You", the inspector pulls from MC.GetLocalScore so the
+    -- value tracks the live local state even between broadcasts.
+    local total, legacy
+    if entry.isMe and MC.GetLocalScore then
+        total, legacy = MC.GetLocalScore()
+    else
+        total = entry.totalScore or 0
+        legacy = entry.totalLegacyCount or 0
+    end
+    if total > 0 or legacy > 0 then
+        local row = acquireColRow(col, "_score", yOff - 4)
+        row.label:SetText("Collection Score")
+        row.label:SetTextColor(0.95, 0.85, 0.45)
+        row.value:SetTextColor(0.95, 0.85, 0.45)
+        if legacy > 0 then
+            row.value:SetText(format("%d  ·  %dL", total, legacy))
+        else
+            row.value:SetText(tostring(total))
+        end
+        -- No progress bar on the score row.
+        row.barFill:SetWidth(0)
+        yOff = yOff - 22 - 4
     end
     return -yOff
 end
@@ -590,10 +713,17 @@ function MC.ShowPeerPanel(peerName)
             end
         end
     end
+    -- Initialize the inspector's filter from the panel filter on each
+    -- open. The user can change this independently inside the inspector
+    -- without affecting the main panel.
+    if MC.GetExpansionFilter then
+        inspectorFilter = copyFilter(MC.GetExpansionFilter())
+    end
     -- Even with empty activePeers we open the popup so the player can see
     -- the peer list and pick someone to compare. The right pane shows a
     -- small hint until they do.
     local f = build()
+    if f.RefreshFilterButton then f:RefreshFilterButton() end
     rerender(f)
     f:Show()
     f:Raise()
@@ -601,6 +731,7 @@ end
 
 function MC.HidePeerPanel()
     wipe(activePeers)
+    inspectorFilter = nil  -- next open re-syncs from the panel filter
     if FRAME then FRAME:Hide() end
 end
 

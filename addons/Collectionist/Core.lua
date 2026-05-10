@@ -60,6 +60,140 @@ function MC.RegisterModule(key, opts)
 end
 
 --------------------------------------------------------------------------
+-- Content registration. Each expansion's data file calls into this so
+-- the per-module lists (MC.MountData, MC.PetData, etc.) build up
+-- additively. Each top-level group gets `expansion` stamped on it so
+-- scanners and the UI filter can route entries by expansion.
+--
+-- Per-module content destination is determined by the moduleKey:
+--   mounts       -> MC.MountData
+--   pets         -> MC.PetData
+--   toys         -> MC.ToyData
+--   decorations  -> MC.DecorationData
+--   rares        -> MC.RareData
+--   treasures    -> MC.TreasureData
+--   achievements -> MC.AchievementData
+--   recipes      -> MC.RecipeData (per-skillline merge handled by Recipes module)
+--------------------------------------------------------------------------
+MC._registeredExpansions = {}
+
+local CONTENT_TARGETS = {
+    mounts       = "MountData",
+    pets         = "PetData",
+    toys         = "ToyData",
+    decorations  = "DecorationData",
+    rares        = "RareData",
+    treasures    = "TreasureData",
+    achievements = "AchievementData",
+    recipes      = "RecipeData",
+}
+
+function MC.RegisterContent(expansionKey, moduleKey, groups)
+    if not (expansionKey and moduleKey and groups) then return end
+    local targetField = CONTENT_TARGETS[moduleKey]
+    if not targetField then
+        print(format("|cffff8888[Collectionist]|r RegisterContent: unknown module '%s'",
+            tostring(moduleKey)))
+        return
+    end
+    -- Append to MC.<X>Data. Multiple files registering the same
+    -- (module, expansion) combo is allowed — useful when an expansion's
+    -- data grows large enough to warrant splitting into per-source
+    -- files. /reload resets Lua state so MC[targetField] starts empty
+    -- on each session; no idempotency guard needed.
+    if not MC[targetField] then MC[targetField] = {} end
+    local target = MC[targetField]
+
+    for _, group in ipairs(groups) do
+        -- Stamp expansion on the group itself and on each entry within.
+        -- Entries inherit at scan time via group.expansion; per-entry
+        -- stamping is belt-and-suspenders for code paths that read the
+        -- entry directly (Inspector, Sharing).
+        group.expansion = group.expansion or expansionKey
+        -- Inner-list keys: matches CONTENT_TARGETS module keys plus
+        -- "items" (a generic catch-all used by some Decorations groups).
+        for _, listKey in ipairs({ "mounts", "pets", "toys", "decorations",
+                                   "rares", "treasures", "achievements",
+                                   "recipes", "items" }) do
+            local list = group[listKey]
+            if type(list) == "table" then
+                for _, entry in ipairs(list) do
+                    entry.expansion = entry.expansion or expansionKey
+                end
+            end
+        end
+        target[#target + 1] = group
+    end
+
+    MC._registeredExpansions[expansionKey] = true
+    -- Invalidate the latest-expansion cache so the next read picks up
+    -- newly-registered expansions.
+    MC._latestExpansionKey = nil
+end
+
+--------------------------------------------------------------------------
+-- Expansion filter. Scanners call MC.IsGroupVisible(group) to decide
+-- whether to include a content group in the scan. The filter has
+-- three modes:
+--   "current" — show only the latest expansion that has data
+--   "single"  — show only the expansion named in db.expansionFilter.single
+--   "all"     — show every expansion's data
+-- Default is "current" so existing players see no behavior change.
+--------------------------------------------------------------------------
+function MC.GetExpansionFilter()
+    if not MC.db then return { mode = "current" } end
+    if not MC.db.expansionFilter then
+        MC.db.expansionFilter = { mode = "current",
+                                  single = MC.GetLatestExpansion and MC.GetLatestExpansion() }
+    end
+    return MC.db.expansionFilter
+end
+
+function MC.IsGroupVisible(group)
+    if not group then return true end
+    -- Groups without an expansion stamp are pre-1.7.0 entries — show
+    -- them so legacy data doesn't silently disappear.
+    if not group.expansion then return true end
+    local f = MC.GetExpansionFilter()
+    if f.mode == "all" then return true end
+    if f.mode == "single" then
+        return group.expansion == (f.single or MC.GetLatestExpansion())
+    end
+    -- "current" mode (default)
+    return group.expansion == MC.GetLatestExpansion()
+end
+
+function MC.SetExpansionFilter(mode, singleKey)
+    local f = MC.GetExpansionFilter()
+    f.mode = mode or "current"
+    if singleKey then f.single = singleKey end
+    -- Re-scan via ThrottledScan so the click doesn't synchronously
+    -- block on every scanner (especially Decorations, which hits the
+    -- housing catalog API). ThrottledScan also coalesces duplicate
+    -- requests and yields a frame.
+    if MC.modules and MC.ThrottledScan then
+        for _, m in ipairs(MC.modules) do
+            if MC.IsModuleEnabled and MC.IsModuleEnabled(m.key)
+               and m.Scanner and m.Scanner.Scan then
+                MC.ThrottledScan(m, 0)
+            end
+        end
+    end
+    if MC.RefreshActive then MC.RefreshActive() end
+    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
+end
+
+-- Human-readable label for the current filter, used by the title-bar
+-- button.
+function MC.GetExpansionFilterLabel()
+    local f = MC.GetExpansionFilter()
+    if f.mode == "all" then return "All" end
+    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion()
+    local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
+    return e and e.label or key or "?"
+end
+
+--------------------------------------------------------------------------
 -- Module reorder. The user can rearrange modules via up/down arrows in
 -- the options panel; the chosen order persists per-character in
 -- MC.db.moduleOrder. ApplyModuleOrder rebuilds the runtime list and
@@ -1215,19 +1349,153 @@ function MC.CreatePanel()
     end
     MC.BuildConfig()
 
-    -- Peer-count indicator in the title bar. Clickable; opens the
-    -- Collection Inspector. Hidden when Roster is disabled.
+    -- Expansion filter button in the title bar. Click opens a dropdown
+    -- to switch between Current / per-expansion / All. Lives left of
+    -- the peer indicator.
     local bar = panel.frame and panel.frame.titleBar
     if bar then
+        local filterBtn = CreateFrame("Button", nil, bar)
+        filterBtn:SetHeight(16)
+        local ffs = filterBtn:CreateFontString(nil, "OVERLAY")
+        ffs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
+        ffs:SetPoint("CENTER")
+        ffs:SetTextColor(0.85, 0.85, 0.85)
+        filterBtn:SetFontString(ffs)
+        filterBtn:SetScript("OnEnter", function(s)
+            ffs:SetTextColor(1, 1, 1)
+            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+            GameTooltip:SetText("Expansion filter")
+            GameTooltip:AddLine("Click to switch which expansion's data is shown.",
+                0.7, 0.7, 0.7, true)
+            GameTooltip:Show()
+        end)
+        filterBtn:SetScript("OnLeave", function()
+            ffs:SetTextColor(0.85, 0.85, 0.85)
+            GameTooltip:Hide()
+        end)
+        local popup = MUI.MakeDropdown()
+        local function buildItems()
+            local f = MC.GetExpansionFilter()
+            local currentKey = f.mode == "single" and f.single or MC.GetLatestExpansion()
+            local items = {
+                { label = "All Expansions",
+                  selected = f.mode == "all",
+                  onClick = function() MC.SetExpansionFilter("all") end },
+            }
+            for _, e in ipairs(MC.EXPANSIONS or {}) do
+                if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+                    local key = e.key
+                    items[#items + 1] = {
+                        label = e.label,
+                        selected = f.mode ~= "all" and currentKey == key,
+                        onClick = function() MC.SetExpansionFilter("single", key) end,
+                    }
+                end
+            end
+            return items
+        end
+        filterBtn:SetScript("OnClick", function()
+            if popup:IsShown() then popup:Hide(); return end
+            popup:ShowAt(filterBtn, "BOTTOMLEFT", "TOPLEFT", buildItems())
+        end)
+        MC.expansionFilterBtn = filterBtn
+
+        function MC.RefreshExpansionFilterButton()
+            local btn = MC.expansionFilterBtn
+            if not btn then return end
+            local label = MC.GetExpansionFilterLabel()
+            btn:GetFontString():SetText(label)
+            btn:SetWidth(btn:GetFontString():GetStringWidth() + 14)
+        end
+        MC.RefreshExpansionFilterButton()
+    end
+
+    -- Collection Score button. Sits between the peer indicator and the
+    -- per-tab progress text. Hover for per-module breakdown; click is
+    -- a no-op today (could route to a leaderboard view later).
+    if bar then
+        local scoreBtn = CreateFrame("Button", nil, bar)
+        scoreBtn:SetHeight(16)
+        local sfs = scoreBtn:CreateFontString(nil, "OVERLAY")
+        sfs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
+        sfs:SetPoint("CENTER")
+        sfs:SetTextColor(0.95, 0.85, 0.45)  -- warm gold to draw the eye
+        scoreBtn:SetFontString(sfs)
+        if panel.titleProgressText then
+            scoreBtn:SetPoint("RIGHT", panel.titleProgressText, "LEFT", -10, 0)
+        else
+            scoreBtn:SetPoint("RIGHT", bar, "RIGHT", -68, 0)
+        end
+        scoreBtn:SetScript("OnEnter", function(s)
+            sfs:SetTextColor(1, 1, 0.65)
+            if MC.GetLocalScore then
+                local total, legacy, byMod = MC.GetLocalScore()
+                GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+                GameTooltip:SetText("Collection Score")
+                GameTooltip:AddDoubleLine("Total", tostring(total),
+                    1, 1, 1, 0.95, 0.85, 0.45)
+                if MC.modules then
+                    for _, m in ipairs(MC.modules) do
+                        local b = byMod[m.key]
+                        if b and b.score > 0 then
+                            GameTooltip:AddDoubleLine("  " .. (m.label or m.key),
+                                tostring(b.score), 0.85, 0.85, 0.85, 0.95, 0.85, 0.45)
+                        end
+                    end
+                end
+                if legacy > 0 then
+                    GameTooltip:AddLine(" ")
+                    GameTooltip:AddDoubleLine("Legacies",
+                        tostring(legacy), 0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
+                    GameTooltip:AddLine("Items you've collected that are no longer obtainable. Tracked separately so retired content doesn't drag down newer collectors.",
+                        0.6, 0.6, 0.6, true)
+                end
+                GameTooltip:Show()
+            end
+        end)
+        scoreBtn:SetScript("OnLeave", function()
+            sfs:SetTextColor(0.95, 0.85, 0.45)
+            GameTooltip:Hide()
+        end)
+        MC.scoreIndicator = scoreBtn
+
+        function MC.RefreshScoreIndicator()
+            local btn = MC.scoreIndicator
+            if not btn or not MC.GetLocalScore then return end
+            local total, legacy = MC.GetLocalScore()
+            local txt
+            if legacy > 0 then
+                txt = format("CS %d  ·  %dL", total, legacy)
+            else
+                txt = format("CS %d", total)
+            end
+            btn:GetFontString():SetText(txt)
+            btn:SetWidth(btn:GetFontString():GetStringWidth() + 14)
+        end
+        MC.RefreshScoreIndicator()
+    end
+
+    -- Peer-count indicator in the title bar. Clickable; opens the
+    -- Collection Inspector. Hidden when Roster is disabled.
+    if bar then
         local peerBtn = CreateFrame("Button", nil, bar)
+        -- Filter btn sits to the LEFT of the peer indicator. Anchor it
+        -- here once both buttons exist.
+        if MC.expansionFilterBtn then
+            MC.expansionFilterBtn:ClearAllPoints()
+            MC.expansionFilterBtn:SetPoint("RIGHT", peerBtn, "LEFT", -8, 0)
+        end
         peerBtn:SetHeight(16)
         local fs = peerBtn:CreateFontString(nil, "OVERLAY")
         fs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
         fs:SetPoint("CENTER")
         fs:SetTextColor(0.85, 0.85, 0.85)
         peerBtn:SetFontString(fs)
-        -- Anchor between the addon-progress text and the gear/options button
-        if panel.titleProgressText then
+        -- Score btn sits to the RIGHT of the peer indicator (closer to
+        -- the progress text). Anchor peer to the score btn's left.
+        if MC.scoreIndicator then
+            peerBtn:SetPoint("RIGHT", MC.scoreIndicator, "LEFT", -10, 0)
+        elseif panel.titleProgressText then
             peerBtn:SetPoint("RIGHT", panel.titleProgressText, "LEFT", -10, 0)
         else
             peerBtn:SetPoint("RIGHT", bar, "RIGHT", -68, 0)
@@ -1319,6 +1587,9 @@ function MC.RefreshActive()
     MC.HideInfoTooltip()
     if GameTooltip then GameTooltip:Hide() end
     mod.UI:Refresh()
+    -- Score depends on every scanner; refresh it whenever any tab
+    -- redraws so the title-bar number tracks the latest scan.
+    if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
 end
 
 --------------------------------------------------------------------------
@@ -1435,6 +1706,8 @@ local function PrintHelp()
     print("  /mc collected [module] - toggle collected/learned display")
     print("  /mc reset - reset panel position + size")
     print("  /mc sharing on|off|announce|sync|prune|status - guild sharing")
+    print("  /mc filter all|current|<expansion> - filter visible expansions")
+    print("  /mc score - show your Collection Score breakdown")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -1500,6 +1773,40 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
         print(format("%s Collectionist v%s", PREFIX, MC.version))
+    elseif cmd == "score" then
+        if not MC.GetLocalScore then
+            print(PREFIX .. " Score system not available.")
+        else
+            local total, legacy, byMod = MC.GetLocalScore()
+            print(format("%s Collection Score: |cffffcc66%d|r", PREFIX, total))
+            for _, m in ipairs(MC.modules) do
+                local b = byMod[m.key]
+                if b and b.score > 0 then
+                    print(format("    %s: %d", m.label or m.key, b.score))
+                end
+            end
+            if legacy > 0 then
+                print(format("  Legacies: %d (collected items no longer obtainable)", legacy))
+            end
+        end
+    elseif cmd == "filter" then
+        local a = (arg or ""):lower()
+        if a == "" or a == "status" then
+            local f = MC.GetExpansionFilter()
+            print(format("%s Filter: %s%s", PREFIX, f.mode,
+                f.mode == "single" and (" (" .. tostring(f.single) .. ")") or ""))
+        elseif a == "all" or a == "current" then
+            MC.SetExpansionFilter(a)
+            print(format("%s Filter set to %s.", PREFIX, a))
+        elseif MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[a] then
+            MC.SetExpansionFilter("single", a)
+            print(format("%s Filter set to %s.", PREFIX, MC.EXPANSION_BY_KEY[a].label))
+        else
+            print(PREFIX .. " /mc filter all|current|<expansion-key>")
+            local keys = {}
+            for k in pairs(MC._registeredExpansions or {}) do keys[#keys+1] = k end
+            if #keys > 0 then print("    available: " .. table.concat(keys, ", ")) end
+        end
     elseif cmd == "sharing" or cmd == "roster" then
         if MC.RosterSlashHandler then
             MC.RosterSlashHandler(arg)

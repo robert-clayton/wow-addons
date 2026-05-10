@@ -99,3 +99,78 @@ MC.MAP_PARENT = {
 }
 
 -- MC.PORTALS is defined at the bottom of Data/Locations.lua (it needs MC.LOC).
+
+----------------------------------------------------------------------
+-- Collection Score weights. Each collected item contributes its
+-- weight to the player's CS, computed in each module's Scanner.
+--
+-- Per-item override: set `score = N` on the entry in the data file.
+-- Otherwise the source-default below applies; otherwise SCORE_DEFAULT.
+--
+-- Tiers (see plan):
+--   1   Trivial       — easy vendor purchases
+--   5   Standard      — renown, normal raid drops, easy quest rewards
+--   25  Long          — exalted-rep grinds, ~5% drops, weekly-locked
+--   100 Epic          — <1% drops, mythic-only, hard solo achievements
+--   500 Legendary     — ultra-rare, retired-but-collected, multi-year
+----------------------------------------------------------------------
+MC.SCORE_TIERS = {
+    trivial    = 1,
+    standard   = 5,
+    long       = 25,
+    epic       = 100,
+    legendary  = 500,
+}
+
+MC.DEFAULT_SCORE_BY_SOURCE = {
+    -- Trivial
+    vendor          = 1,
+    -- Standard
+    renown          = 5,
+    quest           = 5,
+    worldevent      = 5,
+    profession      = 5,
+    delve           = 5,
+    -- Long
+    drop            = 25,
+    achievement     = 25,
+    prey            = 25,
+    ritual_sites    = 25,
+    void_assaults   = 25,
+    dungeon         = 25,
+    reputation      = 25,
+    -- Per-zone source keys used by Treasures and Rares modules.
+    eversong        = 25,
+    zulaman         = 25,
+    harandar        = 25,
+    voidstorm       = 25,
+    -- Epic
+    raid            = 100,
+    pvp             = 100,
+    prepatch        = 100,
+    -- Achievement-tab source keys (most are Long; metas overridden per-item).
+    metas           = 100,
+    explore         = 25,
+    vistas          = 25,
+    glyphs          = 25,
+    lore            = 25,
+    paintings       = 25,
+    events          = 25,
+    zone            = 25,
+    pets            = 25,
+    mounts          = 25,
+    toys            = 25,
+}
+
+MC.SCORE_DEFAULT = 5
+
+-- Returns the integer weight for a collectible entry. Per-item override
+-- (`entry.score`) wins; otherwise the source default; otherwise the
+-- catch-all default.
+function MC.ScoreFor(entry)
+    if not entry then return MC.SCORE_DEFAULT end
+    if entry.score then return entry.score end
+    local d = MC.DEFAULT_SCORE_BY_SOURCE[entry.source]
+    if d then return d end
+    return MC.SCORE_DEFAULT
+end

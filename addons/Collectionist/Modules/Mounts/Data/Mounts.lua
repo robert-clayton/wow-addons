@@ -114,7 +114,7 @@ local LOC = MC.LOC
 --   [achievementID], [dropInfo], [faction] }
 -- mountID is the C_MountJournal id (Wowhead /mount/NNNN), not spell or NPC id.
 
-MC.MountData = {
+MC.RegisterContent("midnight", "mounts", {
     -- Renown Vendor Mounts (Voidlight Marl, currency 3316)
     -- 4 factions × 2 mounts each
     {
@@ -414,4 +414,4 @@ MC.MountData = {
               unavailable = true },
         },
     },
-}
+})

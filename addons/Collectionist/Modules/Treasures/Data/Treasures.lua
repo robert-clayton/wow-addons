@@ -8,7 +8,7 @@ MC.TreasureSourceLabels = {
     voidstorm = "Voidstorm",
 }
 
-MC.TreasureData = {
+MC.RegisterContent("midnight", "treasures", {
     { source = "eversong",  achievementID = 61960, name = "Treasures of Eversong Woods",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
     { source = "zulaman",   achievementID = 62125, name = "Treasures of Zul'Aman",
@@ -17,7 +17,7 @@ MC.TreasureData = {
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
     { source = "voidstorm", achievementID = 62126, name = "Treasures of Voidstorm",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
-}
+})
 
 -- name -> { mapID, x, y, "Name" }
 -- Coords sourced from HandyNotes_Midnight (May 2026), deduped to one waypoint

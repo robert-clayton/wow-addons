@@ -122,7 +122,7 @@ local LEGENDS_NEVER_DIE_TASKS = {
 -- itemID is only present on crafted entries; the scanner falls back to it
 -- via C_HousingCatalog.GetCatalogEntryInfoByItem when decorID lookup fails.
 
-MC.DecorationData = {
+MC.RegisterContent("midnight", "decorations", {
     -- Crafted — Alchemy (skillLine 171)
     {
         source = "crafted",
@@ -643,4 +643,4 @@ MC.DecorationData = {
             },
         }
     end)(),
-}
+})

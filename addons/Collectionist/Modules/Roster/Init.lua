@@ -104,13 +104,26 @@ local WIRE_KEY = {
 
 -- Per-module {collected, total} from the live scanners. Shared by the
 -- wire payload and the "Me" entry rendered in the Inspector.
+--
+-- Returns two tables:
+--   counts        — module -> { collected, total }                    (account-wide)
+--   byExpansion   — expKey -> module -> { collected, total }          (sliced)
+--
+-- The account-wide counts come from r.totalAll / r.collectedCountAll
+-- so peers broadcast consistent account-wide totals regardless of
+-- their local expansion filter. The byExpansion slice feeds the new
+-- 'e' wire messages and the Inspector's filter-aware peer columns.
 local function BuildLocalCounts()
     local counts = {}
+    local byExpansion = {}
     for _, m in ipairs(MC.modules) do
         local r = m.Scanner and m.Scanner.results
-        if WIRE_KEY[m.key] and r and r.total and r.total > 0 then
+        if WIRE_KEY[m.key] and r then
             if m.key == "recipes" then
-                -- Recipes' results table is keyed by skill-line.
+                -- Recipes' results table is keyed by skill-line and
+                -- doesn't go through the expansion filter (yet), so
+                -- learnedCount/total per skill-line is already
+                -- account-wide and isn't sliced by expansion.
                 local learned, total = 0, 0
                 for _, sub in pairs(r) do
                     if type(sub) == "table" and sub.total then
@@ -122,14 +135,28 @@ local function BuildLocalCounts()
                     counts[m.key] = { collected = learned, total = total }
                 end
             else
-                counts[m.key] = {
-                    collected = r.collectedCount or 0,
-                    total     = r.total,
-                }
+                local total = r.totalAll or r.total
+                if total and total > 0 then
+                    counts[m.key] = {
+                        collected = r.collectedCountAll or r.collectedCount or 0,
+                        total     = total,
+                    }
+                end
+                if r.byExpansion then
+                    for expKey, b in pairs(r.byExpansion) do
+                        if b.total and b.total > 0 then
+                            byExpansion[expKey] = byExpansion[expKey] or {}
+                            byExpansion[expKey][m.key] = {
+                                collected = b.collected or 0,
+                                total     = b.total,
+                            }
+                        end
+                    end
+                end
             end
         end
     end
-    return counts
+    return counts, byExpansion
 end
 
 -- Build the count-summary payload from current scanner results.
@@ -145,19 +172,95 @@ local function BuildPayload()
     return table.concat(parts, ",")
 end
 
+-- Build the Collection Score payload: "m:S:L,p:S:L,...". Score (S)
+-- and legacy count (L) per module. Recipes aggregate score across all
+-- skill lines (each profession returns its own per-result score).
+local function BuildScorePayload()
+    local parts = {}
+    for _, m in ipairs(MC.modules) do
+        local r = m.Scanner and m.Scanner.results
+        if WIRE_KEY[m.key] and r then
+            local s, l = 0, 0
+            if m.key == "recipes" then
+                for _, sub in pairs(r) do
+                    if type(sub) == "table" and sub.score then
+                        s = s + sub.score
+                    end
+                end
+            else
+                s = r.score or 0
+                l = r.legacyCount or 0
+            end
+            parts[#parts + 1] = format("%s:%d:%d", WIRE_KEY[m.key], s, l)
+        end
+    end
+    return table.concat(parts, ",")
+end
+
+-- Aggregate the local Collection Score for tooltip / display use.
+-- Returns total, legacyCount, byModule, where byModule[modKey] =
+-- { score = S, legacyCount = L }. Used by the title-bar display and
+-- the /mc score command.
+function MC.GetLocalScore()
+    local byModule = {}
+    local total, legacy = 0, 0
+    for _, m in ipairs(MC.modules) do
+        local r = m.Scanner and m.Scanner.results
+        if WIRE_KEY[m.key] and r then
+            local s, l = 0, 0
+            if m.key == "recipes" then
+                for _, sub in pairs(r) do
+                    if type(sub) == "table" and sub.score then
+                        s = s + sub.score
+                    end
+                end
+            else
+                s = r.score or 0
+                l = r.legacyCount or 0
+            end
+            byModule[m.key] = { score = s, legacyCount = l }
+            total = total + s
+            legacy = legacy + l
+        end
+    end
+    return total, legacy, byModule
+end
+
+-- One per-expansion 'e' payload: "<expKey>:m:N/M,p:N/M,...". Returned
+-- as a list (one entry per expansion the player has data for).
+local function BuildExpansionPayloads()
+    local _, byExpansion = BuildLocalCounts()
+    local out = {}
+    for expKey, modCounts in pairs(byExpansion) do
+        local parts = {}
+        for _, m in ipairs(MC.modules) do
+            local c = modCounts[m.key]
+            if c then
+                parts[#parts + 1] = format("%s:%d/%d", WIRE_KEY[m.key], c.collected, c.total)
+            end
+        end
+        if #parts > 0 then
+            out[#out + 1] = { expKey = expKey, payload = expKey .. ":" .. table.concat(parts, ",") }
+        end
+    end
+    return out
+end
+
 -- Local player rendered into a peer-shaped record so the Inspector can
 -- treat us the same as everyone else.
 function MC.GetMeRosterEntry()
     local _, classToken = UnitClass("player")
     local me = UnitName("player")
     local meRealm = (GetRealmName() or ""):gsub("%s+", "")
+    local counts, byExpansion = BuildLocalCounts()
     return {
-        name     = me .. "-" .. meRealm,
-        class    = classToken or "UNKNOWN",
-        version  = MC.version,
-        counts   = BuildLocalCounts(),
-        lastSeen = time(),
-        isMe     = true,
+        name              = me .. "-" .. meRealm,
+        class             = classToken or "UNKNOWN",
+        version           = MC.version,
+        counts            = counts,
+        countsByExpansion = byExpansion,
+        lastSeen          = time(),
+        isMe              = true,
     }
 end
 
@@ -195,18 +298,52 @@ function MC.RosterBroadcastIfChanged(channel)
         end
     end
 
+    -- Per-expansion sub-totals: one 'e' message per expansion the
+    -- player has data for. Hash-deduped per (channel, expansion) so
+    -- expansions whose counts haven't changed don't re-broadcast.
+    -- 1.7.x peers don't have an 'e' handler and silently drop these.
+    mod.db.lastBroadcastE = mod.db.lastBroadcastE or {}
+    mod.db.lastBroadcastE[channel] = mod.db.lastBroadcastE[channel] or {}
+    for _, ep in ipairs(BuildExpansionPayloads()) do
+        local eh = cheapHash(ep.payload)
+        if mod.db.lastBroadcastE[channel][ep.expKey] ~= eh then
+            mod.db.lastBroadcastE[channel][ep.expKey] = eh
+            MC.Comms:Send("e", ep.payload, channel)
+            if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
+                MC.Comms:BroadcastBNet("e", ep.payload)
+            end
+        end
+    end
+
+    -- Collection Score: per-module score:legacyCount. Hash-deduped per
+    -- channel. 1.8.x peers without an 's' handler silently drop.
+    local scorePayload = BuildScorePayload()
+    if scorePayload ~= "" then
+        mod.db.lastBroadcastS = mod.db.lastBroadcastS or {}
+        local sh = cheapHash(scorePayload)
+        if mod.db.lastBroadcastS[channel] ~= sh then
+            mod.db.lastBroadcastS[channel] = sh
+            MC.Comms:Send("s", scorePayload, channel)
+            if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
+                MC.Comms:BroadcastBNet("s", scorePayload)
+            end
+        end
+    end
+
     -- v2: also broadcast the per-item bitmap. Skip when disabled or
-    -- before Bitmap:Init has run.
+    -- before Bitmap:Init has run. SendBitmap / BroadcastBNetBitmap
+    -- transparently chunk the payload when it exceeds the 250-byte
+    -- wire limit (multi-expansion data will trigger this).
     if mod.db.shareItems and MC.Bitmap and MC.Bitmap.fingerprint then
         local bmp = MC.Bitmap:Build()
         if bmp then
-            local bmpPayload = MC.Bitmap.fingerprint .. "|" .. bmp
-            local bh = cheapHash(bmpPayload)
+            local fp = MC.Bitmap.fingerprint
+            local bh = cheapHash(fp .. "|" .. bmp)
             if mod.db.lastBitmap[channel] ~= bh then
                 mod.db.lastBitmap[channel] = bh
-                MC.Comms:Send("b", bmpPayload, channel)
-                if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
-                    MC.Comms:BroadcastBNet("b", bmpPayload)
+                MC.Comms:SendBitmap(fp, bmp, channel)
+                if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNetBitmap then
+                    MC.Comms:BroadcastBNetBitmap(fp, bmp)
                 end
             end
         end
@@ -220,6 +357,19 @@ function MC.RosterForceBroadcast(channel)
     local payload = BuildPayload() .. "|" .. GetClassToken() .. "|" .. (MC.version or "?")
     if mod.db then mod.db.lastBroadcast[channel] = nil end
     MC.Comms:Send("u", payload, channel)
+
+    -- Also force-resend per-expansion sub-totals.
+    if mod.db and mod.db.lastBroadcastE then mod.db.lastBroadcastE[channel] = nil end
+    for _, ep in ipairs(BuildExpansionPayloads()) do
+        MC.Comms:Send("e", ep.payload, channel)
+    end
+
+    -- And the Collection Score.
+    if mod.db and mod.db.lastBroadcastS then mod.db.lastBroadcastS[channel] = nil end
+    local scorePayload = BuildScorePayload()
+    if scorePayload ~= "" then
+        MC.Comms:Send("s", scorePayload, channel)
+    end
 end
 
 -- 30s debounce for scanner-finished hooks.
@@ -262,16 +412,93 @@ local function OnUpdateReceived(payload, sender)
     local myKey = me .. "-" .. meRealm
     if sender == myKey or sender == me then return end
 
-    MC.RosterDB[sender] = {
-        name     = sender,
-        class    = parsed.class,
-        version  = parsed.version,
-        counts   = parsed.counts,
-        lastSeen = time(),
-    }
+    -- Merge into existing record so accumulated fields (countsByExpansion
+    -- from prior 'e' messages, bitmap from 'b' messages) survive a
+    -- subsequent 'u' broadcast.
+    local rec = MC.RosterDB[sender] or {}
+    rec.name     = sender
+    rec.class    = parsed.class
+    rec.version  = parsed.version
+    rec.counts   = parsed.counts
+    rec.lastSeen = time()
+    MC.RosterDB[sender] = rec
 
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
     if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+end
+
+-- 'e' payload: "<expKey>:m:N/M,p:N/M,...". Stored on the peer record
+-- under .countsByExpansion[expKey][modKey] = { collected, total }.
+-- The Inspector reads this when its filter is set to a specific
+-- expansion; otherwise it falls back to the account-wide .counts.
+local function OnExpansionUpdateReceived(payload, sender)
+    if not MC.RosterDB then return end
+    local expKey, rest = strsplit(":", payload, 2)
+    if not (expKey and rest and expKey ~= "" and rest ~= "") then return end
+
+    -- Drop unknown expansion keys so a malicious or buggy peer can't
+    -- pollute our table with arbitrary keys.
+    if not (MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[expKey]) then return end
+
+    -- Drop our own echo.
+    local me = UnitName("player")
+    local meRealm = (GetRealmName() or ""):gsub("%s+", "")
+    local myKey = me .. "-" .. meRealm
+    if sender == myKey or sender == me then return end
+
+    local rec = MC.RosterDB[sender] or { name = sender }
+    rec.countsByExpansion = rec.countsByExpansion or {}
+    local slice = {}
+    for code, n, total in (rest or ""):gmatch("(%a):(%d+)/(%d+)") do
+        for modKey, c in pairs(WIRE_KEY) do
+            if c == code then
+                slice[modKey] = {
+                    collected = tonumber(n) or 0,
+                    total     = tonumber(total) or 0,
+                }
+            end
+        end
+    end
+    rec.countsByExpansion[expKey] = slice
+    rec.lastSeen = time()
+    MC.RosterDB[sender] = rec
+
+    if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
+end
+
+-- 's' payload: "m:S:L,p:S:L,...". Stored on peer.score[modKey] =
+-- { score, legacyCount } and aggregated to peer.totalScore /
+-- peer.totalLegacyCount for at-a-glance access.
+local function OnScoreReceived(payload, sender)
+    if not MC.RosterDB then return end
+    if not (payload and payload ~= "") then return end
+
+    -- Drop our own echo.
+    local me = UnitName("player")
+    local meRealm = (GetRealmName() or ""):gsub("%s+", "")
+    local myKey = me .. "-" .. meRealm
+    if sender == myKey or sender == me then return end
+
+    local rec = MC.RosterDB[sender] or { name = sender }
+    local score = {}
+    local total, legacy = 0, 0
+    for code, s, l in (payload):gmatch("(%a):(%d+):(%d+)") do
+        for modKey, c in pairs(WIRE_KEY) do
+            if c == code then
+                local sn, ln = tonumber(s) or 0, tonumber(l) or 0
+                score[modKey] = { score = sn, legacyCount = ln }
+                total = total + sn
+                legacy = legacy + ln
+            end
+        end
+    end
+    rec.score             = score
+    rec.totalScore        = total
+    rec.totalLegacyCount  = legacy
+    rec.lastSeen          = time()
+    MC.RosterDB[sender] = rec
+
+    if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
 end
 
 local function OnRequestReceived(_, sender)
@@ -306,10 +533,14 @@ end
 if MC.Comms then
     -- GUILD channel
     MC.Comms:RegisterPrefix("GUILD", "u", OnUpdateReceived)
+    MC.Comms:RegisterPrefix("GUILD", "e", OnExpansionUpdateReceived)
+    MC.Comms:RegisterPrefix("GUILD", "s", OnScoreReceived)
     MC.Comms:RegisterPrefix("GUILD", "r", OnRequestReceived)
     MC.Comms:RegisterPrefix("GUILD", "b", OnBitmapReceived)
     -- BNET friends — same handlers, just routed from BNet
     MC.Comms:RegisterPrefix("BNET", "u", OnUpdateReceived)
+    MC.Comms:RegisterPrefix("BNET", "e", OnExpansionUpdateReceived)
+    MC.Comms:RegisterPrefix("BNET", "s", OnScoreReceived)
     MC.Comms:RegisterPrefix("BNET", "r", OnRequestReceived)
     MC.Comms:RegisterPrefix("BNET", "b", OnBitmapReceived)
 end

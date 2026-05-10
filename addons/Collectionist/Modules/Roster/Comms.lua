@@ -4,8 +4,24 @@ local _, MC = ...
 -- routing is ours. Outbound messages get queued and rate-limited so
 -- login storms don't disconnect.
 --
--- Wire: "MC|<proto>|<sub>|<payload>". Subs: u=update, v=version,
--- r=request, b=bitmap (v2).
+-- Wire: "MC|<proto>|<sub>|<payload>". Subs:
+--   u  update (account-wide count summary across all expansions)
+--   e  expansion sub-totals: "<expKey>:<modKey>:N/M,<modKey>:N/M,...".
+--      One 'e' per expansion the player has data for. Lets the
+--      Inspector's expansion filter actually re-scope peer columns.
+--      Older peers without an 'e' handler silently drop these.
+--   s  Collection Score: "<modKey>:<score>:<legacyCount>,...". The
+--      time-investment score; per-module score plus a count of
+--      collected-but-now-unobtainable items kept separately so
+--      retired content doesn't lock newer collectors out.
+--   v  version handshake
+--   r  re-broadcast request
+--   b  bitmap (single message; ≤250 bytes total wire)
+--   B  bitmap chunk (one of N pieces of a larger bitmap). Payload:
+--      "<fingerprint>|<seq>/<total>|<chunk-base64>". Reassembled by
+--      the comms layer and dispatched as a single 'b' to handlers
+--      once all chunks arrive. Older peers without a 'B' handler
+--      silently drop these — forward-compatible.
 
 local PROTO_VERSION = 2
 local PREFIX = "MC"
@@ -171,6 +187,153 @@ end
 
 function Comms:Broadcast(sub, payload)
     if IsInGuild() then self:Send(sub, payload, "GUILD") end
+end
+
+----------------------------------------------------------------------
+-- Bitmap chunking. Today's single-expansion bitmaps fit in one
+-- ~150-byte addon-message; with multi-expansion data the encoded
+-- payload will exceed the 250-byte cap.
+--
+-- SendBitmap / BroadcastBNetBitmap pick single-message ('b') for
+-- small payloads and chunked ('B') for large ones. Reassembly happens
+-- inside this file — handlers register against 'b' as before and
+-- receive the rebuilt payload when the last chunk lands.
+----------------------------------------------------------------------
+
+-- Wire-cap budget for the pipe-separated wire shape. 250 is the
+-- in-game addon-message limit; we leave a little slack.
+local WIRE_BUDGET = 250
+
+-- Per-(channel, sender, fingerprint) reassembly state. Discarded
+-- after CHUNK_EXPIRY_SECONDS to keep stalled transfers from leaking.
+local CHUNK_EXPIRY_SECONDS = 60
+local chunkBuffer = {}
+
+local function chunkPayloadBudget(fingerprint)
+    -- Body shape: MC|<proto>|B|<fp>|<seq>/<total>|<chunk>
+    -- Reserve room for the longest plausible header. seq/total caps at
+    -- 9999/9999 so 9 chars including the slash; round up to 10.
+    local header = #PREFIX + 1
+                 + #tostring(PROTO_VERSION) + 1
+                 + 1 + 1                                  -- "B|"
+                 + #fingerprint + 1                       -- "<fp>|"
+                 + 10 + 1                                 -- "<seq/total>|"
+    return WIRE_BUDGET - header
+end
+
+local function splitForChunking(fingerprint, payload)
+    local maxChunk = chunkPayloadBudget(fingerprint)
+    if maxChunk <= 0 then return nil end
+    local chunks = {}
+    for i = 1, #payload, maxChunk do
+        chunks[#chunks + 1] = payload:sub(i, i + maxChunk - 1)
+    end
+    return chunks
+end
+
+local function singleBitmapFits(fingerprint, payload)
+    -- Body: MC|<proto>|b|<fingerprint>|<payload>
+    local header = #PREFIX + 1 + #tostring(PROTO_VERSION) + 1 + 1 + 1
+                 + #fingerprint + 1
+    return (header + #payload) <= WIRE_BUDGET
+end
+
+function Comms:SendBitmap(fingerprint, payload, channel)
+    if not (fingerprint and payload) then return end
+    if singleBitmapFits(fingerprint, payload) then
+        self:Send("b", fingerprint .. "|" .. payload, channel)
+        return
+    end
+    local chunks = splitForChunking(fingerprint, payload)
+    if not chunks then
+        print(format("|cffff8888[MC]|r Cannot chunk bitmap (fingerprint too long): %s",
+            tostring(fingerprint)))
+        return
+    end
+    local total = #chunks
+    for seq, chunk in ipairs(chunks) do
+        self:Send("B", format("%s|%d/%d|%s", fingerprint, seq, total, chunk), channel)
+    end
+end
+
+function Comms:BroadcastBNetBitmap(fingerprint, payload)
+    if not (fingerprint and payload) then return end
+    if singleBitmapFits(fingerprint, payload) then
+        self:BroadcastBNet("b", fingerprint .. "|" .. payload)
+        return
+    end
+    local chunks = splitForChunking(fingerprint, payload)
+    if not chunks then return end
+    local total = #chunks
+    for seq, chunk in ipairs(chunks) do
+        self:BroadcastBNet("B", format("%s|%d/%d|%s", fingerprint, seq, total, chunk))
+    end
+end
+
+-- Internal handler for chunk pieces: assemble in chunkBuffer, dispatch
+-- to the registered 'b' handler when complete. Drops chunks whose
+-- (fingerprint, total) doesn't match the in-flight reassembly so a
+-- mid-stream version change can't corrupt a partial buffer.
+local function onBitmapChunk(payload, sender, _, channel)
+    local fp, seqTotal, chunk = strsplit("|", payload, 3)
+    if not (fp and seqTotal and chunk) then return end
+    local seqStr, totalStr = strsplit("/", seqTotal, 2)
+    local seq, total = tonumber(seqStr), tonumber(totalStr)
+    if not (seq and total and seq >= 1 and seq <= total and total >= 1) then return end
+
+    local now = time()
+
+    chunkBuffer[channel] = chunkBuffer[channel] or {}
+    chunkBuffer[channel][sender] = chunkBuffer[channel][sender] or {}
+    local senderBuf = chunkBuffer[channel][sender]
+
+    -- Sweep stale entries on each chunk so we don't accumulate forever.
+    for fingerprint, rec in pairs(senderBuf) do
+        if rec.ts and (now - rec.ts) > CHUNK_EXPIRY_SECONDS then
+            senderBuf[fingerprint] = nil
+        end
+    end
+
+    local rec = senderBuf[fp]
+    if not rec or rec.total ~= total then
+        rec = { count = 0, total = total, parts = {}, ts = now }
+        senderBuf[fp] = rec
+    end
+    if not rec.parts[seq] then
+        rec.parts[seq] = chunk
+        rec.count = rec.count + 1
+    end
+    rec.ts = now
+
+    if rec.count >= total then
+        local full = {}
+        for i = 1, total do
+            if not rec.parts[i] then
+                -- Missing piece — should not happen if count == total,
+                -- but guard regardless.
+                return
+            end
+            full[i] = rec.parts[i]
+        end
+        senderBuf[fp] = nil
+        local rebuilt = fp .. "|" .. table.concat(full)
+        local hs = Comms.handlers[channel]
+        local fn = hs and hs["b"]
+        if fn then fn(rebuilt, sender, PROTO_VERSION) end
+    end
+end
+
+-- Auto-register the chunk-reassembler on every channel that gets a
+-- 'b' handler. Wraps the original RegisterPrefix; consumers don't
+-- need to know chunking exists.
+local _origRegister = Comms.RegisterPrefix
+function Comms:RegisterPrefix(channel, sub, fn)
+    _origRegister(self, channel, sub, fn)
+    if sub == "b" then
+        _origRegister(self, channel, "B", function(payload, sender, proto)
+            onBitmapChunk(payload, sender, proto, channel)
+        end)
+    end
 end
 
 function Comms:GetMaxProto() return MAX_PROTO end

@@ -2,4 +2,5 @@
     <Script file="MidnightUI-1.0.lua"/>
     <Script file="Panel.lua"/>
     <Script file="Widgets.lua"/>
+    <Script file="Dropdown.lua"/>
 </Ui>

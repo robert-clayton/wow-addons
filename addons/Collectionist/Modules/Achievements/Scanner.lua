@@ -32,18 +32,26 @@ end
 function Scanner:Scan()
     if not MC.AchievementData then return end
 
+    -- See Mounts/Scanner.lua for the rationale on totalAll.
     local result = {
-        total            = 0,
-        collectedCount   = 0,
-        uncollectedCount = 0,
+        total              = 0,
+        collectedCount     = 0,
+        uncollectedCount   = 0,
+        totalAll           = 0,
+        collectedCountAll  = 0,
+        byExpansion        = {},
+        score              = 0,
+        legacyScore        = 0,
+        legacyCount        = 0,
         -- Two-level: byCategory[category][source] = { entries... }
-        byCategory       = {},
+        byCategory         = {},
         -- Flat fallback for callers that only look up by source.
-        bySource         = {},
-        collected        = {},
+        bySource           = {},
+        collected          = {},
     }
 
     for _, group in ipairs(MC.AchievementData) do
+        local visible = MC.IsGroupVisible(group)
         local category = group.category or "exploration"
         -- Guard against a missing source: `byCategory[category][nil]`
         -- would crash table.insert. Fall back to a sentinel so the
@@ -51,35 +59,57 @@ function Scanner:Scan()
         local source = group.source or "_unsorted"
         for _, ach in ipairs(group.achievements) do
             local liveName, liveIcon, liveCompleted = getAchievementInfo(ach.achievementID)
-            local done, total = countTasks(ach.taskList)
-            local entry = {
-                achievementID = ach.achievementID,
-                name          = liveName or ach.name,
-                description   = ach.description,
-                category      = category,
-                source        = source,
-                sourceInfo    = ach.description,
-                zone          = ach.zone,
-                icon          = liveIcon,
-                taskList      = ach.taskList,
-                progress      = { done = done, total = total },
-                collected     = liveCompleted,
-            }
-            result.total = result.total + 1
-            if entry.collected then
-                result.collectedCount = result.collectedCount + 1
-                result.collected[#result.collected + 1] = entry
-            else
-                result.uncollectedCount = result.uncollectedCount + 1
-                if not result.byCategory[category] then
-                    result.byCategory[category] = {}
+
+            result.totalAll = result.totalAll + 1
+            if liveCompleted then
+                result.collectedCountAll = result.collectedCountAll + 1
+                local w = ach.score
+                       or MC.DEFAULT_SCORE_BY_SOURCE[group.source]
+                       or MC.SCORE_DEFAULT
+                result.score = result.score + w
+            end
+
+            local exp = ach.expansion or group.expansion or "_unknown"
+            local b = result.byExpansion[exp]
+            if not b then
+                b = { total = 0, collected = 0 }
+                result.byExpansion[exp] = b
+            end
+            b.total = b.total + 1
+            if liveCompleted then b.collected = b.collected + 1 end
+
+            if visible then
+                local done, total = countTasks(ach.taskList)
+                local entry = {
+                    achievementID = ach.achievementID,
+                    name          = liveName or ach.name,
+                    description   = ach.description,
+                    category      = category,
+                    source        = source,
+                    sourceInfo    = ach.description,
+                    zone          = ach.zone,
+                    icon          = liveIcon,
+                    taskList      = ach.taskList,
+                    progress      = { done = done, total = total },
+                    collected     = liveCompleted,
+                    expansion     = ach.expansion or group.expansion,
+                }
+                result.total = result.total + 1
+                if entry.collected then
+                    result.collectedCount = result.collectedCount + 1
+                    result.collected[#result.collected + 1] = entry
+                else
+                    result.uncollectedCount = result.uncollectedCount + 1
+                    if not result.byCategory[category] then
+                        result.byCategory[category] = {}
+                    end
+                    if not result.byCategory[category][source] then
+                        result.byCategory[category][source] = {}
+                    end
+                    table.insert(result.byCategory[category][source], entry)
+                    if not result.bySource[source] then result.bySource[source] = {} end
+                    table.insert(result.bySource[source], entry)
                 end
-                if not result.byCategory[category][source] then
-                    result.byCategory[category][source] = {}
-                end
-                table.insert(result.byCategory[category][source], entry)
-                if not result.bySource[source] then result.bySource[source] = {} end
-                table.insert(result.bySource[source], entry)
             end
         end
     end

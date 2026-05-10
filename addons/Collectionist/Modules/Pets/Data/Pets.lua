@@ -135,7 +135,7 @@ local SOOTPAW_TASKS = {
     },
 }
 
-MC.PetData = {
+MC.RegisterContent("midnight", "pets", {
     -- Wild Pets (Companion-only - caught by right-clicking in the world)
     -- 21 achievement pets + 1 bonus (Silvermoon Broom). All cannot battle.
     -- Required for the Midnight Safari achievement (ID 61091).
@@ -370,4 +370,4 @@ MC.PetData = {
             { speciesID = 4968, npcID = 256663, name = "Lil' Staropod", petType = 6, source = "event", sourceInfo = "Blizzard Gear Store: Lil' Staropod collection (Apr 13 – May 15, 2026)", canBattle = true },
         },
     },
-}
+})

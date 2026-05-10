@@ -42,6 +42,20 @@ function MB:Init()
                     end
                 end
             end
+            if MC.GetLocalScore then
+                local total, legacy = MC.GetLocalScore()
+                if total > 0 or legacy > 0 then
+                    tt:AddLine(" ")
+                    if legacy > 0 then
+                        tt:AddDoubleLine("Collection Score",
+                            format("%d  ·  %dL", total, legacy),
+                            0.95, 0.85, 0.45, 0.95, 0.85, 0.45)
+                    else
+                        tt:AddDoubleLine("Collection Score", tostring(total),
+                            0.95, 0.85, 0.45, 0.95, 0.85, 0.45)
+                    end
+                end
+            end
             tt:AddLine(" ")
             tt:AddLine("|cff80ff80Left-click|r to toggle panel", 0.8, 0.8, 0.8)
             tt:AddLine("|cff80ff00Right-click|r to scan & summarize", 0.8, 0.8, 0.8)

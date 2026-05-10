@@ -56,7 +56,7 @@ MC.AchievementSourceOrder = {
 -- node keys there encode XX.XX × YY.YY as ints; converted to fractions
 -- below.
 
-MC.AchievementData = {
+MC.RegisterContent("midnight", "achievements", {
     --------------------------------------------------------------------
     -- Highest Peaks: each zone has its own achievement with 5 vistas.
     -- Use a telescope at each lookout point to get the criterion.
@@ -415,6 +415,7 @@ MC.AchievementData = {
                 name          = "Light Up the Night",
                 zone          = "Midnight (all zones)",
                 description   = "Complete each of the four zone metas. Rewards the Brilliant Petalwing mount.",
+                score         = 500,  -- top-level grand meta
                 taskList = {
                     intro = "One meta per zone. Finish all four and the mount is yours.",
                     tasks = {
@@ -820,6 +821,7 @@ MC.AchievementData = {
                 name          = "Insurmountable Collection",
                 zone          = "Account-wide",
                 description   = "Collect 600 mounts on a single character. Reward: Anu'shalla, Shadow's Guidance.",
+                score         = 500,  -- 600-mount tier — months/years of work
             },
         },
     },
@@ -1017,4 +1019,4 @@ MC.AchievementData = {
               description = "Disrupt Daggerspine Point with at least 8 challenges active." },
         },
     },
-}
+})

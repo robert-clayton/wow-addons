@@ -129,36 +129,26 @@ local function isDecorCollected(decorID)
     return false
 end
 
+-- Both rare and treasure probes look up completion via the achievement
+-- criterion API directly (filter-independent), mirroring how the mount/
+-- pet/toy probes hit their respective journal APIs. Reading from the
+-- module Scanner's filter-scoped results would silently misreport
+-- completed criteria that are hidden by the active expansion filter.
+--
+-- The lookups are populated at Init time by walking MC.RareData /
+-- MC.TreasureData and iterating each achievement's criteria.
 local function isRareKilled(npcID)
-    -- Rare scanner already maintains per-rare collected state from the
-    -- achievement criteria; just look in there.
-    local mod = MC.modulesByKey and MC.modulesByKey["rares"]
-    if not (mod and mod.Scanner and mod.Scanner.results) then return false end
-    local r = mod.Scanner.results
-    if not r.bySource then return false end
-    for _, list in pairs(r.bySource) do
-        for _, entry in ipairs(list) do
-            if entry.npcID == npcID then return entry.collected and true or false end
-        end
-    end
-    if r.collected then
-        for _, entry in ipairs(r.collected) do
-            if entry.npcID == npcID then return true end
-        end
-    end
-    return false
+    local meta = Bitmap.rareCriterion and Bitmap.rareCriterion[npcID]
+    if not meta then return false end
+    local _, _, completed = GetAchievementCriteriaInfo(meta.achID, meta.idx)
+    return completed and true or false
 end
 
 local function isTreasureLooted(name)
-    local mod = MC.modulesByKey and MC.modulesByKey["treasures"]
-    if not (mod and mod.Scanner and mod.Scanner.results) then return false end
-    local r = mod.Scanner.results
-    if r.collected then
-        for _, entry in ipairs(r.collected) do
-            if entry.name == name then return true end
-        end
-    end
-    return false
+    local meta = Bitmap.treasureCriterion and Bitmap.treasureCriterion[name]
+    if not meta then return false end
+    local _, _, completed = GetAchievementCriteriaInfo(meta.achID, meta.idx)
+    return completed and true or false
 end
 
 local SECTION_PROBE = {
@@ -301,10 +291,43 @@ function Bitmap:OwnersOf(modKey, canonicalID)
     return owners
 end
 
+-- Walks MC.RareData / MC.TreasureData and builds two ID -> criterion
+-- lookups used by isRareKilled / isTreasureLooted. Lets those probes
+-- query GetAchievementCriteriaInfo directly (account-wide) rather
+-- than read from the filter-scoped Scanner results.
+local function buildCriterionLookups()
+    Bitmap.rareCriterion = {}
+    Bitmap.treasureCriterion = {}
+    if not (GetAchievementNumCriteria and GetAchievementCriteriaInfo) then return end
+
+    -- Rares: assetID returned by GetAchievementCriteriaInfo is the npcID.
+    for _, ach in ipairs(MC.RareData or {}) do
+        local n = GetAchievementNumCriteria(ach.achievementID) or 0
+        for i = 1, n do
+            local _, _, _, _, _, _, _, assetID = GetAchievementCriteriaInfo(ach.achievementID, i)
+            if assetID and assetID > 0 then
+                Bitmap.rareCriterion[assetID] = { achID = ach.achievementID, idx = i }
+            end
+        end
+    end
+
+    -- Treasures: criterion name is the treasure name (matches MC.TreasureCoords keys).
+    for _, ach in ipairs(MC.TreasureData or {}) do
+        local n = GetAchievementNumCriteria(ach.achievementID) or 0
+        for i = 1, n do
+            local name = GetAchievementCriteriaInfo(ach.achievementID, i)
+            if name and name ~= "" then
+                Bitmap.treasureCriterion[name] = { achID = ach.achievementID, idx = i }
+            end
+        end
+    end
+end
+
 -- Build the index after PLAYER_LOGIN, once all module data files are
 -- loaded into MC.<Module>Data.
 function Bitmap:Init()
     buildIndex()
+    buildCriterionLookups()
     computeFingerprint()
 end
 

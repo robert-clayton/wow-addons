@@ -11,7 +11,7 @@ MC.RareSourceLabels = {
 -- Each entry is one zone-rare achievement. The Scanner pulls the rare list
 -- and completion state directly from the achievement's criteria at scan time,
 -- so we don't need to hardcode every rare's name.
-MC.RareData = {
+MC.RegisterContent("midnight", "rares", {
     { source = "eversong",  achievementID = 61507, name = "A Bloody Song",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
     { source = "zulaman",   achievementID = 62122, name = "Tallest Tree in the Forest",
@@ -20,7 +20,7 @@ MC.RareData = {
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
     { source = "voidstorm", achievementID = 62130, name = "The Ultimate Predator",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
-}
+})
 
 -- npcID -> { mapID, x, y, "Name" }
 -- Coords sourced from HandyNotes_Midnight (May 2026).

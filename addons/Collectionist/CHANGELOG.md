@@ -1,3 +1,23 @@
+# 1.9.0
+### Added
+- **Collection Score (CS).** A time-investment score: each collectible has a weight (1 / 5 / 25 / 100 / 500) and your CS is the sum across everything you've collected. Shown in the panel title bar (hover for breakdown), in the Inspector for each peer column, and via `/mc score`. Recipes count account-wide — once any of your alts has learned a recipe, every alt scores it.
+- **Legacies count** alongside the CS — separate tally of items you've collected that are no longer obtainable. Tracked but kept out of the main score so retired content doesn't drag down newer collectors.
+- Recipe ledger persists in the account-wide DB as `CollectionistDB.recipesLearned`; populated on each character's PLAYER_LOGIN scan. Never erases.
+
+# 1.8.0
+### Added
+- Collection Inspector's expansion filter now actually filters — peer columns rescope to whichever expansion you pick, falling back to account-wide totals for peers who haven't broadcast that expansion's slice (older versions, or peers with no data there).
+### Fixed
+- Bitmap broadcast no longer silently misreports rare/treasure ownership when the panel's expansion filter hides them. The probes now query achievement criteria directly (account-wide) instead of reading from the filter-scoped scanner results.
+
+# 1.7.0
+### Added
+- Expansion filter in the title bar. Click it to switch between Current (default), All Expansions, or any specific expansion. Defaults to Current, so today's behavior is unchanged — you'll see Midnight content as before.
+- `/mc filter all|current|<expansion>` slash command for the same.
+- Internal infrastructure for shipping older-expansion content in future releases. No older content yet — Vanilla through TWW will land in subsequent versions.
+### Changed
+- Onboarding popup re-shows once on first 1.7.0 launch to mention the new filter.
+
 # 1.6.2
 ### Changed
 - Mounts tab now has dedicated sections for the three Midnight feature systems: Prey, Ritual Sites, and Void Assaults.
@@ -30,7 +50,7 @@
 - Inspector progress bars now fill all the way to 100% (was capped 8px short).
 - Inspector "selected" checkmark renders as a real green check (was a missing-glyph box).
 - Re-adding a peer mid-fade-out no longer briefly hides the column.
-- After /reload, the addon now waits a randomized 5–30 seconds before announcing itself to guildies, so big-guild raid reload waves don't all hit chat at once.
+- After /reload, the addon now waits a randomized 5-30 seconds before announcing itself to guildies, so big-guild raid reload waves don't all hit chat at once.
 - Treasures tab icon now actually appears in retail clients.
 - Options panel checkboxes word-wrap properly instead of truncating after 5 characters.
 ### Removed
