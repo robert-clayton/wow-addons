@@ -932,7 +932,7 @@ function ShellProto:Hide()
     lib.FadeOut(self.frame)
     -- The config dock is parented to UIParent and only anchored to the
     -- window; hide it explicitly or it outlives Close.
-    if self.cfgFrame then lib.FadeOut(self.cfgFrame) end
+    if self.cfgFrame then lib.PopOut(self.cfgFrame) end
     if self.opts.onHide then self.opts.onHide(self) end
 end
 
@@ -1024,80 +1024,32 @@ function ShellProto:UpdateSpine()
     for i = n + 1, #segs do segs[i].base:Hide(); segs[i].lit:Hide() end
 end
 
--- Config side-dock (MVP): delegates to the shared pooled options
--- renderer. Anchored TOPLEFT-only — _populateConfigBody drives the
--- dock's height via SetHeight.
+-- Options live in the shared settings window (Settings.lua) so both
+-- shells present an identical surface. It renders through the same
+-- pooled config renderer via `.body`.
 function ShellProto:BuildConfigFrame()
-    local theme = lib.Theme
-    local f = CreateFrame("Frame", (self.opts.name or "MidnightUIShell") .. "ConfigFrame",
-        UIParent, "BackdropTemplate")
-    f:SetWidth(260)
-    f:SetFrameStrata("HIGH")
-    f:SetClampedToScreen(true)
-    f:SetMovable(true)
-    f:Hide()
-    f:SetPoint("TOPLEFT", self.frame, "TOPRIGHT", 8, 0)
-
-    local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    bar:SetHeight(24)
-    bar:SetPoint("TOPLEFT"); bar:SetPoint("TOPRIGHT")
-    bar:EnableMouse(true)
-    bar:RegisterForDrag("LeftButton")
-    bar:SetScript("OnDragStart", function() f:StartMoving() end)
-    bar:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
-
-    local acc = bar:CreateTexture(nil, "ARTWORK")
-    acc:SetPoint("TOPLEFT"); acc:SetPoint("BOTTOMLEFT")
-    acc:SetWidth(3)
-
-    local ttl = bar:CreateFontString(nil, "OVERLAY")
-    ttl:SetFont(theme.font, theme.fontSize, lib.FontFlags())
-    ttl:SetPoint("LEFT", 8, 0)
-    ttl:SetText("Options")
-
-    local function applyCfgTheme()
-        local th = lib.Theme
-        lib.ApplyThemedBackdrop(f, { kind = "options", alpha = th.colors.optionsBg[4] or 1, borderAlpha = 1 })
-        lib.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
-        acc:SetColorTexture(unpack(th.colors.accent))
-        ttl:SetFont(th.font, th.fontSize, lib.FontFlags())
-        ttl:SetTextColor(unpack(th.colors.title))
-    end
-    applyCfgTheme()
-    lib.RegisterThemeHook(applyCfgTheme)
-
-    local cls = lib.MakeHeaderBtn(bar, "x",
-        theme.colors.btnCloseFg,
-        theme.colors.btnCloseHoverBg,
-        theme.colors.btnCloseHoverBd,
-        "Close")
-    cls:SetPoint("RIGHT", bar, "RIGHT", -4, 0)
-    cls:SetScript("OnClick", function() f:Hide() end)
-
-    local body = CreateFrame("Frame", nil, f)
-    body:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", 0, -4)
-    body:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT", 0, -4)
-    f.body = body
-
-    return f
+    return lib.BuildSettingsWindow(self, {
+        name     = self.opts.name or "MidnightUIShell",
+        title    = "Options",
+        subtitle = (self.opts.title or "")
+            .. (self.opts.version and (" v" .. self.opts.version) or ""),
+        db       = self.db,
+    })
 end
 
 function ShellProto:ToggleConfig()
     if self.cfgFrame and self.cfgFrame:IsShown() then
-        lib.FadeOut(self.cfgFrame)
+        lib.PopOut(self.cfgFrame)
         return
     end
     if not self.cfgFrame then
         self.cfgFrame = self:BuildConfigFrame()
     end
-    if self.frame then
-        self.cfgFrame:ClearAllPoints()
-        self.cfgFrame:SetPoint("TOPLEFT", self.frame, "TOPRIGHT", 8, 0)
-    end
+    -- Free-floating window with its own saved position: no re-docking.
     if self.pendingConfigDefs then
         self:_PopulateConfigBody(self.pendingConfigDefs)
     end
-    lib.FadeIn(self.cfgFrame)
+    lib.PopIn(self.cfgFrame)
 end
 
 function ShellProto:PopulateConfig(defs)

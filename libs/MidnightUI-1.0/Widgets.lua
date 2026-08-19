@@ -460,5 +460,12 @@ lib._populateConfigBody = function(panel, defs)
 
     local totalH = math.abs(yOff) + 8
     body:SetHeight(totalH)
-    cfgFrame:SetHeight(24 + 4 + totalH)
+    -- A scrolling settings window is a fixed size: the body is its scroll
+    -- child, so only the scroll range changes. The legacy side-dock grew
+    -- to fit instead.
+    if cfgFrame._scrolls then
+        if cfgFrame.UpdateScrollBar then cfgFrame.UpdateScrollBar() end
+    else
+        cfgFrame:SetHeight(24 + 4 + totalH)
+    end
 end

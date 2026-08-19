@@ -40,6 +40,11 @@ local function easeInOut(t)
     return t < 0.5 and (2 * t * t) or (1 - ((-2 * t + 2) ^ 2) / 2)
 end
 
+-- Mirrors SetSmoothing("OUT").
+local function easeOut(t)
+    return 1 - (1 - t) ^ 3
+end
+
 local function stopDriver(target, kind)
     local byKind = drivers[target]
     local d = byKind and byKind[kind]
@@ -287,6 +292,52 @@ function lib.FadeTexture(tex, r, g, b, toAlpha, duration)
             tex._muiAlpha = a
             tex:SetColorTexture(r, g, b, a)
         end)
+end
+
+--------------------------------------------------------------------------
+-- Window open/close: fade paired with a slight scale, so a window
+-- arrives rather than appearing. Scale rides a driver (SetScale is
+-- universal; the Scale animation's setters were renamed across client
+-- versions) and always commits back to 1.
+--------------------------------------------------------------------------
+local POP_FROM = 0.97
+
+function lib.PopIn(frame, duration)
+    if not frame then return end
+    if frame:IsShown() and frame:GetAlpha() >= 0.99
+       and not (frame._muiFadeOut and frame._muiFadeOut:IsPlaying()) then
+        return
+    end
+    duration = duration or lib.ANIM_IN
+    if not lib.animEnabled then
+        frame:SetScale(1)
+        lib.FadeIn(frame, duration)
+        return
+    end
+    frame:SetScale(POP_FROM)
+    lib.FadeIn(frame, duration)
+    startDriver(frame, "scale", duration, easeOut, function(e, done)
+        frame:SetScale(done and 1 or (POP_FROM + (1 - POP_FROM) * e))
+    end)
+end
+
+function lib.PopOut(frame, duration, onComplete)
+    if not frame then return end
+    if not frame:IsShown() then
+        if onComplete then onComplete() end
+        return
+    end
+    duration = duration or lib.ANIM_OUT
+    lib.FadeOut(frame, duration, function()
+        stopDriver(frame, "scale")
+        frame:SetScale(1)
+        if onComplete then onComplete() end
+    end)
+    if not lib.animEnabled then return end
+    local from = frame:GetScale() or 1
+    startDriver(frame, "scale", duration, nil, function(e, done)
+        if not done then frame:SetScale(from + (0.98 - from) * e) end
+    end)
 end
 
 -- Cancel every animation on a region, leaving it where it got to.
