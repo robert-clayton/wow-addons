@@ -17,6 +17,9 @@ MC.PREFIX = PREFIX
 
 -- Bumped when SavedVariables shape changes; MigrateDB reads it.
 local DB_VERSION = 1
+
+-- Cross-fade for switching what the content area shows.
+MC.TAB_FADE = 0.3
 -- Marker we set on the per-character DB the first time the v1->v2 flip runs
 -- (per-character primary, account-wide DB demoted to "last-logged-out snapshot"
 -- used to seed brand-new alts).
@@ -2056,7 +2059,7 @@ function MC.SwitchTab(key)
     local child = MC.panel and MC.panel.scrollChild
     if child then child:SetAlpha(0) end
     MC.RefreshActive()
-    if child then MUI.FadeIn(child, 0.1) end
+    if child then MUI.FadeIn(child, MC.TAB_FADE) end
 end
 
 -- Refresh hides the tooltip first, otherwise it can stay pinned to a row

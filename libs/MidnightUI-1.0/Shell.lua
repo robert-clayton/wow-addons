@@ -873,9 +873,16 @@ end
 function ShellProto:_SizeTo(w, h)
     if self._initializing then
         self.frame:SetSize(w, h)
+        self:UpdateSpine(w)
         return
     end
-    lib.SizeTo(self.frame, w, h)
+    -- The spine's segments carry absolute widths, so lay them out for
+    -- the size we are travelling TO — measuring the header mid-animation
+    -- would freeze them at the width we are leaving, and they would
+    -- overhang the window once it arrived. Re-run on completion as well,
+    -- in case the animation was interrupted or clamped.
+    self:UpdateSpine(w)
+    lib.SizeTo(self.frame, w, h, nil, function() self:UpdateSpine() end)
 end
 
 -- Collapse to the strip from whichever view is current, remembering
@@ -995,7 +1002,7 @@ end
 -- collected. Structure as information — the accent line IS the data.
 -- Falls back to the plain accent hairline when the consumer supplies no
 -- spine data (module deferred, recipes, classic consumers).
-function ShellProto:UpdateSpine()
+function ShellProto:UpdateSpine(targetFrameW)
     local bar = self.frame and self.frame.titleBar
     if not bar or not bar.spineSegs then return end
     local c = lib.Theme.colors
@@ -1008,7 +1015,13 @@ function ShellProto:UpdateSpine()
     if data then
         for _, d in ipairs(data) do grand = grand + (d.total or 0) end
     end
+    -- targetFrameW: lay out for a size the window is animating toward
+    -- rather than the one it currently has. The header spans the whole
+    -- frame in compact and everything right of the sidebar in full.
     local barW = bar:GetWidth() or 0
+    if targetFrameW then
+        barW = self.db.compact and targetFrameW or (targetFrameW - SIDEBAR_W)
+    end
     if n == 0 or grand == 0 or barW < 200 then
         for _, seg in ipairs(segs) do seg.base:Hide(); seg.lit:Hide() end
         local ac = c.accent
