@@ -1,9 +1,10 @@
 local _, MC = ...
 
--- Wrath of the Lich King battle pets. Generated from the exact 50-row release manifest.
+-- Wrath of the Lich King battle pets. Generated from the exact 52-row release manifest.
 MC.RegisterContent("wrath", "pets", {
     { source = "drop", pets = {
         { speciesID = 234, npcID = 35400, name = "Gundrak Hatchling", petType = 8, source = "drop", sourceInfo = "Gundrak Hatchling\n			“This crafty raptor was born in the icy wastes of Northrend. Its harsh upbringing gives it strength when many others would perish.\n			Drop: Gundrak Raptor\n			Zul’Drak\n			--" },
+        { speciesID = 238, npcID = 35398, name = "Razormaw Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rRazormaw Matriarch's Nest|n|cFFFFD200Zone: |rWetlands" },
         { speciesID = 530, npcID = 62697, name = "Oily Slimeling", petType = 6, source = "drop", sourceInfo = "Oily Slimeling\n			“These living blobs of ooze lack even the most rudimentary form of intelligence but that doesn’t mean they can’t be your friend.”\n			Pet Battle\n			Borean Tundra\n			--" },
         { speciesID = 532, npcID = 62816, name = "Stunted Shardhorn", petType = 8, source = "drop", sourceInfo = "Stunted Shardhorn\n			“The fierce wolvar hunt these ill-tempered brutes for their horns, which are then carved into talsimans and other trinkets.”\n			Pet Battle\n			Sholazar Basin\n			--" },
         { speciesID = 535, npcID = 62820, name = "Water Waveling", petType = 7, source = "drop", sourceInfo = "Water Waveling\n			“The trolls of Zul’Drak inadvertently created these little beings while summoning water elementals to fight the Scourge.”\n			Pet Battle\n			Zul’Drak\n			--" },
@@ -29,6 +30,9 @@ MC.RegisterContent("wrath", "pets", {
         { speciesID = 1966, npcID = 115149, name = "Soulbroken Whelpling", petType = 4, source = "drop", sourceInfo = "Soulbroken Whelpling\n			“The Lich King tore the spirits of Sindragosa’s lost whelps into undeath in front of her skeletal form as a final affront to the great dragon.”\n			Drop: Sindragosa\n			Icecrown Citadel\n			--" },
         { speciesID = 1967, npcID = 115150, name = "Drudge Ghoul", petType = 4, source = "drop", sourceInfo = "Drudge Ghoul\n			“One of innumerable ghouls summoned by the Lich King in his final battle, left to roam the world for eternity.”\n			Drop: The Lich King\n			Icecrown\n			--" },
         { speciesID = 1968, npcID = 115152, name = "Wicked Soul", petType = 4, source = "drop", sourceInfo = "Wicked Soul\n			“An unrepentant soul that was once trapped inside Frostmourne, and now flits restlessly between worlds.”\n			Drop: The Lich King\n			Icecrown Citadel\n			--" },
+    } },
+    { source = "achievement", pets = {
+        { speciesID = 199, npcID = 32643, name = "Kirin Tor Familiar", petType = 7, source = "achievement", sourceInfo = "|cFFFFD200Achievement:|r Higher Learning|n|cFFFFD200Category: |rGeneral" },
     } },
     { source = "quest", pets = {
         { speciesID = 214, npcID = 33238, name = "Argent Squire", petType = 1, source = "quest", sourceInfo = "Argent Squire\n			“Many of Stormwind’s youth joined the Argent Crusade as squires, hoping to one day serve the Holy Light in battle.”\n			Quest: A Champion Rises\n			Icecrown\n			--" },

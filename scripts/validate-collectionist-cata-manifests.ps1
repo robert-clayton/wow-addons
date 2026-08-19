@@ -74,7 +74,7 @@ $factionManifest = Read-Rows (Join-Path $manifestRoot "supporting-factions.csv")
 $mapManifest = Read-Rows (Join-Path $manifestRoot "supporting-maps.csv")
 
 Assert-ExactSet $mountManifest @($mountInventory | Where-Object release_decision -eq "include_cataclysm") "mount_id" "Cataclysm mounts" 48
-Assert-ExactSet $petManifest $petInventory "species_id" "Cataclysm pets" 42
+Assert-ExactSet $petManifest $petInventory "species_id" "Cataclysm pets" 43
 Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_cataclysm") "toy_id" "Cataclysm toys" 40
 Assert-ExactSet $decorManifest $decorInventory "decor_id" "Cataclysm decorations" 46
 Assert-ExactSet $achievementManifest $achievementInventory "achievement_id" "Cataclysm achievements" 233
@@ -123,6 +123,7 @@ foreach ($expectation in @(@("mount",23,23,22),@("pet",40,40,40),@("toy",9,9,9))
 Assert-IDValues @($blizzardRows | Where-Object collectible_type -eq "mount" | ForEach-Object mapped_id) @($mountManifest | Where-Object official_guide_match -eq "True" | ForEach-Object mount_id) "Cataclysm mount guide coverage"
 Assert-IDValues @($petManifest | Where-Object status -eq "blizzard_cataclysm_acquisition_confirmed" | ForEach-Object species_id) @($blizzardRows | Where-Object collectible_type -eq "pet" | ForEach-Object mapped_id) "Cataclysm pet guide coverage"
 Assert-IDValues @($petManifest | Where-Object status -eq "cataclysm_archaeology_confirmed" | ForEach-Object species_id) @("309","310") "Cataclysm additional Archaeology pets"
+Assert-IDValues @($petManifest | Where-Object status -eq "handynotes_cataclysm_acquisition_confirmed" | ForEach-Object species_id) @("306") "Cataclysm HandyNotes acquisition additions"
 Assert-IDValues @($blizzardRows | Where-Object collectible_type -eq "toy" | ForEach-Object mapped_id) @($toyManifest | Where-Object official_guide_match -eq "True" | ForEach-Object toy_id) "Cataclysm toy guide coverage"
 Assert-IDValues @($blizzardRows | Where-Object { $_.collectible_type -eq "mount" -and $_.mapping -eq "name_override_bad_guide_link" } | ForEach-Object source_id) @("94230") "Cataclysm bad camel guide link"
 

@@ -1,7 +1,10 @@
 local _, MC = ...
 
--- Shadowlands battle pets. Generated from the exact 175-row release manifest.
+-- Shadowlands battle pets. Generated from the exact 176-row release manifest.
 MC.RegisterContent("shadowlands", "pets", {
+    { source = "wild", pets = {
+        { speciesID = 3215, npcID = 183230, name = "Mawtouched Geomental", petType = 7, source = "wild", sourceInfo = "|cFFFFD200Pet Battle: |rZereth Mortis" },
+    } },
     { source = "drop", pets = {
         { speciesID = 2891, itemID = 180584, npcID = 171117, name = "Blushing Spiderling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rTomb Burster|n|cFFFFD200Zone: |rRevendreth" },
         { speciesID = 2892, itemID = 180586, npcID = 171119, name = "Bound Lightspawn", petType = 7, source = "drop", sourceInfo = "|cFFFFD200Drop: |rRevendreth" },

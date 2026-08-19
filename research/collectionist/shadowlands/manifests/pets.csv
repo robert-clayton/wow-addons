@@ -158,6 +158,7 @@
 "snapshot_candidate","include_shadowlands","False",,"True","3204","Archetype of Survival","182504","361157","189364","0","4","2","3","|cFFFFD200Profession: |rProtoform Synthesis"
 "snapshot_candidate","include_shadowlands","False",,"True","3207","Archetype of Cunning","182735","361400","189380","0","7","2","3","|cFFFFD200Profession:|r Protoform Synthesis|n"
 "snapshot_candidate","include_shadowlands","False",,"True","3211","Archetype of Malice","182840","361572","189383","0","2","2","3","|cFFFFD200Profession:|r Protoform Synthesis|n"
+"collectible_wild_pet","include_shadowlands","False",,"True","3215","Mawtouched Geomental","183230","0","","","6","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "snapshot_candidate","include_shadowlands","False",,"True","3220","Archetype of Satisfaction","183557","362640","189367","0","2","2","3","|cFFFFD200Profession:|r Protoform Synthesis"
 "item_expansion_signal","include_shadowlands","False",,"True","3221","Lightless Tormentor","183772","363086","188679","8","0","82","5","|cFFFFD200Achievement: |rThe Jailer's Gauntlet: Layer 1|n|cFFFFD200Category: |rTorghast"
 "snapshot_candidate","include_shadowlands","False",,"True","3222","Shelly","184196","364255","189378","0","4","2","3","|cFFFFD200Profession: |rProtoform Synthesis"

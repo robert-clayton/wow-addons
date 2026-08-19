@@ -14,11 +14,15 @@ $guideRoot = Join-Path $Db2Root "guides"
 $decorSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\dragonflight\sources\housing-wowdb.csv"
 $decorDetailSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\dragonflight\sources\housing-wowdb-details.csv"
 $decorAuditSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\dragonflight\sources\housing-wowdb-acquisition-audit.csv"
+$ancientZulGurubSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\dragonflight\sources\ancient-zulgurub-recipes.csv"
 
 foreach ($required in @($shadowlandsRoot, $dragonflightRoot, $currentRoot, $CurrentTradeDb2Root)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Missing input directory: $required"
     }
+}
+if (-not (Test-Path -LiteralPath $ancientZulGurubSourcePath)) {
+    throw "Missing Ancient Zul'Gurub recipe audit: $ancientZulGurubSourcePath"
 }
 
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
@@ -520,12 +524,36 @@ $professionNames = @{
     "333" = "Enchanting"; "202" = "Engineering"; "773" = "Inscription";
     "755" = "Jewelcrafting"; "165" = "Leatherworking"; "197" = "Tailoring"
 }
+$ancientZulGurubRows = @(Import-Csv -LiteralPath $ancientZulGurubSourcePath)
+if ($ancientZulGurubRows.Count -ne 31) { throw "Ancient Zul'Gurub recipe audit must contain exactly 31 rows" }
+if (@($ancientZulGurubRows | Group-Object item_id | Where-Object { $_.Count -gt 1 }).Count) {
+    throw "Ancient Zul'Gurub recipe item audit contains duplicate item IDs"
+}
+if (@($ancientZulGurubRows | Group-Object recipe_spell_id | Where-Object { $_.Count -gt 1 }).Count) {
+    throw "Ancient Zul'Gurub recipe spell audit contains duplicate spell IDs"
+}
+foreach ($audit in $ancientZulGurubRows) {
+    $item = $items[[string]$audit.item_id]
+    if (-not $item -or [string]$item.Display_lang -ne [string]$audit.recipe_item_name) {
+        throw "Ancient Zul'Gurub recipe item mismatch for item $($audit.item_id)"
+    }
+    $teachingSpellIDs = @($itemEffects | Where-Object { [string]$_.ItemID -eq [string]$audit.item_id } | ForEach-Object {
+        $effect = $effects[[string]$_.ItemEffectID]
+        if ($effect) { [string]$effect.SpellID }
+    })
+    if ([string]$audit.recipe_spell_id -notin $teachingSpellIDs) {
+        throw "Ancient Zul'Gurub item $($audit.item_id) does not teach spell $($audit.recipe_spell_id)"
+    }
+}
+$ancientZulGurubBySpell = New-Index $ancientZulGurubRows "recipe_spell_id"
+$ancientZulGurubSpellIDs = New-IDSet $ancientZulGurubRows "recipe_spell_id"
 $historicalRecipeInventory = foreach ($ability in $skillLineAbilities | Where-Object {
-    $allowedTradeCategories.ContainsKey([string]$_.TradeSkillCategoryID)
+    $allowedTradeCategories.ContainsKey([string]$_.TradeSkillCategoryID) -or $ancientZulGurubSpellIDs.ContainsKey([string]$_.Spell)
 }) {
     $spell = $spellNames[[string]$ability.Spell]
+    $ancientZulGurubAudit = $ancientZulGurubBySpell[[string]$ability.Spell]
     [pscustomobject]@{
-        status                    = if ($spell -and $spell.Name_lang -match "DNT|DO NOT USE") { "internal_dnt" } elseif ($spell -and $spell.Name_lang) { "named_recipe" } else { "unnamed_db2_ability_candidate" }
+        status                    = if ($ancientZulGurubAudit) { "acquisition_dragonflight_ancient_zulgurub" } elseif ($spell -and $spell.Name_lang -match "DNT|DO NOT USE") { "internal_dnt" } elseif ($spell -and $spell.Name_lang) { "named_recipe" } else { "unnamed_db2_ability_candidate" }
         current_ability_exists    = $currentRecipeSpellIDs.ContainsKey([string]$ability.Spell)
         current_spell_name_exists = $currentSpellNameIDs.ContainsKey([string]$ability.Spell)
         profession                = $professionNames[[string]$ability.SkillLine]
@@ -536,6 +564,12 @@ $historicalRecipeInventory = foreach ($ability in $skillLineAbilities | Where-Ob
         trade_category_id         = $ability.TradeSkillCategoryID
         acquire_method            = $ability.AcquireMethod
         supercedes_spell_id       = $ability.SupercedesSpell
+    }
+}
+foreach ($audit in $ancientZulGurubRows) {
+    $recipe = @($historicalRecipeInventory | Where-Object { [string]$_.recipe_spell_id -eq [string]$audit.recipe_spell_id })
+    if ($recipe.Count -ne 1 -or [string]$recipe[0].profession -ne [string]$audit.profession) {
+        throw "Ancient Zul'Gurub recipe audit mismatch for spell $($audit.recipe_spell_id)"
     }
 }
 $currentTradeChildren = @{}
@@ -663,9 +697,9 @@ Assert-Equal @($toyInventory).Count 192 "Toy snapshot row count"
 Assert-Equal @($achievementInventory).Count 3377 "Achievement snapshot row count"
 Assert-Equal @($rareInventory).Count 197 "Rare criteria row count"
 Assert-Equal @($treasureInventory).Count 57 "Treasure criteria row count"
-Assert-Equal @($historicalRecipeInventory).Count 950 "Historical recipe row count"
+Assert-Equal @($historicalRecipeInventory).Count 981 "Historical recipe row count"
 Assert-Equal @($houseDecorRecipeInventory).Count 25 "Current Dragonflight house decor recipe count"
-Assert-Equal @($recipeInventory).Count 975 "Recipe row count"
+Assert-Equal @($recipeInventory).Count 1006 "Recipe row count"
 Assert-Equal @($mapInventory).Count 9 "Map row count"
 Assert-Equal @($factionInventory).Count 28 "Faction row count"
 Assert-Equal @($currencyInventory).Count 739 "Currency row count"
@@ -703,10 +737,11 @@ Assert-Equal @($achievementInventory | Where-Object { $_.status -eq "dragonfligh
 Assert-Equal @($achievementInventory | Where-Object { $_.status -eq "dragonflight_category_hidden" }).Count 1369 "Dragonflight hidden category achievement count"
 Assert-Equal @($rareInventory | Where-Object { -not $_.npc_ids }).Count 0 "Unresolved rare NPC rows"
 Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "named_recipe" }).Count 948 "Historical named recipe count"
+Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "acquisition_dragonflight_ancient_zulgurub" }).Count 31 "Ancient Zul'Gurub acquisition recipe count"
 Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "internal_dnt" }).Count 1 "Internal recipe count"
 Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "unnamed_db2_ability_candidate" }).Count 1 "Unnamed recipe count"
-Assert-Equal @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe") }).Count 973 "Named recipe count"
-Assert-Equal @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe") -and -not $_.current_ability_exists }).Count 0 "Named recipes missing from current retail"
+Assert-Equal @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe", "acquisition_dragonflight_ancient_zulgurub") }).Count 1004 "Named recipe count"
+Assert-Equal @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe", "acquisition_dragonflight_ancient_zulgurub") -and -not $_.current_ability_exists }).Count 0 "Named recipes missing from current retail"
 
 $currentDecorByID = New-Index $currentDecorRows
 foreach ($sourceRow in $catalogRows) {
@@ -780,7 +815,7 @@ $achievementCriteriaManifest = @($achievementCriteriaInventory |
     Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
 Assert-Equal @($achievementCriteriaManifest).Count 3203 "Dragonflight visible achievement criteria manifest row count"
 Assert-UniqueField $achievementCriteriaManifest "tree_id" "Dragonflight visible achievement criteria manifest"
-$recipeManifest = @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe") } | Sort-Object profession, { [int]$_.recipe_spell_id })
+$recipeManifest = @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe", "acquisition_dragonflight_ancient_zulgurub") } | Sort-Object profession, { [int]$_.recipe_spell_id })
 $rareManifest = @($rareInventory | Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
 $treasureManifest = @($treasureInventory | Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
 Write-CsvFile (Join-Path $ManifestRoot "achievements.csv") $achievementManifest
@@ -840,7 +875,7 @@ $manifestSummary = @(
     [pscustomobject]@{ manifest = "pets"; rows = 164; identifier = "species_id" }
     [pscustomobject]@{ manifest = "toys"; rows = 171; identifier = "toy_id" }
     [pscustomobject]@{ manifest = "decorations"; rows = 76; identifier = "decor_id" }
-    [pscustomobject]@{ manifest = "recipes"; rows = 973; identifier = "recipe_spell_id" }
+    [pscustomobject]@{ manifest = "recipes"; rows = 1004; identifier = "recipe_spell_id" }
     [pscustomobject]@{ manifest = "achievements"; rows = 569; identifier = "achievement_id" }
     [pscustomobject]@{ manifest = "achievement-criteria"; rows = 3203; identifier = "tree_id" }
     [pscustomobject]@{ manifest = "rares"; rows = 197; identifier = "tree_id" }

@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $idRoot = Join-Path $ResearchRoot "ids"
 $manifestRoot = Join-Path $ResearchRoot "manifests"
+$sourceRoot = Join-Path $ResearchRoot "sources"
 
 function Read-Rows([string]$path) {
     if (-not (Test-Path -LiteralPath $path)) { throw "Missing CSV: $path" }
@@ -71,11 +72,13 @@ Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq
 Assert-IDValues @($toyInventory | Where-Object release_decision -eq "exclude_classic" | ForEach-Object toy_id) @("1340") "Dragonflight Classic-owned toy exclusions"
 Assert-ExactSet $decorationManifest @($decorationInventory | Where-Object status -eq "acquisition_dragonflight_confirmed") "decor_id" "Dragonflight decorations" 76
 Assert-ExactSet $achievementManifest @($achievementInventory | Where-Object status -eq "dragonflight_category_confirmed") "achievement_id" "Dragonflight achievements" 569
-Assert-ExactSet $recipeManifest @($recipeInventory | Where-Object status -in @("named_recipe", "current_house_decor_recipe")) "recipe_spell_id" "Dragonflight recipes" 973
+Assert-ExactSet $recipeManifest @($recipeInventory | Where-Object status -in @("named_recipe", "current_house_decor_recipe", "acquisition_dragonflight_ancient_zulgurub")) "recipe_spell_id" "Dragonflight recipes" 1004
 Assert-IDValues @($recipeManifest | Where-Object status -eq "current_house_decor_recipe" | ForEach-Object recipe_spell_id) @(
     "1259195","1259233","1259247","1259369","1259384","1259386","1259404","1259422","1259429","1259433","1259441","1259451",
     "1259461","1260331","1260333","1261882","1261885","1261892","1261896","1261919","1261933","1261940","1263237","1266555","1272572"
 ) "Dragonflight house decor recipe IDs"
+$ancientZulGurubRecipes = Read-Rows (Join-Path $sourceRoot "ancient-zulgurub-recipes.csv")
+Assert-ExactSet @($recipeManifest | Where-Object status -eq "acquisition_dragonflight_ancient_zulgurub") $ancientZulGurubRecipes "recipe_spell_id" "Dragonflight Ancient Zul'Gurub recipes" 31
 Assert-ExactSet $rareManifest $rareInventory "tree_id" "Dragonflight rare criteria" 197
 Assert-ExactSet $treasureManifest $treasureInventory "tree_id" "Dragonflight treasure criteria" 57
 Assert-ExactSet $mapManifest $mapInventory "map_id" "Dragonflight supporting maps" 9

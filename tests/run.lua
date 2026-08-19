@@ -284,7 +284,8 @@ do
     equal(MC.GetLatestExpansion("recipes"), "midnight",
         "recipe Current expansion after TWW registration")
 
-    local recipeSeen, classicRecipes, tbcRecipes, wrathRecipes, cataRecipes, mopRecipes, wodRecipes, legionRecipes, bfaRecipes, slRecipes, dfRecipes, twwRecipes, midnightRecipes = {}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    local recipeSeen, recipeExpansion = {}, {}
+    local classicRecipes, tbcRecipes, wrathRecipes, cataRecipes, mopRecipes, wodRecipes, legionRecipes, bfaRecipes, slRecipes, dfRecipes, twwRecipes, midnightRecipes = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
         for _, category in ipairs(MC[dataKey]) do
             truthy(category.expansion == "vanilla" or category.expansion == "tbc" or category.expansion == "wrath" or category.expansion == "cata" or category.expansion == "mop" or category.expansion == "wod" or category.expansion == "legion"
@@ -297,6 +298,7 @@ do
                 truthy(not recipeSeen[recipe.id],
                     "duplicate cross-expansion recipe spell ID " .. recipe.id)
                 recipeSeen[recipe.id] = true
+                recipeExpansion[recipe.id] = recipe.expansion
                 equal(recipe.expansion, category.expansion,
                     "recipe/category expansion agreement " .. recipe.id)
                 if recipe.expansion == "vanilla" then
@@ -336,9 +338,18 @@ do
     equal(legionRecipes, 773, "Legion recipe count")
     equal(bfaRecipes, 1253, "BFA recipe count")
     equal(slRecipes, 634, "Shadowlands recipe count")
-    equal(dfRecipes, 973, "Dragonflight recipe count")
+    equal(dfRecipes, 1004, "Dragonflight recipe count")
     equal(twwRecipes, 696, "TWW recipe count")
     truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
+    for _, recipeID in ipairs({
+        402118, 402123, 402124, 402125, 402126, 402128, 402129, 402130,
+        402131, 402133, 402134, 402135, 402136, 402137, 402138, 402139,
+        402140, 402141, 402142, 402143, 402144, 402146, 402147, 402148,
+        402150, 402151, 402152, 402155, 402156, 402615, 405205,
+    }) do
+        equal(recipeExpansion[recipeID], "df",
+            "Ancient Zul'Gurub recipe acquisition expansion " .. recipeID)
+    end
 
     -- Visibility follows Options > Expansions alone: the per-tab
     -- expansion filter is gone.
@@ -544,7 +555,7 @@ do
 
     local dataFixtures = {
         mounts = {
-            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 93, cataCount = 48, mopCount = 89, wodCount = 68, legionCount = 124, bfaCount = 140, slCount = 179, dfCount = 161, twwCount = 186,
+            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 93, cataCount = 48, mopCount = 89, wodCount = 68, legionCount = 124, bfaCount = 140, slCount = 180, dfCount = 161, twwCount = 186,
             files = {
                 "Modules/Mounts/Data/Classic.lua",
                 "Modules/Mounts/Data/TheBurningCrusade.lua",
@@ -561,7 +572,7 @@ do
             },
         },
         pets = {
-            field = "PetData", list = "pets", id = "speciesID", classicCount = 59, tbcCount = 65, wrathCount = 50, cataCount = 42, mopCount = 152, wodCount = 84, legionCount = 106, bfaCount = 236, slCount = 175, dfCount = 164, twwCount = 200,
+            field = "PetData", list = "pets", id = "speciesID", classicCount = 59, tbcCount = 65, wrathCount = 52, cataCount = 43, mopCount = 152, wodCount = 84, legionCount = 106, bfaCount = 236, slCount = 176, dfCount = 164, twwCount = 201,
             files = {
                 "Modules/Pets/Data/Classic.lua",
                 "Modules/Pets/Data/TheBurningCrusade.lua",
@@ -1545,6 +1556,50 @@ do
             equal(criteriaCount, 86, "TWW treasure criteria count")
         end
     end
+
+    local function findCatalogEntry(dataField, listField, idField, expectedID)
+        for _, group in ipairs(MC[dataField] or {}) do
+            for _, entry in ipairs(group[listField] or {}) do
+                if entry[idField] == expectedID then return entry end
+            end
+        end
+    end
+
+    local acquisitionChecks = {
+        { "MountData", "mounts", "mountID", 293, "shadowlands" },
+        { "MountData", "mounts", "mountID", 2767, "midnight" },
+        { "PetData", "pets", "speciesID", 199, "wrath" },
+        { "PetData", "pets", "speciesID", 238, "wrath" },
+        { "PetData", "pets", "speciesID", 306, "cata" },
+        { "PetData", "pets", "speciesID", 3215, "shadowlands" },
+        { "PetData", "pets", "speciesID", 3362, "tww" },
+        { "DecorationData", "decorations", "decorID", 14824, "midnight" },
+        { "DecorationData", "decorations", "decorID", 15478, "midnight" },
+        { "DecorationData", "decorations", "decorID", 15480, "midnight" },
+    }
+    for _, check in ipairs(acquisitionChecks) do
+        local entry = findCatalogEntry(check[1], check[2], check[3], check[4])
+        truthy(entry, "missing acquisition-era collectible " .. check[4])
+        equal(entry.expansion, check[5], "acquisition expansion " .. check[4])
+    end
+
+    -- HandyNotes_WarWithin mislabeled these six pet items as toys. The
+    -- species/item pairs are collectible pets and must never enter ToyData.
+    local underminePetMislabels = {
+        [232850] = 4649, [232846] = 4648, [232849] = 4650,
+        [232840] = 4661, [232841] = 4644, [232842] = 4638,
+    }
+    for itemID, speciesID in pairs(underminePetMislabels) do
+        local pet = findCatalogEntry("PetData", "pets", "speciesID", speciesID)
+        truthy(pet, "missing Undermine pet species " .. speciesID)
+        equal(pet.itemID, itemID, "Undermine pet item mapping " .. speciesID)
+        equal(findCatalogEntry("ToyData", "toys", "itemID", itemID), nil,
+            "Undermine pet item must not be a toy " .. itemID)
+    end
+    equal(findCatalogEntry("ToyData", "toys", "itemID", 131809), nil,
+        "Gleaming Roc Feather is a component, not a toy")
+    truthy(findCatalogEntry("ToyData", "toys", "itemID", 131811),
+        "Rocfeather Skyhorn Kite is the actual toy")
 end
 
 -- Communication queues survive encounters and report actual send success.

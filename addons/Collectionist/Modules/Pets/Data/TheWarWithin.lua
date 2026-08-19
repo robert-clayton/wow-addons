@@ -318,10 +318,12 @@ MC.RegisterContent("tww", "pets", {
         },
     },
 
-    -- Treasure pets. 17 entries.
+    -- Treasure pets. 18 entries.
     {
         source = "treasure",
         pets = {
+            { speciesID = 3362, itemID = 224579, npcID = 192365, name = "Sapphire Crab",      petType = 8, source = "treasure", sourceInfo = "Magical Treasure Chest (Lionel), Isle of Dorn",
+              canBattle = true, zone = "Isle of Dorn" },
             { speciesID = 4470, itemID = 224439, npcID = 222319, name = "Oop'lajax",           petType = 9, source = "treasure", sourceInfo = "Scary Dark Chest, The Ringing Deeps",
               canBattle = true, zone = "The Ringing Deeps" },
             { speciesID = 4472, itemID = 221819, npcID = 222326, name = "Shadowbog Hopper",    petType = 9, source = "treasure", sourceInfo = "Shadowrooted Vine, Hallowfall",

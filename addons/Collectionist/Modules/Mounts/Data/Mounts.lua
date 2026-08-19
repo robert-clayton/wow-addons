@@ -365,6 +365,8 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2933, name = "Magister's Spell Bee", source = "worldevent", sourceInfo = "Gamesmaster Fleurin - 500 Illusionary Coins (Decor Duels)",
               waypoint = LOC.GamesmasterFleurin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.IllusionaryCoin, 500 } } },
+            { mountID = 2767, itemID = 257180, name = "Contained Stormarion Defender", source = "worldevent",
+              sourceInfo = "Stormarion Assault event", zone = "Voidstorm" },
         },
     },
 

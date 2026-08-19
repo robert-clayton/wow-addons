@@ -22,6 +22,7 @@
 			Profession: Fishing
 			Dalaran
 			--","https://news.blizzard.com/en-us/article/23507736/wrath-of-the-lich-king-mounts-pets-and-more"
+"handynotes_wrath_acquisition_confirmed","include_wrath","False","True","199","Kirin Tor Familiar","32643","61472","6","82","5","|cFFFFD200Achievement:|r Higher Learning|n|cFFFFD200Category: |rGeneral",""
 "blizzard_wrath_acquisition_confirmed","include_wrath","False","True","204","Teldrassil Sproutling","33188","62491","6","2","2","Teldrassil Sproutling
 			“It always wakes up dancing. What a happy little tree!”
 			Vendor: Rook Hawkfist
@@ -108,6 +109,7 @@
 			Drop: Gundrak Raptor
 			Zul’Drak
 			--","https://news.blizzard.com/en-us/article/23507736/wrath-of-the-lich-king-mounts-pets-and-more"
+"handynotes_wrath_acquisition_confirmed","include_wrath","False","True","238","Razormaw Hatchling","35398","67419","7","2","0","|cFFFFD200Drop: |rRazormaw Matriarch's Nest|n|cFFFFD200Zone: |rWetlands",""
 "blizzard_wrath_acquisition_confirmed","include_wrath","False","True","525","Turkey","62648","0","2","26","4","Turkey
 			“A key food source during the Feast of Winter Veil.”
 			Pet Battle

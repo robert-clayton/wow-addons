@@ -76,7 +76,7 @@ $factionManifest = Read-Rows (Join-Path $manifestRoot "supporting-factions.csv")
 $mapManifest = Read-Rows (Join-Path $manifestRoot "supporting-maps.csv")
 
 Assert-ExactSet $mountManifest @($mountInventory | Where-Object release_decision -eq "include_wrath") "mount_id" "Wrath mounts" 93
-Assert-ExactSet $petManifest $petInventory "species_id" "Wrath pets" 50
+Assert-ExactSet $petManifest $petInventory "species_id" "Wrath pets" 52
 Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_wrath") "toy_id" "Wrath toys" 36
 Assert-ExactSet $decorManifest $decorInventory "decor_id" "Wrath decorations" 27
 Assert-ExactSet $achievementManifest $achievementInventory "achievement_id" "Wrath achievements" 384
@@ -123,7 +123,8 @@ foreach ($expectation in @(@("mount",49,49,49),@("pet",50,50,50),@("toy",25,25,2
     if ($rows.Count -ne $expectation[1] -or $mapped.Count -ne $expectation[2] -or $unique.Count -ne $expectation[3]) { throw "Blizzard Wrath $($expectation[0]) guide mapping count mismatch" }
 }
 Assert-IDValues @($blizzardRows | Where-Object collectible_type -eq "mount" | ForEach-Object mapped_id) @($mountManifest | Where-Object official_guide_match -eq "True" | ForEach-Object mount_id) "Wrath mount guide coverage"
-Assert-IDValues $petManifest.species_id @($blizzardRows | Where-Object collectible_type -eq "pet" | ForEach-Object mapped_id) "Wrath pet guide coverage"
+Assert-IDValues @($petManifest | Where-Object status -eq "blizzard_wrath_acquisition_confirmed" | ForEach-Object species_id) @($blizzardRows | Where-Object collectible_type -eq "pet" | ForEach-Object mapped_id) "Wrath pet guide coverage"
+Assert-IDValues @($petManifest | Where-Object status -eq "handynotes_wrath_acquisition_confirmed" | ForEach-Object species_id) @("199", "238") "Wrath HandyNotes acquisition additions"
 Assert-IDValues @($blizzardRows | Where-Object collectible_type -eq "toy" | ForEach-Object mapped_id) @($toyInventory | Where-Object official_guide_match -eq "True" | ForEach-Object toy_id) "Wrath toy guide mapping"
 Assert-IDValues @($blizzardRows | Where-Object { $_.collectible_type -eq "toy" -and $_.mapped_id -notin $toyManifest.toy_id } | ForEach-Object mapped_id) @("467") "Wrath guide cross-expansion toy exclusion"
 

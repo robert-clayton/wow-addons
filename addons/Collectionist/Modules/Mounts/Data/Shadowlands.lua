@@ -1,6 +1,6 @@
 local _, MC = ...
 
--- Shadowlands mounts. Generated from the exact 179-row release manifest.
+-- Shadowlands mounts. Generated from the exact 180-row release manifest.
 MC.RegisterContent("shadowlands", "mounts", {
     { source = "renown", mounts = {
         { mountID = 803, itemID = 186479, name = "Mastercraft Gravewing", source = "renown", sourceInfo = "|cFFFFD200Covenant: |rVenthyr|n|cFFFFD200Drop:|r Stygian Stonecrusher|n|cFFFFD200Zone:|r Korthia |n" },
@@ -65,6 +65,7 @@ MC.RegisterContent("shadowlands", "mounts", {
         { mountID = 1529, itemID = 187640, name = "Anointed Protostag", source = "renown", sourceInfo = "|cFFFFD200Vendor: |rVilo|n|cFFFFD200Zone: |rZereth Mortis|n|cFFFFD200Faction: |rThe Enlightened - Revered|n|cFFFFD200Cost: |r5000|Hcurrency:1813|h|TInterface\\ICONS\\Spell_AnimaBastion_Orb.BLP:0|t|h" },
     } },
     { source = "drop", mounts = {
+        { mountID = 293, itemID = 186469, name = "Illidari Doomhawk", source = "drop", sourceInfo = "|cFFFFD200Drop: |rDoomwalker|n|cFFFFD200Zone: |rTanaris" },
         { mountID = 1304, itemID = 184167, name = "Mawsworn Soulhunter", source = "drop", sourceInfo = "|cFFFFD200Drop: |rGorged Shadehound|n|cFFFFD200Zone: |rThe Maw" },
         { mountID = 1305, itemID = 183052, name = "Darkwarren Hardshell", source = "drop", sourceInfo = "|cFFFFD200Adventures:|r Shadowlands" },
         { mountID = 1306, itemID = 180728, name = "Swift Gloomhoof", source = "drop", sourceInfo = "|cFFFFD200Drop: |rNight Mare|n|cFFFFD200Zone: |rArdenweald" },

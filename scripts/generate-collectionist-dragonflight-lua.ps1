@@ -242,13 +242,15 @@ $recipes = Read-Manifest "recipes"
 $recipeLines = [System.Collections.Generic.List[string]]::new()
 $recipeLines.Add("local _, MC = ...")
 $recipeLines.Add("")
-$recipeLines.Add("-- Dragon Isles profession recipes. Generated from the exact 948-spell manifest.")
+$recipeLines.Add("-- Dragonflight-acquisition profession recipes. Generated from the exact $($recipes.Count)-spell manifest.")
 $recipeLines.Add('MC.RegisterContent("df", "recipes", {')
 foreach ($group in $recipes | Group-Object profession | Sort-Object Name) {
     $first = $group.Group[0]
     $recipeLines.Add("    { skillLine = $($first.profession_id), name = `"Dragonflight`", recipes = {")
     foreach ($row in $group.Group | Sort-Object { [int]$_.recipe_spell_id }) {
-        if ($row.acquire_method -eq "1") {
+        if ($row.status -eq "acquisition_dragonflight_ancient_zulgurub") {
+            $recipeLines.Add("        { id = $($row.recipe_spell_id), name = $(ConvertTo-LuaString $row.name), source = `"drop`", sourceInfo = `"Gurubashi Tribute in Zul'Gurub (Dragonflight 10.0.7)`" },")
+        } elseif ($row.acquire_method -eq "1") {
             $recipeLines.Add("        { id = $($row.recipe_spell_id), name = $(ConvertTo-LuaString $row.name), source = `"trainer`", sourceInfo = `"Learned automatically`", priority = 1 },")
         } else {
             $recipeLines.Add("        { id = $($row.recipe_spell_id), name = $(ConvertTo-LuaString $row.name), source = `"unknown`" },")

@@ -1,6 +1,6 @@
 local _, MC = ...
 
--- Cataclysm battle pets. Generated from the exact 42-row release manifest.
+-- Cataclysm battle pets. Generated from the exact 43-row release manifest.
 MC.RegisterContent("cata", "pets", {
     { source = "drop", pets = {
         { speciesID = 278, npcID = 48641, name = "Fox Kit", petType = 8, source = "drop", sourceInfo = "Fox Kit “The fighting in Tol Barad has made it difficult to find these kits, and numerous would-be owners have decimated the fox population there as a result.” Drop: Baradin Fox Tol Barad Peninsula --" },
@@ -52,6 +52,7 @@ MC.RegisterContent("cata", "pets", {
     } },
     { source = "vendor", pets = {
         { speciesID = 271, npcID = 48107, name = "Rustberg Gull", petType = 3, source = "vendor", sourceInfo = "Rustberg Gull “This bird is a salty veteran of the endless naval battles surrounding Tol Barad—a veteran whose grown plump from picking through the leftovers, that is.” Vendor: Quartermaster Brazie Tol Barad Peninsula Faction: Baradin’s Warden’s-Honored/ Hellscream’s Reach- Honored 50 Tol Barad Commendations" },
+        { speciesID = 306, npcID = 52831, name = "Winterspring Cub", petType = 8, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rMichelle De Rum|n|cFFFFD200Zone: |rWinterspring|n|cFFFFD200Cost: |r50|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
         { speciesID = 317, npcID = 53658, name = "Hyjal Bear Cub", petType = 8, source = "vendor", sourceInfo = "Hyjal Bear Cub “The cubs of Hyjal suffered much during the Cataclysm. On the bright side, the devastation also led to their newfound love of heights and daredevil stunts.” Vendor: Varlan Highbough Molten Front 1,500 Gold" },
     } },
 })

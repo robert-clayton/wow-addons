@@ -81,7 +81,7 @@ $mounts = Read-Manifest "mounts"
 $mountLines = [System.Collections.Generic.List[string]]::new()
 $mountLines.Add("local _, MC = ...")
 $mountLines.Add("")
-$mountLines.Add("-- Shadowlands mounts. Generated from the exact 179-row release manifest.")
+$mountLines.Add("-- Shadowlands mounts. Generated from the exact $($mounts.Count)-row release manifest.")
 $mountLines.Add('MC.RegisterContent("shadowlands", "mounts", {')
 Add-GroupedEntries $mountLines $mounts "mounts" "mounts" {
     param($row, $source)
@@ -103,7 +103,7 @@ $pets = Read-Manifest "pets"
 $petLines = [System.Collections.Generic.List[string]]::new()
 $petLines.Add("local _, MC = ...")
 $petLines.Add("")
-$petLines.Add("-- Shadowlands battle pets. Generated from the exact 175-row release manifest.")
+$petLines.Add("-- Shadowlands battle pets. Generated from the exact $($pets.Count)-row release manifest.")
 $petLines.Add('MC.RegisterContent("shadowlands", "pets", {')
 Add-GroupedEntries $petLines $pets "pets" "pets" {
     param($row, $source)

@@ -197,13 +197,14 @@ $mountInventory = foreach ($historicalMount in $cataclysmMountCandidates) {
 }
 Assert-Equal @($mountInventory | Where-Object release_decision -eq "include_cataclysm").Count 48 "Cataclysm mount manifest count"
 
-$cataclysmAdditionalPetIDs = @("309","310")
+$cataclysmArchaeologyPetIDs = @("309","310")
+$cataclysmAdditionalPetIDs = @("306") + $cataclysmArchaeologyPetIDs
 $petInventory = foreach ($id in @($officialIDs.pets.Keys + $cataclysmAdditionalPetIDs | Sort-Object -Unique { [int]$_ })) {
     $pet = $currentPetByID[$id]
     $creature = $creatureByID[[string]$pet.CreatureID]
     $source = @($officialRows | Where-Object { $_.collectible_type -eq "pet" -and [string]$_.mapped_id -eq $id })[0]
     [pscustomobject]@{
-        status=if($source){"blizzard_cataclysm_acquisition_confirmed"}else{"cataclysm_archaeology_confirmed"}; release_decision="include_cataclysm"; unavailable=$false; current_exists=$true
+        status=if($source){"blizzard_cataclysm_acquisition_confirmed"}elseif($id -in $cataclysmArchaeologyPetIDs){"cataclysm_archaeology_confirmed"}else{"handynotes_cataclysm_acquisition_confirmed"}; release_decision="include_cataclysm"; unavailable=$false; current_exists=$true
         species_id=$pet.ID; name=if($creature){$creature.Name_lang}else{$source.guide_name}; creature_id=$pet.CreatureID; summon_spell_id=$pet.SummonSpellID
         pet_type_enum=$pet.PetTypeEnum; flags=$pet.Flags; source_type_enum=$pet.SourceTypeEnum; source_text=if($source){$source.source_text}else{$pet.SourceText_lang}; guide_url=if($source){$source.guide_url}else{""}
     }
@@ -332,7 +333,7 @@ $currentCurrencyByID=New-Index $currentCurrencies
 $currencyInventory=foreach($id in $currencyNames.Keys|Sort-Object {[int]$_}){$c=$currentCurrencyByID[$id];if(-not$c){throw "Missing current Cataclysm currency $id"};if($c.Name_lang-ne$currencyNames[$id]){throw "Cataclysm currency $id name mismatch: '$($c.Name_lang)'"};[pscustomobject]@{status="cataclysm_support_confirmed";current_exists=$currentCurrencyIDs.ContainsKey($id);currency_id=$c.ID;name=$c.Name_lang;category_id=$c.CategoryID;flags=$c.Flags}}
 
 Assert-Equal $mountInventory.Count 63 "Cataclysm mount inventory count"
-Assert-Equal $petInventory.Count 42 "Cataclysm pet inventory count"
+Assert-Equal $petInventory.Count 43 "Cataclysm pet inventory count"
 Assert-Equal $toyInventory.Count 61 "Cataclysm toy inventory count"
 Assert-Equal $decorInventory.Count 46 "Cataclysm decoration inventory count"
 Assert-Equal $achievementInventory.Count 233 "Cataclysm achievement inventory count"
@@ -366,7 +367,7 @@ Write-CsvFile (Join-Path $OutputRoot "summary.csv") $summary
 
 $manifests=[ordered]@{
     mounts=@{rows=@($mountInventory|Where-Object release_decision -eq "include_cataclysm"|Sort-Object {[int]$_.mount_id});expected=48;id="mount_id"}
-    pets=@{rows=@($petInventory|Sort-Object {[int]$_.species_id});expected=42;id="species_id"}
+    pets=@{rows=@($petInventory|Sort-Object {[int]$_.species_id});expected=43;id="species_id"}
     toys=@{rows=@($toyInventory|Where-Object release_decision -eq "include_cataclysm"|Sort-Object {[int]$_.toy_id});expected=40;id="toy_id"}
     decorations=@{rows=@($decorInventory|Sort-Object {[int]$_.decor_id});expected=46;id="decor_id"}
     achievements=@{rows=@($achievementInventory|Sort-Object {[int]$_.achievement_id});expected=233;id="achievement_id"}

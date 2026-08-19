@@ -391,6 +391,13 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "vendor",
         decorations = {
+            -- Mothkeeper Wew'tam (10 Luminous Dust each; moth milestones unlock stock)
+            { decorID = 14824, itemID = 263038, name = "Haranir Reclined Bed", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (90 Glowing Moths)",
+              waypoint = LOC.MothkeeperWewTam, zone = "Harandar" },
+            { decorID = 15478, itemID = 264243, name = "Firm Haranir Pillow", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (30 Glowing Moths)",
+              waypoint = LOC.MothkeeperWewTam, zone = "Harandar" },
+            { decorID = 15480, itemID = 264245, name = "Warm Haranir Blanket", source = "vendor", sourceInfo = "Mothkeeper Wew'tam - 10 Luminous Dust (60 Glowing Moths)",
+              waypoint = LOC.MothkeeperWewTam, zone = "Harandar" },
             -- Delves (Naleidea Rivergleam, Undercoin 2803)
             { decorID = 2503, name = "Hanging Mana Brazier", source = "vendor", sourceInfo = "Naleidea Rivergleam - 500 Undercoin",
               waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City", cost = { currency = { MC.CURRENCY.Undercoin, 500 } } },

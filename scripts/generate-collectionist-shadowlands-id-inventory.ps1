@@ -179,7 +179,11 @@ $toySourceOverrides = @{
     "1189" = "|cFFFFD200Mail:|r Ve'nari, after inspecting her at the Creation Catalyst|n|cFFFFD200Zone:|r Zereth Mortis"
 }
 
-$mountInventory = foreach ($mount in (Get-NewRows $bfaMounts $slMounts)) {
+# Mount journal ID 293 was reused in Shadowlands: the BFA row is the retired
+# Black Dragonhawk while the Shadowlands row is Illidari Doomhawk.
+$shadowlandsReusedMountIDs = @("293")
+$shadowlandsMountCandidates = @((Get-NewRows $bfaMounts $slMounts)) + @($slMounts | Where-Object { [string]$_.ID -in $shadowlandsReusedMountIDs })
+$mountInventory = foreach ($mount in $shadowlandsMountCandidates) {
     $itemIDs = @($itemsBySpell[[string]$mount.SourceSpellID])
     $itemExpansionIDs = @($itemIDs | ForEach-Object {
         $item = $items[[string]$_]
@@ -211,6 +215,7 @@ $mountInventory = foreach ($mount in (Get-NewRows $bfaMounts $slMounts)) {
     }
 }
 
+$shadowlandsCollectibleWildPetIDs = @("3215")
 $petInventory = foreach ($pet in (Get-NewRows $bfaPets $slPets)) {
     $itemIDs = @($itemsBySpell[[string]$pet.SummonSpellID])
     $itemExpansionIDs = @($itemIDs | ForEach-Object {
@@ -218,7 +223,9 @@ $petInventory = foreach ($pet in (Get-NewRows $bfaPets $slPets)) {
         if ($item) { $item.ExpansionID }
     })
     $creature = $creatures[[string]$pet.CreatureID]
-    $status = if ($pet.SummonSpellID -eq "0" -or [int]$pet.SourceTypeEnum -lt 0) {
+    $status = if ([string]$pet.ID -in $shadowlandsCollectibleWildPetIDs) {
+        "collectible_wild_pet"
+    } elseif ($pet.SummonSpellID -eq "0" -or [int]$pet.SourceTypeEnum -lt 0) {
         "noncollectible_pet_battle_npc"
     } elseif ($pet.SourceText_lang -match $externalCollectionPattern) {
         "policy_external_candidate"
@@ -586,7 +593,7 @@ $currencyInventory = foreach ($currency in (Get-NewRows $bfaCurrencies $slCurren
     }
 }
 
-Assert-Equal @($mountInventory).Count 193 "Mount snapshot row count"
+Assert-Equal @($mountInventory).Count 194 "Mount snapshot row count"
 Assert-Equal @($petInventory).Count 300 "Pet snapshot row count"
 Assert-Equal @($toyInventory).Count 121 "Toy snapshot row count"
 Assert-Equal @($achievementInventory).Count 963 "Achievement snapshot row count"
@@ -596,12 +603,12 @@ Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "named_
 Assert-Equal @($historicalRecipeInventory | Where-Object { $_.status -eq "unnamed_db2_ability_candidate" }).Count 2 "Unnamed Shadowlands recipe count"
 Assert-Equal @($houseDecorRecipeInventory).Count 23 "Current Shadowlands house decor recipe count"
 Assert-Equal @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe") }).Count 634 "Named Shadowlands recipe count"
-Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 179 "Selected Shadowlands mount count"
+Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 180 "Selected Shadowlands mount count"
 Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 12 "External Shadowlands mount count"
 Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 2 "Internal Shadowlands mount count"
-Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 175 "Selected Shadowlands pet count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 176 "Selected Shadowlands pet count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 6 "External Shadowlands pet count"
-Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 119 "Noncollectible Shadowlands pet count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 118 "Noncollectible Shadowlands pet count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 115 "Selected Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 4 "External Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 2 "Internal Shadowlands toy count"
@@ -728,8 +735,8 @@ Write-CsvFile (Join-Path $ManifestRoot "supporting-factions.csv") $supportingFac
 Write-CsvFile (Join-Path $ManifestRoot "supporting-maps.csv") $supportingMapManifest
 
 $manifestSummary = @(
-    [pscustomobject]@{ manifest = "mounts"; rows = 179; identifier = "mount_id" }
-    [pscustomobject]@{ manifest = "pets"; rows = 175; identifier = "species_id" }
+    [pscustomobject]@{ manifest = "mounts"; rows = 180; identifier = "mount_id" }
+    [pscustomobject]@{ manifest = "pets"; rows = 176; identifier = "species_id" }
     [pscustomobject]@{ manifest = "toys"; rows = 115; identifier = "toy_id" }
     [pscustomobject]@{ manifest = "decorations"; rows = 26; identifier = "decor_id" }
     [pscustomobject]@{ manifest = "achievements"; rows = 419; identifier = "achievement_id" }

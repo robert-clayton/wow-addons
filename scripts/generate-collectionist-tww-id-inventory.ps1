@@ -249,7 +249,11 @@ foreach ($match in [regex]::Matches($petGuideText, '<a href="/npc=(\d+)(?:/[^"#?
     $guideNPCNames[$match.Groups[1].Value] = [System.Net.WebUtility]::HtmlDecode($match.Groups[2].Value)
 }
 
-$petInventory = foreach ($pet in (Get-NewRows $dfPets $twwPets)) {
+# Sapphire Crab existed as an uncollectible preload in Dragonflight, then
+# gained its real Isle of Dorn treasure source and item in The War Within.
+$twwReacquiredPetIDs = @("3362")
+$twwPetCandidates = @((Get-NewRows $dfPets $twwPets)) + @($twwPets | Where-Object { [string]$_.ID -in $twwReacquiredPetIDs })
+$petInventory = foreach ($pet in $twwPetCandidates) {
     $itemIDs = @($itemsBySpell[[string]$pet.SummonSpellID])
     $itemExpansionIDs = @($itemIDs | ForEach-Object {
         $item = $items[[string]$_]
@@ -313,6 +317,9 @@ if (@($petPreloadAuditRows).Count -ne 2) {
 }
 if (@($petPreloadAuditRows | Group-Object species_id | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
     throw "Pet preload audit contains duplicate species IDs"
+}
+if (@($petInventory | Where-Object { [string]$_.species_id -in $twwReacquiredPetIDs -and $_.release_decision -eq "include_tww" }).Count -ne $twwReacquiredPetIDs.Count) {
+    throw "TWW reacquired pet overrides were not included"
 }
 
 $toyInventory = foreach ($toy in (Get-NewRows $dfToys $twwToys)) {
@@ -724,7 +731,7 @@ $achievementCriteriaManifest = @($achievementCriteriaInventory | Where-Object { 
 
 $releaseManifests = [ordered]@{
     mounts      = @{ rows = $mountManifest; expected = 186; id = "mount_id" }
-    pets        = @{ rows = $petManifest; expected = 200; id = "species_id" }
+    pets        = @{ rows = $petManifest; expected = 201; id = "species_id" }
     toys        = @{ rows = $toyManifest; expected = 99; id = "item_id" }
     decorations = @{ rows = $twwDecorationManifest; expected = 108; id = "decor_id" }
     recipes     = @{ rows = $recipeManifest; expected = 696; id = "recipe_spell_id" }

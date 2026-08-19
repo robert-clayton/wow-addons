@@ -275,7 +275,7 @@
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3212","Bloodsucker Vespoid","182876","0","","","2","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3213","Vombata Pup","183142","0","","","7","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3214","Momma Vombata","183158","0","","","7","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
-"noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3215","Mawtouched Geomental","183230","0","","","6","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
+"collectible_wild_pet","include_shadowlands","False",,"True","3215","Mawtouched Geomental","183230","0","","","6","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3216","Ambystan Snapper","183277","0","","","8","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3217","Aurelid Floater","183281","0","","","8","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"
 "noncollectible_pet_battle_npc","exclude_noncollectible","False",,"True","3218","Enraged Poultrid","183285","0","","","2","26","4","|cFFFFD200Pet Battle: |rZereth Mortis"

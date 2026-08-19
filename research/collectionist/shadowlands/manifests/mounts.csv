@@ -1,4 +1,5 @@
 "status","release_decision","unavailable","availability_note","current_exists","mount_id","name","source_spell_id","item_ids","item_expansion_ids","source_type_enum","flags","source_text"
+"snapshot_candidate","include_shadowlands","False",,"True","293","Illidari Doomhawk","62048","186469","0","0","192","|cFFFFD200Drop: |rDoomwalker|n|cFFFFD200Zone: |rTanaris"
 "item_expansion_signal","include_shadowlands","False",,"True","803","Mastercraft Gravewing","215545","186479","8","0","0","|cFFFFD200Covenant: |rVenthyr|n|cFFFFD200Drop:|r Stygian Stonecrusher|n|cFFFFD200Zone:|r Korthia |n"
 "item_expansion_signal","include_shadowlands","False",,"True","1298","Hopecrusher Gargon","312753","180581","8","0","0","|cFFFFD200Covenant: |rVenthyr|n|cFFFFD200Zone: |rRevendreth"
 "item_expansion_signal","include_shadowlands","False",,"True","1299","Battle Gargon Vrednic","312754","180948","8","0","0","|cFFFFD200Covenant: |rVenthyr|n|cFFFFD200Zone: |rRevendreth"
