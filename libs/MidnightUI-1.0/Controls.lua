@@ -38,14 +38,20 @@ function lib.MakePillToggle(parent, opts)
 
     local function paint(on, instant)
         local c = lib.Theme.colors
+        local tr, tg, tb, ta
         if on then
             local ac = c.accent
-            lib.FadeTexture(track, ac[1], ac[2], ac[3], 0.75)
+            tr, tg, tb, ta = ac[1], ac[2], ac[3], 0.75
             knob:SetColorTexture(1, 1, 1, 1)
         else
-            lib.FadeTexture(track, 0.27, 0.27, 0.27, 0.65)
             local t = c.text
+            tr, tg, tb, ta = 0.27, 0.27, 0.27, 0.65
             knob:SetColorTexture(t[1], t[2], t[3], 0.5)
+        end
+        if instant then
+            lib.SetTextureAlpha(track, tr, tg, tb, ta)
+        else
+            lib.FadeTexture(track, tr, tg, tb, ta)
         end
         local x = on and KNOB_OFF or 2
         if instant then
@@ -214,7 +220,7 @@ function lib.MakeNavRow(parent, opts)
 
     local hover = row:CreateTexture(nil, "BACKGROUND", nil, 3)
     hover:SetAllPoints()
-    hover:SetColorTexture(1, 1, 1, 0)
+    lib.SetTextureAlpha(hover, 1, 1, 1, 0)
 
     local icon = row:CreateTexture(nil, "ARTWORK")
     icon:SetSize(18, 18)

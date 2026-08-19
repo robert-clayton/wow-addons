@@ -273,13 +273,23 @@ end
 -- Texture vertex-alpha fade, for washes and hairlines that are textures
 -- rather than frames (hover states, active bars).
 --------------------------------------------------------------------------
+-- Set a colour texture and record its alpha, so a later fade knows where
+-- it is starting from. Use this instead of a bare SetColorTexture on any
+-- texture that will be faded.
+function lib.SetTextureAlpha(tex, r, g, b, a)
+    if not tex then return end
+    tex._muiAlpha = a
+    tex:SetColorTexture(r, g, b, a)
+end
+
 function lib.FadeTexture(tex, r, g, b, toAlpha, duration)
     if not tex then return end
-    local from = tex._muiAlpha
-    if from == nil then
-        local _, _, _, a = tex:GetVertexColor()
-        from = a or 0
-    end
+    -- SetColorTexture's alpha cannot be read back — GetVertexColor
+    -- returns the vertex tint, which is 1 on a texture that has never
+    -- been tinted. Reading it would start every first fade from fully
+    -- opaque. This helper's own bookkeeping is the only source of truth;
+    -- absent it, assume invisible (seed with SetTextureAlpha otherwise).
+    local from = tex._muiAlpha or 0
     stopDriver(tex, "texfade")
     if not lib.animEnabled or math.abs(from - toAlpha) < 0.01 then
         tex._muiAlpha = toAlpha
