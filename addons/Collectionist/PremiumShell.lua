@@ -50,7 +50,8 @@ StaticPopupDialogs["COLLECTIONIST_UISTYLE_RELOAD"] = {
 -- MC.db.premium lives inside CollectionistCharDB, so persistence and
 -- the logout snapshot are automatic.
 --------------------------------------------------------------------------
-local GEO = { position = true, panelWidth = true, panelHeight = true, minimized = true }
+local GEO = { position = true, panelWidth = true, panelHeight = true, minimized = true,
+              compact = true, compactWidth = true, compactHeight = true }
 
 function MC.MakePremiumDB()
     MC.db.premium = MC.db.premium or {}

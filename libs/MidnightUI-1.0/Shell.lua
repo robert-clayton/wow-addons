@@ -9,9 +9,19 @@ if not lib then return end
 --   titleProgressText, navContainer, searchInput,
 --   Show/Hide/Toggle, RefreshScrollContent, ApplyBackdrop,
 --   SetPageHeader, PopulateConfig/ToggleConfig,
---   ApplyMinimizeState/UpdateMinimizeVisual, UpdateDraggerVisibility.
+--   ApplyMinimizeState/UpdateMinimizeVisual, UpdateDraggerVisibility,
+--   GetViewMode ("full" | "compact" | "strip").
+-- View states: full (sidebar + header + footer), compact (db.compact —
+-- a narrow leave-it-up list view: condensed 52px header, no sidebar or
+-- footer, its own saved geometry in db.compactWidth/compactHeight),
+-- strip (db.minimized — the 48px brand strip; checked first when both
+-- flags are set, and restore clears both). All three states share
+-- db.position. Nil db.compact keys mean legacy saves and resolve to
+-- the full state.
 -- Behavioral hooks arrive through opts so the lib stays consumer-
--- agnostic: onRefresh, onHide, onScan, onInspector, inspectorVisible.
+-- agnostic: onRefresh, onHide, onScan, onInspector, inspectorVisible,
+-- onViewChanged(shell, mode) — fired after every non-combat state
+-- apply.
 
 local SIDEBAR_W   = 220
 local BRAND_H     = 64
@@ -22,6 +32,9 @@ local CONTENT_PAD = 24
 local GAP         = 8
 local MINI_W      = SIDEBAR_W + 240
 local MINI_H      = 48
+-- Compact state: condensed header height and tighter content padding.
+local COMPACT_HEADER_H = 52
+local COMPACT_PAD      = 12
 
 local WHITE8 = "Interface\\Buttons\\WHITE8x8"
 
@@ -47,6 +60,15 @@ local function ClampSize(opts, w, h)
     return w, h
 end
 
+-- Compact envelope. Lib-owned defaults; consumers may override via
+-- opts.compactMinWidth / compactMaxWidth / compactMinHeight /
+-- compactMaxHeight.
+local function ClampCompact(opts, w, h)
+    w = math.max(opts.compactMinWidth or 320, math.min(opts.compactMaxWidth or 520, w))
+    h = math.max(opts.compactMinHeight or 320, math.min(opts.compactMaxHeight or 900, h))
+    return w, h
+end
+
 function lib:CreatePremiumShell(opts)
     local shell = setmetatable({}, ShellProto)
     shell.opts = opts
@@ -61,6 +83,10 @@ end
 -- that follows a resize (module renderers read parent:GetWidth() for
 -- bar fills at first Refresh).
 function ShellProto:_ContentWidth()
+    if self.db.compact and not self.db.minimized then
+        local w = self.db.compactWidth or 380
+        return math.max(w - 2 * COMPACT_PAD - 6, 100)
+    end
     local w = self.db.panelWidth or self.opts.defaultWidth or 980
     return math.max(w - SIDEBAR_W - 2 * CONTENT_PAD - 6, 100)
 end
@@ -110,7 +136,7 @@ function ShellProto:Create()
     if db.panelShown then
         f:Show()
         if opts.onRefresh then opts.onRefresh(self) end
-        if db.minimized then
+        if db.minimized or db.compact then
             self:ApplyMinimizeState()
         end
     end
@@ -260,16 +286,48 @@ function ShellProto:_CreateHeader()
     local progress = f:CreateFontString(nil, "OVERLAY")
     progress:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
     self.titleProgressText = progress
+
+    -- Compact-state header controls (footer is hidden in compact, so
+    -- the compact header carries its own expand / to-strip buttons).
+    -- Created once, hidden until _ApplyCompactVisuals shows them.
+    local shell = self
+    local db = self.db
+    local colors = theme.colors
+    local expandBtn = lib.MakeHeaderBtn(bar, "+",
+        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
+        "Expand", { width = 20, height = 20 })
+    expandBtn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -8, -8)
+    expandBtn:Hide()
+    expandBtn:SetScript("OnClick", function()
+        db.compact = false
+        shell:ApplyMinimizeState()
+    end)
+    f.compactExpandBtn = expandBtn
+
+    local stripBtn = lib.MakeHeaderBtn(bar, "-",
+        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
+        "Minimize to strip", { width = 20, height = 20 })
+    stripBtn:SetPoint("RIGHT", expandBtn, "LEFT", -6, 0)
+    stripBtn:Hide()
+    stripBtn:SetScript("OnClick", function()
+        db.minimized = true
+        shell:ApplyMinimizeState()
+    end)
+    f.compactStripBtn = stripBtn
+
     self:_AnchorProgressText(false)
 end
 
-function ShellProto:_AnchorProgressText(minimized)
+-- mode: "strip" (or legacy true), "compact", anything else = full.
+function ShellProto:_AnchorProgressText(mode)
     local f = self.frame
     local p = self.titleProgressText
     if not p then return end
     p:ClearAllPoints()
-    if minimized and f.restoreBtn then
+    if (mode == "strip" or mode == true) and f.restoreBtn then
         p:SetPoint("RIGHT", f.restoreBtn, "LEFT", -10, 0)
+    elseif mode == "compact" and f.compactStripBtn then
+        p:SetPoint("RIGHT", f.compactStripBtn, "LEFT", -10, 0)
     else
         p:SetPoint("RIGHT", f.titleBar, "BOTTOMRIGHT", -CONTENT_PAD, 16)
     end
@@ -401,12 +459,15 @@ function ShellProto:_CreateFooter()
     end)
     footer.inspectorBtn = inspBtn
 
+    -- First leg of the full -> compact -> strip cycle. The footer is
+    -- hidden in compact, so the compact header's own buttons carry the
+    -- compact -> strip and compact -> full legs.
     local minBtn = lib.MakeHeaderBtn(footer, "-",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Minimize", { width = 30, height = 30 })
+        "Compact view", { width = 30, height = 30 })
     minBtn:SetPoint("LEFT", inspBtn, "RIGHT", 12, 0)
     minBtn:SetScript("OnClick", function()
-        db.minimized = not db.minimized
+        db.compact = true
         shell:ApplyMinimizeState()
     end)
     footer.minBtn = minBtn
@@ -419,7 +480,10 @@ function ShellProto:_CreateFooter()
     restoreBtn:SetPoint("RIGHT", f, "RIGHT", -12, 0)
     restoreBtn:Hide()
     restoreBtn:SetScript("OnClick", function()
+        -- Strip restore always returns to the full state, even when the
+        -- strip was entered from compact.
         db.minimized = false
+        db.compact = false
         shell:ApplyMinimizeState()
     end)
     f.restoreBtn = restoreBtn
@@ -464,7 +528,7 @@ function ShellProto:_CreateResizeDragger()
         cy = cy / scale
         local dx = cx - dragStartX
         local dy = dragStartY - cy
-        local newW, newH = ClampSize(shell.opts, dragStartW + dx, dragStartH + dy)
+        local newW, newH = shell:_CurrentClamp(dragStartW + dx, dragStartH + dy)
         f:SetWidth(newW)
         f:SetHeight(newH)
     end
@@ -491,10 +555,15 @@ function ShellProto:_CreateResizeDragger()
         if button == "LeftButton" and dragger._dragging then
             dragger._dragging = false
             dragger:SetScript("OnUpdate", nil)
-            local newW, newH = ClampSize(shell.opts,
+            local newW, newH = shell:_CurrentClamp(
                 math.floor(f:GetWidth()), math.floor(f:GetHeight()))
-            db.panelWidth = newW
-            db.panelHeight = newH
+            if db.compact and not db.minimized then
+                db.compactWidth = newW
+                db.compactHeight = newH
+            else
+                db.panelWidth = newW
+                db.panelHeight = newH
+            end
             f:SetWidth(newW)
             f:SetHeight(newH)
             local point, _, relativePoint, x, y = f:GetPoint()
@@ -525,6 +594,15 @@ function ShellProto:_CreateResizeDragger()
     f.dragger = dragger
 end
 
+-- Clamp against the envelope of the CURRENT view state (compact sizes
+-- must not be forced into the full 760x520 minimum and vice versa).
+function ShellProto:_CurrentClamp(w, h)
+    if self.db.compact and not self.db.minimized then
+        return ClampCompact(self.opts, w, h)
+    end
+    return ClampSize(self.opts, w, h)
+end
+
 function ShellProto:UpdateDraggerVisibility()
     if not self.frame or not self.frame.dragger then return end
     if self.db.locked or self.db.minimized then
@@ -532,6 +610,16 @@ function ShellProto:UpdateDraggerVisibility()
     else
         self.frame.dragger:Show()
     end
+end
+
+-- Page-title font by view state: the compact header condenses the
+-- title. State-aware (not applier-owned) so a live theme switch during
+-- compact cannot resurrect the full-size font.
+function ShellProto:_ApplyTitleFont()
+    local bar = self.frame and self.frame.titleBar
+    if not bar then return end
+    local delta = (self.db.compact and not self.db.minimized) and 4 or 9
+    bar.pageTitle:SetFont(lib.FontBold(), lib.Theme.fontSize + delta, lib.FontFlags())
 end
 
 -- Repaint every piece of chrome from the live theme. Called at
@@ -561,7 +649,7 @@ function ShellProto:ApplyBackdrop()
     brand.version:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
 
     local bar = f.titleBar
-    bar.pageTitle:SetFont(lib.FontBold(), theme.fontSize + 9, lib.FontFlags())
+    self:_ApplyTitleFont()
     bar.pageTitle:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
     bar.pageSubtitle:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     bar.pageSubtitle:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
@@ -618,11 +706,115 @@ function ShellProto:_ApplyMinimizedVisuals()
     f.sidebarBg:Hide()
     f.sidebarLine:Hide()
     if f.searchInput then f.searchInput:Hide() end
+    -- The strip can be entered from compact, which hides the whole
+    -- brand block; re-show it (the version line alone stays hidden).
+    f.brand:Show()
     f.brand.version:Hide()
     if f.dragger then f.dragger:Hide() end
     f:SetSize(MINI_W, MINI_H)
-    self:_AnchorProgressText(true)
+    self:_AnchorProgressText("strip")
     if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
+end
+
+-- Compact: a narrow leave-it-up window. No sidebar/footer, condensed
+-- 52px header (title + progress + spine along its bottom edge), the
+-- active module's list at the compact width. Idempotent — re-asserted
+-- by RefreshScrollContent after every content refresh.
+function ShellProto:_ApplyCompactVisuals()
+    local f = self.frame
+    local db = self.db
+    f.navContainer:Hide()
+    f.sidebarBg:Hide()
+    f.sidebarLine:Hide()
+    if f.searchInput then f.searchInput:Hide() end
+    f.brand:Hide()
+    f.footer:Hide()
+
+    local bar = f.titleBar
+    bar:Show()
+    bar:SetHeight(COMPACT_HEADER_H)
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+    bar:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+    bar.pageSubtitle:Hide()
+    bar.pageTitle:ClearAllPoints()
+    bar.pageTitle:SetPoint("TOPLEFT", bar, "TOPLEFT", COMPACT_PAD, -8)
+    self:_ApplyTitleFont()
+    if f.compactExpandBtn then f.compactExpandBtn:Show() end
+    if f.compactStripBtn then f.compactStripBtn:Show() end
+
+    f.scrollFrame:Show()
+    f.scrollFrame:ClearAllPoints()
+    f.scrollFrame:SetPoint("TOPLEFT", f, "TOPLEFT",
+        COMPACT_PAD, -(COMPACT_HEADER_H + GAP))
+    f.scrollFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT",
+        -(COMPACT_PAD + 6), GAP)
+    f.scrollTrack:ClearAllPoints()
+    f.scrollTrack:SetPoint("TOPRIGHT", f, "TOPRIGHT", -8, -(COMPACT_HEADER_H + GAP))
+    f.scrollTrack:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, GAP)
+
+    local w, h = ClampCompact(self.opts,
+        db.compactWidth or 380, db.compactHeight or 560)
+    f:SetSize(w, h)
+    if f.dragger and not db.locked then f.dragger:Show() end
+    self:_AnchorProgressText("compact")
+    self:UpdateSpine()
+    if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
+end
+
+-- Full: the application window. Extracted from the old un-minimize
+-- branch; must explicitly re-anchor the title bar / scroll region back
+-- to the full-state anchors because compact moves them.
+function ShellProto:_ApplyFullVisuals()
+    local f = self.frame
+    local db = self.db
+
+    local bar = f.titleBar
+    bar:Show()
+    bar:SetHeight(HEADER_H)
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", f, "TOPLEFT", SIDEBAR_W, 0)
+    bar:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+    bar.pageSubtitle:Show()
+    bar.pageTitle:ClearAllPoints()
+    bar.pageTitle:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD, -14)
+    self:_ApplyTitleFont()
+    if f.compactExpandBtn then f.compactExpandBtn:Hide() end
+    if f.compactStripBtn then f.compactStripBtn:Hide() end
+
+    f.scrollFrame:Show()
+    f.scrollFrame:ClearAllPoints()
+    f.scrollFrame:SetPoint("TOPLEFT", f, "TOPLEFT",
+        SIDEBAR_W + CONTENT_PAD, -(HEADER_H + GAP))
+    f.scrollFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT",
+        -(CONTENT_PAD + 6), FOOTER_H + GAP)
+    f.scrollTrack:ClearAllPoints()
+    f.scrollTrack:SetPoint("TOPRIGHT", f, "TOPRIGHT", -8, -(HEADER_H + GAP))
+    f.scrollTrack:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, FOOTER_H + GAP)
+
+    f.footer:Show()
+    f.navContainer:Show()
+    f.sidebarBg:Show()
+    f.sidebarLine:Show()
+    f.brand:Show()
+    f.brand.version:Show()
+    -- searchInput stays hidden in the MVP.
+    local w, h = ClampSize(self.opts,
+        db.panelWidth or self.opts.defaultWidth or 980,
+        db.panelHeight or self.opts.defaultHeight or 680)
+    f:SetSize(w, h)
+    if f.dragger and not db.locked then f.dragger:Show() end
+    self:_AnchorProgressText("full")
+    self:UpdateSpine()
+    if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
+end
+
+-- "full" | "compact" | "strip". Strip wins when both flags are set
+-- (strip entered from compact); restore clears both.
+function ShellProto:GetViewMode()
+    if self.db.minimized then return "strip" end
+    if self.db.compact then return "compact" end
+    return "full"
 end
 
 function ShellProto:ApplyMinimizeState()
@@ -644,41 +836,40 @@ function ShellProto:ApplyMinimizeState()
         return
     end
     local db = self.db
-    if db.minimized then
-        local left = f:GetLeft()
-        local top = f:GetTop()
-        if left and top then
-            f:ClearAllPoints()
-            f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
-            db.position = { point = "TOPLEFT", relativePoint = "BOTTOMLEFT", x = left, y = top }
-        end
+    -- Convert the anchor to TOPLEFT before any resize so the window's
+    -- top-left corner stays put across every state transition.
+    -- db.position stays the single shared position for all three states.
+    local left = f:GetLeft()
+    local top = f:GetTop()
+    if left and top then
+        f:ClearAllPoints()
+        f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+        db.position = { point = "TOPLEFT", relativePoint = "BOTTOMLEFT", x = left, y = top }
+    end
+    local mode = self:GetViewMode()
+    if mode == "strip" then
         self:_ApplyMinimizedVisuals()
     else
-        f.titleBar:Show()
-        f.scrollFrame:Show()
-        f.footer:Show()
-        f.navContainer:Show()
-        f.sidebarBg:Show()
-        f.sidebarLine:Show()
-        f.brand.version:Show()
-        -- searchInput stays hidden in the MVP.
-        local w, h = ClampSize(self.opts,
-            db.panelWidth or self.opts.defaultWidth or 980,
-            db.panelHeight or self.opts.defaultHeight or 680)
-        f:SetSize(w, h)
-        if f.dragger and not db.locked then f.dragger:Show() end
-        self:_AnchorProgressText(false)
-        self:UpdateSpine()
-        if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
+        if mode == "compact" then
+            self:_ApplyCompactVisuals()
+        else
+            self:_ApplyFullVisuals()
+        end
+        -- Width before refresh: bar fills read parent:GetWidth() at
+        -- first Refresh (same ordering as the resize dragger).
+        if self.scrollChild then
+            self.scrollChild:SetWidth(self:_ContentWidth())
+        end
         if self.opts.onRefresh then self.opts.onRefresh(self) end
     end
+    if self.opts.onViewChanged then self.opts.onViewChanged(self, mode) end
 end
 
 function ShellProto:Show()
     self.frame:Show()
     self.db.panelShown = true
     if self.opts.onRefresh then self.opts.onRefresh(self) end
-    if self.db.minimized then
+    if self.db.minimized or self.db.compact then
         self:ApplyMinimizeState()
     end
 end
@@ -740,8 +931,10 @@ function ShellProto:UpdateSpine()
     local dv = c.optionsDivider
     bar.hairline:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
     local GAP_W = 2
-    local usable = barW - 2 * CONTENT_PAD - GAP_W * (n - 1)
-    local x = CONTENT_PAD
+    local pad = (self.db.compact and not self.db.minimized)
+        and COMPACT_PAD or CONTENT_PAD
+    local usable = barW - 2 * pad - GAP_W * (n - 1)
+    local x = pad
     for i, d in ipairs(data) do
         local seg = segs[i]
         if not seg then
@@ -868,10 +1061,13 @@ function ShellProto:RefreshScrollContent(height)
     if self.scrollChild then
         self.scrollChild:SetHeight(math.max(height, 1))
     end
-    -- Re-assert the minimized strip after refresh (a refresh restores
-    -- neither size nor hidden regions on its own).
+    -- Re-assert the minimized strip / compact chrome after refresh (a
+    -- refresh restores neither size nor hidden regions on its own; the
+    -- appliers are idempotent and cheap).
     if self.db.minimized then
         self:_ApplyMinimizedVisuals()
+    elseif self.db.compact then
+        self:_ApplyCompactVisuals()
     end
 end
 

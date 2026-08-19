@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "MidnightUI-1.0", 20260819
+local MAJOR, MINOR = "MidnightUI-1.0", 20260820
 
 -- No pre-gate hook wipe here: /reload resets all Lua state, so hooks
 -- can never accumulate across reloads — but a second addon embedding

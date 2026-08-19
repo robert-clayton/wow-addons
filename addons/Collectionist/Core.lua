@@ -340,6 +340,13 @@ local ACCOUNT_ONLY_KEYS = {
     recipesLearned = true,
 }
 
+-- Strictly per-character state that must never ride the PLAYER_LOGOUT
+-- snapshot into the account-wide seed pool (a brand-new alt must not
+-- inherit another character's pinned Targets).
+local CHAR_ONLY_KEYS = {
+    targets = true,
+}
+
 local charDefaults = {
     dbVersion        = DB_VERSION,
     minimap          = { minimapPos = 225, hide = false },
@@ -860,6 +867,17 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     end
     tt:AddLine("Shift-click to copy Wowhead URL", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
     tt:AddLine("Ctrl-click to print entry info", C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
+    if MC.IsTargetPinned then
+        -- Collected rows can't be pinned; only show the hint when it can
+        -- act (or a stale pin still needs the unpin path).
+        if MC.IsTargetPinned(item) then
+            tt:AddLine("Alt-click to unpin from Targets",
+                C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
+        elseif not (item.collected or item.learned) then
+            tt:AddLine("Alt-click to pin to Targets",
+                C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
+        end
+    end
 
     -- Roster (v2): show which guildies/BNet friends already own this item.
     if MC.Bitmap and MC.Bitmap.OwnersOf then
@@ -1221,6 +1239,15 @@ function MC.DoItemAction(item, skillLine)
         MC.PrintItemInfo(item)
         return
     end
+    -- Alt-click: pin/unpin the row in the Targets overlay (shift and
+    -- ctrl are taken by Wowhead / info dump above). Guarded so Core
+    -- stays loadable without Targets.lua (tests load Core standalone).
+    if IsAltKeyDown() then
+        -- skillLine rides along so a recipes pin can reopen its
+        -- profession before the first scan of a session.
+        if MC.ToggleTargetPin then MC.ToggleTargetPin(item, skillLine) end
+        return
+    end
 
     -- Task-list aware: if any prerequisite is incomplete, route to those
     -- waypoints first. Once all tasks are done, fall through to the regular
@@ -1316,6 +1343,7 @@ end
 function MC.OnScanComplete(mod)
     if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
     if MC.PremiumNav and MC.PremiumNav.RefreshCounts then MC.PremiumNav:RefreshCounts() end
+    if MC.Targets and MC.Targets.OnScanComplete then MC.Targets:OnScanComplete(mod) end
     if MC.RosterDebouncedBroadcast then MC.RosterDebouncedBroadcast() end
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
     if MC.activeModule == mod.key and mod.UI and MC.panel
@@ -1630,7 +1658,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
                 if not ACCOUNT_ONLY_KEYS[k] then MC.snapshotDB[k] = nil end
             end
             for k, v in pairs(MC.db) do
-                if not ACCOUNT_ONLY_KEYS[k] then
+                if not ACCOUNT_ONLY_KEYS[k] and not CHAR_ONLY_KEYS[k] then
                     MC.snapshotDB[k] = type(v) == "table" and CopyTable(v) or v
                 end
             end
@@ -1663,6 +1691,25 @@ end)
 --------------------------------------------------------------------------
 -- Panel creation
 --------------------------------------------------------------------------
+-- Premium compact/strip states condense the title bar; the indicator
+-- chain (filter/score/peer) would overlap the page title at compact
+-- widths, so it hides whenever the shell is not in the full state.
+-- Never called under classic, so MC._indicatorsHidden stays unset there.
+local function ApplyIndicatorVisibility(mode)
+    MC._indicatorsHidden = (mode ~= "full")
+    local hidden = MC._indicatorsHidden
+    local function setShown(btn)
+        if not btn then return end
+        if hidden then btn:Hide() else btn:Show() end
+    end
+    setShown(MC.expansionFilterBtn)
+    setShown(MC.scoreIndicator)
+    setShown(MC.peerIndicator)
+    -- Peer visibility also depends on rosterEnabled; re-derive it on
+    -- return to full rather than blanket-showing.
+    if not hidden and MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+end
+
 function MC.CreatePanel()
     if MC.panel then return end
 
@@ -1702,6 +1749,13 @@ function MC.CreatePanel()
             end,
             inspectorVisible = function()
                 return (MC.db and MC.db.rosterEnabled) and true or false
+            end,
+            -- View-state changes (full/compact/strip). The initial fire
+            -- can happen before the indicator chain exists; the handler
+            -- nil-guards each button and CreatePanel re-applies after
+            -- the chain is built.
+            onViewChanged = function(_, mode)
+                ApplyIndicatorVisibility(mode)
             end,
             -- Collection spine data: per-source {collected, total} for
             -- the active tab, filter-scoped like the 17/90 counter (both
@@ -1892,6 +1946,13 @@ function MC.CreatePanel()
         filterBtn:SetPoint("RIGHT", peerBtn, "LEFT", -8, 0)
 
         MC.RefreshPeerIndicator()
+
+        -- The premium shell may already be in the compact/strip state
+        -- (saved from last session); its initial onViewChanged fired
+        -- before this chain existed, so re-apply visibility now.
+        if panel.GetViewMode and panel:GetViewMode() ~= "full" then
+            ApplyIndicatorVisibility(panel:GetViewMode())
+        end
     end
 end
 
@@ -1900,6 +1961,13 @@ end
 function MC.RefreshPeerIndicator()
     local btn = MC.peerIndicator
     if not btn then return end
+    -- Premium compact/strip: the whole indicator chain is hidden. This
+    -- is the only indicator that self-Shows from events, so it must
+    -- respect the flag itself. Never set under the classic shell.
+    if MC._indicatorsHidden then
+        btn:Hide()
+        return
+    end
     if not (MC.db and MC.db.rosterEnabled) then
         btn:Hide()
         return
@@ -2136,6 +2204,7 @@ local function PrintHelp()
     print("  /mc score - show your Collection Score breakdown")
     print("  /mc theme modern|simple|ellesmere - switch UI theme")
     print("  /mc style classic|premium - switch UI shell (reload required)")
+    print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -2294,6 +2363,12 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             MC.SetUIStyle(a)
         else
             print(PREFIX .. " /mc style classic|premium")
+        end
+    elseif cmd == "targets" then
+        if MC.Targets then
+            MC.Targets:Toggle()
+        else
+            print(PREFIX .. " Targets not loaded.")
         end
     elseif cmd == "help" then
         PrintHelp()

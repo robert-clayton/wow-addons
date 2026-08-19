@@ -25,6 +25,7 @@ MinimapButton.lua
 Onboarding.lua
 PremiumShell.lua
 PremiumNav.lua
+Targets.lua
 
 # Mounts module
 Modules\Mounts\Data\TheWarWithin.lua
