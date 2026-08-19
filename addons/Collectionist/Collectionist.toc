@@ -25,6 +25,7 @@ MinimapButton.lua
 Onboarding.lua
 
 # Mounts module
+Modules\Mounts\Data\TheWarWithin.lua
 Modules\Mounts\Data\Mounts.lua
 Modules\Mounts\Data\Patch120007.lua
 Modules\Mounts\Data\Patch120100.lua
@@ -33,6 +34,7 @@ Modules\Mounts\Scanner.lua
 Modules\Mounts\UI.lua
 
 # Pets module
+Modules\Pets\Data\TheWarWithin.lua
 Modules\Pets\Data\Pets.lua
 Modules\Pets\Data\Patch120007.lua
 Modules\Pets\Data\Patch120100.lua
@@ -49,6 +51,7 @@ Modules\Decorations\Scanner.lua
 Modules\Decorations\UI.lua
 
 # Toys module
+Modules\Toys\Data\TheWarWithin.lua
 Modules\Toys\Data\Toys.lua
 Modules\Toys\Data\Patch120007.lua
 Modules\Toys\Data\Patch120100.lua
@@ -57,6 +60,7 @@ Modules\Toys\Scanner.lua
 Modules\Toys\UI.lua
 
 # Rares module
+Modules\Rares\Data\TheWarWithin.lua
 Modules\Rares\Data\Rares.lua
 Modules\Rares\Data\Patch120007.lua
 Modules\Rares\Data\Patch120100.lua
@@ -65,6 +69,7 @@ Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
 
 # Treasures module
+Modules\Treasures\Data\TheWarWithin.lua
 Modules\Treasures\Data\Treasures.lua
 Modules\Treasures\Data\Patch120100.lua
 Modules\Treasures\Init.lua
@@ -89,6 +94,7 @@ Modules\Recipes\Data\Inscription.lua
 Modules\Recipes\Data\Jewelcrafting.lua
 Modules\Recipes\Data\Leatherworking.lua
 Modules\Recipes\Data\Tailoring.lua
+Modules\Recipes\Data\TheWarWithin.lua
 Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua
 Modules\Recipes\UI.lua

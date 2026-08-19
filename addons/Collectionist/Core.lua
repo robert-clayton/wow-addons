@@ -74,11 +74,13 @@ end
 --   treasures    -> MC.TreasureData
 --   achievements -> MC.AchievementData
 --
--- Recipes deliberately have no route here: profession recipe data lives
--- in the per-skillline tables (MC.AlchemyRecipes etc.), and no merge
--- into a generic list exists. When older-expansion recipe content ships,
--- design the real per-skillline merge then — registering it through this
--- API today would silently discard it.
+-- Recipes route differently: profession recipe data lives in the
+-- per-skillline tables (MC.AlchemyRecipes etc.), so a "recipes" group
+-- carries a `skillLine` and a `recipes` list and is appended to the
+-- matching per-profession table as a new category. Because the base
+-- per-profession files (Modules/Recipes/Data/Alchemy.lua etc.) assign
+-- MC.<Prof>Recipes wholesale, expansion recipe data files MUST be
+-- listed in the TOC after them or the appended groups are clobbered.
 --------------------------------------------------------------------------
 MC._registeredExpansions = {}
 
@@ -92,8 +94,70 @@ local CONTENT_TARGETS = {
     achievements = "AchievementData",
 }
 
+-- skillLine -> per-profession recipe table name on MC. Shared with
+-- Modules/Recipes/Scanner.lua so the routing and the scan stay in sync.
+MC.RECIPE_DATA_KEYS = {
+    [171] = "AlchemyRecipes",
+    [164] = "BlacksmithingRecipes",
+    [185] = "CookingRecipes",
+    [333] = "EnchantingRecipes",
+    [202] = "EngineeringRecipes",
+    [773] = "InscriptionRecipes",
+    [755] = "JewelcraftingRecipes",
+    [165] = "LeatherworkingRecipes",
+    [197] = "TailoringRecipes",
+}
+
+local function markContentRegistered(expansionKey, moduleKey)
+    MC._registeredExpansions[expansionKey] = true
+    MC._registeredExpansionsByModule = MC._registeredExpansionsByModule or {}
+    MC._registeredExpansionsByModule[moduleKey] = MC._registeredExpansionsByModule[moduleKey] or {}
+    MC._registeredExpansionsByModule[moduleKey][expansionKey] = true
+    -- Invalidate the latest-expansion cache so the next read picks up
+    -- newly-registered expansions.
+    MC._latestExpansionKey = nil
+    MC._latestExpansionByModule = nil
+end
+
+-- Recipes branch of RegisterContent. Each group is one category
+-- appended to the matching per-profession table:
+--   { skillLine = 171, name = "The War Within", recipes = { ... } }
+-- Entry fields match the existing per-profession Data files (id, name,
+-- source, sourceInfo, priority, waypoint, cost, dropInfo, score, ...).
+local function RegisterRecipeContent(expansionKey, groups)
+    local registeredAny = false
+    for _, group in ipairs(groups) do
+        local targetField = MC.RECIPE_DATA_KEYS[group.skillLine]
+        if not targetField then
+            print(format("|cffff8888[Collectionist]|r RegisterContent: recipes group '%s' has unknown skillLine '%s'",
+                tostring(group.name), tostring(group.skillLine)))
+        elseif type(group.recipes) ~= "table" then
+            print(format("|cffff8888[Collectionist]|r RegisterContent: recipes group '%s' has no recipes list",
+                tostring(group.name)))
+        else
+            group.expansion = group.expansion or expansionKey
+            group.moduleKey = group.moduleKey or "recipes"
+            for _, recipe in ipairs(group.recipes) do
+                recipe.expansion = recipe.expansion or expansionKey
+                recipe.moduleKey = recipe.moduleKey or "recipes"
+                recipe.availableAfter = recipe.availableAfter or group.availableAfter
+            end
+            if not MC[targetField] then MC[targetField] = {} end
+            local target = MC[targetField]
+            target[#target + 1] = group
+            registeredAny = true
+        end
+    end
+    if registeredAny then
+        markContentRegistered(expansionKey, "recipes")
+    end
+end
+
 function MC.RegisterContent(expansionKey, moduleKey, groups)
     if not (expansionKey and moduleKey and groups) then return end
+    if moduleKey == "recipes" then
+        return RegisterRecipeContent(expansionKey, groups)
+    end
     local targetField = CONTENT_TARGETS[moduleKey]
     if not targetField then
         print(format("|cffff8888[Collectionist]|r RegisterContent: unknown module '%s'",
@@ -132,14 +196,7 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
         target[#target + 1] = group
     end
 
-    MC._registeredExpansions[expansionKey] = true
-    MC._registeredExpansionsByModule = MC._registeredExpansionsByModule or {}
-    MC._registeredExpansionsByModule[moduleKey] = MC._registeredExpansionsByModule[moduleKey] or {}
-    MC._registeredExpansionsByModule[moduleKey][expansionKey] = true
-    -- Invalidate the latest-expansion cache so the next read picks up
-    -- newly-registered expansions.
-    MC._latestExpansionKey = nil
-    MC._latestExpansionByModule = nil
+    markContentRegistered(expansionKey, moduleKey)
 end
 
 --------------------------------------------------------------------------
@@ -165,6 +222,8 @@ function MC.IsGroupVisible(group, moduleKey)
     -- Groups without an expansion stamp are pre-1.7.0 entries — show
     -- them so legacy data doesn't silently disappear.
     if not group.expansion then return true end
+    -- Browse toggle: hidden expansions never show, whatever the filter.
+    if not MC.IsExpansionEnabled(group.expansion) then return false end
     local f = MC.GetExpansionFilter()
     local latest = MC.GetLatestExpansion(moduleKey or group.moduleKey)
     if f.mode == "all" then return true end
@@ -293,6 +352,10 @@ local charDefaults = {
     panelWidth       = 520,
     panelHeight      = 560,
     disabledModules  = {},
+    -- Expansions hidden from the browse lists. Purely a display filter:
+    -- totals, Collection Score, Legacies, and sharing keep counting a
+    -- disabled expansion's content.
+    disabledExpansions = {},
     activeTab        = "mounts",
 }
 
@@ -301,6 +364,46 @@ local charDefaults = {
 --------------------------------------------------------------------------
 function MC.IsModuleEnabled(key)
     return not MC.db.disabledModules[key]
+end
+
+--------------------------------------------------------------------------
+-- Expansion browse toggle. Disabling an expansion hides its rows from
+-- the tab lists ("what to get next" browsing) without touching totals,
+-- Collection Score, Legacies, or sharing — accumulation is unaffected.
+--------------------------------------------------------------------------
+function MC.IsExpansionEnabled(key)
+    if not key then return true end
+    return not (MC.db and MC.db.disabledExpansions
+                and MC.db.disabledExpansions[key])
+end
+
+function MC.SetExpansionEnabled(key, enabled)
+    if not (MC.db and key) then return end
+    MC.db.disabledExpansions = MC.db.disabledExpansions or {}
+    if enabled then
+        MC.db.disabledExpansions[key] = nil
+    else
+        MC.db.disabledExpansions[key] = true
+    end
+    -- "Current" resolves against enabled expansions; drop the memos so
+    -- it re-derives, and unpin a filter pointing at a hidden expansion.
+    MC._latestExpansionKey = nil
+    MC._latestExpansionByModule = nil
+    local f = MC.GetExpansionFilter()
+    if f.mode == "single" and not MC.IsExpansionEnabled(f.single) then
+        f.mode = "current"
+    end
+    -- Visibility is baked into scanner results, so re-scan like the
+    -- expansion filter does.
+    if MC.modules and MC.ThrottledScan then
+        for _, m in ipairs(MC.modules) do
+            if m.Scanner and m.Scanner.Scan then
+                MC.ThrottledScan(m, 0)
+            end
+        end
+    end
+    if MC.RefreshActive then MC.RefreshActive() end
+    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
 end
 
 --------------------------------------------------------------------------
@@ -1620,7 +1723,8 @@ function MC.CreatePanel()
                   onClick = function() MC.SetExpansionFilter("all") end },
             }
             for _, e in ipairs(MC.EXPANSIONS or {}) do
-                if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+                if MC._registeredExpansions and MC._registeredExpansions[e.key]
+                   and MC.IsExpansionEnabled(e.key) then
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,
@@ -1826,6 +1930,23 @@ function MC.BuildConfig()
                 onDown  = function() MC.MoveModule(key,  1) end,
             },
         }
+    end
+
+    -- Browse toggles per expansion with registered content. Unchecking
+    -- hides that expansion from the tab lists only — totals, Collection
+    -- Score, and sharing still count it.
+    defs[#defs + 1] = { type = "divider" }
+    defs[#defs + 1] = { type = "section", label = "BROWSE EXPANSIONS" }
+    for _, e in ipairs(MC.EXPANSIONS or {}) do
+        if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+            local expKey = e.key
+            defs[#defs + 1] = {
+                type  = "checkbox",
+                label = e.label,
+                get   = function() return MC.IsExpansionEnabled(expKey) end,
+                set   = function(v) MC.SetExpansionEnabled(expKey, v) end,
+            }
+        end
     end
 
     defs[#defs + 1] = { type = "divider" }

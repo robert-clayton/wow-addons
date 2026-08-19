@@ -334,7 +334,8 @@ local function build()
                   end },
             }
             for _, e in ipairs(MC.EXPANSIONS or {}) do
-                if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+                if MC._registeredExpansions and MC._registeredExpansions[e.key]
+                   and MC.IsExpansionEnabled(e.key) then
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,

@@ -152,6 +152,17 @@ end
 
 -- Major faction IDs. Used by C_MajorFactions.GetMajorFactionData.
 MC.FACTION = {
+    -- The War Within (tww) renown factions.
+    CouncilOfDornogal   = 2590,
+    AssemblyOfTheDeeps  = 2594,
+    HallowfallArathi    = 2570,
+    SeveredThreads      = 2600,
+    CartelsOfUndermine  = 2653,  -- 11.1 Undermine
+    GallagioLoyaltyClub = 2685,  -- 11.1 raid renown
+    FlamesRadiance      = 2688,  -- 11.1.5
+    KareshTrust         = 2658,  -- 11.2 K'aresh
+    ManaforgeVandals    = 2736,  -- 11.2 raid renown
+    -- Midnight factions.
     AmaniTribe      = 2696,
     Singularity     = 2699,
     Harati          = 2704,
@@ -166,6 +177,13 @@ MC.FACTION = {
 MC.CURRENCY = {
     Honor              = 1792,
     Undercoin          = 2803,
+    -- The War Within (tww) world currencies used by collectible vendors.
+    ResonanceCrystals  = 2815,
+    Valorstones        = 3008,
+    Kej                = 3056,
+    ResidualMemories   = 3089,  -- 11.0.7 Siren Isle
+    FlameBlessedIron   = 3090,  -- 11.0.7 Siren Isle
+    UntetheredCoin     = 3303,  -- 11.2 K'aresh
     TwilightsBladeInsignia = 3319,  -- pre-patch event
     -- Per-profession Artisan's Moxie variants
     AlchemyMoxie       = 3256,
@@ -226,8 +244,20 @@ MC.PROFESSION_LABELS = {
     [MC.PROFESSION.Tailoring]      = "Tailoring",
 }
 
--- uiMapIDs for Midnight zones.
+-- uiMapIDs for tracked zones (The War Within + Midnight).
 MC.MAP = {
+    -- The War Within (tww): Khaz Algar zones.
+    KhazAlgar        = 2274,  -- continent map
+    IsleOfDorn       = 2248,
+    Dornogal         = 2339,  -- capital; sub-map of Isle of Dorn
+    RingingDeeps     = 2214,
+    Hallowfall       = 2215,
+    AzjKahet         = 2255,
+    SirenIsle        = 2369,  -- 11.0.7
+    Undermine        = 2346,  -- 11.1
+    Karesh           = 2371,  -- 11.2 K'aresh
+    Tazavesh         = 2472,  -- 11.2 hub city; sub-map of K'aresh
+    -- Midnight zones.
     Silvermoon       = 2393,
     Eversong         = 2395,
     Voidstorm        = 2405,
@@ -256,6 +286,13 @@ MC.MAP = {
 -- rare from Silvermoon falls past portal lookup and ports you straight
 -- to a coord that's only valid once you're in Voidstorm.
 MC.MAP_PARENT = {
+    -- The War Within (tww). MC.PORTALS has no Khaz Algar routing, so for
+    -- TWW these only affect the "already in the target zone?" rollup;
+    -- waypoints otherwise resolve directly (every zone is flyable).
+    [2339] = 2248,  -- Dornogal           -> Isle of Dorn
+    [2346] = 2214,  -- Undermine          -> The Ringing Deeps
+    [2472] = 2371,  -- Tazavesh           -> K'aresh
+    -- Midnight.
     [2576] = 2413,  -- The Den            -> Harandar
     [2444] = 2405,  -- Slayer's Rise      -> Voidstorm
     [2585] = 2437,  -- Broken Throne      -> Zul'Aman

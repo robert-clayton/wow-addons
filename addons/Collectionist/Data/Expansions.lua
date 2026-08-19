@@ -59,7 +59,11 @@ function MC.GetLatestExpansion(moduleKey)
         or MC._registeredExpansions
     for key in pairs(registered or {}) do
         local e = MC.EXPANSION_BY_KEY[key]
-        if e and e.order > bestOrder then
+        -- Browse-disabled expansions don't count as "Current": the
+        -- default view falls to the newest expansion the player still
+        -- browses. SetExpansionEnabled invalidates the memos above.
+        if e and e.order > bestOrder
+           and (not MC.IsExpansionEnabled or MC.IsExpansionEnabled(key)) then
             best, bestOrder = key, e.order
         end
     end

@@ -6,17 +6,9 @@ local Scanner = mod.Scanner
 
 Scanner.results = {}
 
-local dataSets = {
-    [171] = "AlchemyRecipes",
-    [164] = "BlacksmithingRecipes",
-    [185] = "CookingRecipes",
-    [333] = "EnchantingRecipes",
-    [202] = "EngineeringRecipes",
-    [773] = "InscriptionRecipes",
-    [755] = "JewelcraftingRecipes",
-    [165] = "LeatherworkingRecipes",
-    [197] = "TailoringRecipes",
-}
+-- skillLine -> per-profession recipe table name, shared with Core's
+-- RegisterContent recipes route (Core.lua loads first per the TOC).
+local dataSets = MC.RECIPE_DATA_KEYS
 
 function Scanner:IsRecipeKnown(recipeID)
     return IsPlayerSpell(recipeID) and true or false
@@ -57,9 +49,14 @@ function Scanner:Scan()
                 local recipeData = MC[dataKey]
                 if recipeData then
                     for _, category in ipairs(recipeData) do
-                        for _, recipe in ipairs(category.recipes) do
-                            if recipe.id and ledger[recipe.id] == true then
-                                offScore = offScore + MC.ScoreFor(recipe)
+                        -- Expansion filter: categories without an expansion
+                        -- stamp (the base per-profession files) are always
+                        -- visible, so pre-existing behavior is unchanged.
+                        if MC.IsGroupVisible(category, "recipes") then
+                            for _, recipe in ipairs(category.recipes) do
+                                if recipe.id and ledger[recipe.id] == true then
+                                    offScore = offScore + MC.ScoreFor(recipe)
+                                end
                             end
                         end
                     end
@@ -82,45 +79,51 @@ function Scanner:ScanProfession(skillLine, recipeData)
     }
 
     for _, category in ipairs(recipeData) do
-        for _, recipe in ipairs(category.recipes) do
-            result.total = result.total + 1
-            local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
+        -- Expansion filter: categories without an expansion stamp (the
+        -- base per-profession files) are always visible, so pre-existing
+        -- behavior is unchanged. RegisterContent-added categories carry
+        -- an expansion stamp and follow the user's filter mode.
+        if MC.IsGroupVisible(category, "recipes") then
+            for _, recipe in ipairs(category.recipes) do
+                result.total = result.total + 1
+                local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
 
-            -- Update the account-wide ledger so other alts can score
-            -- this recipe even when not on this character.
-            if known and ledger and recipe.id then
-                ledger[recipe.id] = true
-            end
+                -- Update the account-wide ledger so other alts can score
+                -- this recipe even when not on this character.
+                if known and ledger and recipe.id then
+                    ledger[recipe.id] = true
+                end
 
-            -- Score reads from the ledger so any alt that's learned
-            -- this recipe credits the score on every character.
-            local accountKnown = known
-                or (ledger and recipe.id and ledger[recipe.id] == true)
+                -- Score reads from the ledger so any alt that's learned
+                -- this recipe credits the score on every character.
+                local accountKnown = known
+                    or (ledger and recipe.id and ledger[recipe.id] == true)
 
-            local entry = {
-                id         = recipe.id,
-                name       = recipe.name,
-                source     = recipe.source,
-                sourceInfo = recipe.sourceInfo,
-                priority   = recipe.priority,
-                waypoint   = recipe.waypoint,
-                cost       = recipe.cost,
-                dropInfo   = recipe.dropInfo,
-                learned    = known,
-            }
+                local entry = {
+                    id         = recipe.id,
+                    name       = recipe.name,
+                    source     = recipe.source,
+                    sourceInfo = recipe.sourceInfo,
+                    priority   = recipe.priority,
+                    waypoint   = recipe.waypoint,
+                    cost       = recipe.cost,
+                    dropInfo   = recipe.dropInfo,
+                    learned    = known,
+                }
 
-            if accountKnown then
-                result.score = result.score + MC.ScoreFor(recipe)
-            end
+                if accountKnown then
+                    result.score = result.score + MC.ScoreFor(recipe)
+                end
 
-            if known then
-                result.learnedCount = result.learnedCount + 1
-                result.learned[#result.learned + 1] = entry
-            else
-                result.unlearnedCount = result.unlearnedCount + 1
-                local src = recipe.source or "unknown"
-                if not result.bySource[src] then result.bySource[src] = {} end
-                result.bySource[src][#result.bySource[src] + 1] = entry
+                if known then
+                    result.learnedCount = result.learnedCount + 1
+                    result.learned[#result.learned + 1] = entry
+                else
+                    result.unlearnedCount = result.unlearnedCount + 1
+                    local src = recipe.source or "unknown"
+                    if not result.bySource[src] then result.bySource[src] = {} end
+                    result.bySource[src][#result.bySource[src] + 1] = entry
+                end
             end
         end
     end

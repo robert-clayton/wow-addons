@@ -207,3 +207,11 @@ MC.PORTALS = {
         [MC.MAP.Naigtal]          = LOC.ShowdownGateway,
     },
 }
+
+-- The War Within (tww): wave-1 data files carry their waypoints inline as
+-- { mapID, x, y, "Label" } tables built on the MC.MAP Khaz Algar keys
+-- rather than through MC.LOC. MC.PORTALS deliberately has no Khaz Algar
+-- entries, so GetSmartWaypoint resolves TWW waypoints directly with no
+-- portal routing — correct, since every Khaz Algar zone is flyable.
+-- Promote a TWW vendor/NPC into MC.LOC only once multiple modules need
+-- the same coordinate.
