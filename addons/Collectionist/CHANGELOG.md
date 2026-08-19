@@ -1,86 +1,29 @@
 # 1.12.0
-
-Everything since 1.6.2. Try these first: `/mc filter`, `/mc score`, `/mc theme modern|simple`.
-
 ### Added
-
-#### New systems
-- Expansion filter in the title bar: Current, All Expansions, or pin one
-  expansion. Also `/mc filter all|current|<expansion>`. The Collection
-  Inspector rescopes peer columns to match.
-- **Collection Score**, in the title bar and `/mc score`. Each collectible has
-  a time tier (1 / 5 / 10 / 25 / 50 / 100) and your score is the sum of what
-  you own.
-- A **Legacies** count next to the score: collected items that can't be
-  obtained anymore.
-- **UI themes**: Modern (slate and bronze, the new default) and Simple (the
-  old warm-gold look). Applies account-wide.
-- Achievements get their own row in the Collection Inspector.
-
-#### Content
-- Everything from **Revelations (12.0.7)**: Void Showdowns in Val and Naigtal,
-  their rares and achievements, Showdown vendors, Rotmire, Dragonflight
-  Timewalking, Midsummer, Lorewalking, Arcantina, and the opening Curse of
-  Ula'tek story.
-- Everything from **Curse of Ula'tek (12.1)**: the Coiled Isle, Vaults of
-  Atal'Utek, Curse Surges, Zul'jarra's Forces, Captain Tokka's Crew, Season 2
-  Prey, three new Delves, Altar of Fangs, and the Venomous Abyss.
+- Expansion filter in the title bar: Current, All Expansions, or pin one expansion. Also `/mc filter all|current|<expansion>`. The Collection Inspector rescopes peer columns to match.
+- **Collection Score**, in the title bar and `/mc score`. Each collectible has a difficulty tier (1 / 5 / 10 / 25 / 50 / 100) and your score is the sum of what you own.
+- A **Legacies** count next to the score: collected items that can't be obtained anymore.
+- **UI themes**: Modern (slate and bronze, the new default) and Simple (the old warm-gold look). Applies account-wide.
+- Everything from **Revelations (12.0.7)**: Void Showdowns in Val and Naigtal, their rares and achievements, Showdown vendors, Rotmire, Dragonflight Timewalking, Midsummer, Lorewalking, Arcantina, and the opening Curse of Ula'tek story.
+- Everything from **Curse of Ula'tek (12.1)**: the Coiled Isle, Vaults of Atal'Utek, Curse Surges, Zul'jarra's Forces, Captain Tokka's Crew, Season 2 Prey, three new Delves, Altar of Fangs, and the Venomous Abyss.
 - Coiled Isle rare and treasure trackers, with waypoints and puzzle steps.
-- New 12.1 housing decor, Community Coupon rewards, pet beds, mounts, pets,
-  toys, and achievements. Season 2 rewards show their regional unlock date.
-
-#### Small wins
-- Learned recipes count account-wide now. Your alts share recipe progress.
-- Item-priced collectibles show the item icon, how many you're carrying, and
-  whether you can afford it.
+- New 12.1 housing decor, Community Coupon rewards, pet beds, mounts, pets, toys, and achievements. Season 2 rewards show their regional unlock date.
 
 ### Changed
+- Achievements get their own row in the Collection Inspector.
+- Learned recipes count account-wide now. Your alts share recipe progress.
+- Item-priced collectibles show the item icon, how many you're carrying, and whether you can afford it.
 - Targets client 12.1.0.
-- The panel is wider to fit the new title-bar indicators. A smaller size saved
-  by an older version gets bumped up automatically.
-- Sharing asks for consent on first run. Login announcements spread out over a
-  random delay, and the addon only asks peers to re-send their collections
-  when your peer list is empty or stale.
+- The panel is wider to fit the new title-bar indicators.
+- Collection sharing asks for consent on first run.
 - Disabled tabs stay hidden but still feed your score and shared progress.
-- Future rewards stay visible for planning. They don't count toward totals or
-  score until their regional unlock.
+- Future rewards stay visible for planning.
 
 ### Fixed
-
-#### Hotfix-proofing
-- A Blizzard hotfix to an achievement can no longer blank a tab. Rows the game
-  can't answer yet are skipped and retried for a couple of minutes.
-- If Blizzard adds rares or treasures to an existing achievement, they just
-  show up. No addon update needed.
-- Guild sharing survives achievement hotfixes. One changed achievement used to
-  kill "Owned by" tooltips and shared counts for every tracker.
-- Guildmates never see your collection shrink right after you log in. Counts
-  hold steady until your own data finishes loading.
-- If an achievement's criteria get reordered, waypoints and puzzle steps fall
-  back to safe lookups rather than pointing at the wrong spot.
-
-#### Inspector and sharing
-- Big roster snapshots can't mix chunks from two different broadcasts.
-- Wide peer comparisons scroll, and Inspector filters keep their state when
-  you select peers.
-- "Current" picks each tracker's newest available expansion. It used to blank
-  trackers without newer content.
-- Legacy totals use the same denominator for everyone, whatever your display
-  settings.
-
-#### Everything else
-- Switching the expansion filter right after login shows the right rows within
-  a couple of seconds.
-- Score and shared progress update even when the relevant tab isn't open.
-- Housing decor ownership recognizes redeemable copies and the current Housing
-  API.
-- The minimap right-click summary waits for its scan and says which expansion
-  slice it covers.
-- Corrected bad collectible records, achievement reward text, rare criterion
-  order, 12.1 vendors, and vendor waypoints.
-
-To update: grab Collectionist-1.12.0.zip from the GitHub release, or `/reload`
-if you run from the repo.
+- A Blizzard hotfix to an achievement can no longer blank a tab. Rows the game can't answer yet are skipped and retried for a couple of minutes.
+- If Blizzard adds rares or treasures to an existing achievement, they just show up without needing for the addon to be updated.
+- If an achievement's criteria get reordered, waypoints and puzzle steps fall back to safe lookups rather than pointing at the wrong spot.
+- Corrected bad collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.
 
 # 1.6.2
 ### Changed
