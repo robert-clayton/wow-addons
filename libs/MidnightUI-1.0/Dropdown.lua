@@ -74,15 +74,23 @@ function lib.MakeDropdown()
         row:SetHeight(ROW_HEIGHT)
         row:EnableMouse(true)
         local fs = row:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
+        fs:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
         fs:SetPoint("LEFT", PAD_X, 0)
         fs:SetTextColor(0.88, 0.88, 0.88)
         row._fs = fs
         local hl = row:CreateTexture(nil, "BACKGROUND")
         hl:SetAllPoints()
         hl:SetColorTexture(1, 0.85, 0.5, 0)
-        row:SetScript("OnEnter", function() hl:SetColorTexture(1, 0.85, 0.5, 0.10) end)
-        row:SetScript("OnLeave", function() hl:SetColorTexture(1, 0.85, 0.5, 0) end)
+        -- Hover tint read live from the theme; the fallback keeps the
+        -- legacy warm-gold wash for themes without colors.menuHover.
+        row:SetScript("OnEnter", function()
+            local h = lib.Theme.colors.menuHover or { 1, 0.85, 0.5, 0.10 }
+            hl:SetColorTexture(h[1], h[2], h[3], h[4])
+        end)
+        row:SetScript("OnLeave", function()
+            local h = lib.Theme.colors.menuHover or { 1, 0.85, 0.5, 0.10 }
+            hl:SetColorTexture(h[1], h[2], h[3], 0)
+        end)
         popup._rows[idx] = row
         return row
     end
@@ -93,13 +101,23 @@ function lib.MakeDropdown()
     -- list of { label, selected, onClick } tables.
     function popup:ShowAt(anchorFrame, anchorRel, popupPoint, items)
         local widest = 0
+        -- Per-show theming: rows are created once, so font and colors
+        -- are re-applied here to track live theme switches. The
+        -- fallbacks are the legacy hardcoded palette (|cffffcc66 ==
+        -- RGB 1.0/0.8/0.4 exactly), so themes without menu* keys
+        -- render identically to the old escape-sequence path.
+        local t = lib.Theme
+        local mc = t.colors
+        local selColor  = mc.menuSelected or { 1, 0.8, 0.4 }
+        local textColor = mc.menuText or { 0.88, 0.88, 0.88 }
         for i, item in ipairs(items) do
             local row = acquireRow(i)
             row:ClearAllPoints()
             row:SetPoint("TOPLEFT", popup, "TOPLEFT", 0, -PAD_Y - (i - 1) * ROW_HEIGHT)
-            row._fs:SetText(item.selected
-                and ("|cffffcc66" .. item.label .. "|r")
-                or item.label)
+            row._fs:SetFont(t.font, t.fontSize - 1, lib.FontFlags())
+            row._fs:SetText(item.label)
+            local c = item.selected and selColor or textColor
+            row._fs:SetTextColor(c[1], c[2], c[3])
             row:SetScript("OnClick", function()
                 if item.onClick then item.onClick() end
                 popup:Hide()

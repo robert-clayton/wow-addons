@@ -119,16 +119,28 @@ function PanelProto:ApplyBackdrop()
         f.dragger:ClearAllPoints()
         f.dragger:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -(1 + inset), 1 + inset)
     end
-    -- Refresh title text colors (snapshot at creation).
+    -- Refresh title text fonts + colors (snapshot at creation). SetFont
+    -- with unchanged values is a no-op, so themes sharing the default
+    -- font render exactly as before; themes with their own font/outline
+    -- (ellesmere) re-skin live.
     if f.titleBar and f.titleBar._titleFontStrings then
         local title = lib.Theme.colors.title
         for _, fs in ipairs(f.titleBar._titleFontStrings) do
+            fs:SetFont(lib.Theme.font, lib.Theme.fontSize, lib.FontFlags())
             fs:SetTextColor(title[1], title[2], title[3], title[4] or 1)
         end
     end
     if self.titleProgressText then
-        local td = lib.Theme.colors.textDim
-        self.titleProgressText:SetTextColor(td[1] + 0.20, td[2] + 0.14, td[3] + 0.02)
+        self.titleProgressText:SetFont(lib.Theme.font, lib.Theme.fontSize - 1, lib.FontFlags())
+        -- Themes may pin the counter color via colors.titleCounter;
+        -- absent, keep the legacy warm derivation off textDim.
+        local pc = lib.Theme.colors.titleCounter
+        if pc then
+            self.titleProgressText:SetTextColor(pc[1], pc[2], pc[3])
+        else
+            local td = lib.Theme.colors.textDim
+            self.titleProgressText:SetTextColor(td[1] + 0.20, td[2] + 0.14, td[3] + 0.02)
+        end
     end
     -- Refresh icon vertex color (uses accent).
     if f.titleBar and f.titleBar._titleIcon then
@@ -255,14 +267,14 @@ function PanelProto:CreateTitleBar()
         bar._titleIcon = profIcon
 
         local title = bar:CreateFontString(nil, "OVERLAY")
-        title:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        title:SetFont(theme.font, theme.fontSize, lib.FontFlags())
         title:SetPoint("LEFT", profIcon, "RIGHT", 5, 0)
         title:SetText(self.opts.title or "")
         title:SetTextColor(unpack(theme.colors.title))
         bar._titleFontStrings[#bar._titleFontStrings + 1] = title
     else
         local title = bar:CreateFontString(nil, "OVERLAY")
-        title:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        title:SetFont(theme.font, theme.fontSize, lib.FontFlags())
         title:SetPoint("LEFT", bar, "LEFT", 8, 0)
         title:SetText(self.opts.title or "")
         title:SetTextColor(unpack(theme.colors.title))
@@ -271,7 +283,7 @@ function PanelProto:CreateTitleBar()
 
     -- Progress counter (warm dim gold; color refreshed in ApplyBackdrop)
     local progressText = bar:CreateFontString(nil, "OVERLAY")
-    progressText:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
+    progressText:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
     progressText:SetTextColor(0.60, 0.50, 0.30)
     self.titleProgressText = progressText
 
@@ -549,7 +561,7 @@ function PanelProto:BuildConfigFrame()
 
     -- Title
     local ttl = bar:CreateFontString(nil, "OVERLAY")
-    ttl:SetFont(theme.font, theme.fontSize, "OUTLINE")
+    ttl:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     ttl:SetPoint("LEFT", 8, 0)
     ttl:SetText("Options")
 
@@ -558,7 +570,7 @@ function PanelProto:BuildConfigFrame()
         lib.ApplyThemedBackdrop(f, { kind = "options", alpha = th.colors.optionsBg[4] or 1, borderAlpha = 1 })
         lib.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
         acc:SetColorTexture(unpack(th.colors.accent))
-        ttl:SetFont(th.font, th.fontSize, "OUTLINE")
+        ttl:SetFont(th.font, th.fontSize, lib.FontFlags())
         ttl:SetTextColor(unpack(th.colors.title))
     end
     applyCfgTheme()

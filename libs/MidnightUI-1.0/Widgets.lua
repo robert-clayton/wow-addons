@@ -17,7 +17,7 @@ end
 
 local function OptionsSectionLabel(body, yOff, text)
     local fs = body:CreateFontString(nil, "OVERLAY")
-    fs:SetFont(theme.font, 9, "OUTLINE")
+    fs:SetFont(theme.font, 9, lib.FontFlags())
     fs:SetText("|cff888888" .. text .. "|r")
     fs:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
     return yOff - 14
@@ -34,7 +34,7 @@ local function OptionsCheckbox(body, yOff, label, getVal, setVal, onRefresh)
         if onRefresh then onRefresh() end
     end)
     local lbl = fr:CreateFontString(nil, "OVERLAY")
-    lbl:SetFont(theme.font, 10, "OUTLINE")
+    lbl:SetFont(theme.font, 10, lib.FontFlags())
     lbl:SetText(label)
     lbl:SetTextColor(0.88, 0.88, 0.88)
     lbl:SetPoint("LEFT", fr, "RIGHT", 0, 0)
@@ -43,7 +43,7 @@ end
 
 local function OptionsSlider(body, yOff, label, min, max, step, getVal, setVal, fillR, fillG, fillB)
     local lbl = body:CreateFontString(nil, "OVERLAY")
-    lbl:SetFont(theme.font, 9, "OUTLINE")
+    lbl:SetFont(theme.font, 9, lib.FontFlags())
     lbl:SetText("|cff888888" .. label .. "|r")
     lbl:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
     yOff = yOff - 14
@@ -65,7 +65,7 @@ local function OptionsSlider(body, yOff, label, min, max, step, getVal, setVal, 
     valBox:SetBackdropColor(0, 0, 0, 0.5)
     valBox:SetBackdropBorderColor(0.25, 0.25, 0.3, 1)
     local valTxt = valBox:CreateFontString(nil, "OVERLAY")
-    valTxt:SetFont(theme.font, 9, "OUTLINE")
+    valTxt:SetFont(theme.font, 9, lib.FontFlags())
     valTxt:SetPoint("CENTER")
     local function UpdateVis(v)
         local pct = (v - min) / (max - min)
@@ -130,12 +130,12 @@ local function acquireSection(panel, body, yOff, text)
     local w = pool.items[pool.idx]
     if not w then
         local fs = body:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(theme.font, 9, "OUTLINE")
+        fs:SetFont(theme.font, 9, lib.FontFlags())
         w = { fs = fs }
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
-                fs:SetFont(theme.font, 9, "OUTLINE")
+                fs:SetFont(theme.font, 9, lib.FontFlags())
             end)
         end
     end
@@ -181,7 +181,7 @@ local function acquireCheckbox(panel, body, yOff, def)
         fr:SetSize(20, 20)
         fr:EnableMouse(true)
         local lbl = fr:CreateFontString(nil, "OVERLAY")
-        lbl:SetFont(theme.font, 10, "OUTLINE")
+        lbl:SetFont(theme.font, 10, lib.FontFlags())
         lbl:SetTextColor(0.88, 0.88, 0.88)
         -- Anchor both LEFT and RIGHT so long labels wrap inside the
         -- options column instead of running off the right edge. Top
@@ -202,7 +202,7 @@ local function acquireCheckbox(panel, body, yOff, def)
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
-                lbl:SetFont(theme.font, 10, "OUTLINE")
+                lbl:SetFont(theme.font, 10, lib.FontFlags())
             end)
         end
     end
@@ -261,7 +261,7 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
     local w = pool.items[pool.idx]
     if not w then
         local lbl = body:CreateFontString(nil, "OVERLAY")
-        lbl:SetFont(theme.font, 9, "OUTLINE")
+        lbl:SetFont(theme.font, 9, lib.FontFlags())
         local bg = CreateFrame("Frame", nil, body, "BackdropTemplate")
         bg:SetSize(138, 14)
         bg:SetBackdrop(theme.btnBackdrop)
@@ -278,7 +278,7 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         valBox:SetBackdropColor(0, 0, 0, 0.5)
         valBox:SetBackdropBorderColor(0.25, 0.25, 0.3, 1)
         local valTxt = valBox:CreateFontString(nil, "OVERLAY")
-        valTxt:SetFont(theme.font, 9, "OUTLINE")
+        valTxt:SetFont(theme.font, 9, lib.FontFlags())
         valTxt:SetPoint("CENTER")
         local sl = CreateFrame("Slider", nil, bg)
         sl:SetAllPoints(bg)
@@ -290,8 +290,8 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
-                lbl:SetFont(theme.font, 9, "OUTLINE")
-                valTxt:SetFont(theme.font, 9, "OUTLINE")
+                lbl:SetFont(theme.font, 9, lib.FontFlags())
+                valTxt:SetFont(theme.font, 9, lib.FontFlags())
                 local slc = theme.colors.optionsSliderBg
                 bg:SetBackdropColor(slc[1], slc[2], slc[3], slc[4])
             end)
@@ -332,7 +332,7 @@ local function acquireDropdown(panel, body, yOff, def)
     local w = pool.items[pool.idx]
     if not w then
         local lbl = body:CreateFontString(nil, "OVERLAY")
-        lbl:SetFont(theme.font, 9, "OUTLINE")
+        lbl:SetFont(theme.font, 9, lib.FontFlags())
 
         local btn = CreateFrame("Button", nil, body, "BackdropTemplate")
         btn:SetHeight(20)
@@ -341,7 +341,7 @@ local function acquireDropdown(panel, body, yOff, def)
         btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
 
         local valFs = btn:CreateFontString(nil, "OVERLAY")
-        valFs:SetFont(theme.font, 10, "OUTLINE")
+        valFs:SetFont(theme.font, 10, lib.FontFlags())
         valFs:SetPoint("LEFT", btn, "LEFT", 6, 0)
         valFs:SetPoint("RIGHT", btn, "RIGHT", -18, 0)
         valFs:SetJustifyH("LEFT")
@@ -374,8 +374,8 @@ local function acquireDropdown(panel, body, yOff, def)
                 btn:SetBackdrop(theme.btnBackdrop)
                 btn:SetBackdropColor(unpack(theme.colors.btnBg))
                 btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
-                lbl:SetFont(theme.font, 9, "OUTLINE")
-                valFs:SetFont(theme.font, 10, "OUTLINE")
+                lbl:SetFont(theme.font, 9, lib.FontFlags())
+                valFs:SetFont(theme.font, 10, lib.FontFlags())
                 valFs:SetTextColor(unpack(theme.colors.text))
                 arrow:SetVertexColor(theme.colors.arrowColor[1], theme.colors.arrowColor[2], theme.colors.arrowColor[3])
             end)

@@ -9,10 +9,12 @@ local MAJOR, MINOR = "MidnightUI-1.0", 20260512
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
--- Theme registry. Two flavors:
---   simple — flat panels, 1px borders, warm Midnight gold accent
---   modern — TWW-inspired: slate-charcoal bg, amber bronze accent,
---            gradient title bar, embossed buttons, softer edges
+-- Theme registry. Three flavors:
+--   simple    — flat panels, 1px borders, warm Midnight gold accent
+--   modern    — TWW-inspired: slate-charcoal bg, amber bronze accent,
+--               gradient title bar, embossed buttons, softer edges
+--   ellesmere — EllesmereUI-inspired: flat near-black, 1px grey
+--               hairlines, one saturated teal accent, un-outlined text
 --
 -- Consumers cache `local theme = lib.Theme`. We keep the same table
 -- identity across switches by mutating sub-tables in place — see
@@ -115,6 +117,13 @@ lib.Themes.simple = {
         tooltipSubtext     = { 0.70, 0.70, 0.70 },
         scoreAccent        = { 0.95, 0.85, 0.45 },
         scoreAccentHover   = { 1.00, 1.00, 0.65 },
+        -- Dropdown-popup palette + title-bar counter. Explicit legacy
+        -- values (previously hardcoded in Dropdown.lua / Panel.lua) so
+        -- this theme renders exactly as before those keys existed.
+        menuText     = { 0.88, 0.88, 0.88 },
+        menuHover    = { 1, 0.85, 0.5, 0.10 },
+        menuSelected = { 1, 0.8, 0.4 },
+        titleCounter = { 0.60, 0.50, 0.30 },   -- = textDim + 0.20/0.14/0.02
     },
 
     backdrop = {
@@ -145,6 +154,10 @@ lib.Themes.simple = {
     indicatorHoverUnderline = false,  -- 1px bronze underline under title-bar text buttons on hover
     tabActiveGradient   = false,  -- vertical gradient on the active tab's background
     rowSeparator        = false,  -- 1px hairline between item rows
+    -- Explicit legacy values for keys newer themes override (never rely
+    -- on nil-fallbacks for pre-existing themes).
+    fontOutline            = "OUTLINE",
+    titleBarBotStripeAlpha = 0.45,
 }
 
 lib.Themes.modern = {
@@ -243,6 +256,11 @@ lib.Themes.modern = {
         tooltipSubtext     = { 0.72, 0.72, 0.76 },
         scoreAccent        = { 0.95, 0.75, 0.40 },
         scoreAccentHover   = { 1.00, 0.95, 0.62 },
+        -- Explicit legacy values; see the simple theme's note.
+        menuText     = { 0.88, 0.88, 0.88 },
+        menuHover    = { 1, 0.85, 0.5, 0.10 },
+        menuSelected = { 1, 0.8, 0.4 },
+        titleCounter = { 0.65, 0.59, 0.52 },   -- = textDim + 0.20/0.14/0.02
     },
 
     backdrop = {
@@ -271,11 +289,162 @@ lib.Themes.modern = {
     indicatorHoverUnderline = true,
     tabActiveGradient   = true,
     rowSeparator        = true,
+    -- Explicit legacy values; see the simple theme's note.
+    fontOutline            = "OUTLINE",
+    titleBarBotStripeAlpha = 0.45,
     -- Atlas family for the panel's NineSlice border. The lib resolves
     -- this at runtime (UI-Frame-Bronze is the TWW base UI's family);
     -- if missing, falls back to the backdrop edgeFile above.
     nineSliceFamily     = "UI-Frame-Bronze",
 }
+
+-- EllesmereUI-inspired theme; approximated with built-in assets only.
+-- No EllesmereUI file (texture, font, media path) is referenced — the
+-- look is rebuilt from colors, alpha layering, and Blizzard's stock
+-- WHITE8x8 / ARIALN. Flat near-black shell, 1px grey hairlines, one
+-- saturated teal accent, un-outlined condensed text.
+lib.Themes.ellesmere = {
+    name = "Ellesmere",
+    -- Condensed squarish sans; nearest Blizzard built-in to the suite's
+    -- Expressway-style face.
+    font = "Fonts\\ARIALN.TTF",
+    fontSize = 12,   -- ARIALN@12 ~ FRIZQT@11 in visual mass
+
+    colors = {
+        -- Flat near-black "hairline" UI, one saturated teal #0CD29D accent
+        bg           = { 0.067, 0.067, 0.067, 0.97 },  -- #111111 shell
+        border       = { 0.20, 0.20, 0.20, 1 },        -- 1px grey hairline
+        titlebar     = { 0.03, 0.03, 0.03, 1 },        -- near-black title strip
+        titleBorder  = { 0.20, 0.20, 0.20, 1 },        -- matches panel border
+        accent       = { 0.047, 0.824, 0.616, 1 },     -- #0CD29D teal
+        title        = { 1, 1, 1, 1 },
+        text         = { 1, 1, 1, 0.92 },
+        textDim      = { 0.56, 0.56, 0.56, 1 },        -- white a0.53 composited on bg
+        textComplete = { 0.047, 0.824, 0.616, 1 },
+        learned      = { 0.047, 0.824, 0.616, 0.55 },
+        progress     = { 0.038, 0.659, 0.493, 0.95 },  -- accent x0.8
+        progressBg   = { 0.02, 0.02, 0.02, 1 },
+        hoverBg      = { 1, 1, 1, 0.10 },              -- flat white-wash hover
+        headerBg     = { 0, 0, 0, 0.35 },              -- black alpha wash
+        btnBg        = { 0.02, 0.02, 0.02, 1 },
+        btnBorder    = { 0.25, 0.25, 0.25, 1 },
+        btnCloseFg   = { 0.90, 0.90, 0.90 },           -- white X; lib hover forces 1,1,1
+        btnCloseHoverBg = { 0.13, 0.13, 0.13 },        -- = white a0.10 over titlebar
+        btnCloseHoverBd = { 0.35, 0.35, 0.35 },
+        btnTealFg    = { 0.62, 0.62, 0.62 },
+        btnTealHoverBg  = { 0.13, 0.13, 0.13 },
+        btnTealHoverBd  = { 0.35, 0.35, 0.35 },
+        profAccent = {
+            [171] = { 0.30, 0.80, 0.30 },  -- Alchemy
+            [333] = { 0.55, 0.30, 0.90 },  -- Enchanting
+            [202] = { 0.35, 0.62, 1.00 },  -- Engineering
+            [197] = { 0.90, 0.70, 0.22 },  -- Tailoring
+            [185] = { 0.82, 0.42, 0.22 },  -- Cooking
+            [164] = { 0.72, 0.52, 0.30 },  -- Blacksmithing
+            [165] = { 0.60, 0.78, 0.38 },  -- Leatherworking
+            [755] = { 0.82, 0.32, 0.62 },  -- Jewelcrafting
+            [773] = { 0.42, 0.72, 0.90 },  -- Inscription
+        },
+        headerHover    = { 1, 1, 1, 0.06 },
+        headerDivider  = { 1, 1, 1, 0.08 },            -- row sep derives x0.6
+        arrowColor     = { 0.62, 0.62, 0.62 },
+        countDim       = { 0.56, 0.56, 0.56 },
+        learnedAccent  = { 0.047, 0.824, 0.616, 1 },   -- "Collected" header = the accent
+        learnedDot     = { 0.047, 0.824, 0.616, 0.6 },
+        countComplete  = { 0.047, 0.824, 0.616 },
+        countPartial   = { 0.90, 0.90, 0.90 },
+        countNone      = { 0.48, 0.48, 0.48 },
+        scrollTrack    = { 0, 0, 0, 0 },               -- track invisible
+        scrollThumb    = { 1, 1, 1, 0.30 },            -- white strip
+        optionsBg      = { 0.05, 0.07, 0.09, 0.98 },   -- blue-slate panel variant
+        optionsDivider = { 1, 1, 1, 0.06 },
+        optionsSliderBg = { 0.02, 0.02, 0.02, 0.6 },
+        rowHover       = { 1, 1, 1, 0.05 },
+        -- Semantic tooltip colors kept identical to simple/modern (they
+        -- are info-semantics, not chrome).
+        ttTitle     = { 1, 1, 1 },
+        ttLabel     = { 0.58, 0.58, 0.60 },
+        ttValue     = { 0.88, 0.88, 0.88 },
+        ttDropMob   = { 1, 0.80, 0.45 },
+        ttDropRate  = { 1, 0.90, 0.42 },
+        ttBoss      = { 1, 0.48, 0.28 },
+        ttSpec      = { 0.80, 0.50, 0.88 },
+        ttHintGreen = { 0.55, 0.78, 0.42 },
+        ttHintBlue  = { 0.60, 0.72, 0.95 },
+        ttCostBad   = { 1, 0.30, 0.25 },
+        chat           = { 0.047, 0.824, 0.616 },
+        source = {
+            trainer        = { 0.35, 0.78, 0.30 },
+            discovery      = { 0.90, 0.68, 0.20 },
+            specialization = { 0.78, 0.50, 0.88 },
+            vendor         = { 0.35, 0.62, 0.98 },
+            drop           = { 0.90, 0.38, 0.28 },
+            quest          = { 0.90, 0.78, 0.20 },
+            achievement    = { 0.90, 0.70, 0.20 },
+            renown         = { 0.30, 0.60, 1.00 },
+            reputation     = { 0.20, 0.50, 0.90 },
+            delve          = { 0.55, 0.75, 0.90 },
+            prey           = { 0.80, 0.30, 0.50 },
+            dungeon        = { 0.70, 0.50, 0.90 },
+            raid           = { 0.90, 0.40, 0.60 },
+            pvp            = { 0.85, 0.30, 0.30 },
+            worldevent     = { 0.70, 0.70, 0.70 },
+            profession     = { 0.80, 0.50, 0.90 },
+            prepatch       = { 0.60, 0.60, 0.60 },
+            wild           = { 0.40, 0.90, 0.40 },
+            treasure       = { 0.85, 0.65, 0.30 },
+            tradingpost    = { 0.90, 0.55, 0.80 },
+            event          = { 0.70, 0.70, 0.70 },
+            crafted        = { 0.80, 0.50, 0.90 },
+        },
+        infoText        = { 0.48, 0.48, 0.48 },
+        indicatorText      = { 0.62, 0.62, 0.62 },
+        indicatorTextHover = { 1.00, 1.00, 1.00 },
+        tooltipSubtext     = { 0.70, 0.70, 0.70 },
+        scoreAccent        = { 0.047, 0.824, 0.616 },
+        scoreAccentHover   = { 0.55, 1.00, 0.85 },
+        menuText     = { 0.88, 0.88, 0.88 },
+        menuHover    = { 1, 1, 1, 0.05 },
+        menuSelected = { 0.047, 0.824, 0.616 },
+        titleCounter = { 0.62, 0.62, 0.62 },
+    },
+
+    backdrop = {   -- 1px hairline; same shape as simple's
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    },
+    backdropSlim = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+    },
+    -- See the simple theme's note: small frames always take a 1px edge.
+    btnBackdrop = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    },
+
+    titleBarTopStripe   = false,  -- title strip stays black, no top accent
+    titleBarBotStripe   = true,   -- 1px accent hairline under the title strip
+    titleBarGradient    = false,  -- flat; no bevel/gradient chrome
+    buttonEmboss        = false,
+    progressHighlight   = false,  -- flat bars
+    panelEdgeFile       = false,
+    indicatorHoverUnderline = true,  -- 1px accent underline on hover
+    tabActiveGradient   = false,  -- flat accent tint on the active tab
+    rowSeparator        = true,   -- hairline language
+    -- nineSliceFamily deliberately absent: plain 1px edge, border inset 0.
+    fontOutline            = "",    -- un-outlined text (the typography signature)
+    titleBarBotStripeAlpha = 0.90,  -- crisp full-strength teal hairline
+}
+
+-- Font outline flag shared by every widget FontString. Themes may set
+-- `fontOutline` ("" = none, "OUTLINE", "THICKOUTLINE"); a theme without
+-- the key falls back to the legacy "OUTLINE" so pre-existing themes
+-- render unchanged.
+function lib.FontFlags()
+    return lib.Theme.fontOutline or "OUTLINE"
+end
 
 -- Theme hook registry. Frames that paint static visuals at creation
 -- time register a refresh callback so SetTheme can re-apply.
@@ -558,7 +727,7 @@ function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip, op
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
     btn:SetSize((opts and opts.width) or 16, (opts and opts.height) or 16)
     local lbl = btn:CreateFontString(nil, "OVERLAY")
-    lbl:SetFont(lib.Theme.font, 11, "OUTLINE")
+    lbl:SetFont(lib.Theme.font, 11, lib.FontFlags())
     lbl:SetPoint("CENTER", 0, 1)
     lbl:SetText(label)
     btn:SetFontString(lbl)
@@ -575,7 +744,7 @@ function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip, op
         btn:SetBackdrop(theme.btnBackdrop)
         btn:SetBackdropColor(unpack(theme.colors.btnBg))
         btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
-        lbl:SetFont(theme.font, 11, "OUTLINE")
+        lbl:SetFont(theme.font, 11, lib.FontFlags())
         lbl:SetTextColor(unpack(fgColor))
         lib.ApplyButtonEmboss(btn)
     end
@@ -703,10 +872,10 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     local fs = opts.fontSize or (theme.fontSize - 1)
     local nameFs = lib.GetOrCreate(header, "text", function(p)
         local f = p:CreateFontString(nil, "OVERLAY")
-        f:SetFont(theme.font, fs, "OUTLINE")
+        f:SetFont(theme.font, fs, lib.FontFlags())
         return f
     end)
-    nameFs:SetFont(theme.font, fs, "OUTLINE")
+    nameFs:SetFont(theme.font, fs, lib.FontFlags())
     nameFs:SetPoint("LEFT", textAnchor, textAnchorPt, textOfsX, 0)
     nameFs:SetText(opts.label)
     nameFs:SetTextColor(opts.labelColor[1], opts.labelColor[2], opts.labelColor[3], opts.labelColor[4] or 1)
@@ -715,10 +884,10 @@ function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     local cfs = opts.countFontSize or (theme.fontSize - 2)
     local countFs = lib.GetOrCreate(header, "count", function(p)
         local f = p:CreateFontString(nil, "OVERLAY")
-        f:SetFont(theme.font, cfs, "OUTLINE")
+        f:SetFont(theme.font, cfs, lib.FontFlags())
         return f
     end)
-    countFs:SetFont(theme.font, cfs, "OUTLINE")
+    countFs:SetFont(theme.font, cfs, lib.FontFlags())
     countFs:SetPoint("RIGHT", header, "RIGHT", -20, 0)
     countFs:SetText(opts.count)
     countFs:SetTextColor(opts.countColor[1], opts.countColor[2], opts.countColor[3])
@@ -847,10 +1016,10 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
     local theme = lib.Theme
     local nameFs = lib.GetOrCreate(row, "name", function(p)
         local fs = p:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        fs:SetFont(theme.font, theme.fontSize, lib.FontFlags())
         return fs
     end)
-    nameFs:SetFont(theme.font, theme.fontSize, "OUTLINE")
+    nameFs:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     nameFs:SetJustifyH("LEFT")
     nameFs:SetWordWrap(false)
     nameFs:SetPoint("LEFT", row, "LEFT", nameOffset, 0)
@@ -866,10 +1035,10 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
     if opts.info and opts.info ~= "" then
         local infoFs = lib.GetOrCreate(row, "info", function(p)
             local fs = p:CreateFontString(nil, "OVERLAY")
-            fs:SetFont(theme.font, theme.fontSize - 2, "OUTLINE")
+            fs:SetFont(theme.font, theme.fontSize - 2, lib.FontFlags())
             return fs
         end)
-        infoFs:SetFont(theme.font, theme.fontSize - 2, "OUTLINE")
+        infoFs:SetFont(theme.font, theme.fontSize - 2, lib.FontFlags())
         infoFs:SetJustifyH("RIGHT")
         infoFs:ClearAllPoints()
         infoFs:SetPoint("RIGHT", row, "RIGHT", -pad, 0)
@@ -952,9 +1121,12 @@ function lib.ShowEmptyMessage(parent, text, color)
     local theme = lib.Theme
     local fs = lib.GetOrCreate(parent, "emptyText", function(p)
         local f = p:CreateFontString(nil, "OVERLAY")
-        f:SetFont(theme.font, theme.fontSize, "OUTLINE")
+        f:SetFont(theme.font, theme.fontSize, lib.FontFlags())
         return f
     end)
+    -- Reset pass (create+reset pattern): a cached FontString keeps the
+    -- font it was created with, so re-apply for live theme switches.
+    fs:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     fs:ClearAllPoints()
     fs:SetPoint("TOP", parent, "TOP", 0, -20)
     fs:SetText(text)
@@ -1148,7 +1320,8 @@ function lib.ApplyThemedBackdrop(frame, opts)
         botStripe:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 0)
         if theme.titleBarBotStripe then
             local ac = theme.colors.accent
-            botStripe:SetColorTexture(ac[1], ac[2], ac[3], 0.45)
+            -- Per-theme stripe strength; 0.45 is the pre-key legacy value.
+            botStripe:SetColorTexture(ac[1], ac[2], ac[3], theme.titleBarBotStripeAlpha or 0.45)
             botStripe:Show()
         else
             botStripe:Hide()
@@ -1413,7 +1586,7 @@ function lib.MakeIndicatorBtn(parent, opts)
 
     local function applyTheme()
         local theme = lib.Theme
-        fs:SetFont(theme.font, userFontSize or (theme.fontSize - 1), "OUTLINE")
+        fs:SetFont(theme.font, userFontSize or (theme.fontSize - 1), lib.FontFlags())
         fs:SetTextColor(fg[1], fg[2], fg[3])
     end
     applyTheme()
