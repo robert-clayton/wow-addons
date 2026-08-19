@@ -1,0 +1,419 @@
+"currency_id","name","description","category_id","faction_id","max_quantity","flags_0","flags_1"
+"2531","zzOLD Delving Gems","Payment for recovering various lost artifacts within delves.","250","0","2000","3154370","0"
+"2590","Lost Transcripts","Various Earthen treasures and relics previously thought to be lost.","250","0","2000","3154370","0"
+"2591","11.0 Delves - Score Inside","Payment for recovering various lost artifacts within delves.","250","0","2000","3154370","0"
+"2592","11.0 Delves - Reputation Score","Payment for recovering various lost artifacts within delves.","250","0","2000","3154370","0"
+"2655","Revives","Dummy currency for Delves UI","142","0","0","0","0"
+"2785","Khaz Algar Alchemy Knowledge","Use Knowledge to learn Alchemy Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2786","Khaz Algar Blacksmithing Knowledge","Use Knowledge to learn Blacksmithing Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2787","Khaz Algar Enchanting Knowledge","Use Knowledge to learn Enchanting Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing quests offered by your trainer in Dornogal.","142","0","0","0","0"
+"2788","Khaz Algar Engineering Knowledge","Use Knowledge to learn Engineering Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2789","Khaz Algar Herbalism Knowledge","Use Knowledge to learn Herbalism Specializations.
+
+Knowledge can be gained through various means such as studying discoveries found while gathering and completing quests offered by your trainer in Dornogal.","142","0","0","0","0"
+"2790","Khaz Algar Inscription Knowledge","Use Knowledge to learn Inscription Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2791","Khaz Algar Jewelcrafting Knowledge","Use Knowledge to learn Jewelcrafting Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2792","Khaz Algar Leatherworking Knowledge","Use Knowledge to learn Leatherworking Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2793","Khaz Algar Mining Knowledge","Use Knowledge to learn Mining Specializations.
+
+Knowledge can be gained through various means such as studying discoveries found while mining and completing quests offered by your trainer in Dornogal.","142","0","0","0","0"
+"2794","Khaz Algar Skinning Knowledge","Use Knowledge to learn Skinning Specializations.
+
+Knowledge can be gained through various means such as studying discoveries found while skinning and completing quests offered by your trainer in Dornogal.","142","0","0","0","0"
+"2795","Khaz Algar Tailoring Knowledge","Use Knowledge to learn Tailoring Specializations.
+
+Knowledge can be gained through various means such as crafting recipes for the first time and completing special crafting orders offered in Dornogal.","142","0","0","0","0"
+"2799","[DNT] Beetle Ranch Invisible Currency","[PH]","142","0","7000","68681728","0"
+"2803","Undercoin","A currency commonly used by explorers looking to trade secrets and tales of wealth.","265","0","0","33562626","0"
+"2813","Harmonized Silk","Harmonized Silk charges the Catalyst and allows it to imbue armor with incredible power.","142","0","8","1572866","0"
+"2815","Resonance Crystals","Formed by the energies of the Worldsoul interacting with the stone in and beneath Khaz Algar, these revered objects are used to purchase rewards unlocked from renown.","260","0","0","134217730","0"
+"2839","[DNT] Awakening Currency","","260","0","0","0","0"
+"2897","Council of Dornogal","Grants Reputation with the Council of Dornogal.","142","2590","0","10","0"
+"2898","Renown - The Assembly of the Deeps","[DNT]","142","0","25","85721088","0"
+"2899","Hallowfall Arathi","Grants Reputation with the Hallowfall Arathi.","142","2570","0","10","0"
+"2900","Renown - Council of Dornogal","[DNT]","142","0","25","85721088","0"
+"2901","Renown - Hallowfall Arathi","The Arathi of the Hallowfall Expedition safeguard the star Beledar from the many threats found under Khaz Algar. Cut off from their overseas empire, they have built a new home with the strength of their faith in the Sacred Flame.","142","0","25","85721088","0"
+"2902","The Assembly of the Deeps","Grants Reputation with The Assembly of the Deeps.","142","2594","0","10","0"
+"2903","The Severed Threads","Grants Reputation with The Severed Threads.","142","2600","0","10","0"
+"2904","Renown - The Severed Threads","[DNT]","142","0","25","85721088","0"
+"2914","Weathered Harbinger Crest","Earned from many outdoor activities, Raid Finder Nerub-ar Palace, and Heroic dungeons during The War Within Season 1.","142","0","90","2359490","1"
+"2915","Carved Harbinger Crest","Earned from some outdoor activities, Normal Nerub-ar Palace, Mythic dungeons, and Mythic Keystone dungeons up to +3 during The War Within Season 1.","142","0","90","2359490","1"
+"2916","Runed Harbinger Crest","Earned from Heroic Nerub-ar Palace and Mythic Keystone dungeons from +4 to +7 during The War Within Season 1.","142","0","90","2359490","1"
+"2917","Gilded Harbinger Crest","Earned from Mythic Nerub-ar Palace and Mythic Keystone dungeons from +8 and up during The War Within Season 1.","142","0","90","2359490","1"
+"2918","Weathered Harbinger Crest","Earned from many outdoor activities, Raid Finder Nerub-ar Palace, and Heroic dungeons during The War Within Season 1.","142","0","0","2","0"
+"2919","Carved Harbinger Crest","Earned from some outdoor activities, Normal Nerub-ar Palace, Mythic dungeons, and Mythic Keystone dungeons up to +3 during The War Within Season 1.","142","0","0","2","0"
+"2920","Runed Harbinger Crest","Earned from Heroic Nerub-ar Palace and Mythic Keystone dungeons from +4 to +8 during The War Within Season 1.","142","0","0","2","0"
+"2921","Gilded Harbinger Crest","Earned from Mythic Nerub-ar Palace and Mythic Keystone dungeons from +9 and up during The War Within Season 1.","142","0","0","2","0"
+"2923","Dragon Racing - Personal Best Record - 11 Z1 R1 Easy","","251","0","0","68682752","0"
+"2924","Dragon Racing - Personal Best Record - 11 Z1 R2 Easy","","251","0","0","68682752","0"
+"2925","Dragon Racing - Personal Best Record - 11 Z1 R3 Easy","","251","0","0","68682752","0"
+"2926","Dragon Racing - Personal Best Record - 11 Z1 R4 Easy","","251","0","0","68682752","0"
+"2927","Dragon Racing - Personal Best Record - 11 Z1 R5 Easy","","251","0","0","68682752","0"
+"2928","Dragon Racing - Personal Best Record - 11 Z1 R6 Easy","","251","0","0","68682752","0"
+"2929","Dragon Racing - Personal Best Record - 11 Z1 R1 Advanced","","251","0","0","68682752","0"
+"2930","Dragon Racing - Personal Best Record - 11 Z1 R2 Advanced","","251","0","0","68682752","0"
+"2931","Dragon Racing - Personal Best Record - 11 Z1 R3 Advanced","","251","0","0","68682752","0"
+"2932","Dragon Racing - Personal Best Record - 11 Z1 R4 Advanced","","251","0","0","68682752","0"
+"2933","Dragon Racing - Personal Best Record - 11 Z1 R5 Advanced","","251","0","0","68682752","0"
+"2934","Dragon Racing - Personal Best Record - 11 Z1 R6 Advanced","","251","0","0","68682752","0"
+"2935","Dragon Racing - Personal Best Record - 11 Z1 R1 Reverse","","251","0","0","68682752","0"
+"2936","Dragon Racing - Personal Best Record - 11 Z1 R2 Reverse","","251","0","0","68682752","0"
+"2937","Dragon Racing - Personal Best Record - 11 Z1 R3 Reverse","","251","0","0","68682752","0"
+"2938","Dragon Racing - Personal Best Record - 11 Z1 R4 Reverse","","251","0","0","68682752","0"
+"2939","Dragon Racing - Personal Best Record - 11 Z1 R5 Reverse","","251","0","0","68682752","0"
+"2940","Dragon Racing - Personal Best Record - 11 Z1 R6 Reverse","","251","0","0","68682752","0"
+"2941","Dragon Racing - Personal Best Record - 11 Z2 R1 Easy","","251","0","0","68682752","0"
+"2942","Dragon Racing - Personal Best Record - 11 Z2 R2 Easy","","251","0","0","68682752","0"
+"2943","Dragon Racing - Personal Best Record - 11 Z2 R3 Easy","","251","0","0","68682752","0"
+"2944","Dragon Racing - Personal Best Record - 11 Z2 R4 Easy","","251","0","0","68682752","0"
+"2945","Dragon Racing - Personal Best Record - 11 Z2 R5 Easy","","251","0","0","68682752","0"
+"2946","Dragon Racing - Personal Best Record - 11 Z2 R6 Easy","","251","0","0","68682752","0"
+"2947","Dragon Racing - Personal Best Record - 11 Z2 R1 Advanced","","251","0","0","68682752","0"
+"2948","Dragon Racing - Personal Best Record - 11 Z2 R2 Advanced","","251","0","0","68682752","0"
+"2949","Dragon Racing - Personal Best Record - 11 Z2 R3 Advanced","","251","0","0","68682752","0"
+"2950","Dragon Racing - Personal Best Record - 11 Z2 R4 Advanced","","251","0","0","68682752","0"
+"2951","Dragon Racing - Personal Best Record - 11 Z2 R5 Advanced","","251","0","0","68682752","0"
+"2952","Dragon Racing - Personal Best Record - 11 Z2 R6 Advanced","","251","0","0","68682752","0"
+"2953","Dragon Racing - Personal Best Record - 11 Z2 R1 Reverse","","251","0","0","68682752","0"
+"2954","Dragon Racing - Personal Best Record - 11 Z2 R2 Reverse","","251","0","0","68682752","0"
+"2955","Dragon Racing - Personal Best Record - 11 Z2 R3 Reverse","","251","0","0","68682752","0"
+"2956","Dragon Racing - Personal Best Record - 11 Z2 R4 Reverse","","251","0","0","68682752","0"
+"2957","Dragon Racing - Personal Best Record - 11 Z2 R5 Reverse","","251","0","0","68682752","0"
+"2958","Dragon Racing - Personal Best Record - 11 Z2 R6 Reverse","","251","0","0","68682752","0"
+"2959","Dragon Racing - Personal Best Record - 11 Z3 R1 Easy","","251","0","0","68682752","0"
+"2960","Dragon Racing - Personal Best Record - 11 Z3 R2 Easy","","251","0","0","68682752","0"
+"2961","Dragon Racing - Personal Best Record - 11 Z3 R3 Easy","","251","0","0","68682752","0"
+"2962","Dragon Racing - Personal Best Record - 11 Z3 R4 Easy","","251","0","0","68682752","0"
+"2963","Dragon Racing - Personal Best Record - 11 Z3 R5 Easy","","251","0","0","68682752","0"
+"2964","Dragon Racing - Personal Best Record - 11 Z3 R6 Easy","","251","0","0","68682752","0"
+"2965","Dragon Racing - Personal Best Record - 11 Z3 R1 Advanced","","251","0","0","68682752","0"
+"2966","Dragon Racing - Personal Best Record - 11 Z3 R2 Advanced","","251","0","0","68682752","0"
+"2967","Dragon Racing - Personal Best Record - 11 Z3 R3 Advanced","","251","0","0","68682752","0"
+"2968","Dragon Racing - Personal Best Record - 11 Z3 R4 Advanced","","251","0","0","68682752","0"
+"2969","Dragon Racing - Personal Best Record - 11 Z3 R5 Advanced","","251","0","0","68682752","0"
+"2970","Dragon Racing - Personal Best Record - 11 Z3 R6 Advanced","","251","0","0","68682752","0"
+"2971","Dragon Racing - Personal Best Record - 11 Z3 R1 Reverse","","251","0","0","68682752","0"
+"2972","Dragon Racing - Personal Best Record - 11 Z3 R2 Reverse","","251","0","0","68682752","0"
+"2973","Dragon Racing - Personal Best Record - 11 Z3 R3 Reverse","","251","0","0","68682752","0"
+"2974","Dragon Racing - Personal Best Record - 11 Z3 R4 Reverse","","251","0","0","68682752","0"
+"2975","Dragon Racing - Personal Best Record - 11 Z3 R5 Reverse","","251","0","0","68682752","0"
+"2976","Dragon Racing - Personal Best Record - 11 Z3 R6 Reverse","","251","0","0","68682752","0"
+"2977","Dragon Racing - Personal Best Record - 11 Z5 R1 Easy","","251","0","0","68682752","0"
+"2978","Dragon Racing - Personal Best Record - 11 Z5 R2 Easy","","251","0","0","68682752","0"
+"2979","Dragon Racing - Personal Best Record - 11 Z5 R3 Easy","","251","0","0","68682752","0"
+"2980","Dragon Racing - Personal Best Record - 11 Z5 R4 Easy","","251","0","0","68682752","0"
+"2981","Dragon Racing - Personal Best Record - 11 Z5 R5 Easy","","251","0","0","68682752","0"
+"2982","Dragon Racing - Personal Best Record - 11 Z5 R6 Easy","","251","0","0","68682752","0"
+"2983","Dragon Racing - Personal Best Record - 11 Z5 R1 Advanced","","251","0","0","68682752","0"
+"2984","Dragon Racing - Personal Best Record - 11 Z5 R2 Advanced","","251","0","0","68682752","0"
+"2985","Dragon Racing - Personal Best Record - 11 Z5 R3 Advanced","","251","0","0","68682752","0"
+"2986","Dragon Racing - Personal Best Record - 11 Z5 R4 Advanced","","251","0","0","68682752","0"
+"2987","Dragon Racing - Personal Best Record - 11 Z5 R5 Advanced","","251","0","0","68682752","0"
+"2988","Dragon Racing - Personal Best Record - 11 Z5 R6 Advanced","","251","0","0","68682752","0"
+"2989","Dragon Racing - Personal Best Record - 11 Z5 R1 Reverse","","251","0","0","68682752","0"
+"2990","Dragon Racing - Personal Best Record - 11 Z5 R2 Reverse","","251","0","0","68682752","0"
+"2991","Dragon Racing - Personal Best Record - 11 Z5 R3 Reverse","","251","0","0","68682752","0"
+"2992","Dragon Racing - Personal Best Record - 11 Z5 R4 Reverse","","251","0","0","68682752","0"
+"2993","Dragon Racing - Personal Best Record - 11 Z5 R5 Reverse","","251","0","0","68682752","0"
+"2994","Dragon Racing - Personal Best Record - 11 Z5 R6 Reverse","","251","0","0","68682752","0"
+"3002","The Weaver (Notoriety)","Grants Reputation with The Weaver.","142","2601","0","10","0"
+"3003","The General (Notoriety)","Grants Reputation with The General.","142","2605","0","10","0"
+"3004","The Vizier (Notoriety)","Grants Reputation with The Vizier.","142","2607","0","10","0"
+"3005","The General (Notoriety)","[DNT] Grants Reputation with The General.","142","0","20","2","0"
+"3006","The Vizier (Notoriety)","[DNT] Grants Reputation with The Vizier.","142","0","20","2","0"
+"3007","The Weaver (Notoriety)","[DNT] Grants Reputation with The Weaver.","142","0","20","2","0"
+"3008","Valorstones","Earned from completing quests, raids, dungeons, battlegrounds, arena matches, radiant echoes, and other activities at max level. Used to upgrade max-level gear.","265","0","2000","3154402","0"
+"3009","Bonus Valorstones","Bonus Valorstones are awarded when any player in your group increases their Mythic+ Rating.","142","0","0","4202882","0"
+"3013","Jewelcrafting Concentration","","142","0","1000","1572864","0"
+"3022","Renown - Season 1 Delves","[DNT]","142","0","10","85721088","0"
+"3023","11.0 Professions - Personal Tracker - S1 Spark Drops (Hidden)","","142","0","1","68681728","1"
+"3028","Restored Coffer Key","Restored from combining 100 Coffer Key Shards obtained from the outdoors. Opens a Bountiful Coffer within a Bountiful Delve.","265","0","0","2","0"
+"3040","Blacksmithing Concentration","","142","0","1000","1572864","0"
+"3041","Tailoring Concentration","","142","0","1000","1572864","0"
+"3042","Leatherworking Concentration","","142","0","1000","1572864","0"
+"3043","Inscription Concentration","","142","0","1000","1572864","0"
+"3044","Engineering Concentration","","142","0","1000","1572864","0"
+"3045","Alchemy Concentration","","142","0","1000","1572864","0"
+"3046","Enchanting Concentration","","142","0","1000","1572864","0"
+"3047","Jewelcrafting Concentration","","142","0","1000","1572864","0"
+"3048","Tailoring Concentration","","142","0","1000","1572864","0"
+"3049","Leatherworking Concentration","","142","0","1000","1572864","0"
+"3050","Blacksmithing Concentration","","142","0","1000","1572864","0"
+"3051","Enchanting Concentration","","142","0","1000","1572864","0"
+"3052","Engineering Concentration","","142","0","1000","1572864","0"
+"3053","Inscription Concentration","","142","0","1000","1572864","0"
+"3054","Alchemy Concentration","","142","0","1000","1572864","0"
+"3055","Mereldar Derby Mark","A record of a unique catch during the Mereldar Fishing Derby.","260","0","0","0","0"
+"3056","Kej","Wealth woven into strands and saturated with aromas that convey their value to any vendor of Azj-Kahet.","260","0","0","2","0"
+"3057","11.0 Professions - Tracker - Weekly Alchemy Knowledge","","142","0","0","102236160","5"
+"3058","11.0 Professions - Tracker - Weekly Blacksmithing Knowledge","","142","0","0","102236160","5"
+"3059","11.0 Professions - Tracker - Weekly Enchanting Knowledge","","142","0","0","102236160","5"
+"3060","11.0 Professions - Tracker - Weekly Engineering Knowledge","","142","0","0","102236160","5"
+"3061","11.0 Professions - Tracker - Weekly Herbalism Knowledge","","142","0","0","68681728","1"
+"3062","11.0 Professions - Tracker - Weekly Inscription Knowledge","","142","0","0","102236160","5"
+"3063","11.0 Professions - Tracker - Weekly Jewelcrafting Knowledge","","142","0","0","102236160","5"
+"3064","11.0 Professions - Tracker - Weekly Leatherworking Knowledge","","142","0","0","102236160","5"
+"3065","11.0 Professions - Tracker - Weekly Mining Knowledge","","142","0","0","68681728","1"
+"3066","11.0 Professions - Tracker - Weekly Skinning Knowledge","","142","0","0","68681728","1"
+"3067","11.0 Professions - Tracker - Weekly Tailoring Knowledge","","142","0","0","102236160","5"
+"3068","Delver's Journey","Grants Delver's Journey progress.","142","2644","0","10","0"
+"3069","11.0 Professions - Tailoring - Fishing - Khaz Algar - Skill","[DNT]","142","0","100","67633152","0"
+"3070","11.0 Professions - Fishing - Algari Weaverthread - Perception","[DNT]","142","0","100","524288","0"
+"3071","11.0 Professions - Fishing - Algari Weaverthread - Skill","[DNT]","142","0","100","67633152","0"
+"3072","Everburning Ignition Refund","[DNT]","142","0","100","67633152","0"
+"3073","11.0 Professions - Tracker - Insc Book - Tailoring Knowledge","","142","0","0","68681728","1"
+"3074","11.0 Professions - Tracker - Insc Book - Skinning Knowledge","","142","0","0","68681728","1"
+"3075","11.0 Professions - Tracker - Insc Book - Mining Knowledge","","142","0","0","68681728","1"
+"3076","11.0 Professions - Tracker - Insc Book - Leatherworking Know.","","142","0","0","68681728","1"
+"3077","11.0 Professions - Tracker - Insc Book - Jewelcrafting Knowledge","","142","0","0","68681728","1"
+"3078","11.0 Professions - Tracker - Insc Book - Inscription Knowledge","","142","0","0","68681728","1"
+"3079","11.0 Professions - Tracker - Insc Book - Herbalism Knowledge","","142","0","0","68681728","1"
+"3080","11.0 Professions - Tracker - Insc Book - Engineering Knowledge","","142","0","0","68681728","1"
+"3081","11.0 Professions - Tracker - Insc Book - Enchanting Knowledge","","142","0","0","68681728","1"
+"3082","11.0 Professions - Tracker - Insc Book - Blacksmithing Knowledge","","142","0","0","68681728","1"
+"3083","11.0 Professions - Tracker - Insc Book - Alchemy Knowledge","","142","0","0","68681728","1"
+"3084","11.0 Professions - Tracker - Insc Book - Inscription Knowledge","","142","0","0","68681728","1"
+"3085","11.0 Delves - Personal Tracker - S1 Weekly Elise Turn-In(Hidden)","","142","0","99","85458944","1"
+"3086","DPS","","142","0","3","80764928","0"
+"3087","Tank","","142","0","1","80764928","0"
+"3088","Healer","","142","0","1","80764928","0"
+"3089","Residual Memories","Half-forgotten memories can be glimpsed in the light playing across this iridescent powder.","260","0","0","2","32"
+"3090","Flame-Blessed Iron","Ore infused with mysterious properties after prolonged exposure to the Siren Crystal.","260","0","0","2","0"
+"3093","Nerub-ar Finery","Adorning the armor of the devoted, these insignias are a symbol of high society among the privileged inhabitants of Nerub-ar.
+
+Inside the palace, Anub'azal can smuggle these out to The Severed Threads and in exchange, strengthen your assault.","260","0","8","33554434","0"
+"3094","11.0 Raid - Nerubian - Account Quest Complete Tracker (Hidden)","","142","0","0","85458944","0"
+"3099","11.0 Raid - Nerubian - Nerubar Finery Tracking Currency (Hidden)","","142","0","8","102236160","1"
+"3100","Bronze Celebration Token","Earned from weekly activities during the 20th Bronze Celebration. Exchanged for new items at the Bronze Celebration outside the Caverns of Time.","1","0","0","130","0"
+"3102","Bronze Celebration Token","Earned from weekly activities during the 20th Bronze Celebration. Exchanged for new items at the Bronze Celebration outside the Caverns of Time.","142","0","0","2","0"
+"3103","11.0 Delves - System - Seasonal Affix - Events Active","","142","0","0","68698112","0"
+"3104","11.0 Delves - System - Seasonal Affix - Events Maximum","","142","0","0","68698112","0"
+"3107","Weathered Undermine Crest","Used to upgrade Adventurer and Veteran gear in War Within Season 2 up to item levels 623-632. Earned from the following activities:
+
+- Repeatable Outdoor Events
+- Raid Finder Liberation of Undermine
+- Heroic Season Dungeons
+- Delves (Tiers 1 to 5)","142","0","90","2359490","1"
+"3108","Carved Undermine Crest","Used to upgrade Veteran and Champion gear in War Within Season 2 up to item levels 636-645. Earned from the following activities:
+
+- Weekly Outdoor Events
+- Normal Liberation of Undermine
+- Mythic Season Dungeons
+- Delves (Tiers 6 and 7)
+- Delver's Bounty (Tiers 4 and 5)","142","0","90","2359490","1"
+"3109","Runed Undermine Crest","Used to upgrade Champion and Hero gear in War Within Season 2 up to item levels 649-658. Earned from the following activities:
+
+- Heroic Liberation of Undermine
+- Mythic Keystone Dungeons from +2 to +6
+- Delves (Tiers 8 to 11)
+- Delver's Bounty (Tiers 6 and 7)","142","0","90","2359490","1"
+"3110","Gilded Undermine Crest","Used to upgrade Hero and Myth gear in War Within Season 2 up to item levels 662 and above. Earned from the following activities:
+
+- Mythic Liberation of Undermine
+- Mythic Keystone Dungeons from +7 and up
+- Delve's Gilded Stash (Tier 11)
+- Delver's Bounty (Tier 8 and up)","142","0","90","2359490","1"
+"3111","Weathered Undermine Crest","Used to upgrade Adventurer and Veteran gear in War Within Season 2 up to item levels 623-632. Earned from the following activities:
+
+- Repeatable Outdoor Events
+- Raid Finder Liberation of Undermine
+- Heroic Season Dungeons
+- Delves (Tiers 1 to 5)","142","0","0","2","0"
+"3112","Carved Undermine Crest","Used to upgrade Veteran and Champion gear in War Within Season 2 up to item levels 636-645. Earned from the following activities:
+
+- Weekly Outdoor Events
+- Normal Liberation of Undermine
+- Mythic Season Dungeons
+- Mythic Keystone Dungeons up to +3
+- Delves (Tiers 6 and 7)
+- Delver's Bounty (Tiers 4 and 5)","142","0","0","2","0"
+"3113","Runed Undermine Crest","Used to upgrade Champion and Hero gear in War Within Season 2 up to item levels 649-658. Earned from the following activities:
+
+- Heroic Liberation of Undermine
+- Mythic Keystone Dungeons from +4 to +7
+- Delves (Tiers 8 to 11)
+- Delver's Bounty (Tiers 6 and 7)","142","0","0","2","0"
+"3114","Gilded Undermine Crest","Used to upgrade Hero and Myth gear in War Within Season 2 up to item levels 662 and above. Earned from the following activities:
+
+- Mythic Liberation of Undermine
+- Mythic Keystone Dungeons from +8 and up
+- Delve's Gilded Stash (Tier 11)
+- Delver's Bounty (Tier 8 and up)","142","0","0","2","0"
+"3115","[DNT] Worldsoul Memory Score","[DNT] Tracks Worldsoul Memory score for rewards purposes. Should be 0 at all times except momentarily during script execution.","142","0","0","68682752","0"
+"3116","Essence of Kaja'mite","Essence of Kaja'mite charges the Catalyst and allows it to imbue armor with incredible power. Slowly accumulates every two weeks. Disclaimer: Contains 0% kaja'mite.","142","0","8","2","0"
+"3118","The Cartels of Undermine","Grants Reputation with the Cartels of Undermine.","142","2653","0","33554442","0"
+"3119","Dragon Racing - Personal Best Record - 11 Z6 R1 Easy","","251","0","0","68682752","0"
+"3120","The Cartels of Undermine","Renown ranks with the Cartels of Undermine.","142","0","20","85721088","0"
+"3121","Dragon Racing - Personal Best Record - 11 Z6 R1 Reverse","","251","0","0","68682752","0"
+"3122","Dragon Racing - Personal Best Record - 11 Z6 R2 Easy","","251","0","0","68682752","0"
+"3123","Dragon Racing - Personal Best Record - 11 Z6 R2 Reverse","","251","0","0","68682752","0"
+"3124","Dragon Racing - Personal Best Record - 11 Z6 R3 Easy","","251","0","0","68682752","0"
+"3125","Dragon Racing - Personal Best Record - 11 Z6 R3 Reverse","","251","0","0","68682752","0"
+"3126","Dragon Racing - Personal Best Record - 11 Z6 R4 Easy","","251","0","0","68682752","0"
+"3127","Dragon Racing - Personal Best Record - 11 Z6 R4 Reverse","","251","0","0","68682752","0"
+"3128","Renown - The K'aresh Trust","[DNT]","142","0","20","85721088","0"
+"3129","The K'aresh Trust","[DNT]","142","2658","0","10","0"
+"3130","Renown - Season 2 Delves","[DNT]","142","0","10","85721088","0"
+"3131","Delver's Journey","Grants Delver's Journey progress.","142","2683","0","4194314","0"
+"3132","11.1 Professions - Personal Tracker - S2 Spark Drops (Hidden)","","142","0","1","68681760","0"
+"3135","11.1 Delves - Personal Tracker - S2 Weekly Elise Turn-In(Hidden)","","142","0","99","85458944","1"
+"3136","Gallagio Loyalty Rewards Club","Grants Reputation with the Gallagio Loyalty Rewards Club.","142","2685","0","33554442","0"
+"3137","Renown - Gallagio Loyalty Rewards Club","[DNT]","142","0","20","85721088","0"
+"3139","Plunder","","142","0","15000","-2057829376","4"
+"3140","11.1.5 Arathi - Renown Rank","Grants Reputation with Flame's Radiance.","142","0","10","85721088","0"
+"3141","Starlight Spark Dust","Magical residue obtained alongside Fractured Sparks of Starlight. Used to track how many Fractured Sparks of Starlight you have obtained so far in The War Within Season 3.|n|nIf you fall behind on Fractured Sparks of Starlight, completing max-level content such as Delves, Mythic Plus, Raids, Instanced PvP, and some outdoor events may help you catch up.","265","0","1","68681728","1"
+"3142","11.X Delves - Bountiful Tracker - Brann EXP Cap","","142","0","812","85458944","0"
+"3143","UNUSED - 11.0 Delves - Bountiful Tracker - Delver's Journey Cap","","142","0","812","85458944","1"
+"3144","11.0.5 20th Anniversary - Tracker","","142","0","1","68681728","1"
+"3145","11.0.5 20th Anniversary - Tracker","","142","0","1","68681728","1"
+"3146","11.0.5 20th Anniversary - Tracker","","142","0","1","68681728","1"
+"3147","11.0 Delves - Vendor - Bountiful Key Tracker - Cap","","142","0","812","85458944","1"
+"3149","Displaced Corrupted Mementos","Fragments of memory from Horrific Visions of N'Zoth which can be analyzed at the Titanic Research Archive in the Chamber of Heart.","260","0","0","33554434","0"
+"3169","The Bilgewater Cartel","Grants Reputation with the Bilgewater Cartel.","142","2673","0","33554442","0"
+"3170","The Bilgewater Cartel","[DNT] Grants Reputation with the Bilgewater Cartel.","142","0","5","2","0"
+"3171","The Blackwater Cartel","Grants Reputation with the Blackwater Cartel.","142","2675","0","33554442","0"
+"3172","The Blackwater Cartel","[DNT] Grants Reputation with the Bilgewater Cartel.","142","0","5","2","0"
+"3173","The Steamwheedle Cartel","Grants Reputation with the Steamwheedle Cartel.","142","2677","0","33554442","0"
+"3174","The Steamwheedle Cartel","[DNT] Grants Reputation with the Steamwheedle Cartel.","142","0","5","2","0"
+"3175","The Venture Company","[DNT] Grants Reputation with the Venture Company.","142","0","5","2","0"
+"3176","Venture Company","Grants Reputation with Venture Company.","142","2671","0","33554442","0"
+"3177","Darkfuse Solutions","Grants Reputation with Darkfuse Solutions.","142","2669","0","10","0"
+"3178","Darkfuse Solutions","[DNT] Grants Reputation with Darkfuse Solutions.","142","0","5","2","0"
+"3180","Weekly Limit Test Currency","Currency to test for weekly limit with curve","144","0","100","0","32"
+"3181","Dragon Racing - Personal Best Record - 11 Z6 R5 Easy","","251","0","0","68682752","0"
+"3182","Dragon Racing - Personal Best Record - 11 Z6 R5 Reverse","","251","0","0","68682752","0"
+"3183","Dragon Racing - Personal Best Record - 11 Z6 R6 Easy","","251","0","0","68682752","0"
+"3184","Dragon Racing - Personal Best Record - 11 Z6 R6 Reverse","","251","0","0","68682752","0"
+"3185","Dragon Racing - Personal Best Record - 11 Z6 R7 Easy","","251","0","0","68682752","0"
+"3186","Dragon Racing - Personal Best Record - 11 Z6 R7 Reverse","","251","0","0","68682752","0"
+"3187","Dragon Racing - Personal Best Record - 11 Z6 R8 Easy","","251","0","0","68682752","0"
+"3188","Dragon Racing - Personal Best Record - 11 Z6 R8 Reverse","","251","0","0","68682752","0"
+"3213","Dragon Racing - Personal Best Record - 112 Hope's R1 Easy","","251","0","0","68682752","0"
+"3214","Dragon Racing - Personal Best Record - 112 Hope's R1 Advanced","","251","0","0","68682752","0"
+"3215","Dragon Racing - Personal Best Record - 112 Hope's R1 Reverse","","251","0","0","68682752","0"
+"3216","Bounty's Remnants","Obtained from completing bountiful delves. Use 100 Bounty's Remnants to open a Hidden Trove. It's contents depend on the completed Delve's Tier.","260","0","0","2105826","0"
+"3218","Empty Kaja'Cola Can","An empty can of Kaja'Cola. These are commonly found in S.C.R.A.P Heaps. Angelo Rustbin at S.C.R.A.P Headquarters would be interested in this.","260","0","0","2","0"
+"3220","Vintage Kaja'Cola Can","A can of vintage Kaja'Cola. These are rarely found in S.C.R.A.P Heaps. Angelo Rustbin at S.C.R.A.P Headquarters would be interested in this.","260","0","0","2","0"
+"3221","Goblin Cartels Reputation","Grants rep with an aligned Goblin Cartel.","142","2671","0","10","0"
+"3223","Titan Disc","A complete Titan Disc that can be inserted into the Overcharged Console.","260","0","0","2","0"
+"3224","[DNT] NAK Test Currency","","142","0","100","68682752","0"
+"3225","Blacksmithing Specialization Reset","","142","0","1","1572864","0"
+"3226","Market Research","Darkfuse Solutions is on the lookout for market research to find where to focus their activities. You can exchange this with Sitch Lowdown at Hovel Hill to earn reputation with their cartel.","260","0","0","1048578","0"
+"3227","Alchemy Specialization Reset","","142","0","0","1572864","0"
+"3228","Enchanting Specialization Reset","","142","0","0","1572864","0"
+"3229","Engineering Specialization Reset","","142","0","0","1572864","0"
+"3230","Herbalism Specialization Reset","","142","0","0","1572864","0"
+"3231","Inscription Specialization Reset","","142","0","0","1572864","0"
+"3232","Jewelcrafting Specialization Reset","","142","0","0","1572864","0"
+"3233","Leatherworking Specialization Reset","","142","0","0","1572864","0"
+"3234","Mining Specialization Reset","","142","0","0","1572864","0"
+"3235","Skinning Specialization Reset","","142","0","0","1572864","0"
+"3236","Tailoring Specialization Reset","","142","0","0","1572864","0"
+"3238","Alchemy Specialization Reset","","142","0","0","1572864","0"
+"3239","Enchanting Specialization Reset","","142","0","0","1572864","0"
+"3240","Engineering Specialization Reset","","142","0","0","1572864","0"
+"3241","Herbalism Specialization Reset","","142","0","0","1572864","0"
+"3242","Inscription Specialization Reset","","142","0","0","1572864","0"
+"3243","Jewelcrafting Specialization Reset","","142","0","0","1572864","0"
+"3244","Leatherworking Specialization Reset","","142","0","0","1572864","0"
+"3245","Mining Specialization Reset","","142","0","0","1572864","0"
+"3246","Skinning Specialization Reset","","142","0","0","1572864","0"
+"3247","Tailoring Specialization Reset","","142","0","0","1572864","0"
+"3248","Blacksmithing Specialization Reset","","142","0","1","1572864","0"
+"3251","Felforged Bronze","A mote of time compressed into a bronze coin and corrupted by the Burning Legion. Momentus can use this to upgrade your gear, or trade this to Lidamorrutu for a chance at powerful relics and mementos of infinite power.","266","0","25000","2","256"
+"3252","Bronze","A mote of time compressed into a bronze coin. The infinite dragonflight will trade this for cosmetic rewards.","266","0","2000000","2","0"
+"3253","11.X Delves - Bountiful Tracker - Progress Cap - Mislaid","","142","0","0","85458944","0"
+"3254","Chase's Test Currency [DNT]","","142","0","5000","16777216","0"
+"3267","Felforged Bronze","A mote of time compressed into a bronze coin and corrupted by the Burning Legion. Momentus can use this to upgrade your gear, or trade this to Lidamorrutu for a chance at powerful relics and mementos of infinite power.","142","0","9999999","1048578","256"
+"3268","Infinite Power","Coalesced essence of power, drawn from another timeline. Used to upgrade your artifact weapon with a touch of infinite magic.","266","0","99999999","1048578","0"
+"3269","Ethereal Voidsplinter","Ethereal Voidsplinters charge the Catalyst and allow it to imbue armor with incredible power. Slowly accumulates every two weeks.","265","0","8","33554434","0"
+"3270","11.2 Delves - Personal Tracker - S3 Weekly Elise Turn-In(Hidden)","","142","0","99","85458944","1"
+"3271","Renown - Season 3 Delves","[DNT]","142","0","10","85721088","0"
+"3272","Delver's Journey","Grants Delver's Journey progress.","142","2722","0","4194314","0"
+"3278","Ethereal Strands","Threads imbued with powerful arcane energy. These can be used to enhance the energy harnessing abilities of the Reshii Wraps.","142","0","0","16777218","1"
+"3279","11. Raid Renown - Gallagio - Raid Buff Acct Tracker","","142","0","0","85458944","0"
+"3280","11. Raid Renown - Gallagio - Speed Buff Acct Tracker","","142","0","0","85458944","0"
+"3282","Gallagio Loyalty Rewards Club","Grants Reputation with the Gallagio Loyalty Rewards Club.","142","0","0","119013384","0"
+"3283","Flame's Radiance","Grants Reputation with Flame's Radiance.","142","2688","0","10","0"
+"3284","Weathered Ethereal Crest","Used to upgrade Adventurer and Veteran gear in War Within Season 3 up to item levels 668-678. Earned from the following activities:
+
+- Repeatable Outdoor Events
+- Raid Finder Manaforge Omega
+- Heroic Season Dungeons
+- Delves (Tiers 1 to 5)","265","0","90","35913922","1"
+"3285","Weathered Ethereal Crest","Used to upgrade Adventurer and Veteran gear in War Within Season 3 up to item levels 668-678. Earned from the following activities:
+
+- Repeatable Outdoor Events
+- Raid Finder Manaforge Omega
+- Heroic Season Dungeons
+- Delves (Tiers 1 to 5)","142","0","0","33554434","0"
+"3286","Carved Ethereal Crest","Used to upgrade Veteran and Champion gear in War Within Season 3 up to item levels 681-691. Earned from the following activities:
+
+- Weekly Outdoor Events
+- Normal Manaforge Omega
+- Mythic Season Dungeons
+- Delves (Tiers 6 and 7)
+- Delver's Bounty (Tiers 4 and 5)","265","0","90","35913922","1"
+"3287","Carved Ethereal Crest","Used to upgrade Veteran and Champion gear in War Within Season 3 up to item levels 681-691. Earned from the following activities:
+
+- Weekly Outdoor Events
+- Normal Manaforge Omega
+- Mythic Season Dungeons
+- Delves (Tiers 6 and 7)
+- Delver's Bounty (Tiers 4 and 5)","142","0","0","33554434","0"
+"3288","Runed Ethereal Crest","Used to upgrade Champion and Hero gear in War Within Season 3 up to item levels 694-704. Earned from the following activities:
+
+- Heroic Manaforge Omega
+- Mythic Keystone Dungeons from +2 to +6
+- Delves (Tiers 8 to 11)
+- Delver's Bounty (Tiers 6 and 7)","265","0","90","35913922","1"
+"3289","Runed Ethereal Crest","Used to upgrade Champion and Hero gear in War Within Season 3 up to item levels 694-704. Earned from the following activities:
+
+- Heroic Manaforge Omega
+- Mythic Keystone Dungeons from +2 to +6
+- Delves (Tiers 8 to 11)
+- Delver's Bounty (Tiers 6 and 7)","142","0","0","33554434","0"
+"3290","Gilded Ethereal Crest","Used to upgrade Hero and Myth gear in War Within Season 3 up to item levels 707 and above. Earned from the following activities:
+
+- Mythic Manaforge Omega
+- Mythic Keystone Dungeons from +7 and up
+- Delve's Gilded Stash (Tier 11)
+- Delver's Bounty (Tier 8 and up)","265","0","90","35913922","1"
+"3291","Gilded Ethereal Crest","Used to upgrade Hero and Myth gear in War Within Season 3 up to item levels 707 and above. Earned from the following activities:
+
+- Mythic Manaforge Omega
+- Mythic Keystone Dungeons from +7 and up
+- Delve's Gilded Stash (Tier 11)
+- Delver's Bounty (Tier 8 and up)","142","0","0","33554434","0"
+"3292","Infinite Knowledge","Coalesced essence of knowledge, drawn from another timeline. Infinite Knowledge increases the amount of Infinite Power gained from most sources. Infinite Knowledge gained beyond its limit is automatically converted into Bronze.","266","0","36","16777218","0"
+"3293","Epoch Memento","A tiny piece of an epoch story.","266","0","0","1048578","0"
+"3303","Untethered Coin","A strange coin found within Untethered Space on K'aresh. Shad'anis at Overlook Zo'Shuul will be interested in this in exchange for toys, cosmetics, pets, and more. Earned by completing the quest ""More Than Just a Phase.""","260","0","0","1048576","0"
+"3304","Manaforge Vandals","Grants Reputation with the Manaforge Vandals.","142","2736","0","33554442","0"
+"3305","Renown - Manaforge Vandals","[DNT]","142","0","15","85721088","0"
+"3306","Manaforge Vandals","Grants Reputation with the Manaforge Vandals.","142","0","0","119013384","0"
+"3307","11.2 Raid Renown - Manaforge - Raid Buff Acct Tracker","","142","0","0","85458944","0"
+"3308","11.2 Raid Renown - Manaforge Speed Buff Acct Tracker","","142","0","0","85458944","0"
+"3309","Hellstone Shard","Earned from activities during the Greedy Emissary event. Exchanged for hellish armorsets with Baranar in Dornogal.","1","0","0","130","0"
+"3310","Coffer Key Shards","Acquired from treasures, Radiant Echoes, World Quests, and outdoor events throughout Khaz Algar. Gathering 100 combines them into a Restored Coffer Key.","263","2739","0","2","0"
+"3313","11. Raid Renown - Gallagio - Raid Buff Acct Tracker","","142","0","0","85458944","0"
+"3314","11. Raid Renown - Gallagio - Speed Buff Acct Tracker","","142","0","0","85458944","0"
+"3315","Renown - Gallagio Loyalty Rewards Club","[DNT]","142","0","20","85721088","0"
+"3356","Untainted Mana-Crystals","Can be earned after reaching rank 3 of the Delver's Journey. Obtained from opening Bountiful Coffers with Restored Coffer Keys inside of bountiful delves at Tier 9 or above. Can be traded with Zah'ran for powerful equipment.","265","0","1000","100671490","0"
+"3360","[DNT] 11.1.5 Midseason - Turbo-Boost Quest Turn-In Tracker","","142","0","9","102236160","1"
+"3363","Community Coupons","Earned from completing Endeavor tasks to support your neighborhood and its friends. Used to purchase items from Endeavor Traders.","1","0","0","0","0"
+"3364","[DNT] 11.2.5 Midseason - Turbo-Boost Quest Turn-In Tracker","","142","0","9","102236160","1"
+"3372","Bronze","A mote of time compressed into a bronze coin. The infinite dragonflight will trade this for cosmetic rewards.","142","0","9999999","72892418","256"
