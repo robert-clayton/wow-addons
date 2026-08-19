@@ -287,7 +287,7 @@ do
     local recipeSeen, classicRecipes, tbcRecipes, wrathRecipes, cataRecipes, mopRecipes, wodRecipes, legionRecipes, bfaRecipes, slRecipes, dfRecipes, twwRecipes, midnightRecipes = {}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
         for _, category in ipairs(MC[dataKey]) do
-            truthy(category.expansion == "classic" or category.expansion == "tbc" or category.expansion == "wrath" or category.expansion == "cata" or category.expansion == "mop" or category.expansion == "wod" or category.expansion == "legion"
+            truthy(category.expansion == "vanilla" or category.expansion == "tbc" or category.expansion == "wrath" or category.expansion == "cata" or category.expansion == "mop" or category.expansion == "wod" or category.expansion == "legion"
                 or category.expansion == "bfa"
                 or category.expansion == "shadowlands"
                 or category.expansion == "df" or category.expansion == "tww"
@@ -299,7 +299,7 @@ do
                 recipeSeen[recipe.id] = true
                 equal(recipe.expansion, category.expansion,
                     "recipe/category expansion agreement " .. recipe.id)
-                if recipe.expansion == "classic" then
+                if recipe.expansion == "vanilla" then
                     classicRecipes = classicRecipes + 1
                 elseif recipe.expansion == "tbc" then
                     tbcRecipes = tbcRecipes + 1
@@ -340,19 +340,30 @@ do
     equal(twwRecipes, 696, "TWW recipe count")
     truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
 
-    MC.db = { expansionFilter = { mode = "single", single = "tww" },
-              disabledExpansions = {} }
+    -- Visibility follows Options > Expansions alone: the per-tab
+    -- expansion filter is gone.
+    MC.db = { disabledExpansions = {} }
     for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
         for _, category in ipairs(MC[dataKey]) do
-            equal(MC.IsGroupVisible(category, "recipes"), category.expansion == "tww",
-                "TWW-only recipe visibility")
+            equal(MC.IsGroupVisible(category, "recipes"), true,
+                "every enabled expansion is visible")
         end
     end
-    MC.db.expansionFilter.mode = "current"
+    MC.db.disabledExpansions = { tww = true }
     for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
         for _, category in ipairs(MC[dataKey]) do
-            equal(MC.IsGroupVisible(category, "recipes"), category.expansion == "midnight",
-                "Current recipe visibility")
+            equal(MC.IsGroupVisible(category, "recipes"), category.expansion ~= "tww",
+                "a disabled expansion hides only its own categories")
+        end
+    end
+    MC.db.disabledExpansions = {}
+
+    local ALL_EXP_KEYS = { "vanilla", "tbc", "wrath", "cata", "mop", "wod",
+        "legion", "bfa", "shadowlands", "df", "tww", "midnight" }
+    local function onlyExpansion(key)
+        MC.db.disabledExpansions = {}
+        for _, k in ipairs(ALL_EXP_KEYS) do
+            if k ~= key then MC.db.disabledExpansions[k] = true end
         end
     end
 
@@ -365,77 +376,77 @@ do
     loadAddon("addons/Collectionist/Modules/Recipes/Scanner.lua", MC)
     local scanner = MC.modulesByKey.recipes.Scanner
 
-    MC.db.expansionFilter = { mode = "single", single = "classic" }
+    onlyExpansion("vanilla")
     scanner:Scan()
     local classicResult = scanner.results[171]
     equal(classicResult.total, 114, "Classic-only Alchemy visible count")
     equal(classicResult.learnedCount, 0, "Classic-only Alchemy learned count")
     equal(classicResult.learnedCountAll, 2, "account Alchemy learned count from Classic view")
 
-    MC.db.expansionFilter = { mode = "single", single = "tbc" }
+    onlyExpansion("tbc")
     scanner:Scan()
     local tbcResult = scanner.results[171]
     equal(tbcResult.total, 75, "TBC-only Alchemy visible count")
     equal(tbcResult.learnedCount, 0, "TBC-only Alchemy learned count")
     equal(tbcResult.learnedCountAll, 2, "account Alchemy learned count from TBC view")
 
-    MC.db.expansionFilter = { mode = "single", single = "wrath" }
+    onlyExpansion("wrath")
     scanner:Scan()
     local wrathResult = scanner.results[171]
     equal(wrathResult.total, 69, "Wrath-only Alchemy visible count")
     equal(wrathResult.learnedCount, 0, "Wrath-only Alchemy learned count")
     equal(wrathResult.learnedCountAll, 2, "account Alchemy learned count from Wrath view")
 
-    MC.db.expansionFilter = { mode = "single", single = "cata" }
+    onlyExpansion("cata")
     scanner:Scan()
     local cataResult = scanner.results[171]
     equal(cataResult.total, 47, "Cataclysm-only Alchemy visible count")
     equal(cataResult.learnedCount, 0, "Cataclysm-only Alchemy learned count")
     equal(cataResult.learnedCountAll, 2, "account Alchemy learned count from Cataclysm view")
 
-    MC.db.expansionFilter = { mode = "single", single = "mop" }
+    onlyExpansion("mop")
     scanner:Scan()
     local mopResult = scanner.results[171]
     equal(mopResult.total, 37, "Pandaria-only Alchemy visible count")
     equal(mopResult.learnedCount, 0, "Pandaria-only Alchemy learned count")
     equal(mopResult.learnedCountAll, 2, "account Alchemy learned count from Pandaria view")
 
-    MC.db.expansionFilter = { mode = "single", single = "wod" }
+    onlyExpansion("wod")
     scanner:Scan()
     local wodResult = scanner.results[171]
     equal(wodResult.total, 53, "Warlords-only Alchemy visible count")
     equal(wodResult.learnedCount, 0, "Warlords-only Alchemy learned count")
     equal(wodResult.learnedCountAll, 2, "account Alchemy learned count from Warlords view")
 
-    MC.db.expansionFilter = { mode = "single", single = "legion" }
+    onlyExpansion("legion")
     scanner:Scan()
     local legionResult = scanner.results[171]
     equal(legionResult.total, 85, "Legion-only Alchemy visible count")
     equal(legionResult.learnedCount, 0, "Legion-only Alchemy learned count")
     equal(legionResult.learnedCountAll, 2, "account Alchemy learned count from Legion view")
 
-    MC.db.expansionFilter = { mode = "single", single = "bfa" }
+    onlyExpansion("bfa")
     scanner:Scan()
     local bfaResult = scanner.results[171]
     equal(bfaResult.total, 150, "BFA-only Alchemy visible count")
     equal(bfaResult.learnedCount, 0, "BFA-only Alchemy learned count")
     equal(bfaResult.learnedCountAll, 2, "account Alchemy learned count from BFA view")
 
-    MC.db.expansionFilter = { mode = "single", single = "shadowlands" }
+    onlyExpansion("shadowlands")
     scanner:Scan()
     local slResult = scanner.results[171]
     equal(slResult.total, 66, "Shadowlands-only Alchemy visible count")
     equal(slResult.learnedCount, 0, "Shadowlands-only Alchemy learned count")
     equal(slResult.learnedCountAll, 2, "account Alchemy learned count from Shadowlands view")
 
-    MC.db.expansionFilter = { mode = "single", single = "df" }
+    onlyExpansion("df")
     scanner:Scan()
     local dfResult = scanner.results[171]
     equal(dfResult.total, 68, "Dragonflight-only Alchemy visible count")
     equal(dfResult.learnedCount, 0, "Dragonflight-only Alchemy learned count")
     equal(dfResult.learnedCountAll, 2, "account Alchemy learned count from DF view")
 
-    MC.db.expansionFilter = { mode = "single", single = "tww" }
+    onlyExpansion("tww")
     scanner:Scan()
     local twwResult = scanner.results[171]
     equal(twwResult.total, 53, "TWW-only Alchemy visible count")
@@ -443,7 +454,7 @@ do
     equal(twwResult.learnedCountAll, 2, "account Alchemy learned count")
     local accountTotal, accountScore = twwResult.totalAll, twwResult.score
 
-    MC.db.expansionFilter = { mode = "single", single = "midnight" }
+    onlyExpansion("midnight")
     scanner:Scan()
     local midnightResult = scanner.results[171]
     truthy(midnightResult.total > 0 and midnightResult.total ~= twwResult.total,
@@ -703,7 +714,7 @@ do
                 truthy(not seen[id],
                     "duplicate cross-expansion " .. moduleKey .. " ID " .. id)
                 seen[id] = true
-                if entry.expansion == "classic" then
+                if entry.expansion == "vanilla" then
                     classicCount = classicCount + 1
                     local unavailableIDs = classicUnavailableIDs[moduleKey]
                     if unavailableIDs then

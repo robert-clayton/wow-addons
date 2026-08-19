@@ -8,7 +8,7 @@ local _, MC = ...
 -- will start appearing in the filter dropdown automatically.
 
 MC.EXPANSIONS = {
-    { key = "vanilla",     label = "Classic",          order = 1,  color = { 0.85, 0.85, 0.85 } },
+    { key = "vanilla",     label = "Vanilla",          order = 1,  color = { 0.85, 0.85, 0.85 } },
     { key = "tbc",         label = "Burning Crusade",  order = 2,  color = { 0.40, 0.85, 0.40 } },
     { key = "wrath",       label = "Wrath",            order = 3,  color = { 0.55, 0.85, 1.00 } },
     { key = "cata",        label = "Cataclysm",        order = 4,  color = { 0.95, 0.50, 0.30 } },

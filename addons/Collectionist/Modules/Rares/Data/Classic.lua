@@ -1,7 +1,7 @@
 local addonName, MC = ...
 
 -- Classic zone rares. Exact 0 ordered criteria/entity rows.
-MC.RegisterContent("classic", "rares", {
+MC.RegisterContent("vanilla", "rares", {
 })
 
 local SOURCE_KEYS = {

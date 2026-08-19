@@ -825,7 +825,7 @@ function MC.ShowPeerPanel(peerName)
     -- Initialize only once per open session. Toggling a peer while the
     -- Inspector is already visible must not reset its local filter.
     if not inspectorFilter and MC.GetExpansionFilter then
-        inspectorFilter = copyFilter(MC.GetExpansionFilter())
+        inspectorFilter = copyFilter(MC.GetExpansionFilter())  -- starts "all"
     end
     -- Even with empty activePeers we open the window so the player can see
     -- the peer list and pick someone to compare. The right pane shows a

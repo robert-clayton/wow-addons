@@ -1,7 +1,7 @@
 local _, MC = ...
 
 -- Classic profession recipes. Generated from the exact 1223-spell manifest.
-MC.RegisterContent("classic", "recipes", {
+MC.RegisterContent("vanilla", "recipes", {
     { skillLine = 171, name = "Classic", recipes = {
         { id = 2329, name = "Elixir of Lion's Strength", source = "trainer", sourceInfo = "Learned automatically", priority = 1 },
         { id = 2330, name = "Minor Healing Potion", source = "trainer", sourceInfo = "Learned automatically", priority = 1 },

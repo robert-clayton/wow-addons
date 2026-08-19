@@ -1,7 +1,7 @@
 local addonName, MC = ...
 
 -- Classic treasures. Exact 0 ordered criteria rows.
-MC.RegisterContent("classic", "treasures", {
+MC.RegisterContent("vanilla", "treasures", {
 })
 
 local SOURCE_KEYS = {

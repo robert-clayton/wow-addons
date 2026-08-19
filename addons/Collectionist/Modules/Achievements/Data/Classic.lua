@@ -2,7 +2,7 @@ local _, MC = ...
 
 -- Classic player-facing achievements. Exact 199-row manifest;
 -- stable criteria tasks are attached only for 2-30-row progress lists.
-MC.RegisterContent("classic", "achievements", {
+MC.RegisterContent("vanilla", "achievements", {
     { category = "exploration", source = "zone", achievements = {
         { achievementID = 627, name = "Explore Dun Morogh", description = "Explore Dun Morogh, revealing the covered areas of the world map.", zone = "Eastern Kingdoms",
           taskList = { intro = "Progress from live achievement criteria.", tasks = {

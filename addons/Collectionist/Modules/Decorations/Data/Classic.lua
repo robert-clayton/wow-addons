@@ -1,7 +1,7 @@
 local _, MC = ...
 
 -- Classic-acquisition housing decor. Ownership follows the awarding content, not the Midnight housing row or visual theme.
-MC.RegisterContent("classic", "decorations", {
+MC.RegisterContent("vanilla", "decorations", {
     { source = "crafted", decorations = {
         { decorID = 854, itemID = 245502, name = "Brill Coffin", source = "crafted", sourceInfo = "3 Brill Coffin Furnishings › Storage Crafting: Inscription Profession: Classic Inscription (240)", skillLine = MC.PROFESSION.Inscription },
         { decorID = 922, itemID = 245503, name = "Brill Coffin Lid", source = "crafted", sourceInfo = "3 Brill Coffin Lid Furnishings › Storage Crafting: Inscription Profession: Classic Inscription (240)", skillLine = MC.PROFESSION.Inscription },

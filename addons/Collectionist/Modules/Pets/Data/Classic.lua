@@ -1,7 +1,7 @@
 local _, MC = ...
 
 -- Classic battle pets. Generated from the exact 59-row release manifest.
-MC.RegisterContent("classic", "pets", {
+MC.RegisterContent("vanilla", "pets", {
     { source = "drop", pets = {
         { speciesID = 42, npcID = 7383, name = "Black Tabby Cat", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rWorld Drop|n|cFFFFD200Zone: |rHillsbrad Foothills" },
         { speciesID = 49, npcID = 7391, name = "Hyacinth Macaw", petType = 3, source = "drop", sourceInfo = "|cFFFFD200Drop: |rWorld Drop|n|cFFFFD200Zone: |rNorthern Stranglethorn, The Cape of Stranglethorn" },

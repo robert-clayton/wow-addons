@@ -256,72 +256,45 @@ end
 --   "all"     — show every expansion's data
 -- Default is "current" so existing players see no behavior change.
 --------------------------------------------------------------------------
+-- Survives only as the Collection Inspector's starting scope for peer
+-- columns; the browse tabs no longer filter. Defaults to "all" now that
+-- Options decides what is shown.
 function MC.GetExpansionFilter()
-    if not MC.db then return { mode = "current" } end
+    if not MC.db then return { mode = "all" } end
     if not MC.db.expansionFilter then
-        MC.db.expansionFilter = { mode = "current",
-                                  single = MC.GetLatestExpansion and MC.GetLatestExpansion() }
+        MC.db.expansionFilter = { mode = "all" }
     end
     return MC.db.expansionFilter
 end
 
-function MC.IsGroupVisible(group, moduleKey)
+-- Visibility is now a single question: is this expansion switched on in
+-- Options > Expansions. The title-bar filter that used to scope the list
+-- to one expansion (or the current one) is gone — two controls deciding
+-- what a tab shows was one too many.
+function MC.IsGroupVisible(group)
     if not group then return true end
     -- Groups without an expansion stamp are pre-1.7.0 entries — show
     -- them so legacy data doesn't silently disappear.
     if not group.expansion then return true end
-    -- Browse toggle: hidden expansions never show, whatever the filter.
-    if not MC.IsExpansionEnabled(group.expansion) then return false end
-    local f = MC.GetExpansionFilter()
-    local latest = MC.GetLatestExpansion(moduleKey or group.moduleKey)
-    if f.mode == "all" then return true end
-    if f.mode == "single" then
-        return group.expansion == (f.single or latest)
-    end
-    -- "current" mode (default)
-    return group.expansion == latest
-end
-
-function MC.SetExpansionFilter(mode, singleKey)
-    local f = MC.GetExpansionFilter()
-    f.mode = mode or "current"
-    if singleKey then f.single = singleKey end
-    -- Re-scan via ThrottledScan so the click doesn't synchronously
-    -- block on every scanner (especially Decorations, which hits the
-    -- housing catalog API). ThrottledScan also coalesces duplicate
-    -- requests and yields a frame.
-    if MC.modules and MC.ThrottledScan then
-        for _, m in ipairs(MC.modules) do
-            if m.Scanner and m.Scanner.Scan then
-                MC.ThrottledScan(m, 0)
-            end
-        end
-    end
-    if MC.RefreshActive then MC.RefreshActive() end
-    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
-end
-
--- Human-readable label for the current filter, used by the title-bar
--- button.
-function MC.GetExpansionFilterLabel()
-    local f = MC.GetExpansionFilter()
-    if f.mode == "all" then return "All" end
-    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion(MC.activeModule)
-    local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
-    return e and e.label or key or "?"
+    return MC.IsExpansionEnabled(group.expansion)
 end
 
 -- Longer-form scope label for chat summaries, so filter-scoped output
 -- (e.g. the minimap right-click source breakdowns) can say which slice
 -- of the collection it covers.
 function MC.GetFilterScopeLabel()
-    local f = MC.GetExpansionFilter()
-    if f.mode == "all" then return "All Expansions" end
-    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion(MC.activeModule)
-    local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
-    local label = e and e.label or key or "?"
-    if f.mode == "single" then return label end
-    return format("Current (%s)", label)
+    -- No per-tab filter any more: the scope is whatever Options has
+    -- switched on. Named counts read better than a bare "enabled".
+    local on = {}
+    for _, e in ipairs(MC.EXPANSIONS or {}) do
+        if MC._registeredExpansions and MC._registeredExpansions[e.key]
+           and MC.IsExpansionEnabled(e.key) then
+            on[#on + 1] = e.label
+        end
+    end
+    if #on == 0 then return "no expansions" end
+    if #on == 1 then return on[1] end
+    return format("%d expansions", #on)
 end
 
 --------------------------------------------------------------------------
@@ -441,16 +414,11 @@ function MC.SetExpansionEnabled(key, enabled)
     else
         MC.db.disabledExpansions[key] = true
     end
-    -- "Current" resolves against enabled expansions; drop the memos so
-    -- it re-derives, and unpin a filter pointing at a hidden expansion.
+    -- GetLatestExpansion resolves against enabled expansions, so drop
+    -- the memos and let it re-derive.
     MC._latestExpansionKey = nil
     MC._latestExpansionByModule = nil
-    local f = MC.GetExpansionFilter()
-    if f.mode == "single" and not MC.IsExpansionEnabled(f.single) then
-        f.mode = "current"
-    end
-    -- Visibility is baked into scanner results, so re-scan like the
-    -- expansion filter does.
+    -- Visibility is baked into scanner results, so re-scan.
     if MC.modules and MC.ThrottledScan then
         for _, m in ipairs(MC.modules) do
             if m.Scanner and m.Scanner.Scan then
@@ -1949,69 +1917,19 @@ function MC.CreatePanel()
     MC.BuildConfig()
 
     -- Title-bar indicator chain (right→left): progressText, scoreBtn,
-    -- peerBtn, filterBtn. Anchored once at the end so each one can
-    -- reference its right-hand neighbor.
+    -- peerBtn. Anchored once at the end so each one can reference its
+    -- right-hand neighbor.
     local bar = panel.frame and panel.frame.titleBar
     if bar then
         local theme = MC.Theme
         local sub = theme.colors.tooltipSubtext
 
         -- Expansion filter
-        local filterPopup = MUI.MakeDropdown()
-        local function buildFilterItems()
-            local f = MC.GetExpansionFilter()
-            local latestE = MC.EXPANSION_BY_KEY
-                and MC.EXPANSION_BY_KEY[MC.GetLatestExpansion(MC.activeModule)]
-            local items = {
-                -- "Current" auto-advances when a newer expansion's content
-                -- ships; picking an expansion by name pins it instead.
-                { label = format("Current (%s)", latestE and latestE.label or "?"),
-                  selected = f.mode == "current",
-                  onClick = function() MC.SetExpansionFilter("current") end },
-                { label = "All Expansions",
-                  selected = f.mode == "all",
-                  onClick = function() MC.SetExpansionFilter("all") end },
-            }
-            for _, e in ipairs(MC.EXPANSIONS or {}) do
-                local registered = MC._registeredExpansions and MC._registeredExpansions[e.key]
-                if registered and MC.IsExpansionEnabled(e.key) then
-                    local key = e.key
-                    items[#items + 1] = {
-                        label = e.label,
-                        selected = f.mode == "single" and f.single == key,
-                        onClick = function() MC.SetExpansionFilter("single", key) end,
-                    }
-                elseif not registered then
-                    -- Skeleton row: every expansion is listed; ones with
-                    -- no content yet are greyed and unclickable.
-                    items[#items + 1] = { label = e.label, disabled = true }
-                end
-            end
-            return items
-        end
-        -- Forward-declared so the onClick closure captures the button as
-        -- an upvalue. Referencing filterBtn inside the initializer below
-        -- would bind the (nil) global, not this local.
-        local filterBtn
-        filterBtn = MUI.MakeIndicatorBtn(bar, {
-            tooltip = function(_, tt)
-                tt:SetText("Expansion filter")
-                tt:AddLine("Click to switch which expansion's data is shown.",
-                    sub[1], sub[2], sub[3], true)
-            end,
-            onClick = function()
-                if filterPopup:IsShown() then filterPopup:Hide(); return end
-                filterPopup:ShowAt(filterBtn, "BOTTOMLEFT", "TOPLEFT", buildFilterItems())
-            end,
-        })
-        MC.expansionFilterBtn = filterBtn
-
-        function MC.RefreshExpansionFilterButton()
-            if MC.expansionFilterBtn then
-                MC.expansionFilterBtn:SetLabel(MC.GetExpansionFilterLabel())
-            end
-        end
-        MC.RefreshExpansionFilterButton()
+        -- The expansion filter button used to live here. Options >
+        -- Expansions is now the only control over what a tab shows;
+        -- RefreshExpansionFilterButton stays as a no-op so the call
+        -- sites scattered through the scan/refresh paths keep working.
+        function MC.RefreshExpansionFilterButton() end
 
         -- Collection Score
         local scoreBtn = MUI.MakeIndicatorBtn(bar, {
@@ -2019,7 +1937,7 @@ function MC.CreatePanel()
             hoverColor = theme.colors.scoreAccentHover,
             tooltip = function(_, tt)
                 if not MC.GetLocalScore then return end
-                local total, legacy, byMod = MC.GetLocalScore()
+                local total, legacy, byMod, achPoints = MC.GetLocalScore()
                 tt:SetText("Collection Score")
                 tt:AddDoubleLine("Total", tostring(total),
                     1, 1, 1, theme.colors.scoreAccent[1], theme.colors.scoreAccent[2], theme.colors.scoreAccent[3])
@@ -2038,6 +1956,14 @@ function MC.CreatePanel()
                     tt:AddLine(" ")
                     tt:AddDoubleLine("Legacies", tostring(legacy),
                         0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
+                end
+                -- Achievements keep their own tally outside the score.
+                if achPoints and achPoints > 0 then
+                    tt:AddLine(" ")
+                    tt:AddDoubleLine("Achievement points", tostring(achPoints),
+                        0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
+                    tt:AddLine("Tracked separately — not part of the score.",
+                        0.5, 0.5, 0.5, true)
                 end
             end,
         })
@@ -2071,7 +1997,6 @@ function MC.CreatePanel()
         end
         scoreBtn:SetPoint("RIGHT", rightAnchor, rightPoint, rightOfsX, 0)
         peerBtn:SetPoint("RIGHT", scoreBtn, "LEFT", -10, 0)
-        filterBtn:SetPoint("RIGHT", peerBtn, "LEFT", -8, 0)
 
         MC.RefreshPeerIndicator()
 
@@ -2498,7 +2423,6 @@ local function PrintHelp()
     print("  /mc collected [module] - toggle collected/learned display")
     print("  /mc reset - reset panel position + size")
     print("  /mc sharing on|off|announce|sync|prune|clear|status - optional sharing")
-    print("  /mc filter all|current|<expansion> - filter visible expansions")
     print("  /mc score - show your Collection Score breakdown")
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
@@ -2600,7 +2524,7 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         if not MC.GetLocalScore then
             print(PREFIX .. " Score system not available.")
         else
-            local total, legacy, byMod = MC.GetLocalScore()
+            local total, legacy, byMod, achPoints = MC.GetLocalScore()
             print(format("%s Collection Score: |cffffcc66%d|r", PREFIX, total))
             for _, m in ipairs(MC.modules) do
                 local b = byMod[m.key]
@@ -2611,28 +2535,13 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             if legacy > 0 then
                 print(format("  Legacies: %d (collected items no longer obtainable)", legacy))
             end
+            if achPoints and achPoints > 0 then
+                print(format("  Achievement points: %d (tracked separately)", achPoints))
+            end
         end
     elseif cmd == "filter" then
-        local a = (arg or ""):lower()
-        if a == "" or a == "status" then
-            local f = MC.GetExpansionFilter()
-            print(format("%s Filter: %s%s", PREFIX, f.mode,
-                f.mode == "single" and (" (" .. tostring(f.single) .. ")") or ""))
-        elseif a == "all" or a == "current" then
-            MC.SetExpansionFilter(a)
-            print(format("%s Filter set to %s.", PREFIX, a))
-        elseif MC._registeredExpansions and MC._registeredExpansions[a] then
-            -- Only expansions with registered content are selectable; a
-            -- defined-but-empty key (e.g. "tww" before its content ships)
-            -- would blank every tab with no hint why.
-            MC.SetExpansionFilter("single", a)
-            print(format("%s Filter set to %s.", PREFIX, MC.EXPANSION_BY_KEY[a].label))
-        else
-            print(PREFIX .. " /mc filter all|current|<expansion-key>")
-            local keys = {}
-            for k in pairs(MC._registeredExpansions or {}) do keys[#keys+1] = k end
-            if #keys > 0 then print("    available: " .. table.concat(keys, ", ")) end
-        end
+        -- Retired: Options > Expansions decides what the tabs show.
+        print(PREFIX .. " The expansion filter moved into Options > Expansions.")
     elseif cmd == "sharing" or cmd == "roster" then
         if MC.RosterSlashHandler then
             MC.RosterSlashHandler(arg)

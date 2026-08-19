@@ -11,19 +11,8 @@ local OPT_GAP    = 14
 local OPT_INSET  = 4
 local OPT_ICON   = "Interface\\Icons\\INV_Misc_Gear_01"
 
--- Per-module taglines for the Premium page header subtitle.
--- No tagline repeats its module's name — the page title directly above
--- already says it.
-local TAGLINES = {
-    mounts       = "Still out there to hunt down",
-    pets         = "Waiting to be caught",
-    decorations  = "Missing from your housing stock",
-    toys         = "Not in your toybox yet",
-    recipes      = "Your professions haven't learned these",
-    rares        = "Still on the hit list",
-    treasures    = "Left to uncover",
-    achievements = "Within reach",
-}
+-- Tracker pages carry no subtitle: the list under the title already
+-- says what it is, and the line was pure decoration.
 
 -- Canonical counts derivation, mirroring Roster's BuildLocalCounts
 -- (Modules/Roster/Init.lua): recipes sum per-skill-line sub-tables;
@@ -158,10 +147,7 @@ function Nav:SetActive(key)
                 "How Collectionist tracks, and how it looks")
         else
             local mod = MC.modulesByKey and MC.modulesByKey[key]
-            local tagline = TAGLINES[key] or (mod and mod.label) or ""
-            local scope = MC.GetExpansionFilterLabel and MC.GetExpansionFilterLabel()
-            local subtitle = (scope and scope ~= "") and (tagline .. "  \194\183  " .. scope) or tagline
-            self.panel:SetPageHeader((mod and mod.label) or key, subtitle)
+            self.panel:SetPageHeader((mod and mod.label) or key, nil)
         end
     end
 end

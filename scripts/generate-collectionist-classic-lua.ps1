@@ -66,7 +66,7 @@ $mountLines = [System.Collections.Generic.List[string]]::new()
 $mountLines.Add("local _, MC = ...")
 $mountLines.Add("")
 $mountLines.Add("-- Classic mounts. Generated from the exact $($mounts.Count)-row release manifest.")
-$mountLines.Add('MC.RegisterContent("classic", "mounts", {')
+$mountLines.Add('MC.RegisterContent("vanilla", "mounts", {')
 Add-GroupedEntries $mountLines $mounts "mounts" "mounts" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
@@ -86,7 +86,7 @@ $petLines = [System.Collections.Generic.List[string]]::new()
 $petLines.Add("local _, MC = ...")
 $petLines.Add("")
 $petLines.Add("-- Classic battle pets. Generated from the exact $($pets.Count)-row release manifest.")
-$petLines.Add('MC.RegisterContent("classic", "pets", {')
+$petLines.Add('MC.RegisterContent("vanilla", "pets", {')
 Add-GroupedEntries $petLines $pets "pets" "pets" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
@@ -108,7 +108,7 @@ $toyLines = [System.Collections.Generic.List[string]]::new()
 $toyLines.Add("local _, MC = ...")
 $toyLines.Add("")
 $toyLines.Add("-- Classic toys. Generated from the exact $($toys.Count)-row release manifest.")
-$toyLines.Add('MC.RegisterContent("classic", "toys", {')
+$toyLines.Add('MC.RegisterContent("vanilla", "toys", {')
 Add-GroupedEntries $toyLines $toys "toys" "toys" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
@@ -127,7 +127,7 @@ $decorLines = [System.Collections.Generic.List[string]]::new()
 $decorLines.Add("local _, MC = ...")
 $decorLines.Add("")
 $decorLines.Add("-- Classic-acquisition housing decor. Ownership follows the awarding content, not the Midnight housing row or visual theme.")
-$decorLines.Add('MC.RegisterContent("classic", "decorations", {')
+$decorLines.Add('MC.RegisterContent("vanilla", "decorations", {')
 $decorGroups = $decorations | Group-Object { [string]$_.source_kind }
 foreach ($source in @("crafted", "vendor", "achievement", "quest", "drop")) {
     $group = $decorGroups | Where-Object Name -eq $source
@@ -177,7 +177,7 @@ $achievementLines.Add("local _, MC = ...")
 $achievementLines.Add("")
 $achievementLines.Add("-- Classic player-facing achievements. Exact $($achievements.Count)-row manifest;")
 $achievementLines.Add("-- stable criteria tasks are attached only for 2-30-row progress lists.")
-$achievementLines.Add('MC.RegisterContent("classic", "achievements", {')
+$achievementLines.Add('MC.RegisterContent("vanilla", "achievements", {')
 foreach ($categoryID in $categoryOrder) {
     $meta = $achievementGroups[$categoryID]
     $achievementLines.Add("    { category = $(ConvertTo-LuaString $meta[0]), source = $(ConvertTo-LuaString $meta[1]), achievements = {")
@@ -204,7 +204,7 @@ $recipeLines = [System.Collections.Generic.List[string]]::new()
 $recipeLines.Add("local _, MC = ...")
 $recipeLines.Add("")
 $recipeLines.Add("-- Classic profession recipes. Generated from the exact $($recipes.Count)-spell manifest.")
-$recipeLines.Add('MC.RegisterContent("classic", "recipes", {')
+$recipeLines.Add('MC.RegisterContent("vanilla", "recipes", {')
 foreach ($group in $recipes | Group-Object profession | Sort-Object Name) {
     $first = $group.Group[0]
     $recipeLines.Add("    { skillLine = $($first.profession_id), name = `"Classic`", recipes = {")
@@ -223,7 +223,7 @@ $rareLines = [System.Collections.Generic.List[string]]::new()
 $rareLines.Add("local addonName, MC = ...")
 $rareLines.Add("")
 $rareLines.Add("-- Classic zone rares. Exact $($rares.Count) ordered criteria/entity rows.")
-$rareLines.Add('MC.RegisterContent("classic", "rares", {')
+$rareLines.Add('MC.RegisterContent("vanilla", "rares", {')
 foreach ($group in $rareGroups) {
     $achievementID, $source, $zone, $map = $group
     $rows = @($rares | Where-Object achievement_id -eq $achievementID | Sort-Object { Get-OrderPathSortKey $_.order_path })
@@ -256,7 +256,7 @@ $treasureLines = [System.Collections.Generic.List[string]]::new()
 $treasureLines.Add("local addonName, MC = ...")
 $treasureLines.Add("")
 $treasureLines.Add("-- Classic treasures. Exact $($treasures.Count) ordered criteria rows.")
-$treasureLines.Add('MC.RegisterContent("classic", "treasures", {')
+$treasureLines.Add('MC.RegisterContent("vanilla", "treasures", {')
 foreach ($group in $treasureGroups) {
     $achievementID, $source, $zone, $map = $group
     $rows = @($treasures | Where-Object achievement_id -eq $achievementID | Sort-Object { Get-OrderPathSortKey $_.order_path })

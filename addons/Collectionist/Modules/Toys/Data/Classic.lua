@@ -1,7 +1,7 @@
 local _, MC = ...
 
 -- Classic toys. Generated from the exact 10-row release manifest.
-MC.RegisterContent("classic", "toys", {
+MC.RegisterContent("vanilla", "toys", {
     { source = "drop", toys = {
         { itemID = 1973, name = "Orb of Deception", source = "drop", sourceInfo = "|cFFFFD200Drop: |rWorld Drop" },
         { itemID = 13379, name = "Piccolo of the Flaming Fire", source = "drop", sourceInfo = "|cFFFFD200Drop: |rHearthsinger Forresten|n|cFFFFD200Zone: |rStratholme" },

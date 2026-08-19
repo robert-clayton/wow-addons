@@ -1,7 +1,7 @@
 local _, MC = ...
 
 -- Classic mounts. Generated from the exact 85-row release manifest.
-MC.RegisterContent("classic", "mounts", {
+MC.RegisterContent("vanilla", "mounts", {
     { source = "drop", mounts = {
         { mountID = 17, name = "Felsteed", source = "drop", sourceInfo = "|cFFFFD200Class: |rWarlock" },
         { mountID = 41, name = "Warhorse", source = "drop", sourceInfo = "|cFFFFD200Paladin|r|n" },
