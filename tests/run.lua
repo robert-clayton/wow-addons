@@ -72,7 +72,7 @@ do
     }
     local mui = {
         Theme = { colors = colors },
-        Themes = { modern = true, simple = true },
+        Themes = { default = true },
         ChatPrefix = function() return "[Collectionist]" end,
         FormatGold = function(amount) return tostring(amount) end,
     }
@@ -349,7 +349,7 @@ do
             ttDropMob = color, ttDropRate = color, ttBoss = color, ttSpec = color,
             ttHintGreen = color, ttHintBlue = color,
         } },
-        Themes = { modern = true, simple = true },
+        Themes = { default = true },
         ChatPrefix = function() return "[Collectionist]" end,
         FormatGold = function(amount) return tostring(amount) end,
     }

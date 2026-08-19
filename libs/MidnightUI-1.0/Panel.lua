@@ -122,7 +122,7 @@ function PanelProto:ApplyBackdrop()
     -- Refresh title text fonts + colors (snapshot at creation). SetFont
     -- with unchanged values is a no-op, so themes sharing the default
     -- font render exactly as before; themes with their own font/outline
-    -- (ellesmere) re-skin live.
+    -- re-skin live.
     if f.titleBar and f.titleBar._titleFontStrings then
         local title = lib.Theme.colors.title
         for _, fs in ipairs(f.titleBar._titleFontStrings) do

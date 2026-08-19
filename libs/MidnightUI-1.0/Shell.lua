@@ -30,8 +30,9 @@ local HEADER_H    = 96
 local FOOTER_H    = 56
 local CONTENT_PAD = 24
 local GAP         = 8
-local MINI_W      = SIDEBAR_W + 240
-local MINI_H      = 48
+-- Strip: a slim one-line pill, not a second title bar.
+local MINI_W      = 280
+local MINI_H      = 30
 -- Compact state: condensed header height and tighter content padding.
 local COMPACT_HEADER_H = 52
 local COMPACT_PAD      = 12
@@ -223,6 +224,26 @@ function ShellProto:_CreateSidebar()
     version:SetText(opts.version and ("v" .. opts.version) or "")
     brand.version = version
 
+    -- Strip bar: the minimized state's own slim row (the 64px brand
+    -- block is far too heavy for a 30px strip). Hidden outside strip.
+    local strip = CreateFrame("Frame", nil, f)
+    strip:SetAllPoints(f)
+    strip:Hide()
+    f.stripBar = strip
+    self:_MakeDragHandler(strip)
+
+    local sIcon = strip:CreateTexture(nil, "ARTWORK")
+    sIcon:SetSize(14, 14)
+    sIcon:SetPoint("LEFT", strip, "LEFT", 10, 0)
+    if opts.icon then sIcon:SetTexture(opts.icon) end
+    strip.icon = sIcon
+
+    local sText = strip:CreateFontString(nil, "OVERLAY")
+    sText:SetFont(lib.FontBold(), 10, lib.FontFlags())
+    sText:SetPoint("LEFT", sIcon, "RIGHT", 8, 0)
+    sText:SetText(string.upper(opts.title or ""))
+    strip.text = sText
+
     -- Search input: present but hidden in the MVP (Phase 2 wires
     -- lib.MakeSearchInput + the row filter here).
     local search = CreateFrame("Frame", nil, f, "BackdropTemplate")
@@ -319,13 +340,17 @@ function ShellProto:_CreateHeader()
 end
 
 -- mode: "strip" (or legacy true), "compact", anything else = full.
+-- Also owns the counter's font: the slim strip needs body-size text,
+-- the full/compact headers the larger display cut.
 function ShellProto:_AnchorProgressText(mode)
     local f = self.frame
     local p = self.titleProgressText
     if not p then return end
+    local strip = (mode == "strip" or mode == true)
+    p:SetFont(lib.FontBold(), lib.Theme.fontSize + (strip and 0 or 5), lib.FontFlags())
     p:ClearAllPoints()
-    if (mode == "strip" or mode == true) and f.restoreBtn then
-        p:SetPoint("RIGHT", f.restoreBtn, "LEFT", -10, 0)
+    if strip and f.restoreBtn then
+        p:SetPoint("RIGHT", f.restoreBtn, "LEFT", -8, 0)
     elseif mode == "compact" and f.compactStripBtn then
         p:SetPoint("RIGHT", f.compactStripBtn, "LEFT", -10, 0)
     else
@@ -476,8 +501,8 @@ function ShellProto:_CreateFooter()
     -- its minimize button — is hidden while minimized).
     local restoreBtn = lib.MakeHeaderBtn(f, "+",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Restore", { width = 30, height = 30 })
-    restoreBtn:SetPoint("RIGHT", f, "RIGHT", -12, 0)
+        "Restore", { width = 20, height = 20 })
+    restoreBtn:SetPoint("RIGHT", f, "RIGHT", -6, 0)
     restoreBtn:Hide()
     restoreBtn:SetScript("OnClick", function()
         -- Strip restore always returns to the full state, even when the
@@ -658,9 +683,15 @@ function ShellProto:ApplyBackdrop()
     self:UpdateSpine()
 
     if self.titleProgressText then
-        self.titleProgressText:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
+        -- Size is mode-aware: the slim strip uses body-size text.
+        self:_AnchorProgressText(self:GetViewMode())
         local sa = c.scoreAccent
         self.titleProgressText:SetTextColor(sa[1], sa[2], sa[3])
+    end
+
+    if f.stripBar then
+        f.stripBar.text:SetFont(lib.FontBold(), 10, lib.FontFlags())
+        f.stripBar.text:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
     end
 
     if f.footer.scanBtn and f.footer.scanBtn._fill then
@@ -706,10 +737,9 @@ function ShellProto:_ApplyMinimizedVisuals()
     f.sidebarBg:Hide()
     f.sidebarLine:Hide()
     if f.searchInput then f.searchInput:Hide() end
-    -- The strip can be entered from compact, which hides the whole
-    -- brand block; re-show it (the version line alone stays hidden).
-    f.brand:Show()
-    f.brand.version:Hide()
+    -- The slim strip bar replaces the 64px brand block entirely.
+    f.brand:Hide()
+    if f.stripBar then f.stripBar:Show() end
     if f.dragger then f.dragger:Hide() end
     f:SetSize(MINI_W, MINI_H)
     self:_AnchorProgressText("strip")
@@ -728,6 +758,7 @@ function ShellProto:_ApplyCompactVisuals()
     f.sidebarLine:Hide()
     if f.searchInput then f.searchInput:Hide() end
     f.brand:Hide()
+    if f.stripBar then f.stripBar:Hide() end
     f.footer:Hide()
 
     local bar = f.titleBar
@@ -798,6 +829,7 @@ function ShellProto:_ApplyFullVisuals()
     f.sidebarLine:Show()
     f.brand:Show()
     f.brand.version:Show()
+    if f.stripBar then f.stripBar:Hide() end
     -- searchInput stays hidden in the MVP.
     local w, h = ClampSize(self.opts,
         db.panelWidth or self.opts.defaultWidth or 980,

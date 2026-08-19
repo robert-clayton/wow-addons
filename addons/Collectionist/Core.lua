@@ -414,24 +414,17 @@ function MC.SetExpansionEnabled(key, enabled)
 end
 
 --------------------------------------------------------------------------
--- Theme. Account-wide setting stored in CollectionistDB so all alts
--- share the same look. Falls back to "modern" on a fresh install.
+-- Theme. One look now; the selector is gone and UI style (classic /
+-- premium shells) is the appearance axis. Saved theme names from older
+-- versions ("modern"/"simple"/"ellesmere") are deliberately ignored.
+-- The accessors stay so a future second look can slot back in.
 --------------------------------------------------------------------------
 function MC.GetTheme()
-    -- Account-wide CollectionistDB is the primary read so a theme change
-    -- on any character propagates to every alt (last writer wins). It is
-    -- refreshed from CharDB on every PLAYER_LOGOUT snapshot, and SetTheme
-    -- dual-writes both. CharDB is the fallback for a first login before
-    -- the account value exists.
-    return (CollectionistDB and CollectionistDB.theme)
-        or (MC.db and MC.db.theme)
-        or "modern"
+    return "default"
 end
 
 function MC.SetTheme(name)
     if not (MUI and MUI.Themes and MUI.Themes[name]) then return end
-    if MC.db then MC.db.theme = name end
-    if CollectionistDB then CollectionistDB.theme = name end
     MUI.SetTheme(name)
 end
 
@@ -2149,15 +2142,6 @@ function MC.BuildConfig()
 
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "APPEARANCE" }
-    defs[#defs + 1] = { type = "dropdown", label = "Theme",
-        options = {
-            { label = "Modern", value = "modern" },
-            { label = "Simple", value = "simple" },
-            { label = "Ellesmere", value = "ellesmere" },
-        },
-        get = function() return MC.GetTheme() end,
-        set = function(v) MC.SetTheme(v) end,
-        onRefresh = MC.BuildConfig }
     defs[#defs + 1] = { type = "dropdown", label = "UI Style",
         options = {
             { label = "Simple (compact)", value = "classic" },
@@ -2202,7 +2186,6 @@ local function PrintHelp()
     print("  /mc sharing on|off|announce|sync|prune|clear|status - optional sharing")
     print("  /mc filter all|current|<expansion> - filter visible expansions")
     print("  /mc score - show your Collection Score breakdown")
-    print("  /mc theme modern|simple|ellesmere - switch UI theme")
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc version - show addon version")
@@ -2343,17 +2326,8 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             print(PREFIX .. " Sharing not loaded.")
         end
     elseif cmd == "theme" then
-        local a = (arg or ""):lower()
-        if a == "" or a == "status" then
-            print(format("%s Theme: %s", PREFIX, MC.GetTheme()))
-            print("    available: modern, simple, ellesmere")
-        elseif MUI.Themes[a] then
-            MC.SetTheme(a)
-            print(format("%s Theme set to %s.", PREFIX, a))
-            if MC.BuildConfig then MC.BuildConfig() end
-        else
-            print(PREFIX .. " /mc theme modern|simple|ellesmere")
-        end
+        -- Retired: one look now. /mc style picks the shell.
+        print(PREFIX .. " Themes have been retired — try /mc style classic|premium.")
     elseif cmd == "style" then
         local a = (arg or ""):lower()
         if a == "" or a == "status" then
