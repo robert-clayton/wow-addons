@@ -5,15 +5,17 @@ local MUI = LibStub("MidnightUI-1.0")
 local NAV_ROW_H = 32
 
 -- Per-module taglines for the Premium page header subtitle.
+-- No tagline repeats its module's name — the page title directly above
+-- already says it.
 local TAGLINES = {
-    mounts       = "Mounts you can still hunt down",
-    pets         = "Battle pets waiting to be caught",
-    decorations  = "Decor your housing is missing",
-    toys         = "Toys you haven't picked up yet",
-    recipes      = "Recipes your professions are missing",
-    rares        = "Rares still on your hit list",
-    treasures    = "Treasures left to uncover",
-    achievements = "Achievements within reach",
+    mounts       = "Still out there to hunt down",
+    pets         = "Waiting to be caught",
+    decorations  = "Missing from your housing stock",
+    toys         = "Not in your toybox yet",
+    recipes      = "Your professions haven't learned these",
+    rares        = "Still on the hit list",
+    treasures    = "Left to uncover",
+    achievements = "Within reach",
 }
 
 -- Canonical counts derivation, mirroring Roster's BuildLocalCounts
@@ -145,4 +147,6 @@ function Nav:RefreshCounts()
             row:SetCounts(ModuleCounts(mod))
         end
     end
+    -- Fresh scan results move the spine's lit segments too.
+    if self.panel and self.panel.UpdateSpine then self.panel:UpdateSpine() end
 end

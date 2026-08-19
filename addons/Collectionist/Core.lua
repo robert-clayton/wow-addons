@@ -1703,6 +1703,39 @@ function MC.CreatePanel()
             inspectorVisible = function()
                 return (MC.db and MC.db.rosterEnabled) and true or false
             end,
+            -- Collection spine data: per-source {collected, total} for
+            -- the active tab, filter-scoped like the 17/90 counter (both
+            -- read the same visible result sets). Recipes' per-skillLine
+            -- results don't fit the source shape — nil hides the spine.
+            spineData = function()
+                local mod = MC.modulesByKey[MC.activeModule]
+                local r = mod and mod.Scanner and mod.Scanner.results
+                if not r or not r.bySource or mod.key == "recipes" then return nil end
+                local per, order = {}, {}
+                local function bucket(src)
+                    if not per[src] then
+                        per[src] = { key = src, collected = 0, total = 0 }
+                        order[#order + 1] = src
+                    end
+                    return per[src]
+                end
+                for _, e in ipairs(r.collected or {}) do
+                    if e.source then
+                        local b = bucket(e.source)
+                        b.collected = b.collected + 1
+                        b.total = b.total + 1
+                    end
+                end
+                for src, entries in pairs(r.bySource) do
+                    local n = MC.CountObtainableEntries(entries)
+                    if n > 0 then bucket(src).total = bucket(src).total + n end
+                end
+                -- Alphabetical: stable across rescans (pairs order isn't).
+                table.sort(order)
+                local out = {}
+                for _, src in ipairs(order) do out[#out + 1] = per[src] end
+                return out
+            end,
         })
         -- PremiumNav duck-types TabBar's Create/SetActive/Reflow.
         MC.TabBar = MC.PremiumNav or MC.TabBar

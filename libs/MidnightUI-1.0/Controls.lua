@@ -115,10 +115,12 @@ function lib.MakeNavRow(parent, opts)
     count:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
     count:SetPoint("RIGHT", row, "RIGHT", -12, 0)
 
+    -- Disabled marker: small and quiet — an 8px square reads as a
+    -- rendering bug, a 4px tick reads as "switched off".
     local dot = row:CreateTexture(nil, "ARTWORK")
-    dot:SetSize(8, 8)
+    dot:SetSize(4, 4)
     dot:SetTexture(WHITE8)
-    dot:SetPoint("RIGHT", row, "RIGHT", -12, 0)
+    dot:SetPoint("RIGHT", row, "RIGHT", -14, 0)
     dot:Hide()
 
     row._active = false

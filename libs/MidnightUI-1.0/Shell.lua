@@ -15,7 +15,7 @@ if not lib then return end
 
 local SIDEBAR_W   = 220
 local BRAND_H     = 64
-local NAV_TOP     = 110
+local NAV_TOP     = 88
 local HEADER_H    = 96
 local FOOTER_H    = 56
 local CONTENT_PAD = 24
@@ -186,7 +186,7 @@ function ShellProto:_CreateSidebar()
     brand.icon = icon
 
     local wordmark = brand:CreateFontString(nil, "OVERLAY")
-    wordmark:SetFont(theme.font, theme.fontSize + 4, lib.FontFlags())
+    wordmark:SetFont(lib.FontBold(), theme.fontSize + 4, lib.FontFlags())
     wordmark:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, -1)
     wordmark:SetText(string.upper(opts.title or ""))
     brand.wordmark = wordmark
@@ -237,8 +237,12 @@ function ShellProto:_CreateHeader()
     hairline:SetTexture(WHITE8)
     bar.hairline = hairline
 
+    -- Collection spine segments (see UpdateSpine): pooled texture pairs
+    -- along the header's bottom edge.
+    bar.spineSegs = {}
+
     local title = bar:CreateFontString(nil, "OVERLAY")
-    title:SetFont(theme.font, theme.fontSize + 8, lib.FontFlags())
+    title:SetFont(lib.FontBold(), theme.fontSize + 9, lib.FontFlags())
     title:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD, -14)
     bar.pageTitle = title
 
@@ -254,7 +258,7 @@ function ShellProto:_CreateHeader()
     -- minimized strip keeps showing it; normally anchored into the
     -- header's bottom indicator strip.
     local progress = f:CreateFontString(nil, "OVERLAY")
-    progress:SetFont(theme.font, theme.fontSize + 5, lib.FontFlags())
+    progress:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
     self.titleProgressText = progress
     self:_AnchorProgressText(false)
 end
@@ -353,22 +357,31 @@ function ShellProto:_CreateFooter()
 
     local BTN = { width = 88, height = 30 }
 
-    -- Right side (right → left). Close is the primary action: accent
-    -- text with accent hover outline.
+    -- Right side (right → left). Scan is the one primary action in the
+    -- footer (accent text over an accent-tinted fill); Close merely
+    -- dismisses and stays quiet.
     local closeBtn = lib.MakeHeaderBtn(footer, "Close",
-        colors.accent, colors.btnTealHoverBg, colors.accent,
+        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Close", BTN)
     closeBtn:SetPoint("RIGHT", footer, "RIGHT", -CONTENT_PAD, 0)
     closeBtn:SetScript("OnClick", function() shell:Hide() end)
     footer.closeBtn = closeBtn
 
     local scanBtn = lib.MakeHeaderBtn(footer, "Scan",
-        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
+        colors.accent, colors.btnTealHoverBg, colors.accent,
         "Rescan all collection modules", BTN)
     scanBtn:SetPoint("RIGHT", closeBtn, "LEFT", -12, 0)
     scanBtn:SetScript("OnClick", function()
         if opts.onScan then opts.onScan(shell) end
     end)
+    -- Persistent accent-tinted fill; repainted in ApplyBackdrop (the
+    -- backdrop bg renders beneath regular textures, so this overlays it
+    -- and hover backdrop changes still read through the 12% wash).
+    local scanFill = scanBtn:CreateTexture(nil, "BACKGROUND")
+    scanFill:SetPoint("TOPLEFT", 1, -1)
+    scanFill:SetPoint("BOTTOMRIGHT", -1, 1)
+    scanFill:SetTexture(WHITE8)
+    scanBtn._fill = scanFill
     footer.scanBtn = scanBtn
 
     -- Left side (left → right).
@@ -487,10 +500,12 @@ function ShellProto:_CreateResizeDragger()
             local point, _, relativePoint, x, y = f:GetPoint()
             db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
             -- Re-set the scroll child width before the refresh so bar
-            -- fills computed off parent:GetWidth() see the new size.
+            -- fills computed off parent:GetWidth() see the new size, and
+            -- re-lay the spine segments at the new header width.
             if shell.scrollChild then
                 shell.scrollChild:SetWidth(shell:_ContentWidth())
             end
+            shell:UpdateSpine()
             if shell.opts.onRefresh then
                 if InCombatLockdown() then
                     local watcher = CreateFrame("Frame")
@@ -540,23 +555,29 @@ function ShellProto:ApplyBackdrop()
 
     local brand = f.brand
     brand.iconEdge:SetColorTexture(bd[1], bd[2], bd[3], 1)
-    brand.wordmark:SetFont(theme.font, theme.fontSize + 4, lib.FontFlags())
+    brand.wordmark:SetFont(lib.FontBold(), theme.fontSize + 4, lib.FontFlags())
     brand.wordmark:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
     brand.version:SetFont(theme.font, 9, lib.FontFlags())
     brand.version:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
 
     local bar = f.titleBar
-    local ac = c.accent
-    bar.hairline:SetColorTexture(ac[1], ac[2], ac[3], theme.titleBarBotStripeAlpha or 0.9)
-    bar.pageTitle:SetFont(theme.font, theme.fontSize + 8, lib.FontFlags())
+    bar.pageTitle:SetFont(lib.FontBold(), theme.fontSize + 9, lib.FontFlags())
     bar.pageTitle:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
     bar.pageSubtitle:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     bar.pageSubtitle:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
+    -- Hairline color is owned by UpdateSpine (accent when the spine has
+    -- no data, receded divider when it does).
+    self:UpdateSpine()
 
     if self.titleProgressText then
-        self.titleProgressText:SetFont(theme.font, theme.fontSize + 5, lib.FontFlags())
+        self.titleProgressText:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
         local sa = c.scoreAccent
         self.titleProgressText:SetTextColor(sa[1], sa[2], sa[3])
+    end
+
+    if f.footer.scanBtn and f.footer.scanBtn._fill then
+        local ac = c.accent
+        f.footer.scanBtn._fill:SetColorTexture(ac[1], ac[2], ac[3], 0.12)
     end
 
     local tc = c.scrollTrack
@@ -647,6 +668,7 @@ function ShellProto:ApplyMinimizeState()
         f:SetSize(w, h)
         if f.dragger and not db.locked then f.dragger:Show() end
         self:_AnchorProgressText(false)
+        self:UpdateSpine()
         if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
         if self.opts.onRefresh then self.opts.onRefresh(self) end
     end
@@ -683,6 +705,74 @@ function ShellProto:SetPageHeader(title, subtitle)
     if not bar then return end
     bar.pageTitle:SetText(title or "")
     bar.pageSubtitle:SetText(subtitle or "")
+    self:UpdateSpine()
+end
+
+-- The shell's signature element: a segmented "collection spine" along
+-- the header's bottom edge. One segment per source category of the
+-- active page, width proportional to that category's share of the
+-- collection; the lit run inside each segment is the share already
+-- collected. Structure as information — the accent line IS the data.
+-- Falls back to the plain accent hairline when the consumer supplies no
+-- spine data (module deferred, recipes, classic consumers).
+function ShellProto:UpdateSpine()
+    local bar = self.frame and self.frame.titleBar
+    if not bar or not bar.spineSegs then return end
+    local c = lib.Theme.colors
+    local segs = bar.spineSegs
+    local ok, data = true, nil
+    if self.opts.spineData then ok, data = pcall(self.opts.spineData) end
+    if not ok then data = nil end
+    local n = data and #data or 0
+    local grand = 0
+    if data then
+        for _, d in ipairs(data) do grand = grand + (d.total or 0) end
+    end
+    local barW = bar:GetWidth() or 0
+    if n == 0 or grand == 0 or barW < 200 then
+        for _, seg in ipairs(segs) do seg.base:Hide(); seg.lit:Hide() end
+        local ac = c.accent
+        bar.hairline:SetColorTexture(ac[1], ac[2], ac[3],
+            lib.Theme.titleBarBotStripeAlpha or 0.9)
+        return
+    end
+    -- Spine active: the hairline recedes to a divider under it.
+    local dv = c.optionsDivider
+    bar.hairline:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
+    local GAP_W = 2
+    local usable = barW - 2 * CONTENT_PAD - GAP_W * (n - 1)
+    local x = CONTENT_PAD
+    for i, d in ipairs(data) do
+        local seg = segs[i]
+        if not seg then
+            seg = {
+                base = bar:CreateTexture(nil, "ARTWORK", nil, 1),
+                lit  = bar:CreateTexture(nil, "ARTWORK", nil, 2),
+            }
+            seg.base:SetTexture(WHITE8); seg.base:SetHeight(3)
+            seg.lit:SetTexture(WHITE8);  seg.lit:SetHeight(3)
+            segs[i] = seg
+        end
+        local segW = math.max(usable * ((d.total or 0) / grand), 2)
+        local sc = (c.source and d.key and c.source[d.key]) or c.accent
+        seg.base:ClearAllPoints()
+        seg.base:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", x, 0)
+        seg.base:SetWidth(segW)
+        seg.base:SetColorTexture(sc[1], sc[2], sc[3], 0.22)
+        seg.base:Show()
+        local litW = segW * math.min((d.collected or 0) / math.max(d.total or 1, 1), 1)
+        if litW >= 1 then
+            seg.lit:ClearAllPoints()
+            seg.lit:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", x, 0)
+            seg.lit:SetWidth(litW)
+            seg.lit:SetColorTexture(sc[1], sc[2], sc[3], 0.95)
+            seg.lit:Show()
+        else
+            seg.lit:Hide()
+        end
+        x = x + segW + GAP_W
+    end
+    for i = n + 1, #segs do segs[i].base:Hide(); segs[i].lit:Hide() end
 end
 
 -- Config side-dock (MVP): delegates to the shared pooled options

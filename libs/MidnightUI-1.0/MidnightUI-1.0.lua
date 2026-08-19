@@ -305,10 +305,13 @@ lib.Themes.modern = {
 -- saturated teal accent, un-outlined condensed text.
 lib.Themes.ellesmere = {
     name = "Ellesmere",
-    -- Condensed squarish sans; nearest Blizzard built-in to the suite's
-    -- Expressway-style face.
-    font = "Fonts\\ARIALN.TTF",
-    fontSize = 12,   -- ARIALN@12 ~ FRIZQT@11 in visual mass
+    -- Barlow (SIL OFL), shipped in the lib's Media folder — a grotesque
+    -- with real character at UI sizes, replacing the ARIALN stand-in.
+    -- Path assumes the lib is embedded under Collectionist (its only
+    -- consumer); a missing file degrades to the previously set font.
+    font = "Interface\\AddOns\\Collectionist\\Libs\\MidnightUI-1.0\\Media\\Barlow-Regular.ttf",
+    fontBold = "Interface\\AddOns\\Collectionist\\Libs\\MidnightUI-1.0\\Media\\Barlow-SemiBold.ttf",
+    fontSize = 12,
 
     colors = {
         -- Flat near-black "hairline" UI, one saturated teal #0CD29D accent
@@ -444,6 +447,12 @@ lib.Themes.ellesmere = {
 -- render unchanged.
 function lib.FontFlags()
     return lib.Theme.fontOutline or "OUTLINE"
+end
+
+-- Display-weight face for titles/wordmarks. Themes without a fontBold
+-- (modern/simple) fall back to their body face.
+function lib.FontBold()
+    return lib.Theme.fontBold or lib.Theme.font
 end
 
 -- Theme hook registry. Frames that paint static visuals at creation
