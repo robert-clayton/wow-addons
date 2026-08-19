@@ -7,6 +7,15 @@ local theme = lib.Theme
 local PanelProto = {}
 PanelProto.__index = PanelProto
 
+-- Saved sizes can predate a raised minimum (or lowered maximum); bring
+-- them back inside the configured envelope. Defaults match the resize
+-- dragger's.
+local function ClampPanelSize(opts, w, h)
+    w = math.max(opts.minWidth or 240, math.min(opts.maxWidth or 600, w))
+    h = math.max(opts.minHeight or 120, math.min(opts.maxHeight or 900, h))
+    return w, h
+end
+
 function lib:CreatePanel(opts)
     local panel = setmetatable({}, PanelProto)
     panel.opts = opts
@@ -23,6 +32,12 @@ function PanelProto:Create()
 
     local w = db.panelWidth or opts.defaultWidth or 360
     local h = db.panelHeight or opts.defaultHeight or 520
+    w, h = ClampPanelSize(opts, w, h)
+    -- Write back so every later read of the saved size (un-minimize,
+    -- scroll content width) sees the clamped value. Only when a value was
+    -- saved: an untouched nil keeps tracking future default changes.
+    if db.panelWidth then db.panelWidth = w end
+    if db.panelHeight then db.panelHeight = h end
 
     local f = CreateFrame("Frame", (opts.name or "MidnightUIPanel") .. "Frame", UIParent, "BackdropTemplate")
     f:SetSize(w, h)
@@ -33,10 +48,12 @@ function PanelProto:Create()
     f:EnableMouse(true)
     self.frame = f
 
-    self:ApplyBackdrop()
     self:CreateTitleBar()
     self:CreateScrollFrame()
     self:CreateResizeDragger()
+    self:ApplyBackdrop()
+    -- Re-skin on live theme switch.
+    lib.RegisterThemeHook(function() self:ApplyBackdrop() end)
 
     local pos = db.position
     f:ClearAllPoints()
@@ -61,16 +78,62 @@ function PanelProto:Create()
     end
 end
 
--- Backdrop
+-- Backdrop. Delegates to the lib's skin protocol so theme decorations
+-- (top stripe, gradient, etc.) get applied consistently.
 function PanelProto:ApplyBackdrop()
     local f = self.frame
     local v = self.db.frameAlpha or 1.0
-    f:SetBackdrop(theme.backdrop)
-    f:SetBackdropColor(theme.colors.bg[1], theme.colors.bg[2], theme.colors.bg[3], theme.colors.bg[4] * v)
-    f:SetBackdropBorderColor(theme.colors.border[1], theme.colors.border[2], theme.colors.border[3], v)
+    lib.ApplyThemedBackdrop(f, { kind = "panel", alpha = v, borderAlpha = v })
+
+    -- Modern theme's NineSlice corners sit at the panel's TOPLEFT/etc.
+    -- and would occlude title-bar text + the first/last row. Re-anchor
+    -- the title bar inside the corner inset, and shrink the scroll
+    -- area's bottom and right edges by the same amount. Simple theme's
+    -- inset is 0, so anchors stay at the panel's edges.
+    local inset = lib.GetBorderInset()
     if f.titleBar then
-        f.titleBar:SetBackdropColor(theme.colors.titlebar[1], theme.colors.titlebar[2], theme.colors.titlebar[3], v)
-        f.titleBar:SetBackdropBorderColor(theme.colors.titleBorder[1], theme.colors.titleBorder[2], theme.colors.titleBorder[3], math.max(v, 0.4))
+        f.titleBar:ClearAllPoints()
+        f.titleBar:SetPoint("TOPLEFT", f, "TOPLEFT", inset, -inset)
+        f.titleBar:SetPoint("TOPRIGHT", f, "TOPRIGHT", -inset, -inset)
+        lib.ApplyThemedBackdrop(f.titleBar, { kind = "titlebar", alpha = v })
+    end
+    if f.scrollFrame then
+        local bottom = 4 + inset
+        local right = 9 + inset
+        f.scrollFrame:ClearAllPoints()
+        if f.tabBar then
+            f.scrollFrame:SetPoint("TOPLEFT", f.tabBar, "BOTTOMLEFT", 0, -1)
+        else
+            f.scrollFrame:SetPoint("TOPLEFT", f.titleBar, "BOTTOMLEFT", 0, -1)
+        end
+        f.scrollFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -right, bottom)
+    end
+    if f.scrollTrack then
+        f.scrollTrack:ClearAllPoints()
+        local titleH = (f.titleBar and f.titleBar:GetHeight()) or 24
+        local topOfsY = -(inset + titleH + 2 + ((f.tabBar and f.tabBar:GetHeight() + 2) or 0))
+        f.scrollTrack:SetPoint("TOPRIGHT", f, "TOPRIGHT", -(3 + inset), topOfsY)
+        f.scrollTrack:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -(3 + inset), 4 + inset)
+    end
+    if f.dragger then
+        f.dragger:ClearAllPoints()
+        f.dragger:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -(1 + inset), 1 + inset)
+    end
+    -- Refresh title text colors (snapshot at creation).
+    if f.titleBar and f.titleBar._titleFontStrings then
+        local title = lib.Theme.colors.title
+        for _, fs in ipairs(f.titleBar._titleFontStrings) do
+            fs:SetTextColor(title[1], title[2], title[3], title[4] or 1)
+        end
+    end
+    if self.titleProgressText then
+        local td = lib.Theme.colors.textDim
+        self.titleProgressText:SetTextColor(td[1] + 0.20, td[2] + 0.14, td[3] + 0.02)
+    end
+    -- Refresh icon vertex color (uses accent).
+    if f.titleBar and f.titleBar._titleIcon then
+        local ac = lib.Theme.colors.accent
+        f.titleBar._titleIcon:SetVertexColor(ac[1], ac[2], ac[3])
     end
 end
 
@@ -128,10 +191,8 @@ function PanelProto:CreateTitleBar()
     bar:SetHeight(24)
     bar:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
     bar:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
-    local v = db.frameAlpha or 1.0
-    bar:SetBackdrop(theme.backdrop)
-    bar:SetBackdropColor(theme.colors.titlebar[1], theme.colors.titlebar[2], theme.colors.titlebar[3], v)
-    bar:SetBackdropBorderColor(theme.colors.titleBorder[1], theme.colors.titleBorder[2], theme.colors.titleBorder[3], math.max(v, 0.4))
+    -- Backdrop colors + decoration applied by ApplyBackdrop at the
+    -- end of :Create() (and again on every theme switch).
     bar:EnableMouse(true)
     -- Drag tracking: a release that follows real cursor movement should not
     -- count as a click for the manual double-click detector below, otherwise
@@ -177,12 +238,12 @@ function PanelProto:CreateTitleBar()
         end
     end)
 
-    -- Gold crown bar (2px accent at the very top edge)
-    local crown = bar:CreateTexture(nil, "OVERLAY")
-    crown:SetHeight(2)
-    crown:SetPoint("TOPLEFT", bar, "TOPLEFT", 1, -1)
-    crown:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -1, -1)
-    crown:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2], theme.colors.accent[3], 0.70)
+    -- Top accent stripe + optional bottom stripe + gradient are now
+    -- managed by ApplyThemedBackdrop based on the active theme.
+
+    -- Track title font strings + the icon so ApplyBackdrop can refresh
+    -- their colors on theme switch.
+    bar._titleFontStrings = {}
 
     -- Icon
     if self.opts.icon then
@@ -191,21 +252,24 @@ function PanelProto:CreateTitleBar()
         profIcon:SetPoint("LEFT", bar, "LEFT", 8, 0)
         profIcon:SetTexture(self.opts.icon)
         profIcon:SetVertexColor(theme.colors.accent[1], theme.colors.accent[2], theme.colors.accent[3])
+        bar._titleIcon = profIcon
 
         local title = bar:CreateFontString(nil, "OVERLAY")
         title:SetFont(theme.font, theme.fontSize, "OUTLINE")
         title:SetPoint("LEFT", profIcon, "RIGHT", 5, 0)
         title:SetText(self.opts.title or "")
         title:SetTextColor(unpack(theme.colors.title))
+        bar._titleFontStrings[#bar._titleFontStrings + 1] = title
     else
         local title = bar:CreateFontString(nil, "OVERLAY")
         title:SetFont(theme.font, theme.fontSize, "OUTLINE")
         title:SetPoint("LEFT", bar, "LEFT", 8, 0)
         title:SetText(self.opts.title or "")
         title:SetTextColor(unpack(theme.colors.title))
+        bar._titleFontStrings[#bar._titleFontStrings + 1] = title
     end
 
-    -- Progress counter (warm dim gold)
+    -- Progress counter (warm dim gold; color refreshed in ApplyBackdrop)
     local progressText = bar:CreateFontString(nil, "OVERLAY")
     progressText:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
     progressText:SetTextColor(0.60, 0.50, 0.30)
@@ -273,14 +337,19 @@ function PanelProto:CreateScrollFrame()
     track:SetWidth(5)
     track:SetPoint("TOPRIGHT", f, "TOPRIGHT", -3, -26)
     track:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -3, 4)
-    local tc = theme.colors.scrollTrack
-    track:SetColorTexture(tc[1], tc[2], tc[3], tc[4])
 
     local thumb = scroll:CreateTexture(nil, "ARTWORK")
     thumb:SetWidth(5)
-    local stc = theme.colors.scrollThumb
-    thumb:SetColorTexture(stc[1], stc[2], stc[3], stc[4])
     thumb:Hide()
+
+    local function applyScrollTheme()
+        local tc = lib.Theme.colors.scrollTrack
+        track:SetColorTexture(tc[1], tc[2], tc[3], tc[4])
+        local stc = lib.Theme.colors.scrollThumb
+        thumb:SetColorTexture(stc[1], stc[2], stc[3], stc[4])
+    end
+    applyScrollTheme()
+    lib.RegisterThemeHook(applyScrollTheme)
 
     local function UpdateScrollBar()
         local viewH = scroll:GetHeight()
@@ -384,8 +453,8 @@ function PanelProto:CreateResizeDragger()
             -- on non-secure frames is technically allowed in combat, but the
             -- onRefresh below will rebuild rows and we don't want to rebuild
             -- mid-combat — defer it.
-            local newW = math.max(minW, math.min(maxW, math.floor(f:GetWidth())))
-            local newH = math.max(minH, math.min(maxH, math.floor(f:GetHeight())))
+            local newW, newH = ClampPanelSize(panel.opts,
+                math.floor(f:GetWidth()), math.floor(f:GetHeight()))
             db.panelWidth = newW
             db.panelHeight = newH
             f:SetWidth(newW)
@@ -456,10 +525,6 @@ function PanelProto:BuildConfigFrame()
     f:SetFrameStrata("HIGH")
     f:SetClampedToScreen(true)
     f:SetMovable(true)
-    f:SetBackdrop(theme.backdrop)
-    local obc = theme.colors.optionsBg
-    f:SetBackdropColor(obc[1], obc[2], obc[3], obc[4])
-    f:SetBackdropBorderColor(theme.colors.titleBorder[1], theme.colors.titleBorder[2], theme.colors.titleBorder[3], 1)
     f:Hide()
 
     if self.frame then
@@ -472,33 +537,32 @@ function PanelProto:BuildConfigFrame()
     local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     bar:SetHeight(24)
     bar:SetPoint("TOPLEFT"); bar:SetPoint("TOPRIGHT")
-    bar:SetBackdrop(theme.backdrop)
-    bar:SetBackdropColor(unpack(theme.colors.titlebar))
-    bar:SetBackdropBorderColor(unpack(theme.colors.titleBorder))
     bar:EnableMouse(true)
     bar:RegisterForDrag("LeftButton")
     bar:SetScript("OnDragStart", function() f:StartMoving() end)
     bar:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
 
-    -- Gold crown bar (matching main panel)
-    local crownCfg = bar:CreateTexture(nil, "OVERLAY")
-    crownCfg:SetHeight(2)
-    crownCfg:SetPoint("TOPLEFT", bar, "TOPLEFT", 1, -1)
-    crownCfg:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -1, -1)
-    crownCfg:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2], theme.colors.accent[3], 0.70)
-
     -- Left accent bar
     local acc = bar:CreateTexture(nil, "ARTWORK")
     acc:SetPoint("TOPLEFT"); acc:SetPoint("BOTTOMLEFT")
     acc:SetWidth(3)
-    acc:SetColorTexture(unpack(theme.colors.accent))
 
     -- Title
     local ttl = bar:CreateFontString(nil, "OVERLAY")
     ttl:SetFont(theme.font, theme.fontSize, "OUTLINE")
     ttl:SetPoint("LEFT", 8, 0)
     ttl:SetText("Options")
-    ttl:SetTextColor(unpack(theme.colors.title))
+
+    local function applyCfgTheme()
+        local th = lib.Theme
+        lib.ApplyThemedBackdrop(f, { kind = "options", alpha = th.colors.optionsBg[4] or 1, borderAlpha = 1 })
+        lib.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
+        acc:SetColorTexture(unpack(th.colors.accent))
+        ttl:SetFont(th.font, th.fontSize, "OUTLINE")
+        ttl:SetTextColor(unpack(th.colors.title))
+    end
+    applyCfgTheme()
+    lib.RegisterThemeHook(applyCfgTheme)
 
     -- Close
     local cls = lib.MakeHeaderBtn(bar, "x",

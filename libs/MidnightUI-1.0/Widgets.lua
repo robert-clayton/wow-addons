@@ -97,6 +97,7 @@ local function getPool(panel)
             divider  = { items = {}, idx = 0 },
             checkbox = { items = {}, idx = 0 },
             slider   = { items = {}, idx = 0 },
+            dropdown = { items = {}, idx = 0 },
         }
     end
     return panel._cfgPools
@@ -132,6 +133,11 @@ local function acquireSection(panel, body, yOff, text)
         fs:SetFont(theme.font, 9, "OUTLINE")
         w = { fs = fs }
         pool.items[pool.idx] = w
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                fs:SetFont(theme.font, 9, "OUTLINE")
+            end)
+        end
     end
     w.fs:ClearAllPoints()
     w.fs:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
@@ -152,6 +158,12 @@ local function acquireDivider(panel, body, yOff)
         fr:SetBackdropColor(dc[1], dc[2], dc[3], dc[4])
         w = { frame = fr }
         pool.items[pool.idx] = w
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                local dc2 = theme.colors.optionsDivider
+                fr:SetBackdropColor(dc2[1], dc2[2], dc2[3], dc2[4])
+            end)
+        end
     end
     w.frame:ClearAllPoints()
     w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
@@ -188,6 +200,11 @@ local function acquireCheckbox(panel, body, yOff, def)
         dnBtn:Hide()
         w = { frame = fr, lbl = lbl, upBtn = upBtn, dnBtn = dnBtn }
         pool.items[pool.idx] = w
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                lbl:SetFont(theme.font, 10, "OUTLINE")
+            end)
+        end
     end
     w.frame:ClearAllPoints()
     w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 6, yOff)
@@ -247,7 +264,7 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         lbl:SetFont(theme.font, 9, "OUTLINE")
         local bg = CreateFrame("Frame", nil, body, "BackdropTemplate")
         bg:SetSize(138, 14)
-        bg:SetBackdrop(theme.backdrop)
+        bg:SetBackdrop(theme.btnBackdrop)
         local slc = theme.colors.optionsSliderBg
         bg:SetBackdropColor(slc[1], slc[2], slc[3], slc[4])
         bg:SetBackdropBorderColor(0.25, 0.25, 0.3, 1)
@@ -257,7 +274,7 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         local valBox = CreateFrame("Frame", nil, body, "BackdropTemplate")
         valBox:SetPoint("LEFT", bg, "RIGHT", 4, 0)
         valBox:SetSize(44, 14)
-        valBox:SetBackdrop(theme.backdrop)
+        valBox:SetBackdrop(theme.btnBackdrop)
         valBox:SetBackdropColor(0, 0, 0, 0.5)
         valBox:SetBackdropBorderColor(0.25, 0.25, 0.3, 1)
         local valTxt = valBox:CreateFontString(nil, "OVERLAY")
@@ -271,6 +288,14 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         if th then th:Hide() end
         w = { lbl = lbl, frame = bg, fill = fill, valBox = valBox, valTxt = valTxt, slider = sl }
         pool.items[pool.idx] = w
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                lbl:SetFont(theme.font, 9, "OUTLINE")
+                valTxt:SetFont(theme.font, 9, "OUTLINE")
+                local slc = theme.colors.optionsSliderBg
+                bg:SetBackdropColor(slc[1], slc[2], slc[3], slc[4])
+            end)
+        end
     end
     w.lbl:ClearAllPoints()
     w.lbl:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
@@ -298,6 +323,105 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
     return yOff - 18
 end
 
+-- Single-select dropdown. `def.options` is `{ { label, value }, ... }`;
+-- `def.get()` returns the current value; `def.set(v)` applies it.
+-- Clicking the button opens MUI.MakeDropdown popup with the options.
+local function acquireDropdown(panel, body, yOff, def)
+    local pool = getPool(panel).dropdown
+    pool.idx = pool.idx + 1
+    local w = pool.items[pool.idx]
+    if not w then
+        local lbl = body:CreateFontString(nil, "OVERLAY")
+        lbl:SetFont(theme.font, 9, "OUTLINE")
+
+        local btn = CreateFrame("Button", nil, body, "BackdropTemplate")
+        btn:SetHeight(20)
+        btn:SetBackdrop(theme.btnBackdrop)
+        btn:SetBackdropColor(unpack(theme.colors.btnBg))
+        btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+
+        local valFs = btn:CreateFontString(nil, "OVERLAY")
+        valFs:SetFont(theme.font, 10, "OUTLINE")
+        valFs:SetPoint("LEFT", btn, "LEFT", 6, 0)
+        valFs:SetPoint("RIGHT", btn, "RIGHT", -18, 0)
+        valFs:SetJustifyH("LEFT")
+        valFs:SetTextColor(unpack(theme.colors.text))
+
+        local arrow = btn:CreateTexture(nil, "OVERLAY")
+        arrow:SetSize(8, 8)
+        arrow:SetPoint("RIGHT", btn, "RIGHT", -6, 0)
+        arrow:SetTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+        arrow:SetVertexColor(theme.colors.arrowColor[1], theme.colors.arrowColor[2], theme.colors.arrowColor[3])
+
+        local popup = lib.MakeDropdown()
+
+        btn:SetScript("OnEnter", function()
+            local h = theme.colors.btnTealHoverBg
+            btn:SetBackdropColor(h[1], h[2], h[3], h[4] or 1)
+        end)
+        btn:SetScript("OnLeave", function()
+            btn:SetBackdropColor(unpack(theme.colors.btnBg))
+        end)
+
+        w = { lbl = lbl, frame = btn, valFs = valFs, arrow = arrow, popup = popup }
+        pool.items[pool.idx] = w
+
+        -- One-time theme hook: re-apply backdrop and font/colors on
+        -- theme switch. (Pool items persist across config rebuilds, so
+        -- registering here doesn't accumulate per-BuildConfig.)
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                btn:SetBackdrop(theme.btnBackdrop)
+                btn:SetBackdropColor(unpack(theme.colors.btnBg))
+                btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+                lbl:SetFont(theme.font, 9, "OUTLINE")
+                valFs:SetFont(theme.font, 10, "OUTLINE")
+                valFs:SetTextColor(unpack(theme.colors.text))
+                arrow:SetVertexColor(theme.colors.arrowColor[1], theme.colors.arrowColor[2], theme.colors.arrowColor[3])
+            end)
+        end
+    end
+
+    w.lbl:ClearAllPoints()
+    w.lbl:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
+    w.lbl:SetText("|cff888888" .. (def.label or "") .. "|r")
+    w.lbl:Show()
+    yOff = yOff - 14
+
+    w.frame:ClearAllPoints()
+    w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff)
+    w.frame:SetPoint("TOPRIGHT", body, "TOPRIGHT", -8, yOff)
+
+    -- Display the option label whose value matches def.get().
+    local curVal = def.get()
+    local curLabel = tostring(curVal)
+    for _, opt in ipairs(def.options or {}) do
+        if opt.value == curVal then curLabel = opt.label; break end
+    end
+    w.valFs:SetText(curLabel)
+
+    -- Rebuild the click handler each refresh so it sees the latest
+    -- def.options / def.get / def.set / def.onRefresh.
+    w.frame:SetScript("OnClick", function()
+        if w.popup:IsShown() then w.popup:Hide(); return end
+        local items = {}
+        for _, opt in ipairs(def.options or {}) do
+            items[#items + 1] = {
+                label = opt.label,
+                selected = opt.value == def.get(),
+                onClick = function()
+                    def.set(opt.value)
+                    if def.onRefresh then def.onRefresh() end
+                end,
+            }
+        end
+        w.popup:ShowAt(w.frame, "BOTTOMLEFT", "TOPLEFT", items)
+    end)
+
+    w.frame:Show()
+    return yOff - 24
+end
+
 -- PopulateConfig implementation (called by PanelProto:_PopulateConfigBody)
 lib._populateConfigBody = function(panel, defs)
     local cfgFrame = panel.cfgFrame
@@ -319,6 +443,8 @@ lib._populateConfigBody = function(panel, defs)
             local fc = def.fillColor or { 0.40, 0.40, 0.40 }
             yOff = acquireSlider(panel, body, yOff, def.label, def.min, def.max, def.step,
                 def.get, def.set, fc[1], fc[2], fc[3])
+        elseif def.type == "dropdown" then
+            yOff = acquireDropdown(panel, body, yOff, def)
         end
     end
 

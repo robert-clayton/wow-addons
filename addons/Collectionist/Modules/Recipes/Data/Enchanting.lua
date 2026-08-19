@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -22,7 +23,7 @@ MC.EnchantingRecipes = {
         recipes = {
             { id = 1236085, name = "Enchant Boots - Farstrider's Hunt",      source = "vendor",         sourceInfo = "Construct V'anore, Silvermoon City", priority = 1, waypoint = LOC.ConstructVanore, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.RemnantOfAnguish, 500 } } },
             { id = 1236057, name = "Enchant Boots - Lynx's Dexterity",       source = "specialization", sourceInfo = "Amani Augments",                    priority = 3 },
-            { id = 1236072, name = "Enchant Boots - Shaladrassil's Roots",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",              priority = 4 },
+            { id = 1236072, name = "Enchant Boots - Shaladrassil's Roots",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",              priority = 4, score = T.epic },
         },
     },
     {
@@ -41,8 +42,8 @@ MC.EnchantingRecipes = {
             { id = 1236055, name = "Enchant Helm - Hex of Leeching",              source = "trainer",        sourceInfo = "Trainer (Skill 35)",     priority = 1 },
             { id = 1236070, name = "Enchant Helm - Blessing of Speed",            source = "trainer",        sourceInfo = "Trainer (Skill 50)",     priority = 1 },
             { id = 1236071, name = "Enchant Helm - Empowered Blessing of Speed",  source = "specialization", sourceInfo = "Haranir Heightening",    priority = 3 },
-            { id = 1236084, name = "Enchant Helm - Empowered Rune of Avoidance",  source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4 },
-            { id = 1236056, name = "Enchant Helm - Empowered Hex of Leeching",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4 },
+            { id = 1236084, name = "Enchant Helm - Empowered Rune of Avoidance",  source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4, score = T.epic },
+            { id = 1236056, name = "Enchant Helm - Empowered Hex of Leeching",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4, score = T.epic },
         },
     },
     {
@@ -52,8 +53,8 @@ MC.EnchantingRecipes = {
             { id = 1236061, name = "Enchant Shoulders - Flight of the Eagle",     source = "trainer",        sourceInfo = "Trainer (Skill 30)",     priority = 1 },
             { id = 1236090, name = "Enchant Shoulders - Thalassian Recovery",     source = "trainer",        sourceInfo = "Trainer (Skill 50)",     priority = 1 },
             { id = 1236091, name = "Enchant Shoulders - Silvermoon's Mending",    source = "specialization", sourceInfo = "Thalassian Talents",     priority = 3 },
-            { id = 1236076, name = "Enchant Shoulders - Amirdrassil's Grace",     source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4 },
-            { id = 1236062, name = "Enchant Shoulders - Akil'zon's Swiftness",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4 },
+            { id = 1236076, name = "Enchant Shoulders - Amirdrassil's Grace",     source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4, score = T.epic },
+            { id = 1236062, name = "Enchant Shoulders - Akil'zon's Swiftness",   source = "drop",           sourceInfo = "Heavy Trunk (Delves)",   priority = 4, score = T.epic },
         },
     },
     {
@@ -66,8 +67,8 @@ MC.EnchantingRecipes = {
             { id = 1236089, name = "Enchant Ring - Silvermoon's Tenacity",    source = "vendor",         sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1236088, name = "Enchant Ring - Silvermoon's Alacrity",    source = "specialization", sourceInfo = "Thalassian Talents",               priority = 3 },
             { id = 1236060, name = "Enchant Ring - Zul'jin's Mastery",        source = "specialization", sourceInfo = "Amani Augments",                   priority = 3 },
-            { id = 1236074, name = "Enchant Ring - Nature's Fury",            source = "drop",           sourceInfo = "Heavy Trunk (Delves)",             priority = 4 },
-            { id = 1236059, name = "Enchant Ring - Eyes of the Eagle",        source = "drop",           sourceInfo = "Zul'Aman (Treasure Drops)",        priority = 4, dropInfo = { rate = "~0.3%" } },
+            { id = 1236074, name = "Enchant Ring - Nature's Fury",            source = "drop",           sourceInfo = "Heavy Trunk (Delves)",             priority = 4, score = T.epic },
+            { id = 1236059, name = "Enchant Ring - Eyes of the Eagle",        source = "drop",           sourceInfo = "Zul'Aman (Treasure Drops)",        priority = 4, dropInfo = { rate = "~0.3%" }, score = T.epic },
         },
     },
     {
@@ -162,7 +163,7 @@ MC.EnchantingRecipes = {
             { id = 1281349, name = "Endless Codex of the Voidtouched",        source = "vendor",  sourceInfo = "Void Researcher Anomander",        priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1246909, name = "Self-Pouring Thalassian Sunwine",         source = "vendor",  sourceInfo = "Neriv, Eversong Woods",            priority = 1, waypoint = LOC.Neriv, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 } } },
             { id = 1246907, name = "Spellbound Tome of Thalassian Magics",    source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods",  priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.EnchantingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
-            { id = 1246908, name = "Rootflame Campfire",                      source = "drop",    sourceInfo = "Master Tailor's Surplus Reagents",  priority = 4, dropInfo = { rate = "~20%" } },
+            { id = 1246908, name = "Rootflame Campfire",                      source = "drop",    sourceInfo = "Master Tailor's Surplus Reagents",  priority = 4, dropInfo = { rate = "~20%" }, score = T.short },
             { id = 1246903, name = "Ren'dorei Postal Repository",            source = "drop",    sourceInfo = "Voidstorm (Treasure Drop)",         priority = 4 },
         },
     },

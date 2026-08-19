@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 -- NPC waypoint data: { mapID, x, y, "NPC Name" }
 -- Midnight uiMapIDs: Silvermoon=2393, Eversong=2395, Zul'Aman=2437, Harandar=2413, Voidstorm=2405

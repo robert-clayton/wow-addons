@@ -9,7 +9,7 @@ local _, MC = ...
 -- toggles for share/items/bnet, plus skip-if-unchanged caches).
 --
 -- Broadcasts:
---   PLAYER_LOGIN + 5s   one-shot, gated on rosterEnabled
+--   PLAYER_LOGIN + jitter   one-way snapshot, gated on explicit consent
 --   Counts changed      debounced 30s, suppressed when payload hash matches
 --   /mc roster announce force broadcast
 --   /mc roster sync     ask peers to re-broadcast
@@ -29,6 +29,73 @@ local DEFAULTS = {
     lastBitmap     = {},              -- channel -> last bitmap fingerprint
 }
 
+function MC.RosterCanShare()
+    return MC.db and MC.db.rosterEnabled == true
+       and mod.db and mod.db.share == true
+       and MC.Comms ~= nil
+end
+
+local pendingHashes = {}
+local broadcastPending = false
+local broadcastToken = 0
+
+function MC.RosterCancelPendingBroadcasts()
+    broadcastToken = broadcastToken + 1
+    broadcastPending = false
+    wipe(pendingHashes)
+end
+
+-- Peer data is fresh enough to skip an automatic sync request when any
+-- peer record was heard from inside this window.
+local FRESH_PEER_SECONDS = 3 * 86400
+local lastAutoRequestAt = 0
+
+local function HasFreshPeerData()
+    if not MC.RosterDB then return false end
+    local cutoff = time() - FRESH_PEER_SECONDS
+    for name, rec in pairs(MC.RosterDB) do
+        if type(name) == "string" and name:sub(1, 1) ~= "_"
+           and type(rec) == "table"
+           and rec.lastSeen and rec.lastSeen >= cutoff then
+            return true
+        end
+    end
+    return false
+end
+
+-- Ask guild peers to re-broadcast their counts. Peers' broadcasts are
+-- hash-deduped, so without ever asking, a fresh install sees nobody until
+-- someone's counts change. Automatic callers pass force=false: the request
+-- only goes out when the peer list is empty or stale, so fresh installs
+-- and returning players sync while guild-wide /reload waves stay quiet
+-- (everyone in the wave still has minutes-old peer records). Responders
+-- coalesce bursts behind their own 60s cooldown.
+function MC.RosterRequestSync(force)
+    if not (MC.RosterCanShare() and MC.Comms) then return false end
+    if not force then
+        if HasFreshPeerData() then return false end
+        local now = time()
+        if now - lastAutoRequestAt < 600 then return false end
+        lastAutoRequestAt = now
+    end
+    return MC.Comms:Send("r", "", "GUILD")
+end
+
+function MC.SetRosterEnabled(enabled, announce)
+    if not MC.db then return end
+    MC.db.rosterEnabled = enabled and true or false
+    if not enabled then
+        MC.RosterCancelPendingBroadcasts()
+        if MC.Comms and MC.Comms.ClearQueue then MC.Comms:ClearQueue() end
+    elseif announce and MC.RosterForceBroadcast then
+        MC.RosterForceBroadcast("GUILD")
+        -- First-enable is the fresh-install case: ask peers to introduce
+        -- themselves (no-op when we already have fresh peer data).
+        MC.RosterRequestSync(false)
+    end
+    if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+end
+
 -- Wired up from Core.lua at ADDON_LOADED.
 function MC.RosterInit()
     if not MC.db then return end
@@ -41,12 +108,16 @@ function MC.RosterInit()
     end
     mod.db = MC.db.roster
 
-    -- Old "Roster module disabled" -> new rosterEnabled = false.
+    -- Old "Roster module disabled" -> new rosterEnabled = false. Fresh
+    -- installs remain opted out until onboarding records explicit consent;
+    -- existing installs that already completed onboarding retain sharing.
     if MC.db.rosterEnabled == nil then
         if MC.db.disabledModules and MC.db.disabledModules.roster then
             MC.db.rosterEnabled = false
         else
-            MC.db.rosterEnabled = true
+            local consented = MC.db._onboardingShown
+                           or (CollectionistDB and CollectionistDB._onboardingShown)
+            MC.db.rosterEnabled = consented and true or false
         end
     end
 end
@@ -74,32 +145,30 @@ function MC.RosterPostLogin()
     -- so alts seen in earlier sessions can still be deduped.
     if MC.RosterRefreshBnetCache then MC.RosterRefreshBnetCache() end
 
-    if not (MC.db and MC.db.rosterEnabled) then return end
-    -- Randomized 5-30s jitter to spread login storms in big guilds. A
-    -- raid /reload wave with 30 players on the same fixed timer would
-    -- flood guild chat with `r` responses; jitter gives the queue time
-    -- to drain.
-    local delay = 5 + math.random() * 25
+    if not MC.RosterCanShare() then return end
+    -- Randomized announcement. Login only asks peers for a reply when our
+    -- peer data is missing or stale (see RosterRequestSync), so /reload
+    -- waves in large guilds stay one-way instead of going quadratic.
+    local delay = 15 + math.random() * 30
     C_Timer.After(delay, function()
-        -- Force-announce ourselves: clears the unchanged-hash guard so
-        -- peers see us after our /reload even when our counts didn't move.
+        if not MC.RosterCanShare() then return end
         MC.RosterForceBroadcast("GUILD")
-        -- Also ask online peers to re-broadcast their counts. Without
-        -- this, after /reload we only show whatever's in the saved file
-        -- and never learn about peers whose counts haven't changed.
-        if MC.Comms then MC.Comms:Send("r", "", "GUILD") end
+        -- After the force broadcast: it clears the outbound queue, which
+        -- would cancel a request queued before it.
+        MC.RosterRequestSync(false)
     end)
 end
 
 -- Wire format helpers. Single-char codes keep messages compact.
 local WIRE_KEY = {
-    mounts      = "m",
-    pets        = "p",
-    toys        = "t",
-    decorations = "d",
-    recipes     = "c",  -- 'c' for crafting; 'r' is taken by rares
-    rares       = "r",
-    treasures   = "x",
+    mounts       = "m",
+    pets         = "p",
+    toys         = "t",
+    decorations  = "d",
+    recipes      = "c",  -- 'c' for crafting; 'r' is taken by rares
+    rares        = "r",
+    treasures    = "x",
+    achievements = "a",
 }
 
 -- Per-module {collected, total} from the live scanners. Shared by the
@@ -113,7 +182,7 @@ local WIRE_KEY = {
 -- so peers broadcast consistent account-wide totals regardless of
 -- their local expansion filter. The byExpansion slice feeds the new
 -- 'e' wire messages and the Inspector's filter-aware peer columns.
-local function BuildLocalCounts()
+local function BuildLocalCounts(includePartial)
     local counts = {}
     local byExpansion = {}
     for _, m in ipairs(MC.modules) do
@@ -134,7 +203,11 @@ local function BuildLocalCounts()
                 if total > 0 then
                     counts[m.key] = { collected = learned, total = total }
                 end
-            else
+            elseif includePartial or not r._partial then
+                -- A partial snapshot (rows still streaming) would put
+                -- shrunken counts on the wire; hold the module out of
+                -- payloads until its scan comes back clean or settles.
+                -- The next debounced broadcast after that picks it up.
                 local total = r.totalAll or r.total
                 if total and total > 0 then
                     counts[m.key] = {
@@ -173,25 +246,16 @@ local function BuildPayload()
 end
 
 -- Build the Collection Score payload: "m:S:L,p:S:L,...". Score (S)
--- and legacy count (L) per module. Recipes aggregate score across all
--- skill lines (each profession returns its own per-result score).
+-- and legacy count (L) per module. Derived from MC.GetLocalScore so
+-- the broadcast and the local /mc score readout can never disagree;
+-- iterate MC.modules to keep the parts in a stable wire order.
 local function BuildScorePayload()
+    local _, _, byModule = MC.GetLocalScore(true)
     local parts = {}
     for _, m in ipairs(MC.modules) do
-        local r = m.Scanner and m.Scanner.results
-        if WIRE_KEY[m.key] and r then
-            local s, l = 0, 0
-            if m.key == "recipes" then
-                for _, sub in pairs(r) do
-                    if type(sub) == "table" and sub.score then
-                        s = s + sub.score
-                    end
-                end
-            else
-                s = r.score or 0
-                l = r.legacyCount or 0
-            end
-            parts[#parts + 1] = format("%s:%d:%d", WIRE_KEY[m.key], s, l)
+        local b = byModule[m.key]
+        if b then
+            parts[#parts + 1] = format("%s:%d:%d", WIRE_KEY[m.key], b.score, b.legacyCount)
         end
     end
     return table.concat(parts, ",")
@@ -200,13 +264,16 @@ end
 -- Aggregate the local Collection Score for tooltip / display use.
 -- Returns total, legacyCount, byModule, where byModule[modKey] =
 -- { score = S, legacyCount = L }. Used by the title-bar display and
--- the /mc score command.
-function MC.GetLocalScore()
+-- the /mc score command. excludePartial (wire payloads) leaves out
+-- modules whose snapshot is partial or that never scanned, so peers
+-- aren't sent transient zero/shrunken scores.
+function MC.GetLocalScore(excludePartial)
     local byModule = {}
     local total, legacy = 0, 0
     for _, m in ipairs(MC.modules) do
         local r = m.Scanner and m.Scanner.results
-        if WIRE_KEY[m.key] and r then
+        if WIRE_KEY[m.key] and r
+           and not (excludePartial and (r._partial or next(r) == nil)) then
             local s, l = 0, 0
             if m.key == "recipes" then
                 for _, sub in pairs(r) do
@@ -252,7 +319,9 @@ function MC.GetMeRosterEntry()
     local _, classToken = UnitClass("player")
     local me = UnitName("player")
     local meRealm = (GetRealmName() or ""):gsub("%s+", "")
-    local counts, byExpansion = BuildLocalCounts()
+    -- includePartial: the local "Me" row should show best-known numbers
+    -- even while a scan is still settling, matching the tab UI.
+    local counts, byExpansion = BuildLocalCounts(true)
     return {
         name              = me .. "-" .. meRealm,
         class             = classToken or "UNKNOWN",
@@ -278,108 +347,150 @@ local function cheapHash(s)
     return h
 end
 
--- Broadcast, suppressed when our payload hasn't changed.
+-- Queue one payload and write its dedupe hash only after the game API has
+-- accepted it. A failed/paused send therefore remains eligible for retry.
+local function QueueChanged(cache, cacheKey, hash, pendingKey, sendFn)
+    if cache[cacheKey] == hash or pendingHashes[pendingKey] == hash then return false end
+    pendingHashes[pendingKey] = hash
+    local queued = sendFn(function(sent)
+        if pendingHashes[pendingKey] == hash then pendingHashes[pendingKey] = nil end
+        if sent then
+            cache[cacheKey] = hash
+        elseif MC.RosterCanShare() then
+            MC.RosterDebouncedBroadcast(30)
+        end
+    end, pendingKey)
+    if not queued and pendingHashes[pendingKey] == hash then
+        pendingHashes[pendingKey] = nil
+    end
+    return queued and true or false
+end
+
+local function Destinations(channel)
+    local out = {
+        {
+            key = channel,
+            send = function(sub, payload, callback, queueKey)
+                return MC.Comms:Send(sub, payload, channel, nil, callback, queueKey)
+            end,
+            sendBitmap = function(fp, payload, callback, queueKey)
+                return MC.Comms:SendBitmap(fp, payload, channel, callback, queueKey)
+            end,
+        },
+    }
+    if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
+        out[#out + 1] = {
+            key = "BNET",
+            send = function(sub, payload, callback, queueKey)
+                return MC.Comms:BroadcastBNet(sub, payload, callback, queueKey)
+            end,
+            sendBitmap = function(fp, payload, callback, queueKey)
+                return MC.Comms:BroadcastBNetBitmap(fp, payload, callback, queueKey)
+            end,
+        }
+    end
+    return out
+end
+
+-- Broadcast a complete state snapshot, suppressed stream-by-stream when
+-- nothing changed. Guild and Battle.net keep independent delivery hashes.
 function MC.RosterBroadcastIfChanged(channel)
     channel = channel or "GUILD"
-    if not (MC.db and MC.db.rosterEnabled) then return end
-    if not mod.db or not mod.db.share then return end
-    if not MC.Comms then return end
+    if not MC.RosterCanShare() then return false end
 
     local payload = BuildPayload()
-    if payload == "" then return end
+    if payload == "" then return false end
+    local destinations = Destinations(channel)
+    local queuedAny = false
 
     local fullPayload = payload .. "|" .. GetClassToken() .. "|" .. (MC.version or "?")
     local h = cheapHash(fullPayload)
-    if mod.db.lastBroadcast[channel] ~= h then
-        mod.db.lastBroadcast[channel] = h
-        MC.Comms:Send("u", fullPayload, channel)
-        if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
-            MC.Comms:BroadcastBNet("u", fullPayload)
-        end
+    for _, dest in ipairs(destinations) do
+        local d = dest
+        queuedAny = QueueChanged(mod.db.lastBroadcast, d.key, h,
+            "u:" .. d.key,
+            function(callback, queueKey)
+                return d.send("u", fullPayload, callback, queueKey)
+            end) or queuedAny
     end
 
-    -- Per-expansion sub-totals: one 'e' message per expansion the
-    -- player has data for. Hash-deduped per (channel, expansion) so
-    -- expansions whose counts haven't changed don't re-broadcast.
-    -- 1.7.x peers don't have an 'e' handler and silently drop these.
     mod.db.lastBroadcastE = mod.db.lastBroadcastE or {}
-    mod.db.lastBroadcastE[channel] = mod.db.lastBroadcastE[channel] or {}
     for _, ep in ipairs(BuildExpansionPayloads()) do
-        local eh = cheapHash(ep.payload)
-        if mod.db.lastBroadcastE[channel][ep.expKey] ~= eh then
-            mod.db.lastBroadcastE[channel][ep.expKey] = eh
-            MC.Comms:Send("e", ep.payload, channel)
-            if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
-                MC.Comms:BroadcastBNet("e", ep.payload)
-            end
+        local expansion = ep
+        local eh = cheapHash(expansion.payload)
+        for _, dest in ipairs(destinations) do
+            local d = dest
+            mod.db.lastBroadcastE[d.key] = mod.db.lastBroadcastE[d.key] or {}
+            queuedAny = QueueChanged(mod.db.lastBroadcastE[d.key], expansion.expKey, eh,
+                "e:" .. d.key .. ":" .. expansion.expKey,
+                function(callback, queueKey)
+                    return d.send("e", expansion.payload, callback, queueKey)
+                end) or queuedAny
         end
     end
 
-    -- Collection Score: per-module score:legacyCount. Hash-deduped per
-    -- channel. 1.8.x peers without an 's' handler silently drop.
     local scorePayload = BuildScorePayload()
     if scorePayload ~= "" then
         mod.db.lastBroadcastS = mod.db.lastBroadcastS or {}
         local sh = cheapHash(scorePayload)
-        if mod.db.lastBroadcastS[channel] ~= sh then
-            mod.db.lastBroadcastS[channel] = sh
-            MC.Comms:Send("s", scorePayload, channel)
-            if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNet then
-                MC.Comms:BroadcastBNet("s", scorePayload)
-            end
+        for _, dest in ipairs(destinations) do
+            local d = dest
+            queuedAny = QueueChanged(mod.db.lastBroadcastS, d.key, sh,
+                "s:" .. d.key,
+                function(callback, queueKey)
+                    return d.send("s", scorePayload, callback, queueKey)
+                end) or queuedAny
         end
     end
 
-    -- v2: also broadcast the per-item bitmap. Skip when disabled or
-    -- before Bitmap:Init has run. SendBitmap / BroadcastBNetBitmap
-    -- transparently chunk the payload when it exceeds the 250-byte
-    -- wire limit (multi-expansion data will trigger this).
     if mod.db.shareItems and MC.Bitmap and MC.Bitmap.fingerprint then
         local bmp = MC.Bitmap:Build()
         if bmp then
             local fp = MC.Bitmap.fingerprint
             local bh = cheapHash(fp .. "|" .. bmp)
-            if mod.db.lastBitmap[channel] ~= bh then
-                mod.db.lastBitmap[channel] = bh
-                MC.Comms:SendBitmap(fp, bmp, channel)
-                if channel == "GUILD" and mod.db.shareBNet and MC.Comms.BroadcastBNetBitmap then
-                    MC.Comms:BroadcastBNetBitmap(fp, bmp)
-                end
+            for _, dest in ipairs(destinations) do
+                local d = dest
+                queuedAny = QueueChanged(mod.db.lastBitmap, d.key, bh,
+                    "b:" .. d.key,
+                    function(callback, queueKey)
+                        return d.sendBitmap(fp, bmp, callback, queueKey)
+                    end) or queuedAny
             end
         end
     end
+    return queuedAny
 end
 
--- /mc roster announce: bypass the skip-if-unchanged guard.
+-- /mc sharing announce: clear delivery hashes, then use the same complete
+-- snapshot path as automatic updates. Privacy gates still apply.
 function MC.RosterForceBroadcast(channel)
     channel = channel or "GUILD"
-    if not MC.Comms then return end
-    local payload = BuildPayload() .. "|" .. GetClassToken() .. "|" .. (MC.version or "?")
-    if mod.db then mod.db.lastBroadcast[channel] = nil end
-    MC.Comms:Send("u", payload, channel)
-
-    -- Also force-resend per-expansion sub-totals.
-    if mod.db and mod.db.lastBroadcastE then mod.db.lastBroadcastE[channel] = nil end
-    for _, ep in ipairs(BuildExpansionPayloads()) do
-        MC.Comms:Send("e", ep.payload, channel)
-    end
-
-    -- And the Collection Score.
-    if mod.db and mod.db.lastBroadcastS then mod.db.lastBroadcastS[channel] = nil end
-    local scorePayload = BuildScorePayload()
-    if scorePayload ~= "" then
-        MC.Comms:Send("s", scorePayload, channel)
-    end
+    if not MC.RosterCanShare() then return false end
+    if MC.Comms.ClearQueue then MC.Comms:ClearQueue() end
+    MC.RosterCancelPendingBroadcasts()
+    mod.db.lastBroadcast[channel] = nil
+    mod.db.lastBroadcast.BNET = nil
+    mod.db.lastBitmap[channel] = nil
+    mod.db.lastBitmap.BNET = nil
+    mod.db.lastBroadcastS = mod.db.lastBroadcastS or {}
+    mod.db.lastBroadcastS[channel] = nil
+    mod.db.lastBroadcastS.BNET = nil
+    mod.db.lastBroadcastE = mod.db.lastBroadcastE or {}
+    mod.db.lastBroadcastE[channel] = nil
+    mod.db.lastBroadcastE.BNET = nil
+    return MC.RosterBroadcastIfChanged(channel)
 end
 
--- 30s debounce for scanner-finished hooks.
-local broadcastPending = false
-function MC.RosterDebouncedBroadcast()
-    if broadcastPending then return end
+-- Debounce scanner-finished hooks into one state snapshot.
+function MC.RosterDebouncedBroadcast(delay)
+    if not MC.RosterCanShare() or broadcastPending then return end
     broadcastPending = true
-    C_Timer.After(30, function()
+    broadcastToken = broadcastToken + 1
+    local token = broadcastToken
+    C_Timer.After(delay or 30, function()
+        if token ~= broadcastToken then return end
         broadcastPending = false
-        MC.RosterBroadcastIfChanged()
+        if MC.RosterCanShare() then MC.RosterBroadcastIfChanged() end
     end)
 end
 
@@ -402,7 +513,7 @@ local function ParseUpdate(payload)
 end
 
 local function OnUpdateReceived(payload, sender)
-    if not MC.RosterDB then return end
+    if not (MC.RosterDB and MC.db and MC.db.rosterEnabled) then return end
     local parsed = ParseUpdate(payload)
     if not parsed.counts or next(parsed.counts) == nil then return end
 
@@ -432,7 +543,7 @@ end
 -- The Inspector reads this when its filter is set to a specific
 -- expansion; otherwise it falls back to the account-wide .counts.
 local function OnExpansionUpdateReceived(payload, sender)
-    if not MC.RosterDB then return end
+    if not (MC.RosterDB and MC.db and MC.db.rosterEnabled) then return end
     local expKey, rest = strsplit(":", payload, 2)
     if not (expKey and rest and expKey ~= "" and rest ~= "") then return end
 
@@ -470,7 +581,7 @@ end
 -- { score, legacyCount } and aggregated to peer.totalScore /
 -- peer.totalLegacyCount for at-a-glance access.
 local function OnScoreReceived(payload, sender)
-    if not MC.RosterDB then return end
+    if not (MC.RosterDB and MC.db and MC.db.rosterEnabled) then return end
     if not (payload and payload ~= "") then return end
 
     -- Drop our own echo.
@@ -501,31 +612,57 @@ local function OnScoreReceived(payload, sender)
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
 end
 
+local lastRequestResponseAt = 0
+local requestResponsePending = false
 local function OnRequestReceived(_, sender)
-    -- Someone (probably running /mc roster sync) wants everyone to
-    -- re-broadcast. Force-send our own update.
-    MC.RosterForceBroadcast("GUILD")
+    if not MC.RosterCanShare() or requestResponsePending then return end
+    local now = time()
+    -- A single global cooldown coalesces simultaneous sync requests from
+    -- multiple peers. Jitter keeps legitimate manual syncs from aligning.
+    if now - lastRequestResponseAt < 60 then return end
+    requestResponsePending = true
+    C_Timer.After(2 + math.random() * 6, function()
+        requestResponsePending = false
+        if not MC.RosterCanShare() then return end
+        lastRequestResponseAt = time()
+        MC.RosterForceBroadcast("GUILD")
+    end)
 end
 
-local function OnBitmapReceived(payload, sender)
-    if not (MC.RosterDB and MC.Bitmap) then return end
+local function OnBitmapReceived(payload, sender, _, generation)
+    if not (MC.RosterDB and MC.Bitmap and MC.db and MC.db.rosterEnabled) then return end
     local fp, bmp = strsplit("|", payload, 2)
     if not (fp and bmp) then return end
     -- Drop bitmaps from peers whose bit-layout doesn't match ours: their
     -- IDs would land at different bit positions and we'd report wrong
     -- ownership. They'll see the same and silently ignore ours.
     if fp ~= MC.Bitmap.fingerprint then return end
-    local owned = MC.Bitmap:Decode(bmp)
-    if not owned then return end
-
     -- Discard own echo
     local me = UnitName("player")
     local meRealm = GetRealmName():gsub("%s+", "")
     if sender == (me .. "-" .. meRealm) or sender == me then return end
 
     local rec = MC.RosterDB[sender] or {}
+    local generationStamp = generation
+        and tonumber((generation:match("^(%d+)%-"))) or nil
+    local priorStamp = rec.bitmap and rec.bitmap.generationStamp
+    if generationStamp and priorStamp then
+        if generationStamp < priorStamp then return end
+        if generationStamp == priorStamp
+           and generation <= (rec.bitmap.generation or "") then return end
+    end
+
+    local owned = MC.Bitmap:Decode(bmp)
+    if not owned then return end
+
     rec.name = sender
-    rec.bitmap = { fingerprint = fp, owned = owned, when = time() }
+    rec.bitmap = {
+        fingerprint = fp,
+        owned = owned,
+        when = time(),
+        generation = generation,
+        generationStamp = generationStamp,
+    }
     rec.lastSeen = time()
     MC.RosterDB[sender] = rec
 end
@@ -594,6 +731,8 @@ function MC.RosterClearHistory()
     if mod.db then
         mod.db.lastBroadcast = {}
         mod.db.lastBitmap    = {}
+        mod.db.lastBroadcastE = {}
+        mod.db.lastBroadcastS = {}
     end
     if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     if MC.RefreshPeerPanel    then MC.RefreshPeerPanel()    end
@@ -616,21 +755,22 @@ function MC.RosterSlashHandler(arg)
             (MC.db and MC.db.rosterEnabled) and "ON" or "OFF",
             count, count == 1 and "" or "s"))
     elseif arg == "on" then
-        if MC.db then MC.db.rosterEnabled = true end
+        MC.SetRosterEnabled(true, true)
         print(MC.PREFIX .. " Sharing turned ON.")
-        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
-        MC.RosterForceBroadcast("GUILD")
     elseif arg == "off" then
-        if MC.db then MC.db.rosterEnabled = false end
+        MC.SetRosterEnabled(false)
         print(MC.PREFIX .. " Sharing turned OFF.")
-        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
     elseif arg == "announce" then
-        MC.RosterForceBroadcast("GUILD")
-        print(MC.PREFIX .. " Sharing: broadcast sent to guild.")
+        if MC.RosterForceBroadcast("GUILD") then
+            print(MC.PREFIX .. " Sharing: broadcast queued for guild and enabled friends.")
+        else
+            print(MC.PREFIX .. " Sharing is off or no collection snapshot is ready.")
+        end
     elseif arg == "sync" then
-        if MC.Comms then
-            MC.Comms:Send("r", "", "GUILD")
+        if MC.RosterRequestSync(true) then
             print(MC.PREFIX .. " Sharing: requested updates from guild.")
+        else
+            print(MC.PREFIX .. " Turn Sharing on before requesting updates.")
         end
     elseif arg == "prune" then
         MC.RosterPrune()

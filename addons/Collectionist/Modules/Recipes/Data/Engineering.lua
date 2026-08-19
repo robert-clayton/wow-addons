@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -118,18 +119,18 @@ MC.EngineeringRecipes = {
     {
         name = "Bots",
         recipes = {
-            { id = 1229917, name = "M3DDY, Travel-Sized",    source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
-            { id = 1229922, name = "B1P, Scorcher of Souls",  source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
-            { id = 1261945, name = "B0P, Curator of Booms",   source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
-            { id = 1229926, name = "W-47CH D0G",              source = "discovery",      sourceInfo = "Recycling",                      priority = 2 },
+            { id = 1229917, name = "M3DDY, Travel-Sized",    source = "discovery",      sourceInfo = "Recycling",                      priority = 2, score = T.medium },
+            { id = 1229922, name = "B1P, Scorcher of Souls",  source = "discovery",      sourceInfo = "Recycling",                      priority = 2, score = T.medium },
+            { id = 1261945, name = "B0P, Curator of Booms",   source = "discovery",      sourceInfo = "Recycling",                      priority = 2, score = T.medium },
+            { id = 1229926, name = "W-47CH D0G",              source = "discovery",      sourceInfo = "Recycling",                      priority = 2, score = T.medium },
             { id = 1229924, name = "M3DDY",                   source = "specialization", sourceInfo = "Bits and Bots - Bots",           priority = 3 },
-            { id = 1229921, name = "HU5H, Nonchalant Pup",    source = "specialization", sourceInfo = "Bits and Bots - Bots (30 pts)", priority = 3 },
+            { id = 1229921, name = "HU5H, Nonchalant Pup",    source = "specialization", sourceInfo = "Bits and Bots - Bots (30 pts)", priority = 3, score = T.medium },
         },
     },
     {
         name = "Utility",
         recipes = {
-            { id = 1229928, name = "Wormhole Generator: Quel'Thalas", source = "discovery", sourceInfo = "Recycling", priority = 2 },
+            { id = 1229928, name = "Wormhole Generator: Quel'Thalas", source = "discovery", sourceInfo = "Recycling", priority = 2, score = T.medium },
         },
     },
     {
@@ -145,7 +146,7 @@ MC.EngineeringRecipes = {
             { id = 1229903, name = "Turbo-Junker's Multitool",        source = "specialization", sourceInfo = "Market Mobility - Engi Tools",    priority = 3 },
             { id = 1229897, name = "Sin'dorei Gilded Hardhat",        source = "specialization", sourceInfo = "Market Mobility - Mining",        priority = 3 },
             { id = 1229894, name = "Sin'dorei Headlamp",              source = "specialization", sourceInfo = "Market Mobility - Mining",        priority = 3 },
-            { id = 1229906, name = "Junker's Big Ol' Bag",            source = "specialization", sourceInfo = "Market Mobility - Engi (30 pts)", priority = 3 },
+            { id = 1229906, name = "Junker's Big Ol' Bag",            source = "specialization", sourceInfo = "Market Mobility - Engi (30 pts)", priority = 3, score = T.medium },
             { id = 1229902, name = "Sin'dorei Angler's Rod",          source = "specialization", sourceInfo = "Market Mobility - Fishing Rods",  priority = 3 },
             { id = 1229907, name = "Sin'dorei Snippers",              source = "specialization", sourceInfo = "Market Mobility - Tailoring",     priority = 3 },
             { id = 1229905, name = "Sin'dorei Clampers",              source = "specialization", sourceInfo = "Market Mobility - JC Tools",      priority = 3 },

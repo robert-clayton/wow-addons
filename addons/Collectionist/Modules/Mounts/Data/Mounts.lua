@@ -1,6 +1,7 @@
 local _, MC = ...
 
 local M = MC.MAP
+local T = MC.SCORE_TIERS
 
 -- Shared Ritual Sites gate. Several Ritual-Sites collectibles require both
 -- meta-achievements (Void Response Team + Ritual Site Disruptor) regardless
@@ -95,6 +96,7 @@ local VIVACIOUS_CHLOROCEROS_TASKS = {
 MC.MountSourceOrder = {
     "renown", "reputation", "drop", "achievement", "quest",
     "delve", "prey", "ritual_sites", "void_assaults",
+    "showdowns",
     "dungeon", "raid", "pvp",
     "worldevent", "profession", "vendor", "prepatch",
 }
@@ -102,6 +104,7 @@ MC.MountSourceLabels = {
     renown = "Renown", reputation = "Reputation", drop = "Rare Drop",
     achievement = "Achievement", quest = "Quest", delve = "Delve",
     prey = "Prey", ritual_sites = "Ritual Sites", void_assaults = "Void Assaults",
+    showdowns = "Void Showdowns",
     dungeon = "Dungeon", raid = "Raid", pvp = "PvP",
     worldevent = "World Event", profession = "Profession",
     vendor = "Vendor", prepatch = "Pre-Patch",
@@ -123,34 +126,34 @@ MC.RegisterContent("midnight", "mounts", {
             -- Silvermoon Court (factionID 2710)
             { mountID = 2761, name = "Crimson Silvermoon Hawkstrider", source = "renown", sourceInfo = "Caeris Fairdawn - Renown 17, Silvermoon Court",
               waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 17, factionName = "Silvermoon Court" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 17, factionName = "Silvermoon Court" }, score = T.long },
             { mountID = 2753, name = "Fiery Dragonhawk", source = "renown", sourceInfo = "Caeris Fairdawn - Renown 19, Silvermoon Court",
               waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 19, factionName = "Silvermoon Court" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 19, factionName = "Silvermoon Court" }, score = T.long },
 
             -- Amani Tribe (factionID 2696)
             { mountID = 2776, name = "Amani Blessed Bear", source = "renown", sourceInfo = "Magovu - Renown 17, Amani Tribe",
               waypoint = LOC.Magovu, zone = "Zul'Aman",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 17, factionName = "Amani Tribe" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 17, factionName = "Amani Tribe" }, score = T.long },
             { mountID = 2694, name = "Amani Windcaller", source = "renown", sourceInfo = "Magovu - Renown 19, Amani Tribe",
               waypoint = LOC.Magovu, zone = "Zul'Aman",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 19, factionName = "Amani Tribe" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 19, factionName = "Amani Tribe" }, score = T.long },
 
             -- Hara'ti (factionID 2704)
             { mountID = 2614, name = "Fierce Grimlynx", source = "renown", sourceInfo = "Naynar - Renown 16, Hara'ti",
               waypoint = LOC.Naynar, zone = "Harandar",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Harati, level = 16, factionName = "Hara'ti" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Harati, level = 16, factionName = "Hara'ti" }, score = T.long },
             { mountID = 2710, name = "Cerulean Sporeglider", source = "renown", sourceInfo = "Naynar - Renown 19, Hara'ti",
               waypoint = LOC.Naynar, zone = "Harandar",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Harati, level = 19, factionName = "Hara'ti" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Harati, level = 19, factionName = "Hara'ti" }, score = T.long },
 
             -- The Singularity (factionID 2699)
             { mountID = 2789, name = "Ravenous Shredclaw", source = "renown", sourceInfo = "Void Researcher Anomander - Renown 17, The Singularity",
               waypoint = LOC.Anomander, zone = "Voidstorm",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Singularity, level = 17, factionName = "The Singularity" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Singularity, level = 17, factionName = "The Singularity" }, score = T.long },
             { mountID = 2828, name = "Voidbound Stormray", source = "renown", sourceInfo = "Void Researcher Anomander - Renown 19, The Singularity",
               waypoint = LOC.Anomander, zone = "Voidstorm",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Singularity, level = 19, factionName = "The Singularity" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Singularity, level = 19, factionName = "The Singularity" }, score = T.long },
 
             -- Patch 12.0.5: Ritual Sites renown (Sergeant Vornin)
             { mountID = 2935, name = "Void-Touched Hawkstrider", source = "renown", sourceInfo = "Sergeant Vornin - 4,500 Voidlight Marl, Ritual Sites Renown 8",
@@ -166,10 +169,10 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 2792, name = "Frenzied Shredclaw", source = "reputation", sourceInfo = "Thraxadar - Exalted, Slayer's Duellum",
               waypoint = LOC.Thraxadar, zone = "Voidstorm",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Exalted", factionName = "Slayer's Duellum" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Exalted", factionName = "Slayer's Duellum" }, score = T.medium },
             { mountID = 2791, name = "Prowling Shredclaw", source = "reputation", sourceInfo = "Thraxadar - Exalted, Slayer's Duellum",
               waypoint = LOC.Thraxadar, zone = "Voidstorm",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Exalted", factionName = "Slayer's Duellum" } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Exalted", factionName = "Slayer's Duellum" }, score = T.medium },
             { mountID = 2764, name = "Duskbrute Harrower", source = "reputation", sourceInfo = "Slayer's Duellum Trove (Paragon cache drop)",
               zone = "Voidstorm",
               dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" } },
@@ -202,17 +205,17 @@ MC.RegisterContent("midnight", "mounts", {
               zone = "Voidstorm", dropInfo = { mob = "Zone rares", zone = "Voidstorm", rate = "~1%" } },
             -- Zul'Aman treasures
             { mountID = 2778, name = "Ancestral War Bear", source = "drop", sourceInfo = "Honored Warrior's Cache (4 Loa's Chosen trophies)",
-              waypoint = LOC.HonoredWarriorsCache, zone = "Zul'Aman", dropInfo = { mob = "Honored Warrior's Cache", zone = "Zul'Aman" } },
+              waypoint = LOC.HonoredWarriorsCache, zone = "Zul'Aman", dropInfo = { mob = "Honored Warrior's Cache", zone = "Zul'Aman" }, score = T.medium },
             { mountID = 2786, name = "Hexed Vilefeather Eagle", source = "drop", sourceInfo = "Abandoned Ritual Skull (1,000 Vile Essence)",
               waypoint = LOC.AbandonedRitualSkull, zone = "Zul'Aman", dropInfo = { mob = "Abandoned Ritual Skull", zone = "Zul'Aman" } },
             -- Harandar treasures
             { mountID = 2713, name = "Ruddy Sporeglider", source = "drop", sourceInfo = "Peculiar Cauldron (150 Crystalized Resin Fragments)",
-              waypoint = LOC.PeculiarCauldron, zone = "Harandar", dropInfo = { mob = "Peculiar Cauldron", zone = "Harandar" } },
+              waypoint = LOC.PeculiarCauldron, zone = "Harandar", dropInfo = { mob = "Peculiar Cauldron", zone = "Harandar" }, score = T.medium },
             { mountID = 2747, name = "Untainted Grove Crawler", source = "drop", sourceInfo = "Sporespawned Cache (ring Mycelium Gong)",
-              waypoint = LOC.SporespawnedCache, zone = "Harandar", dropInfo = { mob = "Sporespawned Cache", zone = "Harandar" } },
+              waypoint = LOC.SporespawnedCache, zone = "Harandar", dropInfo = { mob = "Sporespawned Cache", zone = "Harandar" }, score = T.trivial },
             -- Voidstorm treasures
             { mountID = 2790, name = "Insatiable Shredclaw", source = "drop", sourceInfo = "Final Clutch of Predaxas (lightning maze)",
-              waypoint = LOC.FinalClutchPredaxas, zone = "Voidstorm", dropInfo = { mob = "Final Clutch of Predaxas", zone = "Voidstorm" } },
+              waypoint = LOC.FinalClutchPredaxas, zone = "Voidstorm", dropInfo = { mob = "Final Clutch of Predaxas", zone = "Voidstorm" }, score = T.short },
         },
     },
 
@@ -229,11 +232,11 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2961, name = "Void-Corrupted Hex Eagle", source = "ritual_sites",
               sourceInfo = "Broken Throne Tier 2+ — pick up the Misplaced Ritual Candle under the nearby tree, place it in the empty skull, then click the candle cluster to summon the elite",
               waypoint = LOC.HexEagleRitual, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman",
-              dropInfo = { mob = "Void-Corrupted Hex Eagle (elite)", zone = "Broken Throne Ritual Site", rate = "Guaranteed" } },
+              dropInfo = { mob = "Void-Corrupted Hex Eagle (elite)", zone = "Broken Throne Ritual Site", rate = "Guaranteed" }, score = T.medium },
             { mountID = 2964, name = "Void-Touched Snapdragon", source = "ritual_sites",
               sourceInfo = "Daggerspine Point Tier 2+ — loot Washed-Up Kelp piles along the coast (1-2 per instance) for a chance to spawn the rare; otherwise spawns slimes",
               waypoint = LOC.DaggerspineKelpPiles, overworldWaypoint = LOC.DaggerspinePointEntrance, zone = "Eversong Woods",
-              dropInfo = { mob = "Void-Touched Snapdragon (rare)", zone = "Daggerspine Point Ritual Site", rate = "Very rare" } },
+              dropInfo = { mob = "Void-Touched Snapdragon (rare)", zone = "Daggerspine Point Ritual Site", rate = "Very rare" }, score = T.epic },
         },
     },
 
@@ -250,21 +253,21 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2829, name = "Lab-grown Stormray", source = "achievement", sourceInfo = "Staring Into The Void",
               achievementID = 62385 },
             { mountID = 2616, name = "Ivory Grimlynx", source = "achievement", sourceInfo = "Allied Race: Haranir",
-              achievementID = 61506 },
+              achievementID = 61506, score = T.short },
             { mountID = 2831, name = "Tenebrous Harrower", source = "achievement", sourceInfo = "Glory of the Midnight Raider",
-              achievementID = 61380, taskList = GLORY_RAIDER_TASKS },
+              achievementID = 61380, taskList = GLORY_RAIDER_TASKS, score = T.epic },
             { mountID = 2773, name = "Giganto Manis", source = "achievement", sourceInfo = "Glory of the Midnight Delver",
-              achievementID = 61906, taskList = GLORY_DELVER_TASKS },
+              achievementID = 61906, taskList = GLORY_DELVER_TASKS, score = T.epic },
             { mountID = 2842, name = "Arcanovoid Construct", source = "achievement", sourceInfo = "Let Me Solo Him: Nullaeus",
-              achievementID = 61799 },
+              achievementID = 61799, score = T.epic },
             { mountID = 2733, name = "Calamitous Carrion", source = "achievement", sourceInfo = "Midnight Keystone Master: Season One",
-              achievementID = 61256 },
+              achievementID = 61256, score = T.epic },
             { mountID = 2734, name = "Convalescent Carrion", source = "achievement", sourceInfo = "Midnight Keystone Legend: Season One",
-              achievementID = 61258 },
+              achievementID = 61258, score = T.legendary },
             { mountID = 2801, name = "Galactic Gladiator's Goredrake", source = "achievement", sourceInfo = "Gladiator: Midnight Season 1",
-              achievementID = 61188 },
+              achievementID = 61188, score = T.legendary },
             { mountID = 2755, name = "Umbral Dragonhawk", source = "achievement", sourceInfo = "Life of the Party",
-              achievementID = 62190 },
+              achievementID = 62190, score = T.medium },
         },
     },
 
@@ -275,7 +278,7 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2785, name = "Relinquished Scarlet Charger", source = "quest", sourceInfo = "Quest: Relinquishing Relics (Silvermoon City)",
               zone = "Silvermoon City" },
             { mountID = 2749, name = "Echo of Aln'sharan", source = "quest", sourceInfo = "Questline: The Legend of Aln'sharan + 500 Mysterious Skyshards",
-              zone = "Harandar", taskList = ALN_SHARAN_TASKS },
+              zone = "Harandar", taskList = ALN_SHARAN_TASKS, score = T.legendary },
         },
     },
 
@@ -288,7 +291,7 @@ MC.RegisterContent("midnight", "mounts", {
               cost = { currency = { MC.CURRENCY.Undercoin, 10000 } } },
             { mountID = 2840, name = "Silvermoon's Arcane Defender", source = "delve", sourceInfo = "Telemancer Astrandis - 10 Voidlight Marl, Delver's Journey Renown 5",
               waypoint = LOC.TelemancerAstrandis, zone = "Silvermoon City",
-              cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } } },
+              cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } }, score = T.epic },
         },
     },
 
@@ -301,8 +304,8 @@ MC.RegisterContent("midnight", "mounts", {
               cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 2000 } } },
             { mountID = 2770, name = "Preyseeker's Wrath", source = "prey", sourceInfo = "Construct V'anore - 2,550 Remnant of Anguish, Rank 10",
               waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
-              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 2550 } } },
-            { mountID = 2771, name = "Preyseeker's Nightmare", source = "prey", sourceInfo = "Prey: Nightmare Mode III achievement", achievementID = 42703 },
+              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 2550 } }, score = T.epic },
+            { mountID = 2771, name = "Preyseeker's Nightmare", source = "prey", sourceInfo = "Prey: Nightmare Mode III achievement", achievementID = 42703, score = T.epic },
         },
     },
 
@@ -322,7 +325,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "raid",
         mounts = {
             { mountID = 2607, name = "Ashes of Belo'ren", source = "raid", sourceInfo = "March on Quel'Danas (Mythic) - Midnight Falls",
-              dropInfo = { mob = "Midnight Falls", zone = "March on Quel'Danas", boss = true, rate = "~3 per kill (Mythic, current expansion)" } },
+              dropInfo = { mob = "Midnight Falls", zone = "March on Quel'Danas", boss = true, rate = "~3 per kill (Mythic, current expansion)" }, score = T.legendary },
         },
     },
 
@@ -376,7 +379,7 @@ MC.RegisterContent("midnight", "mounts", {
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } },
               achievementID = 62563,
-              taskList = MC.RitualSitesGate },
+              taskList = MC.RitualSitesGate, score = T.epic },
         },
     },
 

@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -72,8 +73,8 @@ MC.BlacksmithingRecipes = {
             { id = 1229657, name = "Spellbreaker's Warglaive",  source = "specialization", sourceInfo = "Weaponsmithing - Blades",          priority = 3 },
             { id = 1229658, name = "Spellbreaker's Blade",      source = "specialization", sourceInfo = "Weaponsmithing - Long Blades",     priority = 3 },
             { id = 1229659, name = "Farstrider's Mercy",        source = "specialization", sourceInfo = "Weaponsmithing - Short Blades",    priority = 3 },
-            { id = 1229653, name = "Blood Knight's Impetus",    source = "drop", sourceInfo = "Drop: Vaelgor (The Voidspire)",  priority = 4 },
-            { id = 1229655, name = "Bloomforged Greataxe",      source = "drop", sourceInfo = "Drop: Vorasius (The Voidspire)", priority = 4 },
+            { id = 1229653, name = "Blood Knight's Impetus",    source = "drop", sourceInfo = "Drop: Vaelgor (The Voidspire)",  priority = 4, score = T.epic },
+            { id = 1229655, name = "Bloomforged Greataxe",      source = "drop", sourceInfo = "Drop: Vorasius (The Voidspire)", priority = 4, score = T.epic },
         },
     },
     {
@@ -135,7 +136,7 @@ MC.BlacksmithingRecipes = {
             { id = 1230760, name = "Refulgent Razorstone",            source = "trainer",        sourceInfo = "Trainer (Skill 45)",                   priority = 1 },
             { id = 1265906, name = "Thalassian Skeleton Key",         source = "vendor",         sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
             { id = 1230758, name = "Refulgent Whetstone",             source = "specialization", sourceInfo = "Weaponsmithing - Weaponstones",        priority = 3 },
-            { id = 1230765, name = "Thalassian Master Repair Hammer", source = "specialization", sourceInfo = "Armorsmithing/Weaponsmithing Capstone", priority = 3 },
+            { id = 1230765, name = "Thalassian Master Repair Hammer", source = "specialization", sourceInfo = "Armorsmithing/Weaponsmithing Capstone", priority = 3, score = T.medium },
             { id = 1230768, name = "Murder Row Fishhook",             source = "drop",           sourceInfo = "Drop: Lithiel Cinderfury",             priority = 4 },
         },
     },
@@ -146,7 +147,7 @@ MC.BlacksmithingRecipes = {
             { id = 1276110, name = "Gilded Silvermoon Hanger",     source = "vendor", sourceInfo = "Caeris Fairdawn (Renown, 150 Moxie)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1276111, name = "Ren'dorei Anvil",              source = "vendor", sourceInfo = "Anomander (150 Moxie)",                priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1276112, name = "Masterwork Crafting Hammer",   source = "vendor", sourceInfo = "Eriden (150 Moxie)",                   priority = 1, waypoint = LOC.Eriden, cost = { currency = { MC.CURRENCY.BlacksmithingMoxie, 150 } } },
-            { id = 1276109, name = "Ornamental Silvermoon Hanger", source = "drop",   sourceInfo = "World Treasures (Eversong Woods)",     priority = 4, dropInfo = { rate = "~3%" } },
+            { id = 1276109, name = "Ornamental Silvermoon Hanger", source = "drop",   sourceInfo = "World Treasures (Eversong Woods)",     priority = 4, dropInfo = { rate = "~3%" }, score = T.medium },
         },
     },
 }

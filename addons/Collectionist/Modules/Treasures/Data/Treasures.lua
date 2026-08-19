@@ -9,13 +9,34 @@ MC.TreasureSourceLabels = {
 }
 
 MC.RegisterContent("midnight", "treasures", {
-    { source = "eversong",  achievementID = 61960, name = "Treasures of Eversong Woods",
+    { source = "eversong", achievementID = 61960, criteriaCount = 9,
+      criteriaNames = {
+          "Rookery Cache", "Gift of the Phoenix", "Gilded Armillary Sphere",
+          "Farstrider's Lost Quiver", "Burbling Paint Pot", "Triple-Locked Safebox",
+          "Forgotten Ink and Quill", "Antique Nobleman's Signet Ring", "Stone Vat of Wine",
+      }, name = "Treasures of Eversong Woods",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
-    { source = "zulaman",   achievementID = 62125, name = "Treasures of Zul'Aman",
+    { source = "zulaman", achievementID = 62125, criteriaCount = 7,
+      criteriaNames = {
+          "Honored Warrior's Cache", "Bait and Tackle", "Mrruk's Mangy Trove",
+          "Abandoned Nest", "Sealed Twilight Blade Bounty", "Burrow Bounty", "Secret Formula",
+      }, name = "Treasures of Zul'Aman",
       zoneMapID = MC.MAP.ZulAman, zone = "Zul'Aman" },
-    { source = "harandar",  achievementID = 61263, name = "Treasures of Harandar",
+    { source = "harandar", achievementID = 61263, criteriaCount = 9,
+      criteriaNames = {
+          "Failed Shroom Jumper's Satchel", "Sporelord's Fight Prize",
+          "Kemet's Simmering Cauldron", "Impenetrably Sealed Gourd", "Peculiar Cauldron",
+          "Burning Branch of the World Tree", "Reliquary's Lost Paintbrush",
+          "Gift of the Cycle", "Sporespawned Cache",
+      }, name = "Treasures of Harandar",
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
-    { source = "voidstorm", achievementID = 62126, name = "Treasures of Voidstorm",
+    { source = "voidstorm", achievementID = 62126, criteriaCount = 13,
+      criteriaNames = {
+          "Final Clutch of Predaxas", "Bloody Sack", "Stellar Stash", "Scout's Pack",
+          "Quivering Egg", "Discarded Energy Pike", "Half-Digested Viscera",
+          "Void-Shielded Tomb", "Malignant Chest", "Forgotten Researcher's Cache",
+          "Embedded Spear", "Exaliburn", "Faindel's Quiver",
+      }, name = "Treasures of Voidstorm",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
 })
 

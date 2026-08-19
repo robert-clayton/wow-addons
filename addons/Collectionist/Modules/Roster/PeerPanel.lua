@@ -7,10 +7,14 @@ local _, MC = ...
 local MUI = LibStub("MidnightUI-1.0", true)
 
 local FRAME
+local rerender  -- forward declaration: assigned below at file scope. The
+                -- inspector-filter dropdown's onClick closures reference
+                -- this and would otherwise resolve to a nil global at
+                -- click time.
 local activePeers = {}  -- ordered list of Name-Realm keys in comparison
 
 -- Inspector's own expansion filter. Initialized from the panel's
--- filter each time the inspector opens. Mutating this here doesn't
+-- filter once per open session. Mutating this here doesn't
 -- affect the panel filter (so the user can browse peer comparisons
 -- in a different scope without losing their main view).
 --
@@ -28,8 +32,8 @@ end
 local function inspectorFilterLabel()
     if not inspectorFilter then return "" end
     if inspectorFilter.mode == "all" then return "All" end
-    local key = inspectorFilter.mode == "single" and inspectorFilter.single
-                or (MC.GetLatestExpansion and MC.GetLatestExpansion())
+    if inspectorFilter.mode == "current" then return "Current" end
+    local key = inspectorFilter.single
     local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
     return e and e.label or (key or "?")
 end
@@ -45,10 +49,11 @@ local SIDE_PAD        = 14
 local LIST_GAP        = 12
 
 -- Column content height: renderColumn starts at -36 then drops -22 per
--- module row, plus a Collection Score row (+22, with a 4px gap above).
--- Stays constant across peer counts (columns are side-by-side, not
--- stacked), so the panel only grows in width.
-local COLUMN_CONTENT_H = 36 + 7 * 22 + 26
+-- module row (8 modules incl. achievements), plus a Collection Score
+-- row (+22, with a 4px gap above). Stays constant across peer counts
+-- (columns are side-by-side, not stacked), so the panel only grows in
+-- width.
+local COLUMN_CONTENT_H = 36 + 8 * 22 + 26
 local DEFAULT_PANEL_H  = TITLE_BAR_H + CONTENT_TOP_PAD + COLUMN_CONTENT_H + BOTTOM_PAD
 
 -- Smooth width/height transitions via OnUpdate lerp. Ease-out cubic so
@@ -109,15 +114,16 @@ local function progressColor(pct)
     return 1 - t, 1, 0
 end
 
-local MOD_DISPLAY_ORDER = { "mounts", "pets", "toys", "decorations", "recipes", "rares", "treasures" }
+local MOD_DISPLAY_ORDER = { "mounts", "pets", "toys", "decorations", "recipes", "rares", "treasures", "achievements" }
 local MOD_LABELS = {
-    mounts      = "Mounts",
-    pets        = "Pets",
-    toys        = "Toys",
-    decorations = "Decorations",
-    recipes     = "Recipes",
-    rares       = "Rares",
-    treasures   = "Treasures",
+    mounts       = "Mounts",
+    pets         = "Pets",
+    toys         = "Toys",
+    decorations  = "Decorations",
+    recipes      = "Recipes",
+    rares        = "Rares",
+    treasures    = "Treasures",
+    achievements = "Achievements",
 }
 
 local function classRGB(token)
@@ -181,8 +187,11 @@ local function buildPeerOrder()
     local soloRecords = {}  -- { name, entry } for non-deduped peers
 
     for k, rec in pairs(MC.RosterDB) do
+        -- rec.counts required: peers known only from a stray 's'/'e'/'b'
+        -- message (their 'u' update was dropped) stay stored but aren't
+        -- listed until real counts arrive — no phantom columns.
         if type(k) == "string" and k:sub(1, 1) ~= "_"
-           and type(rec) == "table" and k:find("-", 1, true) then
+           and type(rec) == "table" and rec.counts and k:find("-", 1, true) then
             local bnetID = cache[k]
             if bnetID then
                 local existing = seenBnet[bnetID]
@@ -236,29 +245,37 @@ local function build()
     if f.SetClipsChildren then f:SetClipsChildren(true) end
     f:Hide()
 
-    if theme and theme.backdrop then
-        f:SetBackdrop(theme.backdrop)
-        f:SetBackdropColor(theme.colors.bg[1], theme.colors.bg[2], theme.colors.bg[3], 0.97)
-        f:SetBackdropBorderColor(unpack(theme.colors.border))
-    end
-
     -- Title bar
     local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     bar:SetHeight(TITLE_BAR_H)
     bar:SetPoint("TOPLEFT")
     bar:SetPoint("TOPRIGHT")
-    if theme and theme.backdrop then
-        bar:SetBackdrop(theme.backdrop)
-        bar:SetBackdropColor(unpack(theme.colors.titlebar))
-        bar:SetBackdropBorderColor(unpack(theme.colors.titleBorder))
-    end
     f.titleBar = bar
 
     f.title = bar:CreateFontString(nil, "OVERLAY")
-    f.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 12, "OUTLINE")
+    -- SetText requires a font to already be assigned; theme hook
+    -- re-applies later on theme switch.
+    f.title:SetFont((MUI and MUI.Theme and MUI.Theme.font) or STANDARD_TEXT_FONT, 12, "OUTLINE")
     f.title:SetPoint("LEFT", 10, 0)
     f.title:SetText("Collection Inspector")
-    if theme then f.title:SetTextColor(unpack(theme.colors.title)) end
+
+    local function applyFrameTheme()
+        local th = MUI and MUI.Theme
+        if not th then return end
+        MUI.ApplyThemedBackdrop(f, { kind = "panel", alpha = 0.97 })
+        MUI.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
+        f.title:SetFont(th.font, 12, "OUTLINE")
+        f.title:SetTextColor(unpack(th.colors.title))
+    end
+    applyFrameTheme()
+    if MUI and MUI.RegisterThemeHook then
+        MUI.RegisterThemeHook(applyFrameTheme)
+        -- Column contents also paint via theme colors at build time, so
+        -- a re-render is needed when the user switches themes.
+        MUI.RegisterThemeHook(function()
+            if FRAME and FRAME:IsShown() then rerender(FRAME) end
+        end)
+    end
 
     if MUI and MUI.MakeHeaderBtn then
         local close = MUI.MakeHeaderBtn(bar, "x",
@@ -300,9 +317,14 @@ local function build()
         local popup = MUI.MakeDropdown()
         local function buildItems()
             if not inspectorFilter then return {} end
-            local currentKey = inspectorFilter.mode == "single" and inspectorFilter.single
-                               or (MC.GetLatestExpansion and MC.GetLatestExpansion())
             local items = {
+                { label = "Current (per module)",
+                  selected = inspectorFilter.mode == "current",
+                  onClick = function()
+                      inspectorFilter.mode = "current"
+                      if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                      if FRAME and FRAME:IsShown() then rerender(FRAME) end
+                  end },
                 { label = "All Expansions",
                   selected = inspectorFilter.mode == "all",
                   onClick = function()
@@ -316,7 +338,7 @@ local function build()
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,
-                        selected = inspectorFilter.mode ~= "all" and currentKey == key,
+                        selected = inspectorFilter.mode == "single" and inspectorFilter.single == key,
                         onClick = function()
                             inspectorFilter.mode = "single"
                             inspectorFilter.single = key
@@ -337,7 +359,8 @@ local function build()
         -- on every open (so the label tracks the panel filter) and
         -- after every selection.
         function f:RefreshFilterButton()
-            filterBtn:GetFontString():SetText(inspectorFilterLabel())
+            local fs = filterBtn:GetFontString()
+            if fs then fs:SetText(inspectorFilterLabel()) end
         end
     end
 
@@ -368,18 +391,27 @@ local function build()
     f.listRows = {}
 
     --------------------------------------------------------------------
-    -- Right-side comparison columns
+    -- Right-side horizontally scrollable comparison columns
     --------------------------------------------------------------------
     f.columns = {}
-    f.columnAnchor = CreateFrame("Frame", nil, f)
-    f.columnAnchor:SetPoint("TOPLEFT", f, "TOPLEFT",
+    local comparison = CreateFrame("ScrollFrame", nil, f)
+    comparison:SetPoint("TOPLEFT", f, "TOPLEFT",
         SIDE_PAD + LIST_WIDTH + LIST_GAP, -TITLE_BAR_H - CONTENT_TOP_PAD)
-    f.columnAnchor:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",
-        SIDE_PAD + LIST_WIDTH + LIST_GAP, BOTTOM_PAD)
-    f.columnAnchor:SetWidth(1)
+    comparison:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -SIDE_PAD, BOTTOM_PAD)
+    comparison:EnableMouseWheel(true)
+    f.comparisonScroll = comparison
+
+    f.columnAnchor = CreateFrame("Frame", nil, comparison)
+    f.columnAnchor:SetSize(COLUMN_WIDTH, COLUMN_CONTENT_H)
+    comparison:SetScrollChild(f.columnAnchor)
+    comparison:SetScript("OnMouseWheel", function(self, delta)
+        local maxScroll = math.max(f.columnAnchor:GetWidth() - self:GetWidth(), 0)
+        local nextScroll = self:GetHorizontalScroll() - delta * (COLUMN_WIDTH / 2)
+        self:SetHorizontalScroll(math.max(0, math.min(nextScroll, maxScroll)))
+    end)
 
     -- Empty-comparison hint text (shown when activePeers is empty)
-    f.emptyText = f:CreateFontString(nil, "OVERLAY")
+    f.emptyText = f.columnAnchor:CreateFontString(nil, "OVERLAY")
     f.emptyText:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
     f.emptyText:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT", 0, -8)
     f.emptyText:SetWidth(220)
@@ -472,7 +504,10 @@ local function acquireColumn(f, peerName)
     local col = f.columns[peerName]
     if not col then
         col = {}
-        col.frame = CreateFrame("Frame", nil, f)
+        -- Columns must be descendants of the ScrollFrame's scroll child;
+        -- anchoring an outer-panel child to it moves the frame but bypasses
+        -- the comparison viewport's clipping.
+        col.frame = CreateFrame("Frame", nil, f.columnAnchor)
         col.title = col.frame:CreateFontString(nil, "OVERLAY")
         col.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 12, "OUTLINE")
         col.title:SetPoint("TOPLEFT", col.frame, "TOPLEFT", 0, 0)
@@ -526,15 +561,17 @@ end
 
 -- Picks which {collected, total} to display for a given module on a
 -- given peer entry, respecting the inspector filter:
---   filter "all" or "current" → account-wide (entry.counts)
+--   filter "all"              → account-wide (entry.counts)
+--   filter "current"          → latest expansion's slice, like single
 --   filter "single"+expKey    → entry.countsByExpansion[expKey] if the
 --                               peer broadcast it; otherwise fall back
 --                               to account-wide so older peers (and
 --                               peers without that expansion's data)
 --                               still render something useful
 local function pickCounts(entry, modKey)
-    if inspectorFilter and inspectorFilter.mode == "single" then
-        local exp = inspectorFilter.single
+    if inspectorFilter and inspectorFilter.mode ~= "all" then
+        local exp = inspectorFilter.mode == "single" and inspectorFilter.single
+                    or (MC.GetLatestExpansion and MC.GetLatestExpansion(modKey))
         local byExp = exp and entry.countsByExpansion and entry.countsByExpansion[exp]
         if byExp and byExp[modKey] then return byExp[modKey] end
     end
@@ -605,7 +642,7 @@ end
 --           while outside the in-progress bounds).
 --   REMOVE: column fades to alpha 0 (becomes invisible), then panel
 --           shrinks (so nothing is visible past the new edge).
-local function rerender(f)
+function rerender(f)  -- forward-declared at top of file
     refreshList(f)
 
     local activeSet = {}
@@ -613,8 +650,18 @@ local function rerender(f)
 
     local n = #activePeers
     local rightWidth = math.max(COLUMN_WIDTH, n * COLUMN_WIDTH + math.max(0, n - 1) * COLUMN_GAP)
-    local totalW = SIDE_PAD + LIST_WIDTH + LIST_GAP + rightWidth + SIDE_PAD
+    local fixedWidth = SIDE_PAD + LIST_WIDTH + LIST_GAP + SIDE_PAD
+    local screenWidth = (UIParent and UIParent.GetWidth and UIParent:GetWidth()) or 1280
+    local visibleRightWidth = math.min(rightWidth,
+        math.max(COLUMN_WIDTH, screenWidth * 0.9 - fixedWidth))
+    local totalW = fixedWidth + visibleRightWidth
     local totalH = DEFAULT_PANEL_H
+    f.columnAnchor:SetWidth(rightWidth)
+    if f.comparisonScroll then
+        local maxScroll = math.max(rightWidth - visibleRightWidth, 0)
+        f.comparisonScroll:SetHorizontalScroll(
+            math.min(f.comparisonScroll:GetHorizontalScroll(), maxScroll))
+    end
 
     -- Identify columns that need to fade out (peer removed).
     local removing = {}
@@ -713,10 +760,9 @@ function MC.ShowPeerPanel(peerName)
             end
         end
     end
-    -- Initialize the inspector's filter from the panel filter on each
-    -- open. The user can change this independently inside the inspector
-    -- without affecting the main panel.
-    if MC.GetExpansionFilter then
+    -- Initialize only once per open session. Toggling a peer while the
+    -- Inspector is already visible must not reset its local filter.
+    if not inspectorFilter and MC.GetExpansionFilter then
         inspectorFilter = copyFilter(MC.GetExpansionFilter())
     end
     -- Even with empty activePeers we open the popup so the player can see

@@ -1,0 +1,68 @@
+name: Validate, package, and release Collectionist
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install LuaJIT
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit
+
+      - name: Run tests
+        run: |
+          luajit tests/toc_smoke.lua
+          luajit tests/run.lua
+
+      - name: Build self-contained addon zip
+        id: package
+        shell: pwsh
+        env:
+          EXPECTED_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: |
+          $archivePath = ./scripts/package.ps1 -ExpectedTag $env:EXPECTED_TAG
+          "archive_path=$archivePath" >> $env:GITHUB_OUTPUT
+
+      - name: Validate shipped files and references
+        shell: pwsh
+        run: ./scripts/validate-package.ps1 -ArchivePath '${{ steps.package.outputs.archive_path }}'
+
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: Collectionist
+          path: dist/Collectionist-*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-release:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: validate-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download validated package
+        uses: actions/download-artifact@v8
+        with:
+          name: Collectionist
+          path: dist
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/Collectionist-*.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true

@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -108,10 +109,10 @@ MC.InscriptionRecipes = {
     {
         name = "Darkmoon Cards & Sigils",
         recipes = {
-            { id = 1230070, name = "Darkmoon Dominion: Blood",  source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
-            { id = 1230071, name = "Darkmoon Dominion: Rot",    source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
-            { id = 1230072, name = "Darkmoon Dominion: Hunt",   source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
-            { id = 1230073, name = "Darkmoon Dominion: Void",   source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
+            { id = 1230070, name = "Darkmoon Dominion: Blood",  source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3, score = T.medium },
+            { id = 1230071, name = "Darkmoon Dominion: Rot",    source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3, score = T.medium },
+            { id = 1230072, name = "Darkmoon Dominion: Hunt",   source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3, score = T.medium },
+            { id = 1230073, name = "Darkmoon Dominion: Void",   source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3, score = T.medium },
             { id = 1230074, name = "Darkmoon Sigil: Blood",     source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
             { id = 1230075, name = "Darkmoon Sigil: Rot",       source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },
             { id = 1230076, name = "Darkmoon Sigil: Hunt",      source = "specialization", sourceInfo = "Darkmoon Curiosity",          priority = 3 },

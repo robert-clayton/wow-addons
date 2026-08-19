@@ -43,15 +43,31 @@ end
 -- The latest expansion with content registered. Computed lazily after
 -- all RegisterContent calls have run; used by the "Current" filter
 -- mode so it auto-advances when a new expansion's data ships.
-function MC.GetLatestExpansion()
-    if MC._latestExpansionKey then return MC._latestExpansionKey end
+function MC.GetLatestExpansion(moduleKey)
+    if moduleKey then
+        MC._latestExpansionByModule = MC._latestExpansionByModule or {}
+        if MC._latestExpansionByModule[moduleKey] then
+            return MC._latestExpansionByModule[moduleKey]
+        end
+    elseif MC._latestExpansionKey then
+        return MC._latestExpansionKey
+    end
     local best, bestOrder = nil, -1
-    for key in pairs(MC._registeredExpansions or {}) do
+    local registered = moduleKey
+        and MC._registeredExpansionsByModule
+        and MC._registeredExpansionsByModule[moduleKey]
+        or MC._registeredExpansions
+    for key in pairs(registered or {}) do
         local e = MC.EXPANSION_BY_KEY[key]
         if e and e.order > bestOrder then
             best, bestOrder = key, e.order
         end
     end
-    MC._latestExpansionKey = best or _highestDefinedExpansion()
-    return MC._latestExpansionKey
+    local resolved = best or (moduleKey and MC.GetLatestExpansion()) or _highestDefinedExpansion()
+    if moduleKey then
+        MC._latestExpansionByModule[moduleKey] = resolved
+    else
+        MC._latestExpansionKey = resolved
+    end
+    return resolved
 end

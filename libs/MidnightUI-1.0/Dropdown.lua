@@ -34,12 +34,20 @@ function lib.MakeDropdown()
     popup:SetClampedToScreen(true)
     popup:Hide()
 
-    if theme and theme.backdrop then
-        popup:SetBackdrop(theme.backdrop)
-        popup:SetBackdropColor(theme.colors.bg[1], theme.colors.bg[2],
-                               theme.colors.bg[3], 0.97)
-        popup:SetBackdropBorderColor(unpack(theme.colors.border))
+    -- Re-skin on theme change like every other widget, otherwise the
+    -- popup keeps whatever theme it was created under (SetBackdrop copies
+    -- colors at call time and never re-reads them).
+    local function applyTheme()
+        local t = lib.Theme
+        if t and t.backdrop then
+            popup:SetBackdrop(t.backdrop)
+            popup:SetBackdropColor(t.colors.bg[1], t.colors.bg[2],
+                                   t.colors.bg[3], 0.97)
+            popup:SetBackdropBorderColor(unpack(t.colors.border))
+        end
     end
+    applyTheme()
+    lib.RegisterThemeHook(applyTheme)
     popup._rows = {}
 
     -- Click-outside dismissal: a full-screen invisible frame one level

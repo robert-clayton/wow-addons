@@ -1,11 +1,26 @@
-local MAJOR, MINOR = "MidnightUI-1.0", 20260506
+local MAJOR, MINOR = "MidnightUI-1.0", 20260512
+
+-- No pre-gate hook wipe here: /reload resets all Lua state, so hooks
+-- can never accumulate across reloads — but a second addon embedding
+-- this lib WOULD hit a pre-gate wipe and destroy the first consumer's
+-- live theme hooks (NewLibrary then returns nil and nothing re-registers
+-- them). Same-MINOR duplicate loads simply return below; upgrades keep
+-- hooks via the `or {}` init on lib._themeHooks.
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
--- Reusing the same Theme table across lib reloads so consumers that cached
--- `local theme = lib.Theme` don't end up pointing at a stale copy.
-lib.Theme = lib.Theme or {}
-local _ThemeRebuild = {
+-- Theme registry. Two flavors:
+--   simple — flat panels, 1px borders, warm Midnight gold accent
+--   modern — TWW-inspired: slate-charcoal bg, amber bronze accent,
+--            gradient title bar, embossed buttons, softer edges
+--
+-- Consumers cache `local theme = lib.Theme`. We keep the same table
+-- identity across switches by mutating sub-tables in place — see
+-- _ApplyTheme below.
+lib.Themes = lib.Themes or {}
+
+lib.Themes.simple = {
+    name = "Simple",
     font = STANDARD_TEXT_FONT,
     fontSize = 11,
 
@@ -25,7 +40,6 @@ local _ThemeRebuild = {
         progressBg   = { 0.06, 0.05, 0.03, 1 },
         hoverBg      = { 1, 0.85, 0.5, 0.05 },
         headerBg     = { 0.04, 0.03, 0.02, 0.60 },
-        -- Header button colors
         btnBg        = { 0.08, 0.06, 0.04, 0.85 },
         btnBorder    = { 0.40, 0.30, 0.14, 0.9 },
         btnCloseFg   = { 0.80, 0.28, 0.22 },
@@ -34,7 +48,6 @@ local _ThemeRebuild = {
         btnTealFg    = { 0.85, 0.62, 0.18 },
         btnTealHoverBg  = { 0.20, 0.15, 0.04 },
         btnTealHoverBd  = { 0.85, 0.60, 0.15 },
-        -- Profession accent colors
         profAccent = {
             [171] = { 0.30, 0.80, 0.30 },  -- Alchemy
             [333] = { 0.55, 0.30, 0.90 },  -- Enchanting
@@ -46,27 +59,21 @@ local _ThemeRebuild = {
             [755] = { 0.82, 0.32, 0.62 },  -- Jewelcrafting
             [773] = { 0.42, 0.72, 0.90 },  -- Inscription
         },
-        -- Header elements
         headerHover    = { 1, 0.85, 0.5, 0.06 },
         headerDivider  = { 0.85, 0.62, 0.15, 0.10 },
         arrowColor     = { 0.55, 0.45, 0.25 },
         countDim       = { 0.55, 0.48, 0.35 },
         learnedAccent  = { 0.35, 0.55, 0.30, 1 },
         learnedDot     = { 0.30, 0.50, 0.25, 0.6 },
-        -- Count colors
         countComplete  = { 0.85, 0.62, 0.15 },
         countPartial   = { 0.92, 0.55, 0.15 },
         countNone      = { 0.50, 0.45, 0.36 },
-        -- Scrollbar
         scrollTrack    = { 0.04, 0.03, 0.02, 0.4 },
         scrollThumb    = { 0.72, 0.52, 0.15, 0.65 },
-        -- Options panel
         optionsBg      = { 0.04, 0.03, 0.02, 0.98 },
         optionsDivider = { 0.85, 0.62, 0.15, 0.10 },
         optionsSliderBg = { 0.02, 0.02, 0.01, 0.5 },
-        -- Row hover
         rowHover       = { 1, 0.85, 0.5, 0.05 },
-        -- Tooltip
         ttTitle     = { 0.92, 0.87, 0.78 },
         ttLabel     = { 0.62, 0.56, 0.46 },
         ttValue     = { 0.80, 0.76, 0.66 },
@@ -77,20 +84,15 @@ local _ThemeRebuild = {
         ttHintGreen = { 0.55, 0.78, 0.42 },
         ttHintBlue  = { 0.60, 0.72, 0.95 },
         ttCostBad   = { 1, 0.30, 0.25 },
-        -- Chat prefix color (warm gold)
         chat           = { 0.85, 0.65, 0.22 },
-        -- Source colors (covers Recipes, Mounts, Pets, Decorations sources)
         source = {
-            -- Recipes
             trainer        = { 0.35, 0.78, 0.30 },
             discovery      = { 0.90, 0.68, 0.20 },
             specialization = { 0.78, 0.50, 0.88 },
-            -- Shared
             vendor         = { 0.35, 0.62, 0.98 },
             drop           = { 0.90, 0.38, 0.28 },
             quest          = { 0.90, 0.78, 0.20 },
             achievement    = { 0.90, 0.70, 0.20 },
-            -- Mounts
             renown         = { 0.30, 0.60, 1.00 },
             reputation     = { 0.20, 0.50, 0.90 },
             delve          = { 0.55, 0.75, 0.90 },
@@ -101,16 +103,18 @@ local _ThemeRebuild = {
             worldevent     = { 0.70, 0.70, 0.70 },
             profession     = { 0.80, 0.50, 0.90 },
             prepatch       = { 0.60, 0.60, 0.60 },
-            -- Pets
             wild           = { 0.40, 0.90, 0.40 },
             treasure       = { 0.85, 0.65, 0.30 },
             tradingpost    = { 0.90, 0.55, 0.80 },
             event          = { 0.70, 0.70, 0.70 },
-            -- Decorations
             crafted        = { 0.80, 0.50, 0.90 },
         },
-        -- Dim "secondary" text on rows
         infoText        = { 0.45, 0.45, 0.45 },
+        indicatorText      = { 0.85, 0.85, 0.85 },
+        indicatorTextHover = { 1.00, 1.00, 1.00 },
+        tooltipSubtext     = { 0.70, 0.70, 0.70 },
+        scoreAccent        = { 0.95, 0.85, 0.45 },
+        scoreAccentHover   = { 1.00, 1.00, 0.65 },
     },
 
     backdrop = {
@@ -118,12 +122,245 @@ local _ThemeRebuild = {
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     },
-
     backdropSlim = {
         bgFile   = "Interface\\Buttons\\WHITE8x8",
     },
+    -- Small controls (16px buttons, 14px slider tracks). WoW corrupts
+    -- backdrop edges when edgeSize exceeds half the frame dimension, so
+    -- small frames always use a 1px edge regardless of theme.
+    btnBackdrop = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    },
+
+    -- Decoration flags. Consumers that paint extras (title-bar
+    -- stripes, button embossing, progress-bar highlight) read these.
+    titleBarTopStripe   = true,   -- 2px accent stripe at top edge of title bar
+    titleBarBotStripe   = false,
+    titleBarGradient    = false,  -- vertical gradient under titlebar bg color
+    buttonEmboss        = false,  -- 1px top-highlight + bottom-shadow on buttons
+    progressHighlight   = false,  -- 1px highlight line on top edge of progress fill
+    panelEdgeFile       = false,  -- whether the panel backdrop edge is a textured nine-slice (false = 1px line)
+    indicatorHoverUnderline = false,  -- 1px bronze underline under title-bar text buttons on hover
+    tabActiveGradient   = false,  -- vertical gradient on the active tab's background
+    rowSeparator        = false,  -- 1px hairline between item rows
 }
-for k, v in pairs(_ThemeRebuild) do lib.Theme[k] = v end
+
+lib.Themes.modern = {
+    name = "Modern",
+    font = STANDARD_TEXT_FONT,
+    fontSize = 11,
+
+    colors = {
+        -- TWW base UI: cool slate-charcoal with amber-bronze accent
+        bg           = { 0.080, 0.090, 0.112, 0.97 },
+        border       = { 0.32, 0.24, 0.13, 1 },
+        titlebar     = { 0.038, 0.044, 0.058, 1 },
+        titleBorder  = { 0.58, 0.44, 0.22, 0.95 },
+        accent       = { 0.82, 0.62, 0.32, 1 },
+        title        = { 0.96, 0.91, 0.78, 1 },
+        text         = { 0.85, 0.85, 0.88, 1 },
+        textDim      = { 0.45, 0.45, 0.50, 1 },
+        textComplete = { 0.86, 0.66, 0.34, 1 },
+        learned      = { 0.32, 0.55, 0.32, 0.55 },
+        progress     = { 0.86, 0.64, 0.32, 1 },
+        progressBg   = { 0.04, 0.046, 0.058, 1 },
+        hoverBg      = { 0.96, 0.82, 0.50, 0.07 },
+        headerBg     = { 0.03, 0.036, 0.046, 0.70 },
+        btnBg        = { 0.10, 0.085, 0.06, 0.92 },
+        btnBorder    = { 0.46, 0.36, 0.18, 0.95 },
+        btnCloseFg   = { 0.85, 0.36, 0.28 },
+        btnCloseHoverBg = { 0.32, 0.07, 0.05 },
+        btnCloseHoverBd = { 0.92, 0.36, 0.28 },
+        btnTealFg    = { 0.86, 0.66, 0.32 },
+        btnTealHoverBg  = { 0.22, 0.17, 0.07 },
+        btnTealHoverBd  = { 0.90, 0.70, 0.34 },
+        profAccent = {
+            [171] = { 0.30, 0.80, 0.30 },
+            [333] = { 0.55, 0.30, 0.90 },
+            [202] = { 0.35, 0.62, 1.00 },
+            [197] = { 0.90, 0.70, 0.22 },
+            [185] = { 0.82, 0.42, 0.22 },
+            [164] = { 0.72, 0.52, 0.30 },
+            [165] = { 0.60, 0.78, 0.38 },
+            [755] = { 0.82, 0.32, 0.62 },
+            [773] = { 0.42, 0.72, 0.90 },
+        },
+        headerHover    = { 0.96, 0.82, 0.50, 0.08 },
+        headerDivider  = { 0.86, 0.66, 0.32, 0.14 },
+        arrowColor     = { 0.62, 0.50, 0.28 },
+        countDim       = { 0.58, 0.52, 0.40 },
+        learnedAccent  = { 0.32, 0.55, 0.32, 1 },
+        learnedDot     = { 0.28, 0.50, 0.28, 0.6 },
+        countComplete  = { 0.86, 0.66, 0.32 },
+        countPartial   = { 0.93, 0.60, 0.20 },
+        countNone      = { 0.50, 0.46, 0.36 },
+        scrollTrack    = { 0.04, 0.046, 0.058, 0.55 },
+        scrollThumb    = { 0.82, 0.62, 0.32, 0.72 },
+        optionsBg      = { 0.05, 0.058, 0.072, 0.98 },
+        optionsDivider = { 0.86, 0.66, 0.32, 0.14 },
+        optionsSliderBg = { 0.02, 0.025, 0.032, 0.5 },
+        rowHover       = { 0.96, 0.82, 0.50, 0.06 },
+        ttTitle     = { 0.96, 0.91, 0.78 },
+        ttLabel     = { 0.65, 0.58, 0.46 },
+        ttValue     = { 0.85, 0.80, 0.70 },
+        ttDropMob   = { 1, 0.80, 0.45 },
+        ttDropRate  = { 1, 0.90, 0.42 },
+        ttBoss      = { 1, 0.48, 0.28 },
+        ttSpec      = { 0.80, 0.50, 0.88 },
+        ttHintGreen = { 0.55, 0.78, 0.42 },
+        ttHintBlue  = { 0.60, 0.72, 0.95 },
+        ttCostBad   = { 1, 0.30, 0.25 },
+        chat           = { 0.86, 0.66, 0.32 },
+        source = {
+            trainer        = { 0.35, 0.78, 0.30 },
+            discovery      = { 0.90, 0.68, 0.20 },
+            specialization = { 0.78, 0.50, 0.88 },
+            vendor         = { 0.35, 0.62, 0.98 },
+            drop           = { 0.90, 0.38, 0.28 },
+            quest          = { 0.90, 0.78, 0.20 },
+            achievement    = { 0.90, 0.70, 0.20 },
+            renown         = { 0.30, 0.60, 1.00 },
+            reputation     = { 0.20, 0.50, 0.90 },
+            delve          = { 0.55, 0.75, 0.90 },
+            prey           = { 0.80, 0.30, 0.50 },
+            dungeon        = { 0.70, 0.50, 0.90 },
+            raid           = { 0.90, 0.40, 0.60 },
+            pvp            = { 0.85, 0.30, 0.30 },
+            worldevent     = { 0.70, 0.70, 0.70 },
+            profession     = { 0.80, 0.50, 0.90 },
+            prepatch       = { 0.60, 0.60, 0.60 },
+            wild           = { 0.40, 0.90, 0.40 },
+            treasure       = { 0.85, 0.65, 0.30 },
+            tradingpost    = { 0.90, 0.55, 0.80 },
+            event          = { 0.70, 0.70, 0.70 },
+            crafted        = { 0.80, 0.50, 0.90 },
+        },
+        infoText        = { 0.50, 0.50, 0.52 },
+        indicatorText      = { 0.86, 0.86, 0.90 },
+        indicatorTextHover = { 1.00, 1.00, 1.00 },
+        tooltipSubtext     = { 0.72, 0.72, 0.76 },
+        scoreAccent        = { 0.95, 0.75, 0.40 },
+        scoreAccentHover   = { 1.00, 0.95, 0.62 },
+    },
+
+    backdrop = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeSize = 12,
+        insets   = { left = 3, right = 3, top = 3, bottom = 3 },
+    },
+    backdropSlim = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+    },
+    -- See the simple theme's note: small frames can't carry the 12px
+    -- nine-slice edge (edge corruption when edgeSize > frame/2).
+    btnBackdrop = {
+        bgFile   = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    },
+
+    titleBarTopStripe   = true,
+    titleBarBotStripe   = true,
+    titleBarGradient    = true,
+    buttonEmboss        = true,
+    progressHighlight   = true,
+    panelEdgeFile       = true,
+    indicatorHoverUnderline = true,
+    tabActiveGradient   = true,
+    rowSeparator        = true,
+    -- Atlas family for the panel's NineSlice border. The lib resolves
+    -- this at runtime (UI-Frame-Bronze is the TWW base UI's family);
+    -- if missing, falls back to the backdrop edgeFile above.
+    nineSliceFamily     = "UI-Frame-Bronze",
+}
+
+-- Theme hook registry. Frames that paint static visuals at creation
+-- time register a refresh callback so SetTheme can re-apply.
+lib._themeHooks = lib._themeHooks or {}
+
+function lib.RegisterThemeHook(fn)
+    lib._themeHooks[#lib._themeHooks + 1] = fn
+end
+
+function lib.FireThemeHooks()
+    for _, fn in ipairs(lib._themeHooks) do
+        local ok, err = pcall(fn)
+        if not ok then
+            -- A hook that errors must not block the rest. Print to chat
+            -- for diagnosis without taking the others down.
+            print("|cffff8080[MidnightUI]|r theme hook error: " .. tostring(err))
+        end
+    end
+end
+
+-- The canonical Theme reference. Kept stable across SetTheme calls so
+-- consumers that captured it as an upvalue still see live values.
+lib.Theme = lib.Theme or {}
+
+-- Recursive in-place merge: copies values from src into dst, replacing
+-- sub-tables key-by-key so cached references to dst.subtable stay valid.
+local function _wipeStaleKeys(dst, src)
+    -- Remove keys in dst that aren't present in the new theme.
+    -- Skip function values (methods like SourceColor/ProfAccentColor
+    -- are attached to lib.Theme after load and must survive SetTheme).
+    for k, v in pairs(dst) do
+        if src[k] == nil and type(v) ~= "function" then
+            dst[k] = nil
+        end
+    end
+end
+
+local function _deepMergeInto(dst, src)
+    for k, v in pairs(src) do
+        if type(v) == "table" then
+            if type(dst[k]) ~= "table" then dst[k] = {} end
+            -- For arrays of primitives (color tables {r,g,b[,a]}), wipe
+            -- and copy. For nested maps (colors.source, profAccent),
+            -- recurse so existing sub-table identities survive, and
+            -- also wipe stale keys at this level so removing a source
+            -- type or profession from one theme doesn't bleed across.
+            if v[1] ~= nil and type(v[1]) ~= "table" then
+                for i = 1, #dst[k] do dst[k][i] = nil end
+                for i = 1, #v do dst[k][i] = v[i] end
+                for kk, vv in pairs(v) do
+                    if type(kk) ~= "number" then dst[k][kk] = vv end
+                end
+            else
+                _wipeStaleKeys(dst[k], v)
+                _deepMergeInto(dst[k], v)
+            end
+        else
+            dst[k] = v
+        end
+    end
+end
+
+function lib.SetTheme(name)
+    local target = lib.Themes[name]
+    if not target then return false end
+    _wipeStaleKeys(lib.Theme, target)
+    if lib.Theme.colors then _wipeStaleKeys(lib.Theme.colors, target.colors) end
+    if lib.Theme.backdrop and target.backdrop then
+        _wipeStaleKeys(lib.Theme.backdrop, target.backdrop)
+    end
+    if lib.Theme.backdropSlim and target.backdropSlim then
+        _wipeStaleKeys(lib.Theme.backdropSlim, target.backdropSlim)
+    end
+    if lib.Theme.btnBackdrop and target.btnBackdrop then
+        _wipeStaleKeys(lib.Theme.btnBackdrop, target.btnBackdrop)
+    end
+    _deepMergeInto(lib.Theme, target)
+    lib._activeThemeName = name
+    lib.FireThemeHooks()
+    return true
+end
+
+function lib.GetActiveThemeName()
+    return lib._activeThemeName
+end
 
 function lib.ChatPrefix(name)
     local c = lib.Theme.colors.chat
@@ -157,7 +394,26 @@ function lib.Theme:CreateStyledFrame(parent, w, h, frameless)
     return f
 end
 
--- Pool class
+-- Initial palette load. Done AFTER every method has been attached to
+-- lib.Theme so the first SetTheme's _wipeStaleKeys can see them and
+-- skip them. Addon code overrides this with the saved theme at
+-- ADDON_LOADED before any frame is built.
+lib.SetTheme("simple")
+
+-- Pool: per-parent reuse of generic mouseable Frames.
+--   pool = lib.Pool:New()
+--   row = pool:Acquire(parent)   -- returns a fresh-or-recycled Frame, parented + Shown
+--   pool:ReleaseAll()            -- hides all active frames, returns them to the inactive list
+-- Designed for per-refresh churn in module UIs: every Refresh() does
+-- pool:ReleaseAll() at the start, then Acquire() per row. Frames carry
+-- a static OnEnter/OnLeave/OnMouseUp dispatcher; consumers stash
+-- per-refresh callbacks on the frame (row._onEnter etc.) instead of
+-- allocating a fresh closure per row.
+--
+-- GetOrCreate: caches lazily-created children on a parent under a
+-- string key. Use it for sub-textures / sub-fontstrings inside a pooled
+-- frame so they persist across release/reacquire instead of being
+-- recreated on every refresh.
 lib.Pool = {}
 lib.Pool.__index = lib.Pool
 
@@ -191,6 +447,16 @@ function lib.Pool:Acquire(parent)
         if frame._children then
             for _, child in pairs(frame._children) do
                 if child.Hide then child:Hide() end
+            end
+        end
+        -- Also hide _decor textures (row separators, etc.). They are
+        -- kept out of _children so a single consumer can persist them
+        -- across renders, but on reuse by a *different* consumer (e.g. a
+        -- header recycled from an item row) they must be cleared or the
+        -- decoration leaks. Every _decor user re-shows what it needs.
+        if frame._decor then
+            for _, tex in pairs(frame._decor) do
+                if tex.Hide then tex:Hide() end
             end
         end
     end
@@ -235,6 +501,33 @@ function lib.GetOrCreate(parent, key, createFn)
     return child
 end
 
+-- Cross-version gradient helper. Retail's SetGradient takes Color
+-- objects; legacy SetGradientAlpha takes raw rgba. Falls back to a flat
+-- color when neither path is available.
+function lib.SetGradient(tex, orientation, a, b)
+    if tex.SetGradient and CreateColor then
+        local ok = pcall(tex.SetGradient, tex, orientation,
+            CreateColor(a[1], a[2], a[3], a[4] or 1),
+            CreateColor(b[1], b[2], b[3], b[4] or 1))
+        if ok then return end
+    end
+    tex:SetColorTexture(a[1], a[2], a[3], a[4] or 1)
+end
+local _setGradient = lib.SetGradient
+
+-- Per-frame decoration texture cache. Keeps these out of `_children`
+-- which the pool's :Acquire hides on recycle; lets decoration helpers
+-- (ApplyThemedBackdrop, ApplyButtonEmboss, row separator, etc.) be
+-- called on pool-managed frames without losing the decoration on
+-- recycle.
+local function _decorTex(frame, key, layer, sublayer)
+    frame._decor = frame._decor or {}
+    if not frame._decor[key] then
+        frame._decor[key] = frame:CreateTexture(nil, layer or "OVERLAY", nil, sublayer)
+    end
+    return frame._decor[key]
+end
+
 -- CountColor (green if done, orange if partial, grey if 0)
 function lib.CountColor(done, total)
     local colors = lib.Theme.colors
@@ -259,21 +552,36 @@ function lib.FormatGold(copper)
     return table.concat(parts, " ")
 end
 
--- MakeHeaderBtn (text label button)
-function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip)
-    local theme = lib.Theme
+-- MakeHeaderBtn (text label button). `opts` is an optional table:
+--   opts.width, opts.height — defaults to { 16, 16 }
+function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip, opts)
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    btn:SetSize(16, 16)
-    btn:SetBackdrop(theme.backdrop)
-    btn:SetBackdropColor(unpack(theme.colors.btnBg))
-    btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+    btn:SetSize((opts and opts.width) or 16, (opts and opts.height) or 16)
     local lbl = btn:CreateFontString(nil, "OVERLAY")
-    lbl:SetFont(theme.font, 11, "OUTLINE")
+    lbl:SetFont(lib.Theme.font, 11, "OUTLINE")
     lbl:SetPoint("CENTER", 0, 1)
     lbl:SetText(label)
-    lbl:SetTextColor(unpack(fgColor))
+    btn:SetFontString(lbl)
     btn._label = lbl
     btn._fgColor = fgColor
+
+    -- All visual state lives in this closure so theme switches re-skin
+    -- the button without recreating it. The color tables (fgColor,
+    -- hoverBg, hoverBd, theme.colors.btnBg/btnBorder) are theme-managed
+    -- so a SetTheme that mutates them in place reflects automatically;
+    -- this hook re-runs SetBackdrop and the emboss decoration.
+    local function applyTheme()
+        local theme = lib.Theme
+        btn:SetBackdrop(theme.btnBackdrop)
+        btn:SetBackdropColor(unpack(theme.colors.btnBg))
+        btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+        lbl:SetFont(theme.font, 11, "OUTLINE")
+        lbl:SetTextColor(unpack(fgColor))
+        lib.ApplyButtonEmboss(btn)
+    end
+    applyTheme()
+    lib.RegisterThemeHook(applyTheme)
+
     btn:SetScript("OnEnter", function(s)
         btn:SetBackdropColor(unpack(hoverBg))
         btn:SetBackdropBorderColor(unpack(hoverBd))
@@ -285,8 +593,8 @@ function lib.MakeHeaderBtn(parent, label, fgColor, hoverBg, hoverBd, tooltip)
         end
     end)
     btn:SetScript("OnLeave", function()
-        btn:SetBackdropColor(unpack(theme.colors.btnBg))
-        btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+        btn:SetBackdropColor(unpack(lib.Theme.colors.btnBg))
+        btn:SetBackdropBorderColor(unpack(lib.Theme.colors.btnBorder))
         lbl:SetTextColor(unpack(fgColor))
         GameTooltip:Hide()
     end)
@@ -295,19 +603,26 @@ end
 
 -- MakeHeaderIconBtn (texture icon button)
 function lib.MakeHeaderIconBtn(parent, texPath, iconSize, fgColor, hoverBg, hoverBd, tooltip)
-    local theme = lib.Theme
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
     btn:SetSize(16, 16)
-    btn:SetBackdrop(theme.backdrop)
-    btn:SetBackdropColor(unpack(theme.colors.btnBg))
-    btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
     local icon = btn:CreateTexture(nil, "ARTWORK")
     icon:SetSize(iconSize, iconSize)
     icon:SetPoint("CENTER")
     icon:SetTexture(texPath)
-    icon:SetVertexColor(unpack(fgColor))
     btn._icon = icon
     btn._fgColor = fgColor
+
+    local function applyTheme()
+        local theme = lib.Theme
+        btn:SetBackdrop(theme.btnBackdrop)
+        btn:SetBackdropColor(unpack(theme.colors.btnBg))
+        btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+        icon:SetVertexColor(unpack(fgColor))
+        lib.ApplyButtonEmboss(btn)
+    end
+    applyTheme()
+    lib.RegisterThemeHook(applyTheme)
+
     btn:SetScript("OnEnter", function(s)
         btn:SetBackdropColor(unpack(hoverBg))
         btn:SetBackdropBorderColor(unpack(hoverBd))
@@ -319,8 +634,8 @@ function lib.MakeHeaderIconBtn(parent, texPath, iconSize, fgColor, hoverBg, hove
         end
     end)
     btn:SetScript("OnLeave", function()
-        btn:SetBackdropColor(unpack(theme.colors.btnBg))
-        btn:SetBackdropBorderColor(unpack(theme.colors.btnBorder))
+        btn:SetBackdropColor(unpack(lib.Theme.colors.btnBg))
+        btn:SetBackdropBorderColor(unpack(lib.Theme.colors.btnBorder))
         icon:SetVertexColor(unpack(btn._fgColor))
         GameTooltip:Hide()
     end)
@@ -581,6 +896,22 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
         strike:Hide()
     end
 
+    -- Row separator: 1px hairline at the bottom edge, visible only
+    -- when the active theme requests it (modern). Uses _decor so it
+    -- survives the pool's _children hide-walk on Acquire.
+    local sep = _decorTex(row, "rowSeparator", "ARTWORK")
+    sep:ClearAllPoints()
+    sep:SetHeight(1)
+    sep:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", pad, 0)
+    sep:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -pad, 0)
+    if theme.rowSeparator then
+        local d = theme.colors.headerDivider
+        sep:SetColorTexture(d[1], d[2], d[3], (d[4] or 0.10) * 0.6)
+        sep:Show()
+    else
+        sep:Hide()
+    end
+
     -- Stash callbacks on the row so the static OnEnter/OnLeave/OnMouseUp
     -- handlers in Pool:Acquire can dispatch without allocating closures.
     row._hoverTex     = hoverTex
@@ -637,4 +968,534 @@ function lib.HideEmptyMessage(parent)
     if parent._children and parent._children.emptyText then
         parent._children.emptyText:Hide()
     end
+end
+
+--------------------------------------------------------------------
+-- Skin protocol: helpers consumers call to paint themed backdrops,
+-- title bars, buttons, etc. Each manages its decoration textures via
+-- GetOrCreate so repeat calls are idempotent (necessary for live theme
+-- switches).
+--------------------------------------------------------------------
+
+
+-- Atlas-presence probe. C_Texture.GetAtlasInfo lands in 10.0+
+-- (Dragonflight); returns a struct for valid atlases, nil otherwise.
+local function _hasAtlas(name)
+    return C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(name) ~= nil
+end
+
+-- Probe-once cache of which Blizzard atlas families are available for
+-- the modern theme's NineSlice border. The TWW base UI uses
+-- "UI-Frame-Bronze"; older clients may not have it. The family must
+-- expose at minimum -CornerTopLeft / -CornerTopRight / -CornerBottomLeft
+-- / -CornerBottomRight + _<family>-Edge{Top,Bottom,Left,Right} tilers.
+local _atlasFamilyCache = nil
+local function _resolveAtlasFamily(preferred)
+    if _atlasFamilyCache ~= nil then return _atlasFamilyCache end
+    local candidates = { preferred, "UI-Frame-Bronze", "UI-Frame-Gold", "UI-Frame-Genericmetal" }
+    for _, fam in ipairs(candidates) do
+        if fam and _hasAtlas(fam .. "-CornerTopLeft") then
+            _atlasFamilyCache = fam
+            return fam
+        end
+    end
+    _atlasFamilyCache = false
+    return false
+end
+
+-- 9-slice border composed of 4 corner atlas pieces + 4 tiling edge
+-- atlases. Idempotent: textures are re-acquired from the frame's
+-- _decor cache. Pass nil/false `atlasFamily` to hide all pieces.
+-- Returns the resolved family (or false if none available).
+function lib.ApplyNineSliceBorder(frame, atlasFamily)
+    local tl = _decorTex(frame, "nsTL", "OVERLAY", 7)
+    local tr = _decorTex(frame, "nsTR", "OVERLAY", 7)
+    local bl = _decorTex(frame, "nsBL", "OVERLAY", 7)
+    local br = _decorTex(frame, "nsBR", "OVERLAY", 7)
+    local et = _decorTex(frame, "nsET", "OVERLAY", 6)
+    local eb = _decorTex(frame, "nsEB", "OVERLAY", 6)
+    local el = _decorTex(frame, "nsEL", "OVERLAY", 6)
+    local er = _decorTex(frame, "nsER", "OVERLAY", 6)
+
+    local resolved = atlasFamily and _resolveAtlasFamily(atlasFamily) or false
+    if not resolved then
+        for _, t in ipairs({ tl, tr, bl, br, et, eb, el, er }) do t:Hide() end
+        return false
+    end
+
+    -- Corners: atlas sized naturally (useAtlasSize = true).
+    tl:SetAtlas(resolved .. "-CornerTopLeft", true)
+    tl:ClearAllPoints(); tl:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0); tl:Show()
+
+    tr:SetAtlas(resolved .. "-CornerTopRight", true)
+    tr:ClearAllPoints(); tr:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0); tr:Show()
+
+    bl:SetAtlas(resolved .. "-CornerBottomLeft", true)
+    bl:ClearAllPoints(); bl:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0); bl:Show()
+
+    br:SetAtlas(resolved .. "-CornerBottomRight", true)
+    br:ClearAllPoints(); br:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0); br:Show()
+
+    -- Edges: underscore-prefixed atlas variants are the tiling versions
+    -- in Blizzard's atlas naming convention.
+    et:SetAtlas("_" .. resolved .. "-EdgeTop", false)
+    et:ClearAllPoints()
+    et:SetPoint("TOPLEFT", tl, "TOPRIGHT", 0, 0)
+    et:SetPoint("TOPRIGHT", tr, "TOPLEFT", 0, 0)
+    et:SetHeight(tl:GetHeight())
+    et:SetHorizTile(true)
+    et:Show()
+
+    eb:SetAtlas("_" .. resolved .. "-EdgeBottom", false)
+    eb:ClearAllPoints()
+    eb:SetPoint("BOTTOMLEFT", bl, "BOTTOMRIGHT", 0, 0)
+    eb:SetPoint("BOTTOMRIGHT", br, "BOTTOMLEFT", 0, 0)
+    eb:SetHeight(bl:GetHeight())
+    eb:SetHorizTile(true)
+    eb:Show()
+
+    el:SetAtlas("_" .. resolved .. "-EdgeLeft", false)
+    el:ClearAllPoints()
+    el:SetPoint("TOPLEFT", tl, "BOTTOMLEFT", 0, 0)
+    el:SetPoint("BOTTOMLEFT", bl, "TOPLEFT", 0, 0)
+    el:SetWidth(tl:GetWidth())
+    el:SetVertTile(true)
+    el:Show()
+
+    er:SetAtlas("_" .. resolved .. "-EdgeRight", false)
+    er:ClearAllPoints()
+    er:SetPoint("TOPRIGHT", tr, "BOTTOMRIGHT", 0, 0)
+    er:SetPoint("BOTTOMRIGHT", br, "TOPRIGHT", 0, 0)
+    er:SetWidth(tr:GetWidth())
+    er:SetVertTile(true)
+    er:Show()
+
+    return resolved
+end
+
+-- Inset (in px) that NineSlice corner textures consume off the
+-- frame's inner content area. Consumers anchor inside this margin so
+-- corner atlases don't occlude the title text / first row / etc.
+-- Returns 0 when no NineSlice is active; otherwise reports the actual
+-- corner atlas height from C_Texture.GetAtlasInfo.
+function lib.GetBorderInset()
+    local fam = lib.Theme.nineSliceFamily
+    if not fam then return 0 end
+    if not _resolveAtlasFamily(fam) then return 0 end
+    local resolved = _atlasFamilyCache
+    if not resolved then return 0 end
+    local info = C_Texture and C_Texture.GetAtlasInfo
+        and C_Texture.GetAtlasInfo(resolved .. "-CornerTopLeft")
+    return (info and info.height) or 8
+end
+
+-- Apply a themed backdrop to a frame.
+--   opts.kind        — "panel" | "titlebar" | "options" (palette pick)
+--   opts.alpha       — multiplier on bg alpha (default 1)
+--   opts.borderAlpha — explicit border alpha (default opts.alpha)
+-- Frames using "titlebar" get extra decoration based on theme flags
+-- (top stripe, bottom stripe, gradient).
+function lib.ApplyThemedBackdrop(frame, opts)
+    opts = opts or {}
+    local kind = opts.kind or "panel"
+    local theme = lib.Theme
+    local v = opts.alpha or 1.0
+    local bv = opts.borderAlpha or v
+
+    frame:SetBackdrop(theme.backdrop)
+    local bgKey = (kind == "options" and "optionsBg") or (kind == "titlebar" and "titlebar") or "bg"
+    local borderKey = (kind == "titlebar" and "titleBorder") or "border"
+    local bg = theme.colors[bgKey]
+    local bd = theme.colors[borderKey]
+    local bgA = (bg[4] or 1) * v
+    frame:SetBackdropColor(bg[1], bg[2], bg[3], bgA)
+    local minBorder = (kind == "titlebar") and 0.4 or 0
+    frame:SetBackdropBorderColor(bd[1], bd[2], bd[3], math.max(bv, minBorder))
+
+    -- NineSlice atlas border for "panel" / "options" frames (not
+    -- titlebars — too small for a 9-slice). Themes that opt in via
+    -- nineSliceFamily get bronze atlas corners + tiling edges; if the
+    -- atlas doesn't resolve, the backdrop's own edge stays visible.
+    if kind == "panel" or kind == "options" then
+        local applied = theme.nineSliceFamily
+            and lib.ApplyNineSliceBorder(frame, theme.nineSliceFamily)
+            or lib.ApplyNineSliceBorder(frame, nil)
+        if applied then
+            -- Hide the SetBackdrop edge so atlas + line edge don't
+            -- compete; the atlas border becomes the only visible edge.
+            frame:SetBackdropBorderColor(0, 0, 0, 0)
+        end
+    end
+
+    if kind == "titlebar" then
+        local topStripe = _decorTex(frame, "titleTopStripe", "OVERLAY")
+        topStripe:ClearAllPoints()
+        topStripe:SetHeight(2)
+        topStripe:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+        topStripe:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
+        if theme.titleBarTopStripe then
+            local ac = theme.colors.accent
+            topStripe:SetColorTexture(ac[1], ac[2], ac[3], 0.70)
+            topStripe:Show()
+        else
+            topStripe:Hide()
+        end
+
+        local botStripe = _decorTex(frame, "titleBotStripe", "ARTWORK")
+        botStripe:ClearAllPoints()
+        botStripe:SetHeight(1)
+        botStripe:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 1, 0)
+        botStripe:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 0)
+        if theme.titleBarBotStripe then
+            local ac = theme.colors.accent
+            botStripe:SetColorTexture(ac[1], ac[2], ac[3], 0.45)
+            botStripe:Show()
+        else
+            botStripe:Hide()
+        end
+
+        -- Gradient overlay: subtle top-to-bottom warmth.
+        local gradient = _decorTex(frame, "titleGradient", "BACKGROUND", 2)
+        gradient:ClearAllPoints()
+        gradient:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+        gradient:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
+        if theme.titleBarGradient then
+            local ac = theme.colors.accent
+            _setGradient(gradient, "VERTICAL",
+                { 0, 0, 0, 0 },
+                { ac[1], ac[2], ac[3], 0.12 })
+            gradient:Show()
+        else
+            gradient:Hide()
+        end
+    end
+end
+
+-- Button emboss: 1px lighter line on top, 1px darker line on bottom.
+-- Gives the button a slight raised look. No-op when the theme doesn't
+-- request it; existing decoration textures are hidden in that case.
+function lib.ApplyButtonEmboss(btn)
+    local theme = lib.Theme
+    local top = _decorTex(btn, "embossTop", "OVERLAY")
+    top:ClearAllPoints()
+    top:SetHeight(1)
+    top:SetPoint("TOPLEFT", btn, "TOPLEFT", 1, -1)
+    top:SetPoint("TOPRIGHT", btn, "TOPRIGHT", -1, -1)
+
+    local bot = _decorTex(btn, "embossBot", "ARTWORK")
+    bot:ClearAllPoints()
+    bot:SetHeight(1)
+    bot:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 1, 0)
+    bot:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -1, 0)
+
+    if theme.buttonEmboss then
+        top:SetColorTexture(1, 1, 1, 0.10)
+        bot:SetColorTexture(0, 0, 0, 0.45)
+        top:Show()
+        bot:Show()
+    else
+        top:Hide()
+        bot:Hide()
+    end
+end
+
+-- Progress fill highlight: 1px highlight line along the top edge of a
+-- fill texture, giving it a slight 3D appearance.
+-- Pass a per-bar GetOrCreate key (bars share one scroll-content parent,
+-- so the key must be unique per bar) and the highlight joins the parent's
+-- _children cache — the same hide-walks that hide the bar then hide it
+-- too. Without a key it is cached on the fill texture itself (legacy
+-- callers), where nothing auto-hides it.
+function lib.ApplyProgressHighlight(fillTex, key)
+    local theme = lib.Theme
+    local hl
+    if key then
+        hl = lib.GetOrCreate(fillTex:GetParent(), key, function(p)
+            return p:CreateTexture(nil, "OVERLAY")
+        end)
+    else
+        hl = fillTex._progressHighlight
+        if not hl then
+            hl = fillTex:GetParent():CreateTexture(nil, "OVERLAY")
+            fillTex._progressHighlight = hl
+        end
+    end
+    hl:ClearAllPoints()
+    hl:SetHeight(1)
+    hl:SetPoint("TOPLEFT", fillTex, "TOPLEFT", 0, 0)
+    hl:SetPoint("TOPRIGHT", fillTex, "TOPRIGHT", 0, 0)
+    if theme.progressHighlight then
+        hl:SetColorTexture(1, 1, 1, 0.22)
+        hl:Show()
+    else
+        hl:Hide()
+    end
+end
+
+-- Source-group header. Thin wrapper over RenderCollapsibleHeader using
+-- the conventions every module shares (countColor = countDim,
+-- labelColor defaults to the accent).
+--
+--   opts.label         — header text
+--   opts.accentColor   — { r, g, b }; required
+--   opts.count         — numeric; tostring'd
+--   opts.collKey       — collapse-state key; required
+--   opts.height        — default 20
+--   opts.indent        — default 0
+--   opts.labelColor    — { r, g, b[, a] }; defaults to accentColor
+--   opts.icon, opts.fontSize, opts.countFontSize — pass-through
+function lib.RenderSourceHeader(pool, parent, yOff, opts, db, refreshCb)
+    local theme = lib.Theme
+    local a = opts.accentColor
+    return lib.RenderCollapsibleHeader(pool, parent, yOff, {
+        height        = opts.height or 20,
+        indent        = opts.indent or 0,
+        collKey       = opts.collKey,
+        accentR       = a[1], accentG = a[2], accentB = a[3],
+        label         = opts.label,
+        labelColor    = opts.labelColor or { a[1], a[2], a[3] },
+        count         = tostring(opts.count),
+        countColor    = theme.colors.countDim,
+        icon          = opts.icon,
+        fontSize      = opts.fontSize,
+        countFontSize = opts.countFontSize,
+    }, db, refreshCb)
+end
+
+-- "Collected/Learned/Looted/Defeated/Completed" group: green-accent
+-- header followed by `opts.entries` iterated through `opts.renderRow`.
+-- Returns the new yOff.
+--
+--   opts.entries    — array of items
+--   opts.renderRow  — function(parent, item, yOff, isCollected) -> newYOff
+--   opts.label      — default "Collected"
+--   opts.collKey    — default "collected"
+--   opts.height     — default 20
+--   opts.indent     — default 0
+function lib.RenderCollectedSection(pool, parent, yOff, opts, db, refreshCb)
+    local theme = lib.Theme
+    local la = theme.colors.learnedAccent
+    local _, collapsed, newY = lib.RenderCollapsibleHeader(pool, parent, yOff, {
+        height     = opts.height or 20,
+        indent     = opts.indent or 0,
+        collKey    = opts.collKey or "collected",
+        accentR    = la[1], accentG = la[2], accentB = la[3],
+        label      = opts.label or "Collected",
+        labelColor = { la[1], la[2], la[3] },
+        count      = tostring(#opts.entries),
+        countColor = theme.colors.countDim,
+    }, db, refreshCb)
+    yOff = newY
+    if collapsed then return yOff end
+    for _, item in ipairs(opts.entries) do
+        yOff = opts.renderRow(parent, item, yOff, true)
+    end
+    return yOff
+end
+
+-- Module-page orchestration: pool-reset → iterate-sources →
+-- collected-group → progress-text → empty-message → scroll-resize.
+-- Used by every "by source" module (Mounts, Pets, Toys, Decorations,
+-- Rares, Treasures). Modules with bespoke shapes (Recipes per-prof,
+-- Achievements per-category) drive their own loop.
+--
+--   opts.results             — Scanner.results { total, collectedCount, bySource, collected }
+--   opts.sourceOrder         — array of source keys in render order
+--   opts.renderSourceGroup   — function(parent, srcType, entries, yOff) -> newYOff
+--   opts.renderRow           — function(parent, item, yOff, isCollected) -> newYOff
+--                              (used by the default collected-group renderer)
+--   opts.renderCollectedGroup— function(parent, entries, yOff) -> newYOff (optional override)
+--   opts.collectedLabel      — default "Collected"
+--   opts.collectedKey        — default "collected"
+--   opts.showCollected       — boolean; default true
+--   opts.sectionPad          — default 8
+--   opts.emptyMessages       — { allDone, noneLeft }
+--   opts.progressText        — function(r) -> string (default "X / Y")
+--   opts.db, opts.refreshCb  — passed to the default collected-section header
+function lib.RenderModulePage(panel, opts)
+    if not panel or not panel.scrollChild then return end
+    panel.pool:ReleaseAll()
+
+    local r = opts.results
+    if not r or not r.total then
+        panel:RefreshScrollContent(0)
+        return
+    end
+
+    local child = panel.scrollChild
+    local PAD = opts.sectionPad or 8
+    local yOff = 0
+
+    local seen = {}
+    for _, srcType in ipairs(opts.sourceOrder or {}) do
+        seen[srcType] = true
+        local entries = r.bySource and r.bySource[srcType]
+        if entries and #entries > 0 then
+            yOff = opts.renderSourceGroup(child, srcType, entries, yOff)
+            yOff = yOff + PAD
+        end
+    end
+    if r.bySource then
+        for srcType, entries in pairs(r.bySource) do
+            if not seen[srcType] and #entries > 0 then
+                yOff = opts.renderSourceGroup(child, srcType, entries, yOff)
+                yOff = yOff + PAD
+            end
+        end
+    end
+
+    if opts.showCollected ~= false and r.collected and #r.collected > 0 then
+        if opts.renderCollectedGroup then
+            yOff = opts.renderCollectedGroup(child, r.collected, yOff)
+        elseif opts.renderRow then
+            yOff = lib.RenderCollectedSection(panel.pool, child, yOff, {
+                entries   = r.collected,
+                renderRow = opts.renderRow,
+                label     = opts.collectedLabel,
+                collKey   = opts.collectedKey,
+            }, opts.db, opts.refreshCb)
+        end
+    end
+
+    if panel.titleProgressText then
+        local txt
+        if opts.progressText then
+            txt = opts.progressText(r)
+        elseif r.total > 0 then
+            txt = format("%d / %d", r.collectedCount or 0, r.total)
+        else
+            txt = ""
+        end
+        panel.titleProgressText:SetText(txt)
+    end
+
+    if yOff == 0 then
+        local complete = r.collectedCount == r.total and r.total > 0
+        local msgs = opts.emptyMessages or {}
+        local msg = (complete and msgs.allDone) or msgs.noneLeft or "Nothing to track."
+        local color = complete and lib.Theme.colors.textComplete or nil
+        yOff = lib.ShowEmptyMessage(child, msg, color)
+    else
+        lib.HideEmptyMessage(child)
+    end
+
+    panel:RefreshScrollContent(yOff)
+end
+
+-- MakeIndicatorBtn: a borderless text button used in the panel title
+-- bar (filter / score / peer count). Auto-sizes to its label and swaps
+-- text color on hover. Optional tooltip is either a static string or a
+-- callback that populates GameTooltip with custom content.
+--
+--   opts.label       — initial text (default "")
+--   opts.fontSize    — defaults to theme.fontSize - 1
+--   opts.fgColor     — table {r,g,b}; default theme.colors.indicatorText
+--   opts.hoverColor  — table {r,g,b}; default theme.colors.indicatorTextHover
+--   opts.tooltip     — string OR function(self, GameTooltip)
+--   opts.height      — default 16
+--   opts.padding     — extra width around label; default 14
+--   opts.onClick     — click handler (button arg passed through)
+--
+-- Returns the button. The button gains a `:SetLabel(text)` method that
+-- updates the text and re-fits the button width.
+function lib.MakeIndicatorBtn(parent, opts)
+    opts = opts or {}
+    local fg = opts.fgColor or lib.Theme.colors.indicatorText
+    local hv = opts.hoverColor or lib.Theme.colors.indicatorTextHover
+    local pad = opts.padding or 14
+    local userFontSize = opts.fontSize
+
+    local btn = CreateFrame("Button", nil, parent)
+    btn:SetHeight(opts.height or 16)
+    local fs = btn:CreateFontString(nil, "OVERLAY")
+    fs:SetPoint("CENTER")
+    btn:SetFontString(fs)
+
+    local function applyTheme()
+        local theme = lib.Theme
+        fs:SetFont(theme.font, userFontSize or (theme.fontSize - 1), "OUTLINE")
+        fs:SetTextColor(fg[1], fg[2], fg[3])
+    end
+    applyTheme()
+    lib.RegisterThemeHook(applyTheme)
+
+    function btn:SetLabel(text)
+        fs:SetText(text or "")
+        btn:SetWidth(fs:GetStringWidth() + pad)
+    end
+    btn:SetLabel(opts.label or "")
+
+    -- Underline texture, shown on hover when the theme requests it
+    -- (modern). Pre-created so OnEnter is just :Show().
+    local underline = _decorTex(btn, "indicatorUnderline", "OVERLAY")
+    underline:SetHeight(1)
+    underline:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 2, 1)
+    underline:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -2, 1)
+    underline:Hide()
+
+    btn:SetScript("OnEnter", function(s)
+        fs:SetTextColor(hv[1], hv[2], hv[3])
+        if lib.Theme.indicatorHoverUnderline then
+            local ac = lib.Theme.colors.accent
+            underline:SetColorTexture(ac[1], ac[2], ac[3], 0.85)
+            underline:Show()
+        end
+        local tt = opts.tooltip
+        if type(tt) == "string" then
+            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+            GameTooltip:SetText(tt)
+            GameTooltip:Show()
+        elseif type(tt) == "function" then
+            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+            tt(s, GameTooltip)
+            GameTooltip:Show()
+        end
+    end)
+    btn:SetScript("OnLeave", function()
+        fs:SetTextColor(fg[1], fg[2], fg[3])
+        underline:Hide()
+        GameTooltip:Hide()
+    end)
+    if opts.onClick then
+        btn:SetScript("OnClick", opts.onClick)
+    end
+    return btn
+end
+
+-- MakeCheckbox: a one-shot Blizzard-template checkbox with a themed
+-- label to the right. Not pooled — for fixed-position UI like the
+-- onboarding popup. Returns the CheckButton; the label font string is
+-- accessible as `btn._label`.
+--
+--   opts.label    — text to the right of the box (default "")
+--   opts.fontSize — defaults to 11
+--   opts.size     — checkbox size (default 22)
+--   opts.checked  — initial state
+--   opts.onClick  — function(checked) callback
+function lib.MakeCheckbox(parent, opts)
+    opts = opts or {}
+    local userFontSize = opts.fontSize
+    local sz = opts.size or 22
+    local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+    cb:SetSize(sz, sz)
+    local fs = cb:CreateFontString(nil, "OVERLAY")
+    fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
+    cb._label = fs
+
+    -- applyTheme MUST run before SetText below; SetText requires a
+    -- font to already be assigned.
+    local function applyTheme()
+        local theme = lib.Theme
+        fs:SetFont(theme.font, userFontSize or 11, "")
+        fs:SetTextColor(unpack(theme.colors.text))
+    end
+    applyTheme()
+    lib.RegisterThemeHook(applyTheme)
+    fs:SetText(opts.label or "")
+
+    if opts.checked ~= nil then cb:SetChecked(opts.checked and true or false) end
+    if opts.onClick then
+        cb:SetScript("OnClick", function(s) opts.onClick(s:GetChecked() and true or false) end)
+    end
+    return cb
 end

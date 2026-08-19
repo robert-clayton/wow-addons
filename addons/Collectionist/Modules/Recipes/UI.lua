@@ -15,7 +15,11 @@ local BAR_KEYS = {}
 local function getBarKeys(skillLine)
     local k = BAR_KEYS[skillLine]
     if not k then
-        k = { bg = "barBg_" .. skillLine, fill = "barFill_" .. skillLine }
+        k = {
+            bg   = "barBg_" .. skillLine,
+            fill = "barFill_" .. skillLine,
+            hl   = "barFill_" .. skillLine .. "_hl",
+        }
         BAR_KEYS[skillLine] = k
     end
     return k
@@ -38,6 +42,7 @@ function UI:Init(panel, m)
     self.mod = m
     -- Track which skillLines we've rendered bars for so we can hide stale ones
     self._lastBars = {}
+    self._refresh = function() self:Refresh() end
 end
 
 function UI:GetConfigDefs()
@@ -76,6 +81,7 @@ function UI:Refresh()
             if kids then
                 if kids[k.bg] then kids[k.bg]:Hide() end
                 if kids[k.fill] then kids[k.fill]:Hide() end
+                if kids[k.hl] then kids[k.hl]:Hide() end
             end
         end
     end
@@ -114,7 +120,7 @@ function UI:RenderProfession(parent, profInfo, result, skillLine, yOff)
             icon          = profInfo.icon,
             fontSize      = theme.fontSize,
             countFontSize = theme.fontSize - 1,
-        }, mod.db, function() self:Refresh() end)
+        }, mod.db, self._refresh)
     yOff = newY
 
     -- Progress bar (4px, theme-colored)
@@ -139,6 +145,7 @@ function UI:RenderProfession(parent, profInfo, result, skillLine, yOff)
     barFill:SetPoint("TOPLEFT", barBg, "TOPLEFT", 0, 0)
     barFill:SetWidth(math.max((parent:GetWidth() - 12) * fillPct, 1))
     barFill:SetColorTexture(unpack(theme.colors.progress))
+    MUI.ApplyProgressHighlight(barFill, barKeys.hl)
 
     yOff = yOff + 8
     if collapsed then return yOff end
@@ -162,19 +169,14 @@ function UI:RenderProfession(parent, profInfo, result, skillLine, yOff)
 end
 
 function UI:RenderSourceGroup(parent, srcType, recipes, skillLine, yOff)
-    local theme = MUI.Theme
-    local sr, sg, sb = theme:SourceColor(srcType)
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 20,
-            indent     = 4,
-            collKey    = "src_" .. tostring(skillLine) .. "_" .. srcType,
-            accentR    = sr, accentG = sg, accentB = sb,
-            label      = SOURCE_LABELS[srcType] or srcType,
-            labelColor = { sr, sg, sb },
-            count      = tostring(#recipes),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
+    local sr, sg, sb = MUI.Theme:SourceColor(srcType)
+    local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
+        label       = SOURCE_LABELS[srcType] or srcType,
+        accentColor = { sr, sg, sb },
+        count       = #recipes,
+        collKey     = "src_" .. tostring(skillLine) .. "_" .. srcType,
+        indent      = 4,
+    }, mod.db, self._refresh)
     yOff = newY
     if collapsed then return yOff end
     for _, recipe in ipairs(recipes) do
@@ -184,25 +186,13 @@ function UI:RenderSourceGroup(parent, srcType, recipes, skillLine, yOff)
 end
 
 function UI:RenderLearnedGroup(parent, recipes, skillLine, yOff)
-    local theme = MUI.Theme
-    local la = theme.colors.learnedAccent
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 20,
-            indent     = 4,
-            collKey    = "learned_" .. tostring(skillLine),
-            accentR    = la[1], accentG = la[2], accentB = la[3],
-            label      = "Learned",
-            labelColor = { la[1], la[2], la[3] },
-            count      = tostring(#recipes),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
-    yOff = newY
-    if collapsed then return yOff end
-    for _, recipe in ipairs(recipes) do
-        yOff = self:RenderRecipeRow(parent, recipe, nil, yOff, true)
-    end
-    return yOff
+    return MUI.RenderCollectedSection(self.panel.pool, parent, yOff, {
+        entries   = recipes,
+        renderRow = function(p, recipe, y, _) return self:RenderRecipeRow(p, recipe, nil, y, true) end,
+        label     = "Learned",
+        collKey   = "learned_" .. tostring(skillLine),
+        indent    = 4,
+    }, mod.db, self._refresh)
 end
 
 function UI:RenderRecipeRow(parent, recipe, skillLine, yOff, isLearned)
@@ -231,10 +221,7 @@ function UI:RenderRecipeRow(parent, recipe, skillLine, yOff, isLearned)
             local label = SOURCE_LABELS[recipe.source] or recipe.source
             MC.ShowItemInfoTooltip(r, recipe, label, sr, sg, sb)
         end,
-        onLeave = function()
-            GameTooltip:Hide()
-            MC.HideInfoTooltip()
-        end,
+        onLeave = MC.RowOnLeave,
         -- Always wire onClick so shift-click (Wowhead) and ctrl-click (info)
         -- still work on learned recipes. DoItemAction handles the modifiers
         -- and the skillLine fallback for unlearned ones.

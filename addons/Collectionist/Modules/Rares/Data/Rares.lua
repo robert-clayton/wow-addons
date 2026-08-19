@@ -1,24 +1,43 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
-MC.RareSourceOrder = { "eversong", "zulaman", "harandar", "voidstorm" }
+MC.RareSourceOrder = { "eversong", "zulaman", "harandar", "voidstorm", "val", "naigtal" }
 MC.RareSourceLabels = {
     eversong  = "Eversong Woods",
     zulaman   = "Zul'Aman",
     harandar  = "Harandar",
     voidstorm = "Voidstorm",
+    val       = "Val (Showdown)",
+    naigtal   = "Naigtal (Showdown)",
 }
 
 -- Each entry is one zone-rare achievement. The Scanner pulls the rare list
 -- and completion state directly from the achievement's criteria at scan time,
 -- so we don't need to hardcode every rare's name.
 MC.RegisterContent("midnight", "rares", {
-    { source = "eversong",  achievementID = 61507, name = "A Bloody Song",
+    { source = "eversong", achievementID = 61507, criteriaCount = 15,
+      criteriaNPCIDs = {
+          246332, 240129, 250719, 250754, 250841, 250826, 255302, 255348,
+          246633, 250582, 250683, 250876, 250780, 250806, 255329,
+      }, name = "A Bloody Song",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
-    { source = "zulaman",   achievementID = 62122, name = "Tallest Tree in the Forest",
+    { source = "zulaman", achievementID = 62122, criteriaCount = 15,
+      criteriaNPCIDs = {
+          242023, 242025, 245975, 242031, 242033, 242035, 242027, 245692,
+          242024, 242028, 247976, 242032, 242034, 242026, 245691,
+      }, name = "Tallest Tree in the Forest",
       zoneMapID = MC.MAP.ZulAman, zone = "Zul'Aman" },
-    { source = "harandar",  achievementID = 61264, name = "Leaf None Behind",
+    { source = "harandar", achievementID = 61264, criteriaCount = 15,
+      criteriaNPCIDs = {
+          248741, 249849, 249962, 250086, 250226, 250246, 250321, 250358,
+          249844, 249902, 249997, 250180, 250231, 250317, 250347,
+      }, name = "Leaf None Behind",
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
-    { source = "voidstorm", achievementID = 62130, name = "The Ultimate Predator",
+    { source = "voidstorm", achievementID = 62130, criteriaCount = 14,
+      criteriaNPCIDs = {
+          244272, 241443, 256923, 256925, 256808, 256770, 245044, 238498,
+          256922, 256924, 256926, 257027, 245182, 256821,
+      }, name = "The Ultimate Predator",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
 })
 
@@ -100,6 +119,27 @@ for _, coords in pairs(MC.RareNPCs) do
     local nm = coords[4]
     if nm then MC.RareCoords[nm] = coords end
 end
+
+-- Per-rare score overrides, keyed by stable NPC ID. Wins over the
+-- achievement-level source default (which is `short` = 5 for all four
+-- zone keys). Used for rares whose actual difficulty is meaningfully
+-- higher than the baseline: rare-elites (elite tuning, group-friendly),
+-- hidden-prerequisite spawns, and forced-PvP-zone spawns in Voidstorm.
+MC.RareScoreOverrides = {
+    -- Hidden interaction prerequisite (light up sunflower before spawn).
+    [250780] = T.medium, -- Waverly
+    -- Rare-elites: solo-unfriendly tuning, multi-step prerequisites,
+    -- AoE-heavy mechanics, or both.
+    [245691] = T.medium, -- The Decaying Diamondback
+    [245692] = T.medium, -- Asha the Empowered
+    [250086] = T.medium, -- Stumpy
+    [250317] = T.medium, -- Oro'ohna
+    [250358] = T.medium, -- Annulus the Worldshaker
+    [256821] = T.medium, -- Far'thana the Mad
+    -- Forced-PvP-zone rare-elites in Voidstorm's Husk shard.
+    [256808] = T.long, -- Ravengerus
+    [257027] = T.long, -- Rakshur the Bonegrinder
+}
 
 -- Aliases for spelling drift between HandyNotes and the achievement criterion.
 -- Add new entries as players spot rares with `waypoint: none` in the ctrl-click

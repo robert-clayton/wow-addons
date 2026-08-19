@@ -1,22 +1,63 @@
+# 1.12.0
+### Fixed
+- Tabs no longer go permanently blank when Blizzard removes or hotfixes an achievement mid-patch. Rows the game can't answer for yet are skipped and picked up automatically within a couple of minutes, and rares or treasures Blizzard adds to an existing achievement now show up without waiting for an addon update.
+- Guild sharing keeps working after achievement hotfixes instead of silently stopping — "Owned by" tooltip lines and your shared counts no longer vanish for the whole guild when one achievement changes. Shared counts also hold steady while your own data is still loading, so guildmates never see your collection briefly shrink after you log in.
+- Switching the expansion filter right after logging in now shows the correct rows within a couple of seconds instead of leaving the previous filter's list on screen.
+- The panel opens at a usable size after upgrading, instead of squashing the title-bar buttons together at a width saved by an older version.
+- Fresh installs and returning players learn about guildmates' shared collections at login again. The request only goes out when your peer list is empty or stale, so guild-wide reload waves stay quiet.
+- If a rare or treasure achievement changes shape, waypoints and puzzle instructions now fall back to safe lookups instead of possibly pointing at the wrong spot.
+- Thin highlight lines from the Recipes tab's progress bars no longer linger over other tabs.
+
+# 1.11.0
+### Added
+- Full **Revelations (12.0.7)** coverage: Void Showdowns in Val and Naigtal, their rare metas and achievements, Showdown vendors, Rotmire, Dragonflight Timewalking, Midsummer rewards, Lorewalking, Arcantina, and the opening Curse of Ula'tek story.
+- Full **Curse of Ula'tek (12.1)** coverage: the Coiled Isle, Vaults of Atal'Utek, Curse Surges, Zul'jarra's Forces, Captain Tokka's Crew, Season 2 Prey, three new Delves, Altar of Fangs, and the Venomous Abyss.
+- Coiled Isle rare and treasure trackers with waypoints and puzzle instructions.
+- New 12.1 housing decor, Community Coupon rewards, pet beds, mounts, pets, toys, and achievements. Season 2 rewards are clearly labeled with their regional unlock date.
+### Changed
+- Updated the client interface target to 12.1.0.
+- Item-based collectible costs now show the item icon, live inventory count, and affordability color in tooltips.
+### Fixed
+- Future rewards stay visible for planning without entering completion totals or Collection Score before their regional unlock; the schedule follows Blizzard's corrected patch-week and Season 2 rollout.
+- Achievement, rare, and treasure scans now wait for complete Blizzard data instead of publishing false incomplete snapshots, and achievement icons use the correct API field.
+- Housing decor ownership now recognizes redeemable copies and current Housing API signatures, with correct item-icon fallbacks.
+- Corrected invalid and missing collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.
+- Large roster snapshots can no longer combine chunks from different broadcasts, and wide peer columns remain clipped to the scrolling area.
+- Release archives now enforce tag/version/changelog agreement, honor packaging exclusions, compile and smoke-load every shipped Lua file, and publish permanent GitHub Releases.
+
+# 1.10.0
+### Added
+- Achievements now appear as their own row in the Collection Inspector, so you can compare achievement progress with guildmates like any other collection.
+- **UI themes.** Two looks to choose from: **Modern** (the new default — slate and bronze with subtle gradients and row separators) and **Simple** (the classic warm-gold appearance from earlier versions). Switch anytime in `/mc options` or with `/mc theme modern|simple`. Your choice is shared account-wide across all your characters.
+### Changed
+- Collection Score now uses six clearer time tiers (1 / 5 / 10 / 25 / 50 / 100).
+- Disabled tracker tabs stay hidden but continue to keep score and shared progress current.
+### Fixed
+- Sharing now waits for explicit first-run consent, retries safely after encounters, and no longer creates guild-wide reply storms on login.
+- Collection updates now refresh score and sharing even when their tab is not open.
+- Rare and treasure ownership sharing uses locale-independent criterion IDs and waits for the full achievement cache.
+- Legacy-item totals use the same denominator for every player, regardless of ownership or display settings.
+- The minimap right-click summary now waits for its scan, and says which expansion slice its per-source breakdown covers.
+- Inspector filters no longer reset when peers are selected, and wide comparisons scroll instead of growing off-screen.
+- “Current” selects the newest expansion available to each tracker rather than blanking trackers without newer content.
+
 # 1.9.0
 ### Added
-- **Collection Score (CS).** A time-investment score: each collectible has a weight (1 / 5 / 25 / 100 / 500) and your CS is the sum across everything you've collected. Shown in the panel title bar (hover for breakdown), in the Inspector for each peer column, and via `/mc score`. Recipes count account-wide — once any of your alts has learned a recipe, every alt scores it.
-- **Legacies count** alongside the CS — separate tally of items you've collected that are no longer obtainable. Tracked but kept out of the main score so retired content doesn't drag down newer collectors.
-- Recipe ledger persists in the account-wide DB as `CollectionistDB.recipesLearned`; populated on each character's PLAYER_LOGIN scan. Never erases.
+- **Collection Score (CS).** A time-investment score: each collectible has a weight (1 / 5 / 25 / 100 / 500) and your CS is the sum across everything you've collected. Shown in the panel title bar, in the Inspector, and via `/mc score`.
+- **Legacies count** alongside the CS — a separate tally of collected items that are no longer obtainable.
+- Recipe progress persists in the account-wide recipe ledger so learned recipes count across alts.
 
 # 1.8.0
 ### Added
-- Collection Inspector's expansion filter now actually filters — peer columns rescope to whichever expansion you pick, falling back to account-wide totals for peers who haven't broadcast that expansion's slice (older versions, or peers with no data there).
+- Collection Inspector's expansion filter now rescopes peer columns, falling back to account-wide totals for peers without an expansion slice.
 ### Fixed
-- Bitmap broadcast no longer silently misreports rare/treasure ownership when the panel's expansion filter hides them. The probes now query achievement criteria directly (account-wide) instead of reading from the filter-scoped scanner results.
+- Bitmap ownership probes query achievement criteria directly instead of filter-scoped scanner results.
 
 # 1.7.0
 ### Added
-- Expansion filter in the title bar. Click it to switch between Current (default), All Expansions, or any specific expansion. Defaults to Current, so today's behavior is unchanged — you'll see Midnight content as before.
-- `/mc filter all|current|<expansion>` slash command for the same.
-- Internal infrastructure for shipping older-expansion content in future releases. No older content yet — Vanilla through TWW will land in subsequent versions.
-### Changed
-- Onboarding popup re-shows once on first 1.7.0 launch to mention the new filter.
+- Expansion filter in the title bar, with Current, All Expansions, and pinned-expansion modes.
+- `/mc filter all|current|<expansion>` slash command.
+- Internal registration infrastructure for adding older-expansion content.
 
 # 1.6.2
 ### Changed

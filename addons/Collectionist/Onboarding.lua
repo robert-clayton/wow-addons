@@ -44,74 +44,65 @@ local function buildFrame()
     f:SetClampedToScreen(true)
     f:Hide()
 
-    if theme and theme.backdrop then
-        f:SetBackdrop(theme.backdrop)
-        f:SetBackdropColor(theme.colors.bg[1], theme.colors.bg[2], theme.colors.bg[3], 0.97)
-        f:SetBackdropBorderColor(unpack(theme.colors.border))
-    end
-
     -- Title bar
     local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     bar:SetHeight(26)
     bar:SetPoint("TOPLEFT")
     bar:SetPoint("TOPRIGHT")
-    if theme and theme.backdrop then
-        bar:SetBackdrop(theme.backdrop)
-        bar:SetBackdropColor(unpack(theme.colors.titlebar))
-        bar:SetBackdropBorderColor(unpack(theme.colors.titleBorder))
-    end
+
+    -- Font has to be set before SetText; theme hook re-applies later.
+    local themeFont = (MUI and MUI.Theme and MUI.Theme.font) or STANDARD_TEXT_FONT
 
     local title = bar:CreateFontString(nil, "OVERLAY")
-    title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 13, "OUTLINE")
+    title:SetFont(themeFont, 13, "OUTLINE")
     title:SetPoint("LEFT", 10, 0)
-    title:SetText("Collectionist — Welcome to 1.7.0")
-    if theme then title:SetTextColor(unpack(theme.colors.title)) end
+    title:SetText("Collectionist — Welcome")
 
-    -- Intro text
     local intro = f:CreateFontString(nil, "OVERLAY")
-    intro:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "")
+    intro:SetFont(themeFont, 11, "")
     intro:SetPoint("TOPLEFT", 14, -40)
     intro:SetPoint("TOPRIGHT", -14, -40)
     intro:SetJustifyH("LEFT")
     intro:SetText(table.concat(INTRO_LINES, "\n"))
-    if theme then intro:SetTextColor(unpack(theme.colors.text)) end
-
-    -- Checkbox factory
-    local function mkCheckbox(parent, label, anchor, yOff, getFn)
-        local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-        cb:SetPoint("TOPLEFT", anchor, "TOPLEFT", 14, yOff)
-        cb:SetSize(22, 22)
-        local fs = cb:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "")
-        fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-        fs:SetText(label)
-        if theme then fs:SetTextColor(unpack(theme.colors.text)) end
-        if getFn then cb:SetChecked(getFn()) end
-        return cb
-    end
 
     f.moduleSection = f:CreateFontString(nil, "OVERLAY")
-    f.moduleSection:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
+    f.moduleSection:SetFont(themeFont, 11, "OUTLINE")
     f.moduleSection:SetPoint("TOPLEFT", 14, -180)
     f.moduleSection:SetText("Trackers")
-    if theme then f.moduleSection:SetTextColor(unpack(theme.colors.accent)) end
 
     f.moduleChecks = {}
 
-    -- Module checkboxes are populated lazily once MC.modules is ready.
     f.shareSection = f:CreateFontString(nil, "OVERLAY")
-    f.shareSection:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
+    f.shareSection:SetFont(themeFont, 11, "OUTLINE")
     f.shareSection:SetText("Sharing")
-    if theme then f.shareSection:SetTextColor(unpack(theme.colors.accent)) end
 
-    -- Footer hint
     f.footer = f:CreateFontString(nil, "OVERLAY")
-    f.footer:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 10, "")
+    f.footer:SetFont(themeFont, 10, "")
     f.footer:SetPoint("BOTTOMLEFT", 14, 44)
     f.footer:SetPoint("BOTTOMRIGHT", -14, 44)
     f.footer:SetJustifyH("LEFT")
     f.footer:SetText("You can change all of these later in /mc options.")
-    if theme then f.footer:SetTextColor(unpack(theme.colors.textDim)) end
+
+    local function applyOnboardingTheme()
+        local th = MUI and MUI.Theme
+        if not th then return end
+        MUI.ApplyThemedBackdrop(f, { kind = "panel", alpha = 0.97 })
+        MUI.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
+        title:SetFont(th.font, 13, "OUTLINE")
+        title:SetTextColor(unpack(th.colors.title))
+        intro:SetFont(th.font, 11, "")
+        intro:SetTextColor(unpack(th.colors.text))
+        f.moduleSection:SetFont(th.font, 11, "OUTLINE")
+        f.moduleSection:SetTextColor(unpack(th.colors.accent))
+        f.shareSection:SetFont(th.font, 11, "OUTLINE")
+        f.shareSection:SetTextColor(unpack(th.colors.accent))
+        f.footer:SetFont(th.font, 10, "")
+        f.footer:SetTextColor(unpack(th.colors.textDim))
+    end
+    applyOnboardingTheme()
+    if MUI and MUI.RegisterThemeHook then
+        MUI.RegisterThemeHook(applyOnboardingTheme)
+    end
 
     -- Got it button
     local btn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
@@ -131,22 +122,15 @@ local function populate(f)
     for _, cb in pairs(f.moduleChecks) do cb:Hide() end
     wipe(f.moduleChecks)
 
-    local theme = MUI and MUI.Theme
     local y = -200  -- below the "Trackers" label
     for _, m in ipairs(MC.modules) do
         if m.key ~= "roster" then
-            local cb = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
+            local cb = MUI.MakeCheckbox(f, {
+                label   = m.label,
+                checked = MC.IsModuleEnabled(m.key),
+            })
             cb:SetPoint("TOPLEFT", 14, y)
-            cb:SetSize(22, 22)
-            cb:SetChecked(MC.IsModuleEnabled(m.key))
             cb._key = m.key
-
-            local fs = cb:CreateFontString(nil, "OVERLAY")
-            fs:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "")
-            fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-            fs:SetText(m.label)
-            if theme then fs:SetTextColor(unpack(theme.colors.text)) end
-
             f.moduleChecks[#f.moduleChecks + 1] = cb
             y = y - 22
         end
@@ -158,14 +142,7 @@ local function populate(f)
 
     -- Master switch for the Sharing feature (peer counts + Inspector).
     if not f.rosterCheck then
-        local cb = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
-        cb:SetSize(22, 22)
-        local fs = cb:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "")
-        fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-        fs:SetText("Enable Sharing")
-        if theme then fs:SetTextColor(unpack(theme.colors.text)) end
-        f.rosterCheck = cb
+        f.rosterCheck = MUI.MakeCheckbox(f, { label = "Enable Sharing" })
     end
     f.rosterCheck:ClearAllPoints()
     f.rosterCheck:SetPoint("TOPLEFT", 14, y - 36)
@@ -184,8 +161,11 @@ local function applyChoices(f)
         end
     end
     if MC.db then
-        MC.db.rosterEnabled = f.rosterCheck:GetChecked() and true or false
-        if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+        if MC.SetRosterEnabled then
+            MC.SetRosterEnabled(f.rosterCheck:GetChecked() and true or false)
+        else
+            MC.db.rosterEnabled = f.rosterCheck:GetChecked() and true or false
+        end
     end
 end
 
@@ -210,10 +190,17 @@ function MC.ShowOnboarding()
         if CollectionistDB then
             CollectionistDB._onboardingShown = ONBOARDING_FLAG
         end
-        -- After the user accepts, fire the first broadcast in 2s so it
-        -- reflects whichever modules they kept on.
-        if MC.RosterForceBroadcast then
-            C_Timer.After(2, function() MC.RosterForceBroadcast("GUILD") end)
+        -- After explicit opt-in, fire the first broadcast once the initial
+        -- scanners have populated their snapshots.
+        if MC.db and MC.db.rosterEnabled and MC.RosterForceBroadcast then
+            C_Timer.After(2, function()
+                if MC.RosterCanShare and MC.RosterCanShare() then
+                    MC.RosterForceBroadcast("GUILD")
+                    -- Fresh consent usually means an empty peer list; ask
+                    -- peers to introduce themselves (no-op otherwise).
+                    if MC.RosterRequestSync then MC.RosterRequestSync(false) end
+                end
+            end)
         end
         print(MC.PREFIX .. " You're set. Type /mc to open the panel.")
     end)

@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -33,7 +34,7 @@ MC.AlchemyRecipes = {
             { id = 1230872, name = "Haranir Phial of Ingenuity",          source = "discovery",      sourceInfo = "Camberon's Cauldron",            priority = 2, waypoint = LOC.CamberonsCauldron },
             { id = 1230875, name = "Flask of Thalassian Resistance",      source = "specialization", sourceInfo = "Fluent in Flasks",               priority = 3 },
             { id = 1230870, name = "Haranir Phial of Finesse",           source = "specialization", sourceInfo = "Fluent in Flasks - Haranir Secrets", priority = 3 },
-            { id = 1230874, name = "Cauldron of Sin'dorei Flasks",        source = "specialization", sourceInfo = "Fluent in Flasks (30 pts)",      priority = 3 },
+            { id = 1230874, name = "Cauldron of Sin'dorei Flasks",        source = "specialization", sourceInfo = "Fluent in Flasks (30 pts)",      priority = 3, score = T.medium },
         },
     },
     {
@@ -53,13 +54,13 @@ MC.AlchemyRecipes = {
         name = "Alchemist Stones",
         recipes = {
             { id = 1230861, name = "Primal Philosopher's Stone",   source = "discovery",      sourceInfo = "Camberon's Cauldron",            priority = 2, waypoint = LOC.CamberonsCauldron },
-            { id = 1230885, name = "Magister's Alchemist Stone",   source = "specialization", sourceInfo = "Transmutation Authority (30 pts)", priority = 3 },
+            { id = 1230885, name = "Magister's Alchemist Stone",   source = "specialization", sourceInfo = "Transmutation Authority (30 pts)", priority = 3, score = T.medium },
         },
     },
     {
         name = "Cauldrons",
         recipes = {
-            { id = 1230857, name = "Voidlight Potion Cauldron", source = "specialization", sourceInfo = "Potion Prowess (30 pts)", priority = 3 },
+            { id = 1230857, name = "Voidlight Potion Cauldron", source = "specialization", sourceInfo = "Potion Prowess (30 pts)", priority = 3, score = T.medium },
         },
     },
     {
@@ -68,9 +69,9 @@ MC.AlchemyRecipes = {
             { id = 1233137, name = "Haranir Preserving Agents",    source = "vendor", sourceInfo = "Lyrendal, Silvermoon City", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.AlchemyMoxie, 150 } } },
             { id = 1233133, name = "Rootbound Vat",                source = "vendor", sourceInfo = "Naynar, Harandar",          priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.AlchemyMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1233135, name = "Sunsmoke Censer",              source = "vendor", sourceInfo = "Lyrendal, Silvermoon City", priority = 1, waypoint = LOC.Lyrendal, cost = { currency = { MC.CURRENCY.AlchemyMoxie, 150 } } },
-            { id = 1233132, name = "Entropic Illuminant",          source = "drop",   sourceInfo = "Mysterious Domanaar Vessel", priority = 4, dropInfo = { rate = "~0.2%" } },
-            { id = 1233136, name = "Riftstone",                    source = "drop",   sourceInfo = "Heavy Trunk (Delves)",      priority = 4 },
-            { id = 1233138, name = "Silvermoon Spire Fountain",    source = "drop",   sourceInfo = "Nemesis Strongbox",         priority = 4, dropInfo = { rate = "~0.1%" } },
+            { id = 1233132, name = "Entropic Illuminant",          source = "drop",   sourceInfo = "Mysterious Domanaar Vessel", priority = 4, dropInfo = { rate = "~0.2%" }, score = T.epic },
+            { id = 1233136, name = "Riftstone",                    source = "drop",   sourceInfo = "Heavy Trunk (Delves)",      priority = 4, score = T.epic },
+            { id = 1233138, name = "Silvermoon Spire Fountain",    source = "drop",   sourceInfo = "Nemesis Strongbox",         priority = 4, dropInfo = { rate = "~0.1%" }, score = T.epic },
         },
     },
 }

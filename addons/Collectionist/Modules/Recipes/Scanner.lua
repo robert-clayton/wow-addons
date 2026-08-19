@@ -34,13 +34,40 @@ end
 
 function Scanner:Scan()
     wipe(self.results)
-    if not mod.professions then return end
-    for skillLine in pairs(mod.professions) do
+    local professions = mod.professions or {}
+    for skillLine in pairs(professions) do
         local recipes = MC[dataSets[skillLine]]
         if recipes then
             self:ScanProfession(skillLine, recipes)
         end
     end
+
+    -- Off-profession pass: recipes count account-wide, so professions
+    -- this character doesn't have still score via the ledger. Held
+    -- professions are skipped — ScanProfession already credited their
+    -- ledger score above, and double-counting would inflate the CS.
+    -- Stored with a score field ONLY: Roster's GetLocalScore sums any
+    -- results sub-table with .score, while BuildLocalCounts requires
+    -- .total, so this entry feeds the score without touching counts.
+    local ledger = ensureLedger()
+    local offScore = 0
+    if ledger then
+        for skillLine, dataKey in pairs(dataSets) do
+            if not professions[skillLine] then
+                local recipeData = MC[dataKey]
+                if recipeData then
+                    for _, category in ipairs(recipeData) do
+                        for _, recipe in ipairs(category.recipes) do
+                            if recipe.id and ledger[recipe.id] == true then
+                                offScore = offScore + MC.ScoreFor(recipe)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    self.results._offProfession = { score = offScore }
 end
 
 function Scanner:ScanProfession(skillLine, recipeData)

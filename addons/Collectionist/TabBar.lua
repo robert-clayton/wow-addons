@@ -29,15 +29,21 @@ function TabBar:Create(panel, modules, onSwitch)
     -- Background
     local bg = container:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints()
-    bg:SetColorTexture(theme.colors.bg[1], theme.colors.bg[2], theme.colors.bg[3], 0.85)
 
     -- Bottom border (warm gold divider)
     local border = container:CreateTexture(nil, "ARTWORK")
     border:SetHeight(1)
     border:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT", 0, 0)
     border:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", 0, 0)
-    border:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2],
-                           theme.colors.accent[3], 0.15)
+
+    local function applyContainerTheme()
+        local th = MUI.Theme
+        bg:SetColorTexture(th.colors.bg[1], th.colors.bg[2], th.colors.bg[3], 0.85)
+        border:SetColorTexture(th.colors.accent[1], th.colors.accent[2],
+                               th.colors.accent[3], 0.15)
+    end
+    applyContainerTheme()
+    MUI.RegisterThemeHook(applyContainerTheme)
 
     -- Re-anchor scroll frame below tab bar
     if panel.frame.scrollFrame then
@@ -59,11 +65,12 @@ function TabBar:Create(panel, modules, onSwitch)
         local tab = CreateFrame("Button", nil, container)
         tab:SetHeight(TAB_HEIGHT)
 
-        -- Active background (warm glow when selected)
+        -- Active background (warm glow when selected). White base so
+        -- the theme gradient (applyTabsTheme) has content to modulate —
+        -- SetGradient alone renders nothing on an empty texture.
         local activeBg = tab:CreateTexture(nil, "BACKGROUND")
+        activeBg:SetColorTexture(1, 1, 1, 1)
         activeBg:SetAllPoints()
-        activeBg:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2],
-                                 theme.colors.accent[3], 0.08)
         activeBg:Hide()
         tab._activeBg = activeBg
 
@@ -73,7 +80,8 @@ function TabBar:Create(panel, modules, onSwitch)
         icon:SetTexture(mod.icon)
         tab._icon = icon
 
-        -- Label
+        -- Label. Font is set here (and again by applyTabsTheme on theme
+        -- switch) — SetText requires a font to already be assigned.
         local label = tab:CreateFontString(nil, "OVERLAY")
         label:SetFont(theme.font, theme.fontSize - 1, "OUTLINE")
         label:SetWordWrap(false)
@@ -86,8 +94,6 @@ function TabBar:Create(panel, modules, onSwitch)
         activeBar:SetHeight(2)
         activeBar:SetPoint("BOTTOMLEFT", tab, "BOTTOMLEFT", 0, 0)
         activeBar:SetPoint("BOTTOMRIGHT", tab, "BOTTOMRIGHT", 0, 0)
-        activeBar:SetColorTexture(theme.colors.accent[1], theme.colors.accent[2],
-                                  theme.colors.accent[3], 1)
         activeBar:Hide()
         tab._activeBar = activeBar
 
@@ -98,7 +104,8 @@ function TabBar:Create(panel, modules, onSwitch)
         tab._hoverBg = hoverBg
         tab:SetScript("OnEnter", function(self)
             if not self._isActive then
-                hoverBg:SetColorTexture(1, 0.85, 0.5, 0.04)
+                local ac = MUI.Theme.colors.accent
+                hoverBg:SetColorTexture(ac[1], ac[2], ac[3], 0.06)
             end
             -- When in icon-only mode, show the label as a tooltip
             if self._iconOnly then
@@ -119,6 +126,44 @@ function TabBar:Create(panel, modules, onSwitch)
 
         self.tabs[mod.key] = tab
     end
+
+    -- Per-tab theme refresh on live palette change. Handles both
+    -- active and inactive states (driven by tab._isActive) so the
+    -- currently-selected tab doesn't briefly de-highlight when the
+    -- user switches themes.
+    local function applyTabsTheme()
+        local th = MUI.Theme
+        local ac = th.colors.accent
+        for _, tab in pairs(self.tabs) do
+            -- Active background: vertical gradient (modern) vs flat
+            -- accent tint (simple).
+            if th.tabActiveGradient then
+                MUI.SetGradient(tab._activeBg, "VERTICAL",
+                    { ac[1], ac[2], ac[3], 0.02 },
+                    { ac[1], ac[2], ac[3], 0.18 })
+            else
+                -- Flat via the same gradient API: retail SetGradient
+                -- state persists on the texture, so a plain
+                -- SetColorTexture here would leave the modern theme's
+                -- fade ghosting through after a live theme switch.
+                MUI.SetGradient(tab._activeBg, "VERTICAL",
+                    { ac[1], ac[2], ac[3], 0.08 },
+                    { ac[1], ac[2], ac[3], 0.08 })
+            end
+            tab._activeBar:SetColorTexture(ac[1], ac[2], ac[3], 1)
+            tab._label:SetFont(th.font, th.fontSize - 1, "OUTLINE")
+            if not tab._isActive then
+                tab._label:SetTextColor(th.colors.textDim[1], th.colors.textDim[2],
+                                        th.colors.textDim[3])
+                tab._icon:SetVertexColor(th.colors.textDim[1] + 0.05, th.colors.textDim[2] + 0.04, th.colors.textDim[3] + 0.02)
+            else
+                tab._label:SetTextColor(ac[1], ac[2], ac[3])
+                tab._icon:SetVertexColor(ac[1], ac[2], ac[3])
+            end
+        end
+    end
+    applyTabsTheme()
+    MUI.RegisterThemeHook(applyTabsTheme)
 
     -- Reflow whenever the container resizes (panel drag-resize)
     container:SetScript("OnSizeChanged", function() self:Reflow() end)
@@ -190,22 +235,23 @@ function TabBar:Reflow()
 end
 
 function TabBar:SetActive(key)
+    local th = MUI.Theme
     for k, tab in pairs(self.tabs) do
         if k == key then
             tab._isActive = true
             tab._activeBar:Show()
             tab._activeBg:Show()
-            tab._label:SetTextColor(theme.colors.accent[1], theme.colors.accent[2],
-                                    theme.colors.accent[3])
-            tab._icon:SetVertexColor(theme.colors.accent[1], theme.colors.accent[2],
-                                     theme.colors.accent[3])
+            tab._label:SetTextColor(th.colors.accent[1], th.colors.accent[2],
+                                    th.colors.accent[3])
+            tab._icon:SetVertexColor(th.colors.accent[1], th.colors.accent[2],
+                                     th.colors.accent[3])
         else
             tab._isActive = false
             tab._activeBar:Hide()
             tab._activeBg:Hide()
-            tab._label:SetTextColor(theme.colors.textDim[1], theme.colors.textDim[2],
-                                    theme.colors.textDim[3])
-            tab._icon:SetVertexColor(0.45, 0.40, 0.30)
+            tab._label:SetTextColor(th.colors.textDim[1], th.colors.textDim[2],
+                                    th.colors.textDim[3])
+            tab._icon:SetVertexColor(th.colors.textDim[1] + 0.05, th.colors.textDim[2] + 0.04, th.colors.textDim[3] + 0.02)
         end
     end
 end

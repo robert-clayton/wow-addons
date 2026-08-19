@@ -6,16 +6,13 @@ local UI = mod.UI
 
 local MUI = LibStub("MidnightUI-1.0")
 
-local SECTION_PAD = 8
-local ROW_HEIGHT  = 22
-local ICON_SIZE   = 24
-
-local SOURCE_SET = {}
-for _, s in ipairs(MC.MountSourceOrder) do SOURCE_SET[s] = true end
+local ROW_HEIGHT = 22
+local ICON_SIZE  = 24
 
 function UI:Init(panel, m)
     self.panel = panel
     self.mod = m
+    self._refresh = function() self:Refresh() end
 end
 
 function UI:GetConfigDefs()
@@ -25,79 +22,36 @@ function UI:GetConfigDefs()
             get = function() return db.hideUnavailable ~= false end,
             set = function(v)
                 db.hideUnavailable = v
-                if mod.Scanner then mod.Scanner:Scan() end
+                if mod.Scanner then MC.ScanNow(mod) end
                 MC.RefreshActive()
             end },
     }
 end
 
 function UI:Refresh()
-    if not self.panel or not self.panel.scrollChild then return end
-    if not mod.Scanner then return end
-
-    self.panel.pool:ReleaseAll()
-
-    local child = self.panel.scrollChild
-    local r = mod.Scanner.results
-    if not r or not r.total then
-        self.panel:RefreshScrollContent(0)
-        return
-    end
-
-    local yOff = 0
-    for _, srcType in ipairs(MC.MountSourceOrder) do
-        local entries = r.bySource[srcType]
-        if entries and #entries > 0 then
-            yOff = self:RenderSourceGroup(child, srcType, entries, yOff)
-            yOff = yOff + SECTION_PAD
-        end
-    end
-    -- Catch-all for unknown source types
-    for srcType, entries in pairs(r.bySource) do
-        if not SOURCE_SET[srcType] and #entries > 0 then
-            yOff = self:RenderSourceGroup(child, srcType, entries, yOff)
-            yOff = yOff + SECTION_PAD
-        end
-    end
-
-    if mod.db.showCollected and #r.collected > 0 then
-        yOff = self:RenderCollectedGroup(child, r.collected, yOff)
-    end
-
-    if self.panel.titleProgressText then
-        self.panel.titleProgressText:SetText(
-            r.total > 0 and format("%d / %d", r.collectedCount, r.total) or "")
-    end
-
-    if yOff == 0 then
-        local msg = r.collectedCount == r.total and r.total > 0
-            and "All Midnight mounts collected!"
-            or "No uncollected Midnight mounts found."
-        local color = (r.collectedCount == r.total and r.total > 0)
-            and MUI.Theme.colors.textComplete or nil
-        yOff = MUI.ShowEmptyMessage(child, msg, color)
-    else
-        MUI.HideEmptyMessage(child)
-    end
-
-    self.panel:RefreshScrollContent(yOff)
+    MUI.RenderModulePage(self.panel, {
+        results       = mod.Scanner and mod.Scanner.results,
+        sourceOrder   = MC.MountSourceOrder,
+        renderSourceGroup = function(p, s, e, y) return self:RenderSourceGroup(p, s, e, y) end,
+        renderRow     = function(p, m, y, c) return self:RenderMountRow(p, m, y, c) end,
+        showCollected = mod.db.showCollected,
+        db            = mod.db,
+        refreshCb     = self._refresh,
+        emptyMessages = {
+            allDone  = "All Midnight mounts collected!",
+            noneLeft = "No uncollected Midnight mounts found.",
+        },
+    })
 end
 
 function UI:RenderSourceGroup(parent, srcType, entries, yOff)
-    local theme = MUI.Theme
-    local sr, sg, sb = theme:SourceColor(srcType)
-
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 20,
-            indent     = 0,
-            collKey    = "src_" .. srcType,
-            accentR    = sr, accentG = sg, accentB = sb,
-            label      = MC.MountSourceLabels[srcType] or srcType,
-            labelColor = { sr, sg, sb },
-            count      = tostring(#entries),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
+    local sr, sg, sb = MUI.Theme:SourceColor(srcType)
+    local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
+        label       = MC.MountSourceLabels[srcType] or srcType,
+        accentColor = { sr, sg, sb },
+        count       = #entries,
+        collKey     = "src_" .. srcType,
+    }, mod.db, self._refresh)
     yOff = newY
     if collapsed then return yOff end
 
@@ -123,44 +77,19 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
 end
 
 function UI:RenderZoneSubGroup(parent, zoneName, mounts, yOff, sr, sg, sb)
-    local theme = MUI.Theme
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 18,
-            indent     = 10,
-            collKey    = "zone_" .. zoneName,
-            accentR    = sr, accentG = sg, accentB = sb,
-            label      = zoneName,
-            labelColor = { sr * 0.85, sg * 0.85, sb * 0.85 },
-            count      = tostring(#mounts),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
+    local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
+        label       = zoneName,
+        accentColor = { sr, sg, sb },
+        labelColor  = { sr * 0.85, sg * 0.85, sb * 0.85 },
+        count       = #mounts,
+        collKey     = "zone_" .. zoneName,
+        height      = 18,
+        indent      = 10,
+    }, mod.db, self._refresh)
     yOff = newY
     if collapsed then return yOff end
     for _, mount in ipairs(mounts) do
         yOff = self:RenderMountRow(parent, mount, yOff, false)
-    end
-    return yOff
-end
-
-function UI:RenderCollectedGroup(parent, entries, yOff)
-    local theme = MUI.Theme
-    local la = theme.colors.learnedAccent
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 20,
-            indent     = 0,
-            collKey    = "collected",
-            accentR    = la[1], accentG = la[2], accentB = la[3],
-            label      = "Collected",
-            labelColor = { la[1], la[2], la[3] },
-            count      = tostring(#entries),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
-    yOff = newY
-    if collapsed then return yOff end
-    for _, mount in ipairs(entries) do
-        yOff = self:RenderMountRow(parent, mount, yOff, true)
     end
     return yOff
 end
@@ -174,7 +103,7 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
                         texture = mount.icon,
                         fallback = "Interface\\Icons\\Ability_Mount_RidingHorse" },
         name        = mount.name,
-        info        = mount.zone,
+        info        = mount.future and MC.GetAvailabilityBadge(mount) or mount.zone,
         isCollected = isCollected,
         onEnter = function(r)
             GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
@@ -189,10 +118,7 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
             local label = MC.MountSourceLabels[mount.source] or mount.source
             MC.ShowItemInfoTooltip(r, mount, label, sr, sg, sb)
         end,
-        onLeave = function()
-            GameTooltip:Hide()
-            MC.HideInfoTooltip()
-        end,
+        onLeave = MC.RowOnLeave,
         onClick = function() MC.DoItemAction(mount) end,
     })
 end

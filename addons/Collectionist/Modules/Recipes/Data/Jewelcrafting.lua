@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -62,7 +63,7 @@ MC.JewelcraftingRecipes = {
     {
         name = "Meta Gems",
         recipes = {
-            { id = 1230470, name = "Powerful Eversong Diamond",       source = "drop", sourceInfo = "Midnight Dungeons (Mythic)", priority = 4, dropInfo = { rate = "~0.2%" } },
+            { id = 1230470, name = "Powerful Eversong Diamond",       source = "drop", sourceInfo = "Midnight Dungeons (Mythic)", priority = 4, dropInfo = { rate = "~0.2%" }, score = T.epic },
             { id = 1230471, name = "Telluric Eversong Diamond",       source = "drop", sourceInfo = "Midnight Dungeons", priority = 4 },
             { id = 1230472, name = "Stoic Eversong Diamond",          source = "drop", sourceInfo = "Midnight Dungeons", priority = 4 },
             { id = 1230473, name = "Indecipherable Eversong Diamond", source = "drop", sourceInfo = "Midnight Dungeons", priority = 4 },
@@ -103,7 +104,7 @@ MC.JewelcraftingRecipes = {
             { id = 1230475, name = "Sin'dorei Lens",                 source = "trainer", sourceInfo = "Trainer (Skill 10)", priority = 1 },
             { id = 1230474, name = "Kaleidoscopic Prism",            source = "trainer", sourceInfo = "Trainer (Skill 40)", priority = 1 },
             { id = 1230477, name = "Prismatic Focusing Iris",        source = "drop",    sourceInfo = "Lothraxion, Nexus-Point Xenas", priority = 4 },
-            { id = 1230478, name = "Stabilizing Gemstone Bandolier", source = "drop",    sourceInfo = "Heavy Trunk (Delves)",          priority = 4 },
+            { id = 1230478, name = "Stabilizing Gemstone Bandolier", source = "drop",    sourceInfo = "Heavy Trunk (Delves)",          priority = 4, score = T.epic },
         },
     },
     {
@@ -136,7 +137,7 @@ MC.JewelcraftingRecipes = {
             { id = 1246889, name = "Tenebrous Ren'dorei Armillary", source = "trainer", sourceInfo = "Trainer (Skill 80)",     priority = 1 },
             { id = 1246891, name = "Bejeweled Sin'dorei Lyre",      source = "vendor",  sourceInfo = "Caeris Fairdawn, Eversong Woods", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.JewelcraftingMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1246892, name = "Resplendent Highborne Statue",  source = "drop",    sourceInfo = "Eversong Treasures",     priority = 4 },
-            { id = 1246893, name = "Replica Haranir Mural",         source = "drop",    sourceInfo = "Heavy Trunk (Delves)",   priority = 4 },
+            { id = 1246893, name = "Replica Haranir Mural",         source = "drop",    sourceInfo = "Heavy Trunk (Delves)",   priority = 4, score = T.epic },
             { id = 1246894, name = "Shining Sin'dorei Hourglass",   source = "drop",    sourceInfo = "Challenger's Cache",     priority = 4 },
         },
     },

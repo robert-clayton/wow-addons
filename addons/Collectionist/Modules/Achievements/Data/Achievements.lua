@@ -1,6 +1,7 @@
 local _, MC = ...
 
 local M = MC.MAP
+local T = MC.SCORE_TIERS
 
 -- Two-level grouping: top-level category, then sub-category. The UI
 -- renders categories as outer collapsibles and sub-categories as inner.
@@ -25,7 +26,10 @@ MC.AchievementSubcategoryOrder = {
     exploration = { "metas", "explore", "vistas", "glyphs", "lore", "paintings", "events", "zone" },
     quests      = { "metas" },
     collections = { "pets", "mounts", "toys" },
-    features    = { "prey", "void_assaults", "ritual_sites" },
+    features    = {
+        "showdowns", "prey", "void_assaults", "ritual_sites",
+        "delves", "dungeons", "raid", "housing", "professions", "season",
+    },
 }
 
 MC.AchievementSourceLabels = {
@@ -43,13 +47,21 @@ MC.AchievementSourceLabels = {
     prey          = "Prey",
     void_assaults = "Void Assaults",
     ritual_sites  = "Ritual Sites",
+    showdowns     = "Void Showdowns",
+    delves        = "Delves",
+    dungeons      = "Dungeons",
+    raid          = "Raids",
+    housing       = "Housing",
+    professions   = "Professions",
+    season        = "Season 2",
 }
 
 -- Back-compat: keep flat source order so older callers don't break.
 MC.AchievementSourceOrder = {
     "metas", "explore", "vistas", "glyphs", "lore", "paintings",
     "events", "zone", "pets", "mounts", "toys",
-    "prey", "void_assaults", "ritual_sites",
+    "showdowns", "prey", "void_assaults", "ritual_sites",
+    "delves", "dungeons", "raid", "housing", "professions", "season",
 }
 
 -- Coordinates from HandyNotes_Midnight (verified May 2026). The 8-digit
@@ -415,7 +427,7 @@ MC.RegisterContent("midnight", "achievements", {
                 name          = "Light Up the Night",
                 zone          = "Midnight (all zones)",
                 description   = "Complete each of the four zone metas. Rewards the Brilliant Petalwing mount.",
-                score         = 500,  -- top-level grand meta
+                score         = T.legendary,  -- top-level grand meta
                 taskList = {
                     intro = "One meta per zone. Finish all four and the mount is yours.",
                     tasks = {
@@ -794,6 +806,13 @@ MC.RegisterContent("midnight", "achievements", {
                 zone          = "Midnight (all zones)",
                 description   = "Catch all 21 new wild pets across the Midnight zones. The Pets tab tracks each one individually with waypoints.",
             },
+            {
+                achievementID = 15644,
+                name          = "Good Things Come in Small Packages",
+                zone          = "Account-wide",
+                description   = "Collect 1800 unique pets. Reward: Mister Muskoxeles. Current top of the pet-collection ladder.",
+                score         = T.legendary,  -- account-wide ultimate collection tier
+            },
         },
     },
 
@@ -821,7 +840,7 @@ MC.RegisterContent("midnight", "achievements", {
                 name          = "Insurmountable Collection",
                 zone          = "Account-wide",
                 description   = "Collect 600 mounts on a single character. Reward: Anu'shalla, Shadow's Guidance.",
-                score         = 500,  -- 600-mount tier — months/years of work
+                score         = T.legendary,  -- account-wide ultimate collection tier
             },
         },
     },
@@ -844,6 +863,13 @@ MC.RegisterContent("midnight", "achievements", {
                 name          = "Craft Your World",
                 zone          = "Out-of-game",
                 description   = "Connect your WoW account to Pinterest via the official promo page. Reward: Pin-o-Matic Camera toy.",
+            },
+            {
+                achievementID = 15781,
+                name          = "The Joy of Toy",
+                zone          = "Account-wide",
+                description   = "Collect 500 toys. Reward: Murglasses. Current top of the toy-collection ladder.",
+                score         = T.legendary,  -- account-wide ultimate collection tier
             },
         },
     },

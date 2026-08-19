@@ -11,6 +11,7 @@ MC.LOC = {
     Thraxadar          = { MC.MAP.Voidstorm, 0.393, 0.811, "Thraxadar, Slayer's Rise" },
     NaleideaRivergleam = { MC.MAP.Silvermoon, 0.526, 0.780, "Naleidea Rivergleam, Silvermoon City" },
     ConstructVanore    = { MC.MAP.Silvermoon, 0.557, 0.657, "Construct V'anore, Silvermoon City" },
+    ConstructAlia      = { MC.MAP.Silvermoon, 0.558, 0.660, "Construct Ali'a, Silvermoon City" },
     ApprenticeDiell    = { MC.MAP.Eversong, 0.434, 0.474, "Apprentice Diell, Eversong Woods" },
     -- Recipe vendors / trainers
     Lyrendal           = { MC.MAP.Silvermoon, 0.450, 0.554, "Lyrendal, Silvermoon City" },
@@ -45,6 +46,21 @@ MC.LOC = {
     DepthdiverTunakit        = { MC.MAP.ZulAman, 0.682, 0.200, "Depthdiver Tu'nakit, Zul'Aman" },
     MothkeeperWewTam         = { MC.MAP.Harandar, 0.492, 0.544, "Mothkeeper Wew'tam, The Den" },
     TelemancerAstrandis      = { MC.MAP.Silvermoon, 0.522, 0.778, "Telemancer Astrandis, Delver's HQ" },
+    Kifaan = {
+        { MC.MAP.Naigtal, 0.477, 0.812, "Kifaan, Naigtal" },
+        { MC.MAP.Val,     0.598, 0.196, "Kifaan, Val" },
+    },
+    Zuronar = {
+        { MC.MAP.Naigtal, 0.481, 0.833, "Zuronar, Naigtal" },
+        { MC.MAP.Val,     0.637, 0.212, "Zuronar, Val" },
+    },
+    ShowdownGateway = { MC.MAP.Voidstorm, 0.514, 0.713, "Gateway to the active Showdown world" },
+
+    -- Patch 12.1: Curse of Ula'tek.
+    Jansari               = { MC.MAP.CoiledIsle, 0.588, 0.450, "Jan'sari the Watchful, Coiled Isle" },
+    SecondMateSluggs      = { MC.MAP.CoiledIsle, 0.516, 0.498, "Second Mate Sluggs, Coiled Isle" },
+    SkullOfErinye         = { MC.MAP.VaultsOfAtalUtek, 0.512, 0.624, "Skull of Er'inye, Vaults of Atal'Utek" },
+    Dugal                 = { MC.MAP.VaultsOfAtalUtek, 0.505, 0.639, "Du'gal, Vaults of Atal'Utek" },
 
     -- Silvermoon City portals to other Midnight zones (used by MC.PORTALS routing)
     SilvermoonHarandarPortal  = { MC.MAP.Silvermoon, 0.367, 0.686, "Portal to Harandar (Gardens of Remembrance)" },
@@ -148,6 +164,8 @@ local LOC = MC.LOC
 local SilvermoonPortals = {
     [MC.MAP.Harandar]  = LOC.SilvermoonHarandarPortal,
     [MC.MAP.Voidstorm] = LOC.SilvermoonVoidstormPortal,
+    [MC.MAP.Val]       = LOC.SilvermoonVoidstormPortal,
+    [MC.MAP.Naigtal]   = LOC.SilvermoonVoidstormPortal,
 }
 
 MC.PORTALS = {
@@ -164,6 +182,8 @@ MC.PORTALS = {
         [MC.MAP.Eversong]        = LOC.HarandarSilvermoonPortal,
         [MC.MAP.ZulAman]         = LOC.HarandarSilvermoonPortal,
         [MC.MAP.IsleOfQuelDanas] = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.Val]              = LOC.HarandarVoidstormPortal,
+        [MC.MAP.Naigtal]          = LOC.HarandarVoidstormPortal,
     },
     -- The Den is a sub-map of Harandar; same routing applies so portals work
     -- whether the player is standing in the overworld zone or the hub itself.
@@ -173,6 +193,8 @@ MC.PORTALS = {
         [MC.MAP.Eversong]        = LOC.HarandarSilvermoonPortal,
         [MC.MAP.ZulAman]         = LOC.HarandarSilvermoonPortal,
         [MC.MAP.IsleOfQuelDanas] = LOC.HarandarSilvermoonPortal,
+        [MC.MAP.Val]              = LOC.HarandarVoidstormPortal,
+        [MC.MAP.Naigtal]          = LOC.HarandarVoidstormPortal,
     },
     [MC.MAP.Voidstorm] = {
         [MC.MAP.Silvermoon]      = LOC.VoidstormSilvermoonPortal,
@@ -180,5 +202,7 @@ MC.PORTALS = {
         [MC.MAP.Eversong]        = LOC.VoidstormSilvermoonPortal,
         [MC.MAP.ZulAman]         = LOC.VoidstormSilvermoonPortal,
         [MC.MAP.IsleOfQuelDanas] = LOC.VoidstormSilvermoonPortal,
+        [MC.MAP.Val]              = LOC.ShowdownGateway,
+        [MC.MAP.Naigtal]          = LOC.ShowdownGateway,
     },
 }

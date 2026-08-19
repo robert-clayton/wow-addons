@@ -26,6 +26,15 @@ local function push(out, id)
     end
 end
 
+local function criterionID(achievementID, criteriaIndex)
+    return tostring(achievementID) .. ":" .. tostring(criteriaIndex)
+end
+
+function Bitmap:CriterionID(achievementID, criteriaIndex)
+    if not (achievementID and criteriaIndex) then return nil end
+    return criterionID(achievementID, criteriaIndex)
+end
+
 local function flattenModuleData(modKey)
     local out = {}
     if modKey == "mounts" then
@@ -53,15 +62,17 @@ local function flattenModuleData(modKey)
             end
         end
     elseif modKey == "rares" then
-        for npcID in pairs(MC.RareNPCs or {}) do
-            push(out, npcID)
+        for _, ach in ipairs(MC.RareData or {}) do
+            for i = 1, ach.criteriaCount or 0 do
+                push(out, criterionID(ach.achievementID, i))
+            end
         end
-        table.sort(out)
     elseif modKey == "treasures" then
-        for name in pairs(MC.TreasureCoords or {}) do
-            push(out, name)
+        for _, ach in ipairs(MC.TreasureData or {}) do
+            for i = 1, ach.criteriaCount or 0 do
+                push(out, criterionID(ach.achievementID, i))
+            end
         end
-        table.sort(out)
     end
     return out
 end
@@ -129,25 +140,25 @@ local function isDecorCollected(decorID)
     return false
 end
 
--- Both rare and treasure probes look up completion via the achievement
--- criterion API directly (filter-independent), mirroring how the mount/
--- pet/toy probes hit their respective journal APIs. Reading from the
--- module Scanner's filter-scoped results would silently misreport
--- completed criteria that are hidden by the active expansion filter.
---
--- The lookups are populated at Init time by walking MC.RareData /
--- MC.TreasureData and iterating each achievement's criteria.
-local function isRareKilled(npcID)
-    local meta = Bitmap.rareCriterion and Bitmap.rareCriterion[npcID]
-    if not meta then return false end
-    local _, _, completed = GetAchievementCriteriaInfo(meta.achID, meta.idx)
-    return completed and true or false
-end
+-- Rare/treasure bit positions use achievementID:criteriaIndex. Both values
+-- are locale-independent and remain usable even when criterion asset IDs do
+-- not match the NPC/object IDs used by map data.
+-- achievementID -> live criteria count, refreshed by Build() each pass.
+local liveCriteriaCounts = {}
 
-local function isTreasureLooted(name)
-    local meta = Bitmap.treasureCriterion and Bitmap.treasureCriterion[name]
-    if not meta then return false end
-    local _, _, completed = GetAchievementCriteriaInfo(meta.achID, meta.idx)
+-- Returns nil (not false) when the criteria data isn't queryable yet:
+-- GetAchievementCriteriaInfo hard-errors on criteria the client hasn't
+-- streamed in, even after GetAchievementNumCriteria reports the full count.
+local function isCriterionComplete(id)
+    local achID, idx = tostring(id):match("^(%d+):(%d+)$")
+    achID, idx = tonumber(achID), tonumber(idx)
+    if not (achID and idx and GetAchievementCriteriaInfo) then return false end
+    -- A shipped index past the live count is a removed criterion: nobody
+    -- can own it, so it packs as a stable 0-bit on every same-version peer.
+    local live = liveCriteriaCounts[achID]
+    if live and idx > live then return false end
+    local ok, _, _, completed = pcall(GetAchievementCriteriaInfo, achID, idx)
+    if not ok then return nil end
     return completed and true or false
 end
 
@@ -156,8 +167,8 @@ local SECTION_PROBE = {
     pets        = isSpeciesCollected,
     toys        = isToyCollected,
     decorations = isDecorCollected,
-    rares       = isRareKilled,
-    treasures   = isTreasureLooted,
+    rares       = isCriterionComplete,
+    treasures   = isCriterionComplete,
 }
 
 -- 0/1 array <-> byte string.
@@ -227,16 +238,65 @@ local function b64Decode(s)
     return table.concat(out)
 end
 
+-- Fail closed only while criteria are plausibly still streaming after
+-- login. Past this window a short count is treated as a real hotfix:
+-- Build's live-count check turns the missing criteria into stable 0-bits
+-- instead of silently disabling sharing for every module.
+local CRITERIA_STRICT_WINDOW = 180
+
+function Bitmap:CriteriaReady()
+    if self._criteriaReady then return true end
+    if not GetAchievementNumCriteria then return false end
+    if GetTime() - (self._loginAt or 0) > CRITERIA_STRICT_WINDOW then
+        self._criteriaReady = true
+        return true
+    end
+    for _, data in ipairs({ MC.RareData or {}, MC.TreasureData or {} }) do
+        for _, ach in ipairs(data) do
+            local expected = ach.criteriaCount or 0
+            -- Zero-count entries contribute no bits; don't let them block.
+            if expected > 0 then
+                local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+                if not ok or (live or 0) < expected then return false end
+            end
+        end
+    end
+    self._criteriaReady = true
+    return true
+end
+
 -- Build the current owned-bitmap for broadcast.
 function Bitmap:Build()
     if not self.ids then return nil end
+    -- Never emit an all-zero partial bitmap while achievement criteria are
+    -- still streaming after login.
+    if not self:CriteriaReady() then return nil end
+    -- Snapshot live criteria counts so the probe can distinguish removed
+    -- criteria (index past the live count -> stable 0-bit) from criteria
+    -- that merely haven't streamed in yet (query error -> abort below).
+    wipe(liveCriteriaCounts)
+    if GetAchievementNumCriteria then
+        for _, data in ipairs({ MC.RareData or {}, MC.TreasureData or {} }) do
+            for _, ach in ipairs(data) do
+                local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+                liveCriteriaCounts[ach.achievementID] = (ok and live) or 0
+            end
+        end
+    end
     local sectionParts = {}
     for _, modKey in ipairs(MODULE_SECTIONS) do
         local ids = self.ids[modKey] or {}
         local probe = SECTION_PROBE[modKey]
         local bits = {}
         for i, id in ipairs(ids) do
-            bits[i] = probe(id) and 1 or 0
+            local owned = probe(id)
+            if owned == nil then
+                -- Criteria evicted since CriteriaReady() last passed; force
+                -- the gate to re-verify and retry on the next CRITERIA_UPDATE.
+                self._criteriaReady = false
+                return nil
+            end
+            bits[i] = owned and 1 or 0
         end
         sectionParts[#sectionParts + 1] = b64Encode(packBits(bits)) .. "/" .. tostring(#ids)
     end
@@ -291,46 +351,26 @@ function Bitmap:OwnersOf(modKey, canonicalID)
     return owners
 end
 
--- Walks MC.RareData / MC.TreasureData and builds two ID -> criterion
--- lookups used by isRareKilled / isTreasureLooted. Lets those probes
--- query GetAchievementCriteriaInfo directly (account-wide) rather
--- than read from the filter-scoped Scanner results.
-local function buildCriterionLookups()
-    Bitmap.rareCriterion = {}
-    Bitmap.treasureCriterion = {}
-    if not (GetAchievementNumCriteria and GetAchievementCriteriaInfo) then return end
-
-    -- Rares: assetID returned by GetAchievementCriteriaInfo is the npcID.
-    for _, ach in ipairs(MC.RareData or {}) do
-        local n = GetAchievementNumCriteria(ach.achievementID) or 0
-        for i = 1, n do
-            local _, _, _, _, _, _, _, assetID = GetAchievementCriteriaInfo(ach.achievementID, i)
-            if assetID and assetID > 0 then
-                Bitmap.rareCriterion[assetID] = { achID = ach.achievementID, idx = i }
-            end
-        end
-    end
-
-    -- Treasures: criterion name is the treasure name (matches MC.TreasureCoords keys).
-    for _, ach in ipairs(MC.TreasureData or {}) do
-        local n = GetAchievementNumCriteria(ach.achievementID) or 0
-        for i = 1, n do
-            local name = GetAchievementCriteriaInfo(ach.achievementID, i)
-            if name and name ~= "" then
-                Bitmap.treasureCriterion[name] = { achID = ach.achievementID, idx = i }
-            end
-        end
-    end
-end
-
 -- Build the index after PLAYER_LOGIN, once all module data files are
 -- loaded into MC.<Module>Data.
 function Bitmap:Init()
     buildIndex()
-    buildCriterionLookups()
+    self._criteriaReady = false
+    self._loginAt = GetTime()
     computeFingerprint()
 end
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_LOGIN")
-f:SetScript("OnEvent", function() Bitmap:Init() end)
+f:RegisterEvent("RECEIVED_ACHIEVEMENT_LIST")
+f:RegisterEvent("CRITERIA_UPDATE")
+f:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_LOGIN" then
+        Bitmap:Init()
+    else
+        Bitmap._criteriaReady = false
+        if Bitmap:CriteriaReady() and MC.RosterDebouncedBroadcast then
+            MC.RosterDebouncedBroadcast(5)
+        end
+    end
+end)

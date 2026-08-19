@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -67,7 +68,7 @@ MC.LeatherworkingRecipes = {
             { id = 1237516, name = "Axe-Flingin' Bands",                          source = "drop",           sourceInfo = "Pattern Drop",                   priority = 4 },
             { id = 1237515, name = "Ranger-General's Grips",                       source = "drop",           sourceInfo = "Pattern Drop",                   priority = 4 },
             { id = 1237517, name = "World Tender's Trunkplate",                   source = "drop",           sourceInfo = "Ziekket, The Blinding Vale",     priority = 4 },
-            { id = 1237518, name = "World Tender's Rootslippers",                 source = "drop",           sourceInfo = "Pattern: Nemesis Strongbox",     priority = 4, dropInfo = { rate = "~0.1%" } },
+            { id = 1237518, name = "World Tender's Rootslippers",                 source = "drop",           sourceInfo = "Pattern: Nemesis Strongbox",     priority = 4, dropInfo = { rate = "~0.1%" }, score = T.epic },
             { id = 1237519, name = "World Tender's Barkclasp",                    source = "drop",           sourceInfo = "Pattern: Chimaerus",             priority = 4 },
         },
     },

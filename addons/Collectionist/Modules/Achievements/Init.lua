@@ -12,27 +12,15 @@ local mod = MC.RegisterModule("achievements", {
     },
     -- ACHIEVEMENT_EARNED + CRITERIA_UPDATE catch live progress as the
     -- player picks up glyphs / scopes vistas without a /reload.
-    events = { "ACHIEVEMENT_EARNED", "CRITERIA_UPDATE" },
+    events = { "RECEIVED_ACHIEVEMENT_LIST", "ACHIEVEMENT_EARNED", "CRITERIA_UPDATE" },
     onEvent = function(m, event)
         MC.ThrottledScan(m)
     end,
     tooltipLines = function(tt, m)
         local r = m.Scanner and m.Scanner.results
-        if r and r.total then
-            tt:AddLine(format("  Achievements: %d / %d", r.collectedCount, r.total), 0.7, 0.7, 0.7)
+        if r and r.totalAll then
+            tt:AddLine(format("  Achievements: %d / %d", r.collectedCountAll or 0, r.totalAll), 0.7, 0.7, 0.7)
         end
     end,
-    printSummary = function(m)
-        local r = m.Scanner and m.Scanner.results
-        if r and r.total then
-            print(format("%s [Achievements] %d / %d completed (%d remaining)",
-                MC.PREFIX, r.collectedCount, r.total, r.uncollectedCount))
-            for _, srcType in ipairs(MC.AchievementSourceOrder) do
-                local entries = r.bySource[srcType]
-                if entries and #entries > 0 then
-                    print(format("  %s: %d remaining", MC.AchievementSourceLabels[srcType], #entries))
-                end
-            end
-        end
-    end,
+    printSummary = MC.MakeSourceSummary("completed", MC.AchievementSourceOrder, MC.AchievementSourceLabels),
 })

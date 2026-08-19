@@ -1,5 +1,155 @@
 local _, MC = ...
 
+-- Time-gated content stays visible for planning, but scanners exclude it
+-- from obtainable totals and Collection Score until the regional unlock.
+-- Region IDs follow GetCurrentRegion: US/OCE 1, KR 2, EU 3, TW 4, CN 5.
+MC.CONTENT_RELEASE = {
+    MIDNIGHT_SEASON_2 = {
+        default = 1787065200, -- Americas: 2026-08-18 15:00 UTC
+        [1] = 1787065200,
+        [2] = 1787187600,    -- Korea:   2026-08-20 01:00 UTC
+        [3] = 1787112000,    -- Europe:  2026-08-19 04:00 UTC
+        [4] = 1787187600,    -- Taiwan:  2026-08-20 01:00 UTC
+        [5] = 1787187600,    -- China:   Thursday regional reset
+        [50] = 0,            -- PTR / test realms already expose test content
+        [57] = 0,
+        labels = {
+            default = "August 18, 2026",
+            [1] = "August 18, 2026",
+            [2] = "August 20, 2026",
+            [3] = "August 19, 2026",
+            [4] = "August 20, 2026",
+            [5] = "August 20, 2026",
+            [50] = "Available on test realms",
+            [57] = "Available on test realms",
+        },
+        badges = {
+            default = "Aug 18",
+            [1] = "Aug 18",
+            [2] = "Aug 20",
+            [3] = "Aug 19",
+            [4] = "Aug 20",
+            [5] = "Aug 20",
+            [50] = "PTR",
+            [57] = "PTR",
+        },
+    },
+}
+
+function MC.GetPlayerRegion()
+    if C_BattleNet and C_BattleNet.GetGameAccountInfoByGUID and UnitGUID then
+        local ok, account = pcall(C_BattleNet.GetGameAccountInfoByGUID, UnitGUID("player"))
+        if ok and account and account.regionID then return account.regionID end
+    end
+    if GetCurrentRegion then
+        local ok, region = pcall(GetCurrentRegion)
+        if ok and region then return region end
+    end
+    return 1
+end
+
+function MC.ResolveContentRelease(release)
+    if type(release) == "number" then return release end
+    if type(release) ~= "table" then return nil end
+    return release[MC.GetPlayerRegion()] or release.default
+end
+
+function MC.GetCurrentTimestamp()
+    if GetServerTime then
+        local ok, timestamp = pcall(GetServerTime)
+        if ok and type(timestamp) == "number" and timestamp > 0 then
+            return timestamp
+        end
+    end
+    if time then
+        local ok, timestamp = pcall(time)
+        if ok and type(timestamp) == "number" then return timestamp end
+    end
+    return 0
+end
+
+function MC.IsContentAvailable(entry, now)
+    local unlock = MC.ResolveContentRelease(entry and entry.availableAfter)
+    return not unlock or (now or MC.GetCurrentTimestamp()) >= unlock
+end
+
+function MC.GetAvailabilityLabel(entry)
+    local release = entry and entry.availableAfter
+    if not release then return nil end
+    if type(release) == "table" and release.labels then
+        return release.labels[MC.GetPlayerRegion()] or release.labels.default
+    end
+    return "a future update"
+end
+
+function MC.GetAvailabilityBadge(entry)
+    local release = entry and entry.availableAfter
+    if not release then return nil end
+    if type(release) == "table" and release.badges then
+        return release.badges[MC.GetPlayerRegion()] or release.badges.default
+    end
+    return "Soon"
+end
+
+function MC.CountObtainableEntries(entries)
+    local count = 0
+    for _, entry in ipairs(entries or {}) do
+        if not entry.future then count = count + 1 end
+    end
+    return count
+end
+
+function MC.HasObtainableEntries(bySource)
+    for _, entries in pairs(bySource or {}) do
+        if MC.CountObtainableEntries(entries) > 0 then return true end
+    end
+    return false
+end
+
+-- Insert a scan entry into the per-source (and, when given, per-category)
+-- buckets, creating sub-tables on demand. Shared by every module scanner.
+function MC.BucketEntry(result, source, entry, category)
+    if category then
+        if not result.byCategory[category] then
+            result.byCategory[category] = {}
+        end
+        if not result.byCategory[category][source] then
+            result.byCategory[category][source] = {}
+        end
+        local bucket = result.byCategory[category][source]
+        bucket[#bucket + 1] = entry
+    end
+    if not result.bySource[source] then result.bySource[source] = {} end
+    local bucket = result.bySource[source]
+    bucket[#bucket + 1] = entry
+end
+
+-- Factory for the minimap-summary printer each module registers as
+-- opts.printSummary. Every module's summary differs only in its verb and
+-- source tables; the bracket label comes from the module itself.
+function MC.MakeSourceSummary(verb, orderTable, labelsTable)
+    local headerNoun = (verb == "collected") and "Uncollected" or "Remaining"
+    local perSource  = (verb == "collected") and "uncollected" or "remaining"
+    return function(m)
+        local r = m.Scanner and m.Scanner.results
+        if not (r and r.totalAll) then return end
+        print(format("%s [%s] %d / %d %s (%d remaining)",
+            MC.PREFIX, m.label, r.collectedCountAll or 0, r.totalAll,
+            verb, r.totalAll - (r.collectedCountAll or 0)))
+        -- bySource is filter-scoped (it feeds the tab's waypoint
+        -- lists), so say which slice the breakdown covers.
+        if MC.HasObtainableEntries(r.bySource) then
+            print(format("  %s by source (%s):", headerNoun, MC.GetFilterScopeLabel()))
+        end
+        for _, srcType in ipairs(orderTable) do
+            local count = MC.CountObtainableEntries(r.bySource[srcType])
+            if count > 0 then
+                print(format("  %s: %d %s", labelsTable[srcType] or srcType, count, perSource))
+            end
+        end
+    end
+end
+
 -- Major faction IDs. Used by C_MajorFactions.GetMajorFactionData.
 MC.FACTION = {
     AmaniTribe      = 2696,
@@ -8,6 +158,8 @@ MC.FACTION = {
     SilvermoonCourt = 2710,
     SlayersDuellum  = 2770,
     RitualSites     = 2792,  -- 12.0.5
+    ZuljarrasForces = 2772,  -- 12.1 Coiled Isle renown
+    CaptainTokka    = 2773,  -- 12.1 Cursed Fishing friendship
 }
 
 -- Currency IDs. Used by C_CurrencyInfo.GetCurrencyInfo and cost = { ... } blocks.
@@ -30,6 +182,10 @@ MC.CURRENCY = {
     BrimmingArcana     = 3379,
     RemnantOfAnguish   = 3392,
     IllusionaryCoin    = 3393,  -- 12.0.5 Decor Duels
+    TimewarpedBadges   = 1166,
+    CommunityCoupons   = 3363,
+    CorrosiveCoin      = 3448,
+    CoiledFilament     = 3546,
 }
 
 -- Profession skill line IDs.
@@ -84,6 +240,14 @@ MC.MAP = {
     -- Sub-zone hubs with their own mapIDs (portal rooms live here).
     HarandarDen      = 2576,
     SlayersRise      = 2444,  -- Voidstorm sub-map
+    -- Patch 12.0.7 Showdown worlds.
+    Val              = 2599,
+    Naigtal          = 2600,
+    NaigtalCrypt     = 2646,
+    -- Patch 12.1: Curse of Ula'tek.
+    CoiledIsle       = 2512,
+    VaultsOfAtalUtek = 2509,
+    VaultsDepths     = 2613,
 }
 
 -- Sub-map -> parent overworld map. The smart-waypoint resolver rolls
@@ -96,6 +260,22 @@ MC.MAP_PARENT = {
     [2444] = 2405,  -- Slayer's Rise      -> Voidstorm
     [2585] = 2437,  -- Broken Throne      -> Zul'Aman
     [2594] = 2395,  -- Daggerspine Point  -> Eversong Woods
+    [2646] = 2600,  -- Naigtal Crypt      -> Naigtal
+    [2617] = 2599,  -- Val interiors      -> Val
+    [2618] = 2599,
+    [2619] = 2599,
+    [2620] = 2599,
+    [2621] = 2599,
+    [2509] = 2512,  -- Vaults of Atal'Utek -> Coiled Isle
+    [2613] = 2509,  -- Vaults interiors     -> Vaults of Atal'Utek
+    [2636] = 2509,
+    [2637] = 2509,
+    [2638] = 2509,
+    [2639] = 2512,  -- Coiled Isle interiors -> Coiled Isle
+    [2640] = 2512,
+    [2641] = 2512,
+    [2642] = 2512,
+    [2644] = 2512,
 }
 
 -- MC.PORTALS is defined at the bottom of Data/Locations.lua (it needs MC.LOC).
@@ -107,62 +287,77 @@ MC.MAP_PARENT = {
 -- Per-item override: set `score = N` on the entry in the data file.
 -- Otherwise the source-default below applies; otherwise SCORE_DEFAULT.
 --
--- Tiers (see plan):
---   1   Trivial       — easy vendor purchases
---   5   Standard      — renown, normal raid drops, easy quest rewards
---   25  Long          — exalted-rep grinds, ~5% drops, weekly-locked
---   100 Epic          — <1% drops, mythic-only, hard solo achievements
---   500 Legendary     — ultra-rare, retired-but-collected, multi-year
+-- Tiers:
+--   1   Trivial    — walk-up loot, easy vendor purchases
+--   5   Short      — single rare, multi-step treasure, raid drop, quest reward
+--   10  Medium     — vistas/glyphs/lore achievement criteria, heroic raid trophy
+--   25  Long       — dungeon, reputation, prey, ritual sites, mythic raid trophy
+--   50  Epic       — raid mount, pvp mount, prepatch, meta achievement
+--   100 Legendary  — grand metas, ultra-rare, multi-year aspirational
 ----------------------------------------------------------------------
 MC.SCORE_TIERS = {
-    trivial    = 1,
-    standard   = 5,
-    long       = 25,
-    epic       = 100,
-    legendary  = 500,
+    trivial    = 1,    -- walk-up loot, vendor purchase
+    short      = 5,    -- single rare, multi-step treasure, raid drop, quest reward
+    medium     = 10,   -- vistas/glyphs/lore/etc. achievement criteria, heroic raid trophy
+    long       = 25,   -- dungeon, reputation, prey, ritual_sites, mythic raid trophy
+    epic       = 50,   -- raid mount, pvp mount, prepatch, meta achievement
+    legendary  = 100,  -- grand metas, multi-year aspirational
 }
+local T = MC.SCORE_TIERS
 
 MC.DEFAULT_SCORE_BY_SOURCE = {
-    -- Trivial
-    vendor          = 1,
-    -- Standard
-    renown          = 5,
-    quest           = 5,
-    worldevent      = 5,
-    profession      = 5,
-    delve           = 5,
-    -- Long
-    drop            = 25,
-    achievement     = 25,
-    prey            = 25,
-    ritual_sites    = 25,
-    void_assaults   = 25,
-    dungeon         = 25,
-    reputation      = 25,
-    -- Per-zone source keys used by Treasures and Rares modules.
-    eversong        = 25,
-    zulaman         = 25,
-    harandar        = 25,
-    voidstorm       = 25,
-    -- Epic
-    raid            = 100,
-    pvp             = 100,
-    prepatch        = 100,
-    -- Achievement-tab source keys (most are Long; metas overridden per-item).
-    metas           = 100,
-    explore         = 25,
-    vistas          = 25,
-    glyphs          = 25,
-    lore            = 25,
-    paintings       = 25,
-    events          = 25,
-    zone            = 25,
-    pets            = 25,
-    mounts          = 25,
-    toys            = 25,
+    vendor          = T.trivial,
+
+    renown          = T.short,
+    quest           = T.short,
+    worldevent      = T.short,
+    profession      = T.short,
+    delve           = T.short,
+    -- Per-zone source keys used by Treasures and Rares modules. A single
+    -- rare kill or treasure pickup is closer to a quest/renown reward
+    -- than to a multi-week rep grind.
+    eversong        = T.short,
+    zulaman         = T.short,
+    harandar        = T.short,
+    voidstorm       = T.short,
+    val             = T.short,
+    naigtal         = T.short,
+    coiled_isle     = T.short,
+
+    -- Achievement criteria (vistas, glyphs, lore, paintings) — quick
+    -- clicks once you know the location.
+    explore         = T.medium,
+    vistas          = T.medium,
+    glyphs          = T.medium,
+    lore            = T.medium,
+    paintings       = T.medium,
+    events          = T.medium,
+    zone            = T.medium,
+    pets            = T.medium,
+    mounts          = T.medium,
+    toys            = T.medium,
+
+    drop            = T.long,
+    achievement     = T.long,
+    prey            = T.long,
+    ritual_sites    = T.long,
+    showdowns       = T.long,
+    void_assaults   = T.long,
+    dungeon         = T.long,
+    delves          = T.long,
+    dungeons        = T.long,
+    housing         = T.medium,
+    professions     = T.medium,
+    reputation      = T.long,
+
+    raid            = T.epic,
+    pvp             = T.epic,
+    prepatch        = T.epic,
+    metas           = T.epic,
+    season          = T.epic,
 }
 
-MC.SCORE_DEFAULT = 5
+MC.SCORE_DEFAULT = T.short
 
 -- Returns the integer weight for a collectible entry. Per-item override
 -- (`entry.score`) wins; otherwise the source default; otherwise the
@@ -173,4 +368,35 @@ function MC.ScoreFor(entry)
     local d = MC.DEFAULT_SCORE_BY_SOURCE[entry.source]
     if d then return d end
     return MC.SCORE_DEFAULT
+end
+
+-- Fold one scanned entry into a scanner's account-wide tallies. Shared by
+-- every module's Scan() so the totalAll / collectedCountAll / score /
+-- legacyCount / byExpansion bookkeeping lives in one place. Callers
+-- resolve the item's weight, expansion key, legacy (unavailable) flag,
+-- and current release state first. Future content remains renderable but
+-- does not enter completion denominators or Collection Score.
+function MC.AccumulateScanEntry(result, collected, weight, expansion, legacy, available)
+    if available == false then
+        result.futureCount = (result.futureCount or 0) + 1
+        return false
+    end
+    result.totalAll = result.totalAll + 1
+    if collected then
+        result.collectedCountAll = result.collectedCountAll + 1
+        if legacy then
+            result.legacyCount = result.legacyCount + 1
+        else
+            result.score = result.score + (weight or 0)
+        end
+    end
+    expansion = expansion or "_unknown"
+    local b = result.byExpansion[expansion]
+    if not b then
+        b = { total = 0, collected = 0 }
+        result.byExpansion[expansion] = b
+    end
+    b.total = b.total + 1
+    if collected then b.collected = b.collected + 1 end
+    return true
 end

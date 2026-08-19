@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 MC.DecoSourceOrder = {
     "crafted", "renown", "vendor", "quest", "achievement",
@@ -504,18 +505,18 @@ MC.RegisterContent("midnight", "decorations", {
         source = "achievement",
         decorations = {
             -- Exploration: Highest Peaks
-            { decorID = 10542, name = "'Eversong Lantern' Painting", source = "achievement", sourceInfo = "Eversong Woods: The Highest Peaks", achievementID = 62288 },
-            { decorID = 11325, name = "Amani Spearhunter's Spit", source = "achievement", sourceInfo = "Zul'Aman: The Highest Peaks", achievementID = 62289 },
-            { decorID = 17516, name = "Fungarian Vine Fence", source = "achievement", sourceInfo = "Harandar: The Highest Peaks", achievementID = 62290 },
-            { decorID = 15890, name = "Void Elf Weapon Rack", source = "achievement", sourceInfo = "Voidstorm: The Highest Peaks", achievementID = 62291 },
+            { decorID = 10542, name = "'Eversong Lantern' Painting", source = "achievement", sourceInfo = "Eversong Woods: The Highest Peaks", achievementID = 62288, score = T.short },
+            { decorID = 11325, name = "Amani Spearhunter's Spit", source = "achievement", sourceInfo = "Zul'Aman: The Highest Peaks", achievementID = 62289, score = T.short },
+            { decorID = 17516, name = "Fungarian Vine Fence", source = "achievement", sourceInfo = "Harandar: The Highest Peaks", achievementID = 62290, score = T.short },
+            { decorID = 15890, name = "Void Elf Weapon Rack", source = "achievement", sourceInfo = "Voidstorm: The Highest Peaks", achievementID = 62291, score = T.short },
             -- Exploration: Other
             { decorID = 11470, name = "Silvermoon Energy Focus", source = "achievement", sourceInfo = "A Bloody Song", achievementID = 61507 },
-            { decorID = 15573, name = "Colossal Amani Stone Visage", source = "achievement", sourceInfo = "Tallest Tree in the Forest", achievementID = 62122, taskList = TALLEST_TREE_TASKS },
+            { decorID = 15573, name = "Colossal Amani Stone Visage", source = "achievement", sourceInfo = "Tallest Tree in the Forest", achievementID = 62122, taskList = TALLEST_TREE_TASKS, score = T.short },
             { decorID = 15501, name = "Lightbloom Moss Mound", source = "achievement", sourceInfo = "Leaf None Behind", achievementID = 61264 },
-            { decorID = 15757, name = "Opened Domanaar Storage Crate", source = "achievement", sourceInfo = "The Ultimate Predator", achievementID = 62130, taskList = ULTIMATE_PREDATOR_TASKS },
-            { decorID = 1446, name = "Silvermoon Painter's Cushion", source = "achievement", sourceInfo = "Ever Painting", achievementID = 62185, taskList = EVER_PAINTING_TASKS },
+            { decorID = 15757, name = "Opened Domanaar Storage Crate", source = "achievement", sourceInfo = "The Ultimate Predator", achievementID = 62130, taskList = ULTIMATE_PREDATOR_TASKS, score = T.short },
+            { decorID = 1446, name = "Silvermoon Painter's Cushion", source = "achievement", sourceInfo = "Ever Painting", achievementID = 62185, taskList = EVER_PAINTING_TASKS, score = T.short },
             -- Questing
-            { decorID = 15494, name = "On'ohia's Call", source = "achievement", sourceInfo = "Legends Never Die", achievementID = 61574, taskList = LEGENDS_NEVER_DIE_TASKS },
+            { decorID = 15494, name = "On'ohia's Call", source = "achievement", sourceInfo = "Legends Never Die", achievementID = 61574, taskList = LEGENDS_NEVER_DIE_TASKS, score = T.short },
             -- Zone Events
             { decorID = 8872, name = "Eversong Feast Platter", source = "achievement", sourceInfo = "The Party Must Go On", achievementID = 62186 },
             { decorID = 8874, name = "Eversong Dessert Platter", source = "achievement", sourceInfo = "The Party Must Go On", achievementID = 62186 },
@@ -534,7 +535,7 @@ MC.RegisterContent("midnight", "decorations", {
             { decorID = 15458, name = "Midnight Skinner's Shop Sign", source = "achievement", sourceInfo = "Skinning at Midnight", achievementID = 42790 },
             { decorID = 15459, name = "Midnight Tailor's Shop Sign", source = "achievement", sourceInfo = "Tailoring at Midnight", achievementID = 42794 },
             -- Feat of Strength
-            { decorID = 14467, name = "Miniature Replica Dark Portal", source = "achievement", sourceInfo = "It's Nearly Midnight", achievementID = 62387 },
+            { decorID = 14467, name = "Miniature Replica Dark Portal", source = "achievement", sourceInfo = "It's Nearly Midnight", achievementID = 62387, score = T.trivial },
         },
     },
 
@@ -571,33 +572,33 @@ MC.RegisterContent("midnight", "decorations", {
               dropInfo = { mob = "Nalorakk", zone = "Den of Nalorakk", boss = true, rate = "100%" } },
             -- Raid drops: The Voidspire
             { decorID = 15758, name = "Banded Domanaar Storage Crate", source = "drop", sourceInfo = "Fallen-King Salhadaar, The Voidspire",
-              dropInfo = { mob = "Fallen-King Salhadaar", zone = "The Voidspire", boss = true, rate = "100%" } },
+              dropInfo = { mob = "Fallen-King Salhadaar", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },
             { decorID = 15761, name = "Imperator's Torment Crystal", source = "drop", sourceInfo = "Imperator Averzian, The Voidspire",
-              dropInfo = { mob = "Imperator Averzian", zone = "The Voidspire", boss = true, rate = "100%" } },
+              dropInfo = { mob = "Imperator Averzian", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },
             { decorID = 14806, name = "Tattered Vanguard Banner", source = "drop", sourceInfo = "War Chaplain Senn, The Voidspire",
-              dropInfo = { mob = "War Chaplain Senn", zone = "The Voidspire", boss = true, rate = "100%" } },
+              dropInfo = { mob = "War Chaplain Senn", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },
             { decorID = 15755, name = "Voidbound Holding Cell", source = "drop", sourceInfo = "Vaelgor, The Voidspire",
-              dropInfo = { mob = "Vaelgor", zone = "The Voidspire", boss = true, rate = "100%" } },
+              dropInfo = { mob = "Vaelgor", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },
             { decorID = 15762, name = "Voltaic Trigore Egg", source = "drop", sourceInfo = "Vorasius, The Voidspire",
-              dropInfo = { mob = "Vorasius", zone = "The Voidspire", boss = true, rate = "100%" } },
-            -- Raid trophies: The Voidspire
-            { decorID = 19252, name = "Voidspire Vanquisher's Argent Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Normal)", zone = "The Voidspire" },
-            { decorID = 17630, name = "Voidspire Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Heroic)", zone = "The Voidspire" },
-            { decorID = 18398, name = "Voidspire Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Mythic)", zone = "The Voidspire" },
+              dropInfo = { mob = "Vorasius", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },
+            -- Raid trophies: The Voidspire (Argent=Normal 5, Aureate=Heroic 10, Gleaming=Mythic 25)
+            { decorID = 19252, name = "Voidspire Vanquisher's Argent Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Normal)", zone = "The Voidspire", score = T.short },
+            { decorID = 17630, name = "Voidspire Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Heroic)", zone = "The Voidspire", score = T.medium },
+            { decorID = 18398, name = "Voidspire Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "Alleria Windrunner (Mythic)", zone = "The Voidspire", score = T.long },
             -- Raid trophies: The Dreamrift
-            { decorID = 19197, name = "Dreamrift Vanquisher's Argent Trophy", source = "drop", sourceInfo = "Chimaerus (Normal)", zone = "The Dreamrift" },
-            { decorID = 17629, name = "Dreamrift Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "Chimaerus (Heroic)", zone = "The Dreamrift" },
-            { decorID = 18397, name = "Dreamrift Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "Chimaerus (Mythic)", zone = "The Dreamrift" },
+            { decorID = 19197, name = "Dreamrift Vanquisher's Argent Trophy", source = "drop", sourceInfo = "Chimaerus (Normal)", zone = "The Dreamrift", score = T.short },
+            { decorID = 17629, name = "Dreamrift Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "Chimaerus (Heroic)", zone = "The Dreamrift", score = T.medium },
+            { decorID = 18397, name = "Dreamrift Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "Chimaerus (Mythic)", zone = "The Dreamrift", score = T.long },
             { decorID = 15481, name = "Eerie Iridescent Riftshroom", source = "drop", sourceInfo = "Chimaerus, The Dreamrift",
-              dropInfo = { mob = "Chimaerus", zone = "The Dreamrift", boss = true, rate = "100%" } },
+              dropInfo = { mob = "Chimaerus", zone = "The Dreamrift", boss = true, rate = "100%" }, score = T.short },
             -- Raid trophies: March on Quel'Danas
-            { decorID = 19198, name = "March on Quel'Danas Vanquisher's Argent Trophy", source = "drop", sourceInfo = "L'ura (Normal)", zone = "March on Quel'Danas" },
-            { decorID = 17628, name = "March on Quel'Danas Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "L'ura (Heroic)", zone = "March on Quel'Danas" },
-            { decorID = 18396, name = "March on Quel'Danas Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "L'ura (Mythic)", zone = "March on Quel'Danas" },
+            { decorID = 19198, name = "March on Quel'Danas Vanquisher's Argent Trophy", source = "drop", sourceInfo = "L'ura (Normal)", zone = "March on Quel'Danas", score = T.short },
+            { decorID = 17628, name = "March on Quel'Danas Vanquisher's Aureate Trophy", source = "drop", sourceInfo = "L'ura (Heroic)", zone = "March on Quel'Danas", score = T.medium },
+            { decorID = 18396, name = "March on Quel'Danas Vanquisher's Gleaming Trophy", source = "drop", sourceInfo = "L'ura (Mythic)", zone = "March on Quel'Danas", score = T.long },
             { decorID = 15467, name = "Blessed Phoenix Egg", source = "drop", sourceInfo = "Void Ember, March on Quel'Danas",
-              dropInfo = { mob = "Void Ember", zone = "March on Quel'Danas", boss = true, rate = "100%" } },
+              dropInfo = { mob = "Void Ember", zone = "March on Quel'Danas", boss = true, rate = "100%" }, score = T.short },
             { decorID = 15756, name = "Chaotic Void Maw", source = "drop", sourceInfo = "L'ura, March on Quel'Danas",
-              dropInfo = { mob = "L'ura", zone = "March on Quel'Danas", boss = true, rate = "100%" } },
+              dropInfo = { mob = "L'ura", zone = "March on Quel'Danas", boss = true, rate = "100%" }, score = T.short },
             -- Treasures
             { decorID = 14977, name = "Gilded Eversong Cup", source = "drop", sourceInfo = "Gift of the Phoenix treasure", zone = "Eversong Woods" },
             { decorID = 8875, name = "Goldenmist Grapes", source = "drop", sourceInfo = "Stone Vat treasure", zone = "Eversong Woods" },

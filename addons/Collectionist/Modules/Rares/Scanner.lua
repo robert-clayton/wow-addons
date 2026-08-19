@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local mod = MC.modulesByKey["rares"]
 mod.Scanner = {}
@@ -7,7 +8,30 @@ local Scanner = mod.Scanner
 Scanner.results = {}
 
 function Scanner:Scan()
-    if not MC.RareData then return end
+    if not MC.RareData then return false end
+    if CanShowAchievementUI then
+        local ok, ready = pcall(CanShowAchievementUI)
+        if not ok or not ready then return false end
+    end
+
+    if not (GetAchievementCriteriaInfo and GetAchievementNumCriteria) then
+        return false
+    end
+
+    -- Preflight: capture each achievement's live criteria count. Criteria
+    -- arrive as a streamed cache, so a short count usually means "still
+    -- loading" — scan what's queryable now, mark the result partial, and
+    -- let the bounded retry settle whether the shortfall is permanent
+    -- (hotfix) or transient. A live count above the shipped one means
+    -- Blizzard added criteria; scan those too.
+    local criteriaCounts, pending = {}, 0
+    for _, ach in ipairs(MC.RareData) do
+        local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+        live = (ok and live) or 0
+        criteriaCounts[ach] = live
+        local expected = ach.criteriaCount or 0
+        if live < expected then pending = pending + (expected - live) end
+    end
 
     -- See Mounts/Scanner.lua for the rationale on totalAll.
     local result = {
@@ -18,46 +42,46 @@ function Scanner:Scan()
         collectedCountAll  = 0,
         byExpansion        = {},
         score              = 0,
-        legacyScore        = 0,
         legacyCount        = 0,
         bySource           = {},
         collected          = {},
     }
 
-    local hasCriteria = GetAchievementCriteriaInfo and GetAchievementNumCriteria
-
     for _, ach in ipairs(MC.RareData) do
-        local visible = MC.IsGroupVisible(ach)
-        local n = hasCriteria and GetAchievementNumCriteria(ach.achievementID) or 0
+        local visible = MC.IsGroupVisible(ach, "rares")
+        local n = criteriaCounts[ach]
+        -- When the live count disagrees with the shipped one, the criterion
+        -- order may have shifted too; distrust the positional metadata
+        -- arrays rather than risk pairing the wrong waypoint/score.
+        local trustPositional = (n == (ach.criteriaCount or 0))
         for i = 1, n do
             -- Returns: name, type, completed, qty, totalQty, charName, flags, assetID, ...
             -- For "kill creature" criteria (type 0), assetID is the NPC ID.
-            local name, _, completed, _, _, _, _, assetID = GetAchievementCriteriaInfo(ach.achievementID, i)
-            if name then
-                result.totalAll = result.totalAll + 1
-                if completed then
-                    result.collectedCountAll = result.collectedCountAll + 1
-                    -- Rares don't have per-criterion `unavailable` flags; the
-                    -- ach-level entry's source default applies. No legacy
-                    -- bucket for rares today.
-                    result.score = result.score + MC.ScoreFor(ach)
-                end
-
+            -- pcall: the API hard-errors on criteria the client hasn't
+            -- streamed in, even after the count preflight passed.
+            local ok, name, _, completed, _, _, _, _, assetID =
+                pcall(GetAchievementCriteriaInfo, ach.achievementID, i)
+            if not ok or name == nil or completed == nil then
+                pending = pending + 1
+            else
+                -- Criterion order is stable across locales; the shipped NPC
+                -- map also covers criteria whose assetID reuses another NPC.
+                local npcID = (trustPositional and ach.criteriaNPCIDs and ach.criteriaNPCIDs[i])
+                           or ((assetID and assetID > 0) and assetID or nil)
+                -- Per-rare stable NPC-ID override wins over
+                -- the achievement-level source default. Used to bump
+                -- rare-elites + PvP-zone rares above the standard per-zone tier.
+                local override = MC.RareScoreOverrides and MC.RareScoreOverrides[npcID]
                 local exp = ach.expansion or "_unknown"
-                local b = result.byExpansion[exp]
-                if not b then
-                    b = { total = 0, collected = 0 }
-                    result.byExpansion[exp] = b
-                end
-                b.total = b.total + 1
-                if completed then b.collected = b.collected + 1 end
+                local available = MC.IsContentAvailable(ach)
+                MC.AccumulateScanEntry(result, completed, override or MC.ScoreFor(ach), exp,
+                    nil, available)
 
                 if visible then
-                    result.total = result.total + 1
-                    local npcID = (assetID and assetID > 0) and assetID or nil
-                    local coords = (name  and MC.RareCoords and MC.RareCoords[name])
-                                or (npcID and MC.RareNPCs   and MC.RareNPCs[npcID])
+                    local coords = (npcID and MC.RareNPCs and MC.RareNPCs[npcID])
+                                or (name and MC.RareCoords and MC.RareCoords[name])
                     local entry = {
+                        moduleKey     = "rares",
                         name          = name,
                         npcID         = npcID,
                         source        = ach.source,
@@ -68,21 +92,27 @@ function Scanner:Scan()
                         waypoint      = coords,
                         collected     = completed and true or false,
                         expansion     = ach.expansion,
+                        availableAfter = ach.availableAfter,
+                        future         = not available,
                     }
-                    if entry.collected then
-                        result.collectedCount = result.collectedCount + 1
-                        result.collected[#result.collected + 1] = entry
-                    else
-                        result.uncollectedCount = result.uncollectedCount + 1
-                        if not result.bySource[ach.source] then
-                            result.bySource[ach.source] = {}
+                    if available then
+                        result.total = result.total + 1
+                        if entry.collected then
+                            result.collectedCount = result.collectedCount + 1
+                            result.collected[#result.collected + 1] = entry
+                        else
+                            result.uncollectedCount = result.uncollectedCount + 1
                         end
-                        result.bySource[ach.source][#result.bySource[ach.source] + 1] = entry
+                    end
+                    if not (available and entry.collected) then
+                        MC.BucketEntry(result, ach.source, entry)
                     end
                 end
             end
         end
     end
 
+    result._partial = pending > 0 and pending or nil
     self.results = result
+    return true
 end

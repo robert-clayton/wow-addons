@@ -100,21 +100,9 @@ local mod = MC.RegisterModule("pets", {
     end,
     tooltipLines = function(tt, m)
         local r = m.Scanner and m.Scanner.results
-        if r and r.total then
-            tt:AddLine(format("  Pets: %d / %d", r.collectedCount, r.total), 0.7, 0.7, 0.7)
+        if r and r.totalAll then
+            tt:AddLine(format("  Pets: %d / %d", r.collectedCountAll or 0, r.totalAll), 0.7, 0.7, 0.7)
         end
     end,
-    printSummary = function(m)
-        local r = m.Scanner and m.Scanner.results
-        if r and r.total then
-            print(format("%s [Pets] %d / %d collected (%d remaining)",
-                MC.PREFIX, r.collectedCount, r.total, r.uncollectedCount))
-            for _, srcType in ipairs(MC.PetSourceOrder) do
-                local entries = r.bySource[srcType]
-                if entries and #entries > 0 then
-                    print(format("  %s: %d uncollected", MC.PetSourceLabels[srcType], #entries))
-                end
-            end
-        end
-    end,
+    printSummary = MC.MakeSourceSummary("collected", MC.PetSourceOrder, MC.PetSourceLabels),
 })

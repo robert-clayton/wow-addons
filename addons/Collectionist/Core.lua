@@ -73,7 +73,12 @@ end
 --   rares        -> MC.RareData
 --   treasures    -> MC.TreasureData
 --   achievements -> MC.AchievementData
---   recipes      -> MC.RecipeData (per-skillline merge handled by Recipes module)
+--
+-- Recipes deliberately have no route here: profession recipe data lives
+-- in the per-skillline tables (MC.AlchemyRecipes etc.), and no merge
+-- into a generic list exists. When older-expansion recipe content ships,
+-- design the real per-skillline merge then — registering it through this
+-- API today would silently discard it.
 --------------------------------------------------------------------------
 MC._registeredExpansions = {}
 
@@ -85,7 +90,6 @@ local CONTENT_TARGETS = {
     rares        = "RareData",
     treasures    = "TreasureData",
     achievements = "AchievementData",
-    recipes      = "RecipeData",
 }
 
 function MC.RegisterContent(expansionKey, moduleKey, groups)
@@ -110,15 +114,18 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
         -- stamping is belt-and-suspenders for code paths that read the
         -- entry directly (Inspector, Sharing).
         group.expansion = group.expansion or expansionKey
+        group.moduleKey = group.moduleKey or moduleKey
         -- Inner-list keys: matches CONTENT_TARGETS module keys plus
         -- "items" (a generic catch-all used by some Decorations groups).
         for _, listKey in ipairs({ "mounts", "pets", "toys", "decorations",
                                    "rares", "treasures", "achievements",
-                                   "recipes", "items" }) do
+                                   "items" }) do
             local list = group[listKey]
             if type(list) == "table" then
                 for _, entry in ipairs(list) do
                     entry.expansion = entry.expansion or expansionKey
+                    entry.moduleKey = entry.moduleKey or moduleKey
+                    entry.availableAfter = entry.availableAfter or group.availableAfter
                 end
             end
         end
@@ -126,9 +133,13 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
     end
 
     MC._registeredExpansions[expansionKey] = true
+    MC._registeredExpansionsByModule = MC._registeredExpansionsByModule or {}
+    MC._registeredExpansionsByModule[moduleKey] = MC._registeredExpansionsByModule[moduleKey] or {}
+    MC._registeredExpansionsByModule[moduleKey][expansionKey] = true
     -- Invalidate the latest-expansion cache so the next read picks up
     -- newly-registered expansions.
     MC._latestExpansionKey = nil
+    MC._latestExpansionByModule = nil
 end
 
 --------------------------------------------------------------------------
@@ -149,18 +160,19 @@ function MC.GetExpansionFilter()
     return MC.db.expansionFilter
 end
 
-function MC.IsGroupVisible(group)
+function MC.IsGroupVisible(group, moduleKey)
     if not group then return true end
     -- Groups without an expansion stamp are pre-1.7.0 entries — show
     -- them so legacy data doesn't silently disappear.
     if not group.expansion then return true end
     local f = MC.GetExpansionFilter()
+    local latest = MC.GetLatestExpansion(moduleKey or group.moduleKey)
     if f.mode == "all" then return true end
     if f.mode == "single" then
-        return group.expansion == (f.single or MC.GetLatestExpansion())
+        return group.expansion == (f.single or latest)
     end
     -- "current" mode (default)
-    return group.expansion == MC.GetLatestExpansion()
+    return group.expansion == latest
 end
 
 function MC.SetExpansionFilter(mode, singleKey)
@@ -173,8 +185,7 @@ function MC.SetExpansionFilter(mode, singleKey)
     -- requests and yields a frame.
     if MC.modules and MC.ThrottledScan then
         for _, m in ipairs(MC.modules) do
-            if MC.IsModuleEnabled and MC.IsModuleEnabled(m.key)
-               and m.Scanner and m.Scanner.Scan then
+            if m.Scanner and m.Scanner.Scan then
                 MC.ThrottledScan(m, 0)
             end
         end
@@ -188,9 +199,22 @@ end
 function MC.GetExpansionFilterLabel()
     local f = MC.GetExpansionFilter()
     if f.mode == "all" then return "All" end
-    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion()
+    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion(MC.activeModule)
     local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
     return e and e.label or key or "?"
+end
+
+-- Longer-form scope label for chat summaries, so filter-scoped output
+-- (e.g. the minimap right-click source breakdowns) can say which slice
+-- of the collection it covers.
+function MC.GetFilterScopeLabel()
+    local f = MC.GetExpansionFilter()
+    if f.mode == "all" then return "All Expansions" end
+    local key = (f.mode == "single") and f.single or MC.GetLatestExpansion(MC.activeModule)
+    local e = MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[key]
+    local label = e and e.label or key or "?"
+    if f.mode == "single" then return label end
+    return format("Current (%s)", label)
 end
 
 --------------------------------------------------------------------------
@@ -248,6 +272,15 @@ end
 -- first enters the game (so they inherit the most recent character's prefs
 -- instead of starting from defaults).
 --------------------------------------------------------------------------
+-- Account-wide ledgers that live only in CollectionistDB. They must
+-- survive the PLAYER_LOGOUT snapshot (which otherwise rebuilds the
+-- account DB from the per-character DB) and must never be seeded into
+-- a CharDB — a per-character copy would overwrite the live ledger with
+-- stale data at that character's next logout.
+local ACCOUNT_ONLY_KEYS = {
+    recipesLearned = true,
+}
+
 local charDefaults = {
     dbVersion        = DB_VERSION,
     minimap          = { minimapPos = 225, hide = false },
@@ -257,7 +290,7 @@ local charDefaults = {
     minimized        = false,
     frameAlpha       = 1.0,
     frameScale       = 1.0,
-    panelWidth       = 380,
+    panelWidth       = 520,
     panelHeight      = 560,
     disabledModules  = {},
     activeTab        = "mounts",
@@ -268,6 +301,28 @@ local charDefaults = {
 --------------------------------------------------------------------------
 function MC.IsModuleEnabled(key)
     return not MC.db.disabledModules[key]
+end
+
+--------------------------------------------------------------------------
+-- Theme. Account-wide setting stored in CollectionistDB so all alts
+-- share the same look. Falls back to "modern" on a fresh install.
+--------------------------------------------------------------------------
+function MC.GetTheme()
+    -- Account-wide CollectionistDB is the primary read so a theme change
+    -- on any character propagates to every alt (last writer wins). It is
+    -- refreshed from CharDB on every PLAYER_LOGOUT snapshot, and SetTheme
+    -- dual-writes both. CharDB is the fallback for a first login before
+    -- the account value exists.
+    return (CollectionistDB and CollectionistDB.theme)
+        or (MC.db and MC.db.theme)
+        or "modern"
+end
+
+function MC.SetTheme(name)
+    if not (MUI and MUI.Themes and MUI.Themes[name]) then return end
+    if MC.db then MC.db.theme = name end
+    if CollectionistDB then CollectionistDB.theme = name end
+    MUI.SetTheme(name)
 end
 
 function MC.FirstEnabledModule()
@@ -293,12 +348,7 @@ function MC.SetModuleEnabled(key, enabled)
                 end
                 MC._RebuildEventMap()
             end
-            if mod.Scanner then
-                mod.Scanner:Scan()
-                if MC.activeModule == key and mod.UI then
-                    MC.RefreshActive()
-                end
-            end
+            if mod.Scanner then MC.ScanNow(mod) end
         end
     end
 
@@ -389,6 +439,14 @@ function MC.HideInfoTooltip()
     if infoTooltip then infoTooltip:Hide() end
 end
 
+-- Default OnLeave handler for module item rows. Hides the WoW tooltip
+-- and the module info tooltip together. Reused via reference (not a
+-- closure) so module rows don't allocate one per refresh.
+function MC.RowOnLeave()
+    GameTooltip:Hide()
+    MC.HideInfoTooltip()
+end
+
 --------------------------------------------------------------------------
 -- Currency info cache. C_CurrencyInfo.GetCurrencyInfo gets called on every
 -- tooltip hover, and currency data only changes on CURRENCY_DISPLAY_UPDATE.
@@ -403,6 +461,60 @@ local function GetCachedCurrencyInfo(currID)
     info = ok and info or false
     currencyCache[currID] = info
     return info or nil
+end
+
+-- Item cost metadata uses the same hover-time caching strategy as currencies.
+-- Item names can be unavailable until the client cache receives them, so the
+-- GET_ITEM_INFO_RECEIVED handler below evicts that specific entry for retry.
+local itemInfoCache = {}
+function MC.InvalidateItemInfoCache(itemID)
+    if itemID then
+        itemInfoCache[itemID] = nil
+    else
+        wipe(itemInfoCache)
+    end
+end
+
+local function GetCachedItemCostInfo(itemID)
+    local hit = itemInfoCache[itemID]
+    if hit ~= nil then return hit end
+
+    local name, icon
+    if C_Item then
+        if C_Item.GetItemNameByID then
+            local ok, value = pcall(C_Item.GetItemNameByID, itemID)
+            if ok then name = value end
+        end
+        if C_Item.GetItemIconByID then
+            local ok, value = pcall(C_Item.GetItemIconByID, itemID)
+            if ok then icon = value end
+        end
+    end
+    -- Keep the legacy API fallback for clients where one or both C_Item
+    -- helpers are absent. GetItemInfo's texture is its tenth return value.
+    if (not name or not icon) and GetItemInfo then
+        local values = { pcall(GetItemInfo, itemID) }
+        if values[1] then
+            name = name or values[2]
+            icon = icon or values[11]
+        end
+    end
+
+    hit = {
+        name = name or ("Item " .. itemID),
+        icon = icon,
+    }
+    itemInfoCache[itemID] = hit
+    return hit
+end
+
+local function GetOwnedItemCount(itemID)
+    local getCount = C_Item and C_Item.GetItemCount or GetItemCount
+    if not getCount then return 0 end
+    -- Include bank, reagent bank, and Warband bank so the affordability hint
+    -- reflects every stack a vendor transaction can reasonably draw from.
+    local ok, count = pcall(getCount, itemID, true, false, true, true)
+    return ok and (count or 0) or 0
 end
 
 -- Standing names <-> reaction index, file-scoped so they're not rebuilt per hover.
@@ -434,6 +546,15 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 
     if item.sourceInfo then
         tt:AddLine(item.sourceInfo, 1, 1, 1, true)
+    end
+
+    if item.availableAfter and MC.IsContentAvailable
+       and not MC.IsContentAvailable(item) then
+        local label = MC.GetAvailabilityLabel and MC.GetAvailabilityLabel(item)
+            or "a future update"
+        tt:AddLine(" ")
+        tt:AddDoubleLine("Available:", label,
+            C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], 1.0, 0.72, 0.25)
     end
 
     -- Step-by-step guide. Used today by treasures that have a puzzle/key
@@ -537,7 +658,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         end
     end
 
-    -- Currency / gold cost. Red if you can't afford it.
+    -- Currency, item, and gold costs. Red if you can't afford them.
     if item.cost then
         if item.cost.gold then
             local playerGold = GetMoney and GetMoney() or 0
@@ -556,6 +677,18 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
                 local owned = (info and info.quantity) or 0
                 local color = owned >= amount and "" or "|cffff4d4d"
                 local costLabel = icon and (amount .. " |T" .. icon .. ":0|t") or (amount .. " " .. name)
+                parts[#parts + 1] = color .. costLabel .. "|r"
+            end
+        end
+        for _, key in ipairs({"item", "item2"}) do
+            local itemCost = item.cost[key]
+            if itemCost then
+                local itemID, amount = itemCost[1], itemCost[2]
+                local info = GetCachedItemCostInfo(itemID)
+                local owned = GetOwnedItemCount(itemID)
+                local color = owned >= amount and "" or "|cffff4d4d"
+                local icon = info.icon and ("|T" .. info.icon .. ":0|t ") or ""
+                local costLabel = amount .. " " .. icon .. info.name
                 parts[#parts + 1] = color .. costLabel .. "|r"
             end
         end
@@ -628,23 +761,19 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
     -- Roster (v2): show which guildies/BNet friends already own this item.
     if MC.Bitmap and MC.Bitmap.OwnersOf then
         local modKey, canonicalID
-        if item.mountID then
+        if item.moduleKey == "mounts" and item.mountID then
             modKey, canonicalID = "mounts", item.mountID
-        elseif item.speciesID then
+        elseif item.moduleKey == "pets" and item.speciesID then
             modKey, canonicalID = "pets", item.speciesID
-        elseif item.decorID then
+        elseif item.moduleKey == "decorations" and item.decorID then
             modKey, canonicalID = "decorations", item.decorID
-        elseif item.itemID and item.source ~= "drop" and item.source ~= "treasure" then
-            -- Toy itemIDs land here; rare-drop items don't (those aren't in the bitmap).
+        elseif item.moduleKey == "toys" and item.itemID then
             modKey, canonicalID = "toys", item.itemID
-        elseif item.criteriaIndex and item.achievementID then
-            -- Treasures and Rares both expose criteriaIndex but we key
-            -- treasures by name and rares by npcID for stable lookup.
-            if item.npcID then
-                modKey, canonicalID = "rares", item.npcID
-            elseif item.objectID and item.name then
-                modKey, canonicalID = "treasures", item.name
-            end
+        elseif (item.moduleKey == "rares" or item.moduleKey == "treasures")
+               and item.criteriaIndex and item.achievementID
+               and MC.Bitmap.CriterionID then
+            modKey = item.moduleKey
+            canonicalID = MC.Bitmap:CriterionID(item.achievementID, item.criteriaIndex)
         end
         if modKey and canonicalID then
             local owners = MC.Bitmap:OwnersOf(modKey, canonicalID)
@@ -1081,24 +1210,105 @@ end
 -- Coalesces a flurry of events into one scan. Pets and Decorations pass
 -- a longer delay for BAG_UPDATE_DELAYED, which fires constantly during loot.
 --------------------------------------------------------------------------
+function MC.OnScanComplete(mod)
+    if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+    if MC.RosterDebouncedBroadcast then MC.RosterDebouncedBroadcast() end
+    if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
+    if MC.activeModule == mod.key and mod.UI and MC.panel
+       and MC.panel.frame and MC.panel.frame:IsShown() then
+        mod.UI:Refresh()
+    end
+end
+
+-- Bounded retry for scans that defer or commit a partial snapshot. While
+-- Blizzard data is still streaming the retries pick the missing rows up
+-- within seconds; if the shortfall never resolves (removed achievement,
+-- hotfixed criteria) the module settles after ~2 minutes and its partial
+-- snapshot becomes the accepted steady state.
+local SCAN_RETRY_MAX = 12
+local SCAN_RETRY_BACKOFF = { 2, 5 } -- then 10s per attempt
+
+function MC._ScheduleScanRetry(mod)
+    if mod._retryPending then return end
+    local tries = mod._scanRetries or 0
+    if tries >= SCAN_RETRY_MAX then
+        -- Settle: stop holding roster broadcasts for rows that are
+        -- evidently gone rather than still streaming.
+        local r = mod.Scanner and mod.Scanner.results
+        if type(r) == "table" and r._partial then
+            r._partial = nil
+            r._degraded = true
+        end
+        return
+    end
+    mod._scanRetries = tries + 1
+    mod._retryPending = true
+    C_Timer.After(SCAN_RETRY_BACKOFF[mod._scanRetries] or 10, function()
+        mod._retryPending = false
+        MC.ScanNow(mod)
+    end)
+end
+
+function MC.ScanNow(mod)
+    if not (mod and mod.Scanner and mod.Scanner.Scan) then return false end
+    local ok, completed = pcall(mod.Scanner.Scan, mod.Scanner)
+    if not ok then
+        print(format("%s Scan error in %s: %s", PREFIX, mod.key, tostring(completed)))
+        return false
+    end
+    -- A scanner may explicitly defer by returning false while its Blizzard
+    -- data source is still streaming. Keep the last committed snapshot and
+    -- retry on a bounded backoff in case no readiness event ever fires.
+    if completed == false then
+        MC._ScheduleScanRetry(mod)
+        return false
+    end
+    local r = mod.Scanner.results
+    if type(r) == "table" and (r._partial or 0) > 0 then
+        MC._ScheduleScanRetry(mod)
+    else
+        mod._scanRetries = 0
+    end
+    MC.OnScanComplete(mod)
+    return true
+end
+
+-- Re-scan exactly when the next time-gated content phase opens. This keeps
+-- long-running sessions accurate even if no collection journal event fires
+-- at the unlock instant.
+function MC.ScheduleContentReleaseScan()
+    if not (MC.CONTENT_RELEASE and C_Timer and C_Timer.After
+            and MC.GetCurrentTimestamp) then return end
+    local now = MC.GetCurrentTimestamp()
+    local nextUnlock
+    for _, release in pairs(MC.CONTENT_RELEASE) do
+        local unlock = MC.ResolveContentRelease and MC.ResolveContentRelease(release)
+            or release
+        if type(unlock) == "number" and unlock > now
+           and (not nextUnlock or unlock < nextUnlock) then
+            nextUnlock = unlock
+        end
+    end
+    if not nextUnlock or MC._scheduledContentRelease == nextUnlock then return end
+    MC._scheduledContentRelease = nextUnlock
+    C_Timer.After(math.max(1, nextUnlock - now + 1), function()
+        MC._scheduledContentRelease = nil
+        for _, candidate in ipairs(MC.modules or {}) do
+            if candidate.Scanner then MC.ScanNow(candidate) end
+        end
+        if MC.activeModule then MC.RefreshActive() end
+        MC.ScheduleContentReleaseScan()
+    end)
+end
+
 function MC.ThrottledScan(mod, delay)
     if mod._scanPending then return end
     mod._scanPending = true
     C_Timer.After(delay or 0.5, function()
         mod._scanPending = false
-        -- Module might have been disabled while we were waiting.
-        if not MC.IsModuleEnabled(mod.key) then return end
-        if mod.Scanner then
-            local ok, err = pcall(mod.Scanner.Scan, mod.Scanner)
-            if not ok then
-                print(format("%s Scan error in %s: %s", PREFIX, mod.key, tostring(err)))
-                return
-            end
-            if MC.activeModule == mod.key and mod.UI and MC.panel
-                and MC.panel.frame and MC.panel.frame:IsShown() then
-                mod.UI:Refresh()
-            end
-        end
+        -- Disabled modules remain hidden but continue supplying fresh score
+        -- and sharing snapshots.
+        MC.ScanNow(mod)
     end)
 end
 
@@ -1157,6 +1367,7 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_LOGOUT")
 frame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 frame:RegisterEvent("UNIT_FACTION")
 MC.eventFrame = frame
 
@@ -1195,6 +1406,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- seeded. Operates on CharDB (the primary) only.
         MC.DeepMergeDefaults(CollectionistCharDB, charDefaults)
 
+        -- Account-only ledgers must never live in a CharDB. The v1->v2 seed
+        -- above copies the whole account DB, and older versions may have
+        -- leaked copies via crash-skipped logouts — scrub unconditionally
+        -- so a stale per-character copy can never shadow the live ledger.
+        for k in pairs(ACCOUNT_ONLY_KEYS) do
+            CollectionistCharDB[k] = nil
+        end
+
         -- Runtime aliases. MC.db is the per-char primary; everything reads
         -- from here. MC.snapshotDB is the account-wide seed pool, written on
         -- PLAYER_LOGOUT. MC.cdb is kept as a back-compat alias.
@@ -1224,6 +1443,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
         end
 
         MC.Theme = MUI.Theme
+        -- Apply the saved theme now, before any frames are built. The
+        -- lib's hook list is empty at this point so the call is just a
+        -- palette swap; CreatePanel later reads the active palette.
+        MC.SetTheme(MC.GetTheme())
         print(PREFIX .. " v" .. MC.version .. " loaded. Type /mc to toggle.")
 
     elseif event == "PLAYER_LOGIN" then
@@ -1232,9 +1455,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- Apply the user's saved module order before anything else uses
         -- the MC.modules array (TabBar:Create, event registration, etc).
         if MC.ApplyModuleOrder then MC.ApplyModuleOrder() end
+        MC.ScheduleContentReleaseScan()
 
         for _, mod in ipairs(MC.modules) do
-            if MC.IsModuleEnabled(mod.key) and mod.opts.events then
+            if mod.opts.events then
                 for _, ev in ipairs(mod.opts.events) do
                     pcall(frame.RegisterEvent, frame, ev)
                 end
@@ -1260,13 +1484,13 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- so the first scan is deferred a couple of seconds. Scan every
         -- module regardless of enabled state — disabling a module hides its
         -- tab but its counts should still be available for the Me row in
-        -- Roster + the Roster broadcast payload. Per-event live updates
-        -- still respect IsModuleEnabled (see ThrottledScan), so disabled
-        -- modules just keep their PLAYER_LOGIN snapshot.
+        -- Roster + the Roster broadcast payload. Disabled trackers remain
+        -- hidden, but their lightweight event scans continue to keep those
+        -- account-wide values current.
         C_Timer.After(2, function()
             for _, mod in ipairs(MC.modules) do
                 if mod.Scanner then
-                    pcall(mod.Scanner.Scan, mod.Scanner)
+                    MC.ScanNow(mod)
                 end
             end
             if MC.activeModule then MC.RefreshActive() end
@@ -1294,15 +1518,25 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- Snapshot the per-character DB into the account-wide DB so the next
         -- alt to log in for the first time inherits these settings as their
         -- seed. /reload also fires PLAYER_LOGOUT, so this stays current.
+        -- ACCOUNT_ONLY_KEYS are skipped in both directions: the clear loop
+        -- must not erase live account ledgers, and the copy loop must not
+        -- let a stale per-character copy of one roll them back.
         if MC.db and MC.snapshotDB then
-            for k in pairs(MC.snapshotDB) do MC.snapshotDB[k] = nil end
+            for k in pairs(MC.snapshotDB) do
+                if not ACCOUNT_ONLY_KEYS[k] then MC.snapshotDB[k] = nil end
+            end
             for k, v in pairs(MC.db) do
-                MC.snapshotDB[k] = type(v) == "table" and CopyTable(v) or v
+                if not ACCOUNT_ONLY_KEYS[k] then
+                    MC.snapshotDB[k] = type(v) == "table" and CopyTable(v) or v
+                end
             end
         end
 
     elseif event == "CURRENCY_DISPLAY_UPDATE" then
         MC.InvalidateCurrencyCache()
+
+    elseif event == "GET_ITEM_INFO_RECEIVED" then
+        MC.InvalidateItemInfoCache(arg1)
 
     elseif event == "UNIT_FACTION" and arg1 == "player" then
         -- Player swapped factions; PvP-filtered mount list needs a rescan.
@@ -1315,7 +1549,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         local handlers = MC._eventHandlers[event]
         if not handlers then return end
         for _, mod in ipairs(handlers) do
-            if MC.IsModuleEnabled(mod.key) and mod.opts.onEvent then
+            if mod.opts.onEvent then
                 mod.opts.onEvent(mod, event, ...)
             end
         end
@@ -1328,14 +1562,22 @@ end)
 function MC.CreatePanel()
     if MC.panel then return end
 
+    -- Live theme switch: re-render the active tab so row colors,
+    -- header accents, and other per-Refresh visuals pick up the new
+    -- palette. The lib's own hooks handle panel chrome (backdrop,
+    -- title bar, tabs, indicator buttons).
+    MUI.RegisterThemeHook(function()
+        if MC.RefreshActive then MC.RefreshActive() end
+    end)
+
     local panel = MUI:CreatePanel({
         name          = "Collectionist",
         title         = "Collectionist",
         icon          = "Interface\\Icons\\INV_Misc_Book_09",
         db            = MC.db,
-        defaultWidth  = 380,
+        defaultWidth  = 520,
         defaultHeight = 560,
-        minWidth      = 280,
+        minWidth      = 520,
         maxWidth      = 700,
         minHeight     = 140,
         maxHeight     = 900,
@@ -1347,37 +1589,32 @@ function MC.CreatePanel()
     if MC.TabBar then
         MC.TabBar:Create(panel, MC.modules, function(key) MC.SwitchTab(key) end)
     end
+    -- TabBar:Create re-anchors the scroll frame to its own hard-coded
+    -- insets, so re-run ApplyBackdrop to re-apply NineSlice insets on
+    -- top.
+    panel:ApplyBackdrop()
     MC.BuildConfig()
 
-    -- Expansion filter button in the title bar. Click opens a dropdown
-    -- to switch between Current / per-expansion / All. Lives left of
-    -- the peer indicator.
+    -- Title-bar indicator chain (right→left): progressText, scoreBtn,
+    -- peerBtn, filterBtn. Anchored once at the end so each one can
+    -- reference its right-hand neighbor.
     local bar = panel.frame and panel.frame.titleBar
     if bar then
-        local filterBtn = CreateFrame("Button", nil, bar)
-        filterBtn:SetHeight(16)
-        local ffs = filterBtn:CreateFontString(nil, "OVERLAY")
-        ffs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
-        ffs:SetPoint("CENTER")
-        ffs:SetTextColor(0.85, 0.85, 0.85)
-        filterBtn:SetFontString(ffs)
-        filterBtn:SetScript("OnEnter", function(s)
-            ffs:SetTextColor(1, 1, 1)
-            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
-            GameTooltip:SetText("Expansion filter")
-            GameTooltip:AddLine("Click to switch which expansion's data is shown.",
-                0.7, 0.7, 0.7, true)
-            GameTooltip:Show()
-        end)
-        filterBtn:SetScript("OnLeave", function()
-            ffs:SetTextColor(0.85, 0.85, 0.85)
-            GameTooltip:Hide()
-        end)
-        local popup = MUI.MakeDropdown()
-        local function buildItems()
+        local theme = MC.Theme
+        local sub = theme.colors.tooltipSubtext
+
+        -- Expansion filter
+        local filterPopup = MUI.MakeDropdown()
+        local function buildFilterItems()
             local f = MC.GetExpansionFilter()
-            local currentKey = f.mode == "single" and f.single or MC.GetLatestExpansion()
+            local latestE = MC.EXPANSION_BY_KEY
+                and MC.EXPANSION_BY_KEY[MC.GetLatestExpansion(MC.activeModule)]
             local items = {
+                -- "Current" auto-advances when a newer expansion's content
+                -- ships; picking an expansion by name pins it instead.
+                { label = format("Current (%s)", latestE and latestE.label or "?"),
+                  selected = f.mode == "current",
+                  onClick = function() MC.SetExpansionFilter("current") end },
                 { label = "All Expansions",
                   selected = f.mode == "all",
                   onClick = function() MC.SetExpansionFilter("all") end },
@@ -1387,133 +1624,99 @@ function MC.CreatePanel()
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,
-                        selected = f.mode ~= "all" and currentKey == key,
+                        selected = f.mode == "single" and f.single == key,
                         onClick = function() MC.SetExpansionFilter("single", key) end,
                     }
                 end
             end
             return items
         end
-        filterBtn:SetScript("OnClick", function()
-            if popup:IsShown() then popup:Hide(); return end
-            popup:ShowAt(filterBtn, "BOTTOMLEFT", "TOPLEFT", buildItems())
-        end)
+        -- Forward-declared so the onClick closure captures the button as
+        -- an upvalue. Referencing filterBtn inside the initializer below
+        -- would bind the (nil) global, not this local.
+        local filterBtn
+        filterBtn = MUI.MakeIndicatorBtn(bar, {
+            tooltip = function(_, tt)
+                tt:SetText("Expansion filter")
+                tt:AddLine("Click to switch which expansion's data is shown.",
+                    sub[1], sub[2], sub[3], true)
+            end,
+            onClick = function()
+                if filterPopup:IsShown() then filterPopup:Hide(); return end
+                filterPopup:ShowAt(filterBtn, "BOTTOMLEFT", "TOPLEFT", buildFilterItems())
+            end,
+        })
         MC.expansionFilterBtn = filterBtn
 
         function MC.RefreshExpansionFilterButton()
-            local btn = MC.expansionFilterBtn
-            if not btn then return end
-            local label = MC.GetExpansionFilterLabel()
-            btn:GetFontString():SetText(label)
-            btn:SetWidth(btn:GetFontString():GetStringWidth() + 14)
+            if MC.expansionFilterBtn then
+                MC.expansionFilterBtn:SetLabel(MC.GetExpansionFilterLabel())
+            end
         end
         MC.RefreshExpansionFilterButton()
-    end
 
-    -- Collection Score button. Sits between the peer indicator and the
-    -- per-tab progress text. Hover for per-module breakdown; click is
-    -- a no-op today (could route to a leaderboard view later).
-    if bar then
-        local scoreBtn = CreateFrame("Button", nil, bar)
-        scoreBtn:SetHeight(16)
-        local sfs = scoreBtn:CreateFontString(nil, "OVERLAY")
-        sfs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
-        sfs:SetPoint("CENTER")
-        sfs:SetTextColor(0.95, 0.85, 0.45)  -- warm gold to draw the eye
-        scoreBtn:SetFontString(sfs)
-        if panel.titleProgressText then
-            scoreBtn:SetPoint("RIGHT", panel.titleProgressText, "LEFT", -10, 0)
-        else
-            scoreBtn:SetPoint("RIGHT", bar, "RIGHT", -68, 0)
-        end
-        scoreBtn:SetScript("OnEnter", function(s)
-            sfs:SetTextColor(1, 1, 0.65)
-            if MC.GetLocalScore then
+        -- Collection Score
+        local scoreBtn = MUI.MakeIndicatorBtn(bar, {
+            fgColor    = theme.colors.scoreAccent,
+            hoverColor = theme.colors.scoreAccentHover,
+            tooltip = function(_, tt)
+                if not MC.GetLocalScore then return end
                 local total, legacy, byMod = MC.GetLocalScore()
-                GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
-                GameTooltip:SetText("Collection Score")
-                GameTooltip:AddDoubleLine("Total", tostring(total),
-                    1, 1, 1, 0.95, 0.85, 0.45)
+                tt:SetText("Collection Score")
+                tt:AddDoubleLine("Total", tostring(total),
+                    1, 1, 1, theme.colors.scoreAccent[1], theme.colors.scoreAccent[2], theme.colors.scoreAccent[3])
                 if MC.modules then
                     for _, m in ipairs(MC.modules) do
                         local b = byMod[m.key]
                         if b and b.score > 0 then
-                            GameTooltip:AddDoubleLine("  " .. (m.label or m.key),
-                                tostring(b.score), 0.85, 0.85, 0.85, 0.95, 0.85, 0.45)
+                            tt:AddDoubleLine("  " .. (m.label or m.key),
+                                tostring(b.score),
+                                0.85, 0.85, 0.85,
+                                theme.colors.scoreAccent[1], theme.colors.scoreAccent[2], theme.colors.scoreAccent[3])
                         end
                     end
                 end
                 if legacy > 0 then
-                    GameTooltip:AddLine(" ")
-                    GameTooltip:AddDoubleLine("Legacies",
-                        tostring(legacy), 0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
-                    GameTooltip:AddLine("Items you've collected that are no longer obtainable. Tracked separately so retired content doesn't drag down newer collectors.",
+                    tt:AddLine(" ")
+                    tt:AddDoubleLine("Legacies", tostring(legacy),
+                        0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
+                    tt:AddLine("Items you've collected that are no longer obtainable. Tracked separately so retired content doesn't drag down newer collectors.",
                         0.6, 0.6, 0.6, true)
                 end
-                GameTooltip:Show()
-            end
-        end)
-        scoreBtn:SetScript("OnLeave", function()
-            sfs:SetTextColor(0.95, 0.85, 0.45)
-            GameTooltip:Hide()
-        end)
+            end,
+        })
         MC.scoreIndicator = scoreBtn
 
         function MC.RefreshScoreIndicator()
             local btn = MC.scoreIndicator
             if not btn or not MC.GetLocalScore then return end
             local total, legacy = MC.GetLocalScore()
-            local txt
             if legacy > 0 then
-                txt = format("CS %d  ·  %dL", total, legacy)
+                btn:SetLabel(format("CS %d  ·  %dL", total, legacy))
             else
-                txt = format("CS %d", total)
+                btn:SetLabel(format("CS %d", total))
             end
-            btn:GetFontString():SetText(txt)
-            btn:SetWidth(btn:GetFontString():GetStringWidth() + 14)
         end
         MC.RefreshScoreIndicator()
-    end
 
-    -- Peer-count indicator in the title bar. Clickable; opens the
-    -- Collection Inspector. Hidden when Roster is disabled.
-    if bar then
-        local peerBtn = CreateFrame("Button", nil, bar)
-        -- Filter btn sits to the LEFT of the peer indicator. Anchor it
-        -- here once both buttons exist.
-        if MC.expansionFilterBtn then
-            MC.expansionFilterBtn:ClearAllPoints()
-            MC.expansionFilterBtn:SetPoint("RIGHT", peerBtn, "LEFT", -8, 0)
-        end
-        peerBtn:SetHeight(16)
-        local fs = peerBtn:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(MC.Theme.font, MC.Theme.fontSize - 1, "OUTLINE")
-        fs:SetPoint("CENTER")
-        fs:SetTextColor(0.85, 0.85, 0.85)
-        peerBtn:SetFontString(fs)
-        -- Score btn sits to the RIGHT of the peer indicator (closer to
-        -- the progress text). Anchor peer to the score btn's left.
-        if MC.scoreIndicator then
-            peerBtn:SetPoint("RIGHT", MC.scoreIndicator, "LEFT", -10, 0)
-        elseif panel.titleProgressText then
-            peerBtn:SetPoint("RIGHT", panel.titleProgressText, "LEFT", -10, 0)
-        else
-            peerBtn:SetPoint("RIGHT", bar, "RIGHT", -68, 0)
-        end
-        peerBtn:SetScript("OnEnter", function(s)
-            fs:SetTextColor(1, 1, 1)
-            GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
-            GameTooltip:SetText("Open Collection Inspector")
-            GameTooltip:Show()
-        end)
-        peerBtn:SetScript("OnLeave", function()
-            fs:SetTextColor(0.85, 0.85, 0.85)
-            GameTooltip:Hide()
-        end)
-        peerBtn:SetScript("OnClick", function()
-            if MC.ShowPeerPanel then MC.ShowPeerPanel() end
-        end)
+        -- Peer count
+        local peerBtn = MUI.MakeIndicatorBtn(bar, {
+            tooltip = "Open Collection Inspector",
+            onClick = function()
+                if MC.ShowPeerPanel then MC.ShowPeerPanel() end
+            end,
+        })
         MC.peerIndicator = peerBtn
+
+        -- Anchor chain right→left from progressText (or bar's right edge).
+        local rightAnchor, rightPoint, rightOfsX = bar, "RIGHT", -68
+        if panel.titleProgressText then
+            rightAnchor, rightPoint, rightOfsX = panel.titleProgressText, "LEFT", -10
+        end
+        scoreBtn:SetPoint("RIGHT", rightAnchor, rightPoint, rightOfsX, 0)
+        peerBtn:SetPoint("RIGHT", scoreBtn, "LEFT", -10, 0)
+        filterBtn:SetPoint("RIGHT", peerBtn, "LEFT", -8, 0)
+
         MC.RefreshPeerIndicator()
     end
 end
@@ -1530,9 +1733,12 @@ function MC.RefreshPeerIndicator()
     local count = 0
     if MC.RosterDB then
         -- Skip reserved meta keys like _bnetCache so the indicator
-        -- reflects the actual peer count.
+        -- reflects the actual peer count. Records without counts are
+        -- partial (a stray 's'/'e'/'b' arrived before the peer's 'u'
+        -- update) — don't count them until they're renderable.
         for k, v in pairs(MC.RosterDB) do
-            if type(k) == "string" and k:sub(1, 1) ~= "_" and type(v) == "table" then
+            if type(k) == "string" and k:sub(1, 1) ~= "_"
+               and type(v) == "table" and v.counts then
                 count = count + 1
             end
         end
@@ -1557,6 +1763,7 @@ function MC.SwitchTab(key)
     if GameTooltip then GameTooltip:Hide() end
 
     if MC.TabBar then MC.TabBar:SetActive(key) end
+    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
 
     if mod.UI and not mod.UI._initialized then
         mod.UI:Init(MC.panel, mod)
@@ -1642,9 +1849,11 @@ function MC.BuildConfig()
         label = "Enable Sharing",
         get = function() return MC.db.rosterEnabled and true or false end,
         set = function(v)
-            MC.db.rosterEnabled = v and true or false
-            if MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
-            if v and MC.RosterForceBroadcast then MC.RosterForceBroadcast("GUILD") end
+            if MC.SetRosterEnabled then
+                MC.SetRosterEnabled(v, v)
+            else
+                MC.db.rosterEnabled = v and true or false
+            end
         end }
 
     -- Inject the "Show Collected" checkbox automatically from each module's
@@ -1671,6 +1880,14 @@ function MC.BuildConfig()
 
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "APPEARANCE" }
+    defs[#defs + 1] = { type = "dropdown", label = "Theme",
+        options = {
+            { label = "Modern", value = "modern" },
+            { label = "Simple", value = "simple" },
+        },
+        get = function() return MC.GetTheme() end,
+        set = function(v) MC.SetTheme(v) end,
+        onRefresh = MC.BuildConfig }
     defs[#defs + 1] = { type = "slider", label = "Background Opacity", min = 0.1, max = 1.0, step = 0.05,
         get = function() return MC.db.frameAlpha or 1.0 end,
         set = function(v)
@@ -1702,12 +1919,13 @@ local function PrintHelp()
     local keys = {}
     for _, mod in ipairs(MC.modules) do keys[#keys + 1] = mod.key end
     print("  /mc <module> - switch tab (" .. table.concat(keys, ", ") .. ")")
-    print("  /mc scan - rescan enabled modules")
+    print("  /mc scan - rescan all collection modules")
     print("  /mc collected [module] - toggle collected/learned display")
     print("  /mc reset - reset panel position + size")
-    print("  /mc sharing on|off|announce|sync|prune|status - guild sharing")
+    print("  /mc sharing on|off|announce|sync|prune|clear|status - optional sharing")
     print("  /mc filter all|current|<expansion> - filter visible expansions")
     print("  /mc score - show your Collection Score breakdown")
+    print("  /mc theme modern|simple - switch UI theme")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -1734,12 +1952,9 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
 
     if cmd == "scan" then
         for _, mod in ipairs(MC.modules) do
-            if MC.IsModuleEnabled(mod.key) and mod.Scanner then
-                pcall(mod.Scanner.Scan, mod.Scanner)
-            end
+            if mod.Scanner then MC.ScanNow(mod) end
         end
-        MC.RefreshActive()
-        print(PREFIX .. " Enabled modules scanned.")
+        print(PREFIX .. " All collection modules scanned.")
     elseif cmd == "collected" or cmd == "learned" then
         local target = (arg and MC.modulesByKey[arg]) and arg or MC.activeModule
         local mod = MC.modulesByKey[target]
@@ -1760,7 +1975,7 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         -- Replace the whole position table so a stale relativePoint from a
         -- previous drag doesn't survive the reset and put us off-screen.
         MC.db.position = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 }
-        MC.db.panelWidth = 380
+        MC.db.panelWidth = 520
         MC.db.panelHeight = 560
         MC.db.frameAlpha = 1.0
         MC.db.frameScale = 1.0
@@ -1798,7 +2013,10 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         elseif a == "all" or a == "current" then
             MC.SetExpansionFilter(a)
             print(format("%s Filter set to %s.", PREFIX, a))
-        elseif MC.EXPANSION_BY_KEY and MC.EXPANSION_BY_KEY[a] then
+        elseif MC._registeredExpansions and MC._registeredExpansions[a] then
+            -- Only expansions with registered content are selectable; a
+            -- defined-but-empty key (e.g. "tww" before its content ships)
+            -- would blank every tab with no hint why.
             MC.SetExpansionFilter("single", a)
             print(format("%s Filter set to %s.", PREFIX, MC.EXPANSION_BY_KEY[a].label))
         else
@@ -1812,6 +2030,18 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             MC.RosterSlashHandler(arg)
         else
             print(PREFIX .. " Sharing not loaded.")
+        end
+    elseif cmd == "theme" then
+        local a = (arg or ""):lower()
+        if a == "" or a == "status" then
+            print(format("%s Theme: %s", PREFIX, MC.GetTheme()))
+            print("    available: modern, simple")
+        elseif MUI.Themes[a] then
+            MC.SetTheme(a)
+            print(format("%s Theme set to %s.", PREFIX, a))
+            if MC.BuildConfig then MC.BuildConfig() end
+        else
+            print(PREFIX .. " /mc theme modern|simple")
         end
     elseif cmd == "help" then
         PrintHelp()

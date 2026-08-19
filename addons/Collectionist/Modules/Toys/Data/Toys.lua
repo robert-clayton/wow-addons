@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 MC.ToySourceOrder = {
     "renown", "achievement", "quest", "treasure", "drop",
@@ -80,18 +81,18 @@ MC.RegisterContent("midnight", "toys", {
         toys = {
             { itemID = 268717, name = "Pango Plating", source = "achievement",
               sourceInfo = "Treasures of Zul'Aman", zone = "Zul'Aman",
-              achievementID = 62125 },
+              achievementID = 62125, score = T.short },
             { itemID = 264695, name = "Interdimensional Parcel Signal", source = "achievement",
               sourceInfo = "Treasures of Voidstorm", zone = "Voidstorm",
-              achievementID = 62126 },
+              achievementID = 62126, score = T.medium },
             { itemID = 263975, name = "Feeling Fielder Mk. 7", source = "achievement",
-              sourceInfo = "Hidden Feat of Strength: Illicit Rain — Five Stars" },
+              sourceInfo = "Hidden Feat of Strength: Illicit Rain — Five Stars", score = T.epic },
             { itemID = 268695, name = "Pin-o-Matic Camera", source = "achievement",
-              sourceInfo = "Pinterest x WoW promotion (Feat of Strength)" },
+              sourceInfo = "Pinterest x WoW promotion (Feat of Strength)", score = T.trivial },
             -- Pre-patch Family Battler chain (added in Midnight pre-patch)
             { itemID = 251491, name = "Magical Pet Clicker", source = "achievement",
               sourceInfo = "Achievement: Old World Family Battler",
-              achievementID = 61094 },
+              achievementID = 61094, score = T.epic },
             { itemID = 266370, name = "Dundun's Abundant Travel Method", source = "achievement",
               sourceInfo = "Achievement: Abundance: Azeroth Runs on Dundun (teleports to current Abundant location)",
               achievementID = 42283, taskList = ABUNDANCE_TASKS },
@@ -107,7 +108,7 @@ MC.RegisterContent("midnight", "toys", {
         toys = {
             { itemID = 253629, name = "Personal Key to the Arcantina", source = "quest",
               sourceInfo = "End of the Arator's Journey campaign chapter",
-              zone = "Silvermoon City" },
+              zone = "Silvermoon City", score = T.medium },
             { itemID = 264413, name = "Dominating Victory", source = "quest",
               sourceInfo = "Quest: Nulling Nullaeus (Torment's Rise nemesis delve)" },
             { itemID = 263871, name = "Holy Pet Leash", source = "quest",
@@ -154,10 +155,10 @@ MC.RegisterContent("midnight", "toys", {
             { itemID = 252265, name = "Hexed Potatoad Mucus", source = "drop",
               sourceInfo = "One of the one-time Sturdy Chests in the Atal'Aman delve (Atal'Aman Discoveries achievement)",
               zone = "Zul'Aman",
-              dropInfo = { mob = "Sturdy Chest", zone = "Atal'Aman delve", rate = "Guaranteed (one-time)" } },
+              dropInfo = { mob = "Sturdy Chest", zone = "Atal'Aman delve", rate = "Guaranteed (one-time)" }, score = T.short },
             { itemID = 251903, name = "Potatoad Egg", source = "drop",
               sourceInfo = "Use Hexed Potatoad Mucus first, then interact with Gravid Potatoad in The Binding Vale while transformed",
-              dropInfo = { mob = "Gravid Potatoad", zone = "The Binding Vale", rate = "Guaranteed" } },
+              dropInfo = { mob = "Gravid Potatoad", zone = "The Binding Vale", rate = "Guaranteed" }, score = T.short },
             { itemID = 264805, name = "Brann-O-Vision 3000", source = "drop",
               sourceInfo = "Sturdy Chest (delve loot)",
               dropInfo = { mob = "Sturdy Chest", zone = "Delves" } },
@@ -170,7 +171,7 @@ MC.RegisterContent("midnight", "toys", {
         toys = {
             { itemID = 268728, name = "Saptor Salve", source = "dungeon",
               sourceInfo = "Ziekket (Mythic), The Binding Vale",
-              dropInfo = { mob = "Ziekket", zone = "The Binding Vale", boss = true } },
+              dropInfo = { mob = "Ziekket", zone = "The Binding Vale", boss = true }, score = T.epic },
         },
     },
     {
@@ -213,7 +214,7 @@ MC.RegisterContent("midnight", "toys", {
             { itemID = 249468, name = "Twilight's Blade Top Secret Strategy Training Guide", source = "vendor",
               sourceInfo = "Materialist Ophinell - 30 Twilight's Blade Insignia (pre-patch event; Twilight Highlands)",
               waypoint = LOC.MaterialistOphinell,
-              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 30 } } },
+              cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 30 } }, score = T.legendary, unavailable = true },
         },
     },
 

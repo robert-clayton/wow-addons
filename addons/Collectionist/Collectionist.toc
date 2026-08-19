@@ -1,8 +1,8 @@
-## Interface: 120005
+## Interface: 120100
 ## Title: Collectionist
-## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, and treasures you're missing from Midnight in one panel.
+## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.9.0
+## Version: 1.12.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -26,42 +26,55 @@ Onboarding.lua
 
 # Mounts module
 Modules\Mounts\Data\Mounts.lua
+Modules\Mounts\Data\Patch120007.lua
+Modules\Mounts\Data\Patch120100.lua
 Modules\Mounts\Init.lua
 Modules\Mounts\Scanner.lua
 Modules\Mounts\UI.lua
 
 # Pets module
 Modules\Pets\Data\Pets.lua
+Modules\Pets\Data\Patch120007.lua
+Modules\Pets\Data\Patch120100.lua
 Modules\Pets\Init.lua
 Modules\Pets\Scanner.lua
 Modules\Pets\UI.lua
 
 # Decorations module
 Modules\Decorations\Data\Decorations.lua
+Modules\Decorations\Data\Patch120007.lua
+Modules\Decorations\Data\Patch120100.lua
 Modules\Decorations\Init.lua
 Modules\Decorations\Scanner.lua
 Modules\Decorations\UI.lua
 
 # Toys module
 Modules\Toys\Data\Toys.lua
+Modules\Toys\Data\Patch120007.lua
+Modules\Toys\Data\Patch120100.lua
 Modules\Toys\Init.lua
 Modules\Toys\Scanner.lua
 Modules\Toys\UI.lua
 
 # Rares module
 Modules\Rares\Data\Rares.lua
+Modules\Rares\Data\Patch120007.lua
+Modules\Rares\Data\Patch120100.lua
 Modules\Rares\Init.lua
 Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
 
 # Treasures module
 Modules\Treasures\Data\Treasures.lua
+Modules\Treasures\Data\Patch120100.lua
 Modules\Treasures\Init.lua
 Modules\Treasures\Scanner.lua
 Modules\Treasures\UI.lua
 
 # Achievements module
 Modules\Achievements\Data\Achievements.lua
+Modules\Achievements\Data\Patch120007.lua
+Modules\Achievements\Data\Patch120100.lua
 Modules\Achievements\Init.lua
 Modules\Achievements\Scanner.lua
 Modules\Achievements\UI.lua

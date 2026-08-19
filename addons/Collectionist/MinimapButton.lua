@@ -18,10 +18,11 @@ function MB:Init()
             if button == "LeftButton" then
                 if MC.panel then MC.panel:Toggle() end
             elseif button == "RightButton" then
-                -- Throttled per-module rescan; only enabled modules
+                -- Explicit user action: scan synchronously so the summary
+                -- reflects the new snapshot rather than the previous one.
                 for _, mod in ipairs(MC.modules) do
                     if MC.IsModuleEnabled(mod.key) and mod.Scanner then
-                        MC.ThrottledScan(mod)
+                        MC.ScanNow(mod)
                     end
                 end
                 MB:PrintSummary()
@@ -35,9 +36,9 @@ function MB:Init()
                         mod.opts.tooltipLines(tt, mod)
                     else
                         local r = mod.Scanner and mod.Scanner.results
-                        if r and r.total then
+                        if r and r.totalAll then
                             tt:AddLine(format("  %s: %d / %d",
-                                mod.label, r.collectedCount or 0, r.total), 0.7, 0.7, 0.7)
+                                mod.label, r.collectedCountAll or 0, r.totalAll), 0.7, 0.7, 0.7)
                         end
                     end
                 end
@@ -82,9 +83,10 @@ function MB:PrintSummary()
                 mod.opts.printSummary(mod)
             else
                 local r = mod.Scanner and mod.Scanner.results
-                if r and r.total then
+                if r and r.totalAll then
                     print(format("%s [%s] %d / %d collected (%d remaining)",
-                        MC.PREFIX, mod.label, r.collectedCount or 0, r.total, r.uncollectedCount or 0))
+                        MC.PREFIX, mod.label, r.collectedCountAll or 0, r.totalAll,
+                        r.totalAll - (r.collectedCountAll or 0)))
                 end
             end
         end

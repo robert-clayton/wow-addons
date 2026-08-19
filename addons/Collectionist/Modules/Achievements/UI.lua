@@ -16,6 +16,7 @@ for _, c in ipairs(MC.AchievementCategoryOrder or {}) do CATEGORY_SET[c] = true 
 function UI:Init(panel, m)
     self.panel = panel
     self.mod = m
+    self._refresh = function() self:Refresh() end
 end
 
 function UI:GetConfigDefs()
@@ -91,22 +92,17 @@ end
 -- Render a category (Exploration, Quests, Collections, Features) with
 -- its sub-categories nested underneath as inner collapsibles.
 function UI:RenderCategoryGroup(parent, category, sourceBuckets, yOff)
-    local theme = MUI.Theme
     local sr, sg, sb = zoneColor()
     -- Total count across all this category's sub-categories.
     local totalCount = 0
     for _, entries in pairs(sourceBuckets) do totalCount = totalCount + #entries end
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 22,
-            indent     = 0,
-            collKey    = "cat_" .. category,
-            accentR    = sr, accentG = sg, accentB = sb,
-            label      = MC.AchievementCategoryLabels[category] or category,
-            labelColor = { sr, sg, sb },
-            count      = tostring(totalCount),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
+    local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
+        label       = MC.AchievementCategoryLabels[category] or category,
+        accentColor = { sr, sg, sb },
+        count       = totalCount,
+        collKey     = "cat_" .. category,
+        height      = 22,
+    }, mod.db, self._refresh)
     yOff = newY
     if collapsed then return yOff end
 
@@ -129,19 +125,15 @@ function UI:RenderCategoryGroup(parent, category, sourceBuckets, yOff)
 end
 
 function UI:RenderSourceGroup(parent, category, srcType, entries, yOff)
-    local theme = MUI.Theme
     local sr, sg, sb = subColor()
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 18,
-            indent     = 14,
-            collKey    = "src_" .. (category or "_") .. "_" .. srcType,
-            accentR    = sr, accentG = sg, accentB = sb,
-            label      = MC.AchievementSourceLabels[srcType] or srcType,
-            labelColor = { sr, sg, sb },
-            count      = tostring(#entries),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
+    local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
+        label       = MC.AchievementSourceLabels[srcType] or srcType,
+        accentColor = { sr, sg, sb },
+        count       = #entries,
+        collKey     = "src_" .. (category or "_") .. "_" .. srcType,
+        height      = 18,
+        indent      = 14,
+    }, mod.db, self._refresh)
     yOff = newY
     if collapsed then return yOff end
     for _, ach in ipairs(entries) do
@@ -151,25 +143,12 @@ function UI:RenderSourceGroup(parent, category, srcType, entries, yOff)
 end
 
 function UI:RenderCollectedGroup(parent, entries, yOff)
-    local theme = MUI.Theme
-    local la = theme.colors.learnedAccent
-    local _, collapsed, newY = MUI.RenderCollapsibleHeader(
-        self.panel.pool, parent, yOff, {
-            height     = 20,
-            indent     = 0,
-            collKey    = "completed",
-            accentR    = la[1], accentG = la[2], accentB = la[3],
-            label      = "Completed",
-            labelColor = { la[1], la[2], la[3] },
-            count      = tostring(#entries),
-            countColor = theme.colors.countDim,
-        }, mod.db, function() self:Refresh() end)
-    yOff = newY
-    if collapsed then return yOff end
-    for _, ach in ipairs(entries) do
-        yOff = self:RenderAchievementRow(parent, ach, yOff, true)
-    end
-    return yOff
+    return MUI.RenderCollectedSection(self.panel.pool, parent, yOff, {
+        entries   = entries,
+        renderRow = function(p, ach, y, _) return self:RenderAchievementRow(p, ach, y, true) end,
+        label     = "Completed",
+        collKey   = "completed",
+    }, mod.db, self._refresh)
 end
 
 function UI:RenderAchievementRow(parent, ach, yOff, isCollected)
@@ -177,7 +156,9 @@ function UI:RenderAchievementRow(parent, ach, yOff, isCollected)
     -- Show "3/5" progress in the right-side info column. For completed
     -- rows fall back to the zone label since the count is implicit.
     local info
-    if isCollected then
+    if ach.future then
+        info = MC.GetAvailabilityBadge(ach)
+    elseif isCollected then
         info = ach.zone
     elseif ach.progress and ach.progress.total > 0 then
         info = format("%d / %d", ach.progress.done, ach.progress.total)
@@ -199,10 +180,7 @@ function UI:RenderAchievementRow(parent, ach, yOff, isCollected)
             GameTooltip:Show()
             MC.ShowItemInfoTooltip(r, ach, "Achievement", sr, sg, sb)
         end,
-        onLeave = function()
-            GameTooltip:Hide()
-            MC.HideInfoTooltip()
-        end,
+        onLeave = MC.RowOnLeave,
         -- Click routes waypoints if the entry has any (taskList or own
         -- waypoint). DoItemAction's natural fallback opens the
         -- achievement frame when neither is set, which is the right

@@ -1,4 +1,5 @@
 local _, MC = ...
+local T = MC.SCORE_TIERS
 
 local LOC = MC.LOC
 
@@ -61,13 +62,13 @@ MC.TailoringRecipes = {
             { id = 1228984, name = "Arcanoweave Bracers", source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
             { id = 1228985, name = "Arcanoweave Cloak",   source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
             { id = 1228986, name = "Arcanoweave Treads",  source = "specialization", sourceInfo = "Nimble Needlework - Arcanoweave Expertise", priority = 3 },
-            { id = 1228988, name = "Arcanoweave Cord",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",                      priority = 4 },
+            { id = 1228988, name = "Arcanoweave Cord",    source = "drop",           sourceInfo = "Heavy Trunk (Delves)",                      priority = 4, score = T.epic },
         },
     },
     {
         name = "Optional Reagents",
         recipes = {
-            { id = 1228960, name = "Sunfire Silk Lining",  source = "drop", sourceInfo = "Heavy Trunk (Delves)",              priority = 4 },
+            { id = 1228960, name = "Sunfire Silk Lining",  source = "drop", sourceInfo = "Heavy Trunk (Delves)",              priority = 4, score = T.epic },
             { id = 1228961, name = "Arcanoweave Lining",   source = "drop", sourceInfo = "Degentrius, Magisters' Terrace",    priority = 4 },
         },
     },
@@ -76,7 +77,7 @@ MC.TailoringRecipes = {
         recipes = {
             { id = 1228976, name = "Bright Linen Spellthread",    source = "trainer", sourceInfo = "Trainer (Skill 35)",                          priority = 1 },
             { id = 1228975, name = "Arcanoweave Spellthread",      source = "vendor",  sourceInfo = "Caeris Fairdawn (Silvermoon Court Renown 5)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.TailoringMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
-            { id = 1228974, name = "Sunfire Silk Spellthread",     source = "drop",    sourceInfo = "Fallen-King Salhadaar, The Voidspire",        priority = 4 },
+            { id = 1228974, name = "Sunfire Silk Spellthread",     source = "drop",    sourceInfo = "Fallen-King Salhadaar, The Voidspire",        priority = 4, score = T.epic },
         },
     },
     {
