@@ -81,6 +81,97 @@ function lib.MakePillToggle(parent, opts)
     return btn
 end
 
+-- Make a texture-drawn scrollbar draggable.
+--
+-- The bars are Textures so they can be anchored and tinted cheaply, but
+-- a Texture cannot receive mouse input — which left every scrollbar in
+-- the addon as a position indicator you could not grab. This overlays
+-- two invisible frames that do the hit testing, so the existing
+-- textures keep their anchoring and painting untouched.
+--
+--   thumb: drag to scroll, with a hit area wider than the 4px bar
+--   track: click anywhere to jump there
+-- onUpdate re-runs the owner's own thumb-positioning function.
+function lib.AttachScrollDrag(scroll, content, thumb, track, onUpdate)
+    if not (scroll and content and thumb and track) then return end
+    local parent = scroll:GetParent() or scroll
+    local baseLevel = scroll:GetFrameLevel() or 0
+
+    local function metrics()
+        local viewH = scroll:GetHeight() or 0
+        local contentH = content:GetHeight() or 0
+        local maxScroll = math.max(contentH - viewH, 0)
+        local trackH = track:GetHeight() or 0
+        local travel = math.max(trackH - (thumb:GetHeight() or 0), 1)
+        return maxScroll, travel, trackH
+    end
+
+    local function cursorY()
+        local _, y = GetCursorPosition()
+        return (y or 0) / (scroll:GetEffectiveScale() or 1)
+    end
+
+    -- Track: click to jump. Sits below the thumb so the thumb wins any
+    -- overlap.
+    local trackHit = CreateFrame("Frame", nil, parent)
+    trackHit:SetFrameLevel(baseLevel + 8)
+    trackHit:EnableMouse(true)
+    trackHit:SetPoint("TOPLEFT", track, "TOPLEFT", -4, 0)
+    trackHit:SetPoint("BOTTOMRIGHT", track, "BOTTOMRIGHT", 4, 0)
+    trackHit:SetScript("OnMouseDown", function(_, btn)
+        if btn ~= "LeftButton" then return end
+        local maxScroll, travel = metrics()
+        if maxScroll <= 0 then return end
+        local top = track:GetTop()
+        if not top then return end
+        -- Distance from the track's top to the click, as a share of the
+        -- thumb's travel.
+        local pct = math.max(0, math.min((top - cursorY()) / travel, 1))
+        scroll:SetVerticalScroll(pct * maxScroll)
+        if onUpdate then onUpdate() end
+    end)
+
+    local thumbHit = CreateFrame("Frame", nil, parent)
+    thumbHit:SetFrameLevel(baseLevel + 9)
+    thumbHit:EnableMouse(true)
+    thumbHit:SetPoint("TOPLEFT", thumb, "TOPLEFT", -4, 0)
+    thumbHit:SetPoint("BOTTOMRIGHT", thumb, "BOTTOMRIGHT", 4, 0)
+
+    local startY, startScroll
+    local function onDrag()
+        local maxScroll, travel = metrics()
+        if maxScroll <= 0 then return end
+        -- Cursor moving down is a decreasing Y but an increasing scroll.
+        local dy = startY - cursorY()
+        local newScroll = startScroll + (dy / travel) * maxScroll
+        scroll:SetVerticalScroll(math.max(0, math.min(newScroll, maxScroll)))
+        if onUpdate then onUpdate() end
+    end
+
+    thumbHit:SetScript("OnMouseDown", function(_, btn)
+        if btn ~= "LeftButton" then return end
+        startY = cursorY()
+        startScroll = scroll:GetVerticalScroll() or 0
+        thumbHit:SetScript("OnUpdate", onDrag)
+    end)
+    local function stop()
+        thumbHit:SetScript("OnUpdate", nil)
+    end
+    thumbHit:SetScript("OnMouseUp", stop)
+    thumbHit:SetScript("OnHide", stop)
+
+    -- The hit frame must follow the bar out of sight: a texture hidden
+    -- by its owner leaves this frame behind, still eating clicks. A
+    -- texture has no scripts to hook, so the owner syncs it from its own
+    -- thumb-positioning pass via the returned function.
+    local function syncVisibility()
+        thumbHit:SetShown(thumb:IsShown())
+        trackHit:SetShown(thumb:IsShown())
+    end
+    syncVisibility()
+    return syncVisibility
+end
+
 -- Window controls (minimize / maximize / restore-down) drawn from
 -- WHITE8x8 rather than typed as glyphs: the box characters those
 -- controls conventionally use are outside the Latin range the UI font

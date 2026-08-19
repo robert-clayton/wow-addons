@@ -363,10 +363,15 @@ function PanelProto:CreateScrollFrame()
     applyScrollTheme()
     lib.RegisterThemeHook(applyScrollTheme)
 
+    local syncScrollHit
     local function UpdateScrollBar()
         local viewH = scroll:GetHeight()
         local contentH = content:GetHeight()
-        if contentH <= viewH or viewH <= 0 then thumb:Hide(); return end
+        if contentH <= viewH or viewH <= 0 then
+            thumb:Hide()
+            if syncScrollHit then syncScrollHit() end
+            return
+        end
         thumb:Show()
         local trackH = math.max(track:GetHeight(), 1)
         local thumbH = math.max(trackH * (viewH / contentH), 14)
@@ -374,7 +379,11 @@ function PanelProto:CreateScrollFrame()
         thumb:SetHeight(thumbH)
         thumb:ClearAllPoints()
         thumb:SetPoint("TOPLEFT", track, "TOPLEFT", 0, -((trackH - thumbH) * pct))
+        if syncScrollHit then syncScrollHit() end
     end
+
+    -- Textures cannot take mouse input; overlay frames that can.
+    syncScrollHit = lib.AttachScrollDrag and lib.AttachScrollDrag(scroll, content, thumb, track, UpdateScrollBar)
 
     scroll:SetScript("OnMouseWheel", function(_, delta)
         local cur = scroll:GetVerticalScroll()

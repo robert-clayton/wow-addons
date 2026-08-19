@@ -213,10 +213,15 @@ function lib.CreateWindow(opts)
     -- `cfgFrame.UpdateScrollBar()` with no self.
     local UpdateScrollBar
     if scrolls then
+        local syncScrollHit
         UpdateScrollBar = function()
             local viewH = scroll:GetHeight()
             local contentH = body:GetHeight()
-            if contentH <= viewH or viewH <= 0 then thumb:Hide(); return end
+            if contentH <= viewH or viewH <= 0 then
+                thumb:Hide()
+                if syncScrollHit then syncScrollHit() end
+                return
+            end
             thumb:Show()
             local trackH = math.max(track:GetHeight(), 1)
             local thumbH = math.max(trackH * (viewH / contentH), 20)
@@ -224,7 +229,11 @@ function lib.CreateWindow(opts)
             thumb:SetHeight(thumbH)
             thumb:ClearAllPoints()
             thumb:SetPoint("TOPLEFT", track, "TOPLEFT", 0, -((trackH - thumbH) * pct))
+            if syncScrollHit then syncScrollHit() end
         end
+
+        -- Textures cannot take mouse input; overlay frames that can.
+        syncScrollHit = lib.AttachScrollDrag and lib.AttachScrollDrag(scroll, body, thumb, track, UpdateScrollBar)
 
         scroll:SetScript("OnMouseWheel", function(_, delta)
             local maxScroll = math.max(body:GetHeight() - scroll:GetHeight(), 0)
