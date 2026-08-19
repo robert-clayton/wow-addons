@@ -3,6 +3,18 @@ if not lib then return end
 
 local theme = lib.Theme
 
+local WHITE8 = "Interface\\Buttons\\WHITE8x8"
+
+-- Paged options layout.
+--   RAIL_W      width of the category rail down the left of the window
+--   RAIL_GUTTER gap between the rail and the first content column
+--   RAIL_ROW_H  one rail row
+--   COL_GAP     half-gutter between the two content columns
+local RAIL_W      = 130
+local RAIL_GUTTER = 14
+local RAIL_ROW_H  = 28
+local COL_GAP     = 8
+
 -- File-local widget helpers
 local function OptionsDivider(body, yOff)
     local fr = CreateFrame("Frame", nil, body, "BackdropTemplate")
@@ -98,27 +110,33 @@ local function getPool(panel)
             checkbox = { items = {}, idx = 0 },
             slider   = { items = {}, idx = 0 },
             dropdown = { items = {}, idx = 0 },
+            button   = { items = {}, idx = 0 },
+            railrow  = { items = {}, idx = 0 },
         }
     end
     return panel._cfgPools
 end
 
+-- Every pool item lists the regions it owns at the top level in `_hide`.
+-- Hiding only `frame`/`fs` used to be enough because every widget type
+-- rendered on every pass; with pages a whole type can go unused, and a
+-- slider's caption / value box (siblings of the track, not children)
+-- would have stayed on screen after switching to a page without sliders.
+local function hideWidget(w)
+    for _, r in ipairs(w._hide) do r:Hide() end
+end
+
 local function poolReset(panel)
     for _, pool in pairs(getPool(panel)) do
         pool.idx = 0
-        for _, w in ipairs(pool.items) do
-            if w.frame then w.frame:Hide() end
-            if w.fs then w.fs:Hide() end
-        end
+        for _, w in ipairs(pool.items) do hideWidget(w) end
     end
 end
 
 local function poolHideExtras(panel)
     for _, pool in pairs(getPool(panel)) do
         for i = pool.idx + 1, #pool.items do
-            local w = pool.items[i]
-            if w.frame then w.frame:Hide() end
-            if w.fs then w.fs:Hide() end
+            hideWidget(pool.items[i])
         end
     end
 end
@@ -131,7 +149,7 @@ local function acquireSection(panel, body, yOff, text)
     if not w then
         local fs = body:CreateFontString(nil, "OVERLAY")
         fs:SetFont(theme.font, 9, lib.FontFlags())
-        w = { fs = fs }
+        w = { fs = fs, _hide = { fs } }
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
@@ -156,7 +174,7 @@ local function acquireDivider(panel, body, yOff)
         fr:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8" })
         local dc = theme.colors.optionsDivider
         fr:SetBackdropColor(dc[1], dc[2], dc[3], dc[4])
-        w = { frame = fr }
+        w = { frame = fr, _hide = { fr } }
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
@@ -172,12 +190,17 @@ local function acquireDivider(panel, body, yOff)
     return yOff - 6
 end
 
-local function acquireCheckbox(panel, body, yOff, def)
+-- `parent` is the stable creation parent (the content frame); `col` is
+-- the frame the row anchors into — the content frame for a full-width
+-- row, or one of the two half-width column frames. Returns the row
+-- HEIGHT (positive), because a two-column row advances by the taller of
+-- its two halves, not by whatever the last one rendered.
+local function acquireCheckbox(panel, parent, col, yOff, def)
     local pool = getPool(panel).checkbox
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
-        local fr = CreateFrame("CheckButton", nil, body, "UICheckButtonTemplate")
+        local fr = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
         fr:SetSize(20, 20)
         fr:EnableMouse(true)
         local lbl = fr:CreateFontString(nil, "OVERLAY")
@@ -198,7 +221,7 @@ local function acquireCheckbox(panel, body, yOff, def)
         dnBtn:SetSize(20, 16)
         dnBtn:SetText("v")
         dnBtn:Hide()
-        w = { frame = fr, lbl = lbl, upBtn = upBtn, dnBtn = dnBtn }
+        w = { frame = fr, lbl = lbl, upBtn = upBtn, dnBtn = dnBtn, _hide = { fr } }
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
@@ -207,7 +230,7 @@ local function acquireCheckbox(panel, body, yOff, def)
         end
     end
     w.frame:ClearAllPoints()
-    w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 6, yOff)
+    w.frame:SetPoint("TOPLEFT", col, "TOPLEFT", 6, yOff)
     w.frame:SetChecked(def.get())
     -- Disabled defs render dim and inert (pooled widgets must reset
     -- both ways). A disabled CheckButton never fires OnClick.
@@ -224,10 +247,12 @@ local function acquireCheckbox(panel, body, yOff, def)
 
     -- Reorder buttons appear at the right edge when the def carries a
     -- `reorder` table. The label width must leave room for them.
+    -- Reorder rows are always laid out full width, so `col` is the
+    -- content frame here.
     local r = def.reorder
     if r then
         w.dnBtn:ClearAllPoints()
-        w.dnBtn:SetPoint("RIGHT", body, "RIGHT", -8, 0)
+        w.dnBtn:SetPoint("RIGHT", col, "RIGHT", -8, 0)
         w.dnBtn:SetPoint("TOP", w.frame, "TOP", 0, -1)
         w.dnBtn:SetScript("OnClick", function() if r.onDown then r.onDown() end end)
         if r.isLast then w.dnBtn:Disable() else w.dnBtn:Enable() end
@@ -243,14 +268,17 @@ local function acquireCheckbox(panel, body, yOff, def)
         w.dnBtn:Hide()
     end
 
-    -- Anchor label LEFT to checkbox and RIGHT to body so it fills the
-    -- column width at draw time. body:GetWidth() returns 0 here because
-    -- BuildConfig runs before cfgFrame:Show(), so SetWidth() would clamp
-    -- to the floor and wrap after a few chars.
+    -- Anchor label LEFT to checkbox and RIGHT to the column so it fills
+    -- the column width at draw time. col:GetWidth() returns 0 here
+    -- because BuildConfig runs before cfgFrame:Show(), so SetWidth()
+    -- would clamp to the floor and wrap after a few chars. The same
+    -- technique carries over per column: the two column frames are
+    -- anchored halves of the content frame, so their edges resolve at
+    -- draw time exactly like the body's did.
     local rightReserve = r and 50 or 6
     w.lbl:ClearAllPoints()
     w.lbl:SetPoint("TOPLEFT", w.frame, "TOPRIGHT", 4, -2)
-    w.lbl:SetPoint("RIGHT", body, "RIGHT", -rightReserve, 0)
+    w.lbl:SetPoint("RIGHT", col, "RIGHT", -rightReserve, 0)
     w.lbl:SetWidth(0)  -- clear any prior fixed width so the L+R anchors win
     w.lbl:SetText(def.label)
 
@@ -260,7 +288,7 @@ local function acquireCheckbox(panel, body, yOff, def)
     -- overlap the next widget. GetStringHeight returns the wrapped
     -- height once SetText has run against the resolved anchor width.
     local lh = w.lbl:GetStringHeight() or 12
-    return yOff - math.max(22, lh + 8)
+    return math.max(22, lh + 8)
 end
 
 local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, setVal, fillR, fillG, fillB)
@@ -294,7 +322,8 @@ local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, s
         sl:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
         local th = sl:GetThumbTexture()
         if th then th:Hide() end
-        w = { lbl = lbl, frame = bg, fill = fill, valBox = valBox, valTxt = valTxt, slider = sl }
+        w = { lbl = lbl, frame = bg, fill = fill, valBox = valBox, valTxt = valTxt,
+            slider = sl, _hide = { lbl, bg, valBox } }
         pool.items[pool.idx] = w
         if lib.RegisterThemeHook then
             lib.RegisterThemeHook(function()
@@ -371,7 +400,8 @@ local function acquireDropdown(panel, body, yOff, def)
             btn:SetBackdropColor(unpack(theme.colors.btnBg))
         end)
 
-        w = { lbl = lbl, frame = btn, valFs = valFs, arrow = arrow, popup = popup }
+        w = { lbl = lbl, frame = btn, valFs = valFs, arrow = arrow, popup = popup,
+            _hide = { lbl, btn, popup } }
         pool.items[pool.idx] = w
 
         -- One-time theme hook: re-apply backdrop and font/colors on
@@ -430,40 +460,365 @@ local function acquireDropdown(panel, body, yOff, def)
     return yOff - 24
 end
 
+-- Action row: a caption on the left, a clickable button on the right.
+--   def = { type = "button", label, text, tooltip, width, height,
+--           disabled, onClick }
+-- `label` is the explanatory caption, `text` the button face (default
+-- "Run"). The button is lib.MakeHeaderBtn with the accent treatment the
+-- window's primary footer button uses.
+local function acquireButton(panel, body, yOff, def)
+    local pool = getPool(panel).button
+    pool.idx = pool.idx + 1
+    local w = pool.items[pool.idx]
+    if not w then
+        local lbl = body:CreateFontString(nil, "OVERLAY")
+        lbl:SetFont(theme.font, 10, lib.FontFlags())
+        lbl:SetJustifyH("LEFT")
+        lbl:SetJustifyV("TOP")
+        lbl:SetWordWrap(true)
+
+        local c = theme.colors
+        -- Tooltip is nil at creation: pooled buttons outlive any one def,
+        -- and MakeHeaderBtn captures its tooltip string in a closure.
+        -- The base OnEnter still paints hover; this wrapper adds the
+        -- current def's tooltip on top. Base OnLeave already hides it.
+        local btn = lib.MakeHeaderBtn(body, "", c.accent, c.btnTealHoverBg,
+            c.accent, nil, { width = 88, height = 24 })
+        local baseEnter = btn:GetScript("OnEnter")
+
+        local fill = btn:CreateTexture(nil, "BACKGROUND")
+        fill:SetPoint("TOPLEFT", 1, -1)
+        fill:SetPoint("BOTTOMRIGHT", -1, 1)
+        fill:SetTexture(WHITE8)
+        local ac = c.accent
+        fill:SetColorTexture(ac[1], ac[2], ac[3], 0.12)
+
+        w = { lbl = lbl, frame = btn, fill = fill, _hide = { lbl, btn } }
+        pool.items[pool.idx] = w
+
+        btn:SetScript("OnEnter", function(s)
+            if baseEnter then baseEnter(s) end
+            if w._tooltip then
+                GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+                GameTooltip:SetText(w._tooltip)
+                GameTooltip:Show()
+            end
+        end)
+
+        if lib.RegisterThemeHook then
+            lib.RegisterThemeHook(function()
+                lbl:SetFont(theme.font, 10, lib.FontFlags())
+                local a = theme.colors.accent
+                fill:SetColorTexture(a[1], a[2], a[3], 0.12)
+            end)
+        end
+    end
+
+    local h = def.height or 24
+    w.frame:ClearAllPoints()
+    w.frame:SetSize(def.width or 88, h)
+    w.frame:SetPoint("TOPRIGHT", body, "TOPRIGHT", -8, yOff)
+    if w.frame._label then w.frame._label:SetText(def.text or "Run") end
+    w._tooltip = def.tooltip
+    w.frame:SetEnabled(not def.disabled)
+    w.frame:SetScript("OnClick", function()
+        if def.onClick then def.onClick() end
+        if def.onRefresh then def.onRefresh() end
+    end)
+    w.frame:Show()
+
+    w.lbl:ClearAllPoints()
+    w.lbl:SetPoint("TOPLEFT", body, "TOPLEFT", 8, yOff - 5)
+    w.lbl:SetPoint("RIGHT", w.frame, "LEFT", -8, 0)
+    w.lbl:SetWidth(0)
+    w.lbl:SetTextColor(0.88, 0.88, 0.88)
+    w.lbl:SetText(def.label or "")
+    w.lbl:Show()
+
+    local lh = w.lbl:GetStringHeight() or 12
+    return yOff - math.max(h + 6, lh + 10)
+end
+
+--------------------------------------------------------------------------
+-- Category rail
+--------------------------------------------------------------------------
+
+-- One rail row. Deliberately not lib.MakeNavRow: that row reserves 40px
+-- for an icon and a right-hand count column, neither of which a 130px
+-- category rail has room for. Same visual language though — shared
+-- accent indicator, hover wash, title-colored active label.
+local function acquireRailRow(panel, rail, index, label, active, onClick)
+    local pool = getPool(panel).railrow
+    pool.idx = pool.idx + 1
+    local w = pool.items[pool.idx]
+    if not w then
+        local row = CreateFrame("Button", nil, rail)
+        row:SetHeight(RAIL_ROW_H)
+        row:RegisterForClicks("LeftButtonUp")
+
+        local wash = row:CreateTexture(nil, "BACKGROUND", nil, 2)
+        wash:SetAllPoints()
+        wash:SetTexture(WHITE8)
+        wash:Hide()
+
+        -- Seeded through SetTextureAlpha: SetColorTexture's alpha cannot
+        -- be read back, so a bare seed would make the first fade start
+        -- from opaque.
+        local hover = row:CreateTexture(nil, "BACKGROUND", nil, 3)
+        hover:SetAllPoints()
+        lib.SetTextureAlpha(hover, 1, 1, 1, 0)
+
+        local bar = row:CreateTexture(nil, "ARTWORK")
+        bar:SetWidth(2)
+        bar:SetPoint("TOPLEFT")
+        bar:SetPoint("BOTTOMLEFT")
+        bar:SetTexture(WHITE8)
+        bar:Hide()
+
+        -- Font before SetText.
+        local fs = row:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
+        fs:SetPoint("LEFT", row, "LEFT", 12, 0)
+        fs:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+        fs:SetJustifyH("LEFT")
+        fs:SetWordWrap(false)
+
+        w = { frame = row, fs = fs, wash = wash, hover = hover, bar = bar,
+            _hide = { row } }
+        pool.items[pool.idx] = w
+
+        local function paint()
+            local c = theme.colors
+            local ac = c.accent
+            lib.SetGradient(wash, "HORIZONTAL",
+                { ac[1], ac[2], ac[3], 0.12 }, { ac[1], ac[2], ac[3], 0 })
+            bar:SetColorTexture(ac[1], ac[2], ac[3], 1)
+            fs:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
+            if w._active then
+                fs:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
+            else
+                fs:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
+            end
+        end
+        w.paint = paint
+        if lib.RegisterThemeHook then lib.RegisterThemeHook(paint) end
+
+        row:SetScript("OnEnter", function()
+            local rh = theme.colors.rowHover
+            lib.FadeTexture(hover, rh[1], rh[2], rh[3], rh[4] or 0.05, 0.08)
+        end)
+        row:SetScript("OnLeave", function()
+            local rh = theme.colors.rowHover
+            lib.FadeTexture(hover, rh[1], rh[2], rh[3], 0, 0.12)
+        end)
+    end
+
+    w._active = active
+    w.frame:ClearAllPoints()
+    w.frame:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(index - 1) * (RAIL_ROW_H + 2))
+    w.frame:SetPoint("TOPRIGHT", rail, "TOPRIGHT", 0, -(index - 1) * (RAIL_ROW_H + 2))
+    w.fs:SetText(label)
+    if active then w.wash:Show() else w.wash:Hide() end
+    if active then w.bar:Show() else w.bar:Hide() end
+    w.paint()
+    w.frame:SetScript("OnClick", onClick)
+    w.frame:Show()
+    return w
+end
+
+-- The rail lives on the window frame, not in the scrolling body: it must
+-- stay put while the page scrolls. Anchored between the header and the
+-- footer so it inherits whatever heights the window factory used.
+local function ensureRail(cfgFrame)
+    if cfgFrame._cfgRail then return cfgFrame._cfgRail end
+    local rail = CreateFrame("Frame", nil, cfgFrame)
+    rail:SetWidth(RAIL_W)
+    if cfgFrame.header then
+        rail:SetPoint("TOPLEFT", cfgFrame.header, "BOTTOMLEFT", 16, -8)
+    else
+        rail:SetPoint("TOPLEFT", cfgFrame, "TOPLEFT", 16, -54)
+    end
+    if cfgFrame.footer then
+        rail:SetPoint("BOTTOMLEFT", cfgFrame.footer, "TOPLEFT", 16, 8)
+    else
+        rail:SetPoint("BOTTOMLEFT", cfgFrame, "BOTTOMLEFT", 16, 16)
+    end
+    -- The scroll frame spans the full body width and is a sibling created
+    -- earlier; lifting the rail above it keeps both the draw order and
+    -- the hit testing unambiguous.
+    if cfgFrame.scrollFrame then
+        rail:SetFrameLevel(cfgFrame.scrollFrame:GetFrameLevel() + 5)
+    end
+
+    local edge = rail:CreateTexture(nil, "ARTWORK")
+    edge:SetWidth(1)
+    edge:SetPoint("TOPRIGHT", rail, "TOPRIGHT", RAIL_GUTTER / 2, 0)
+    edge:SetPoint("BOTTOMRIGHT", rail, "BOTTOMRIGHT", RAIL_GUTTER / 2, 0)
+    edge:SetTexture(WHITE8)
+    local function paint()
+        local dc = theme.colors.optionsDivider
+        edge:SetColorTexture(dc[1], dc[2], dc[3], dc[4] or 0.06)
+    end
+    paint()
+    if lib.RegisterThemeHook then lib.RegisterThemeHook(paint) end
+
+    cfgFrame._cfgRail = rail
+    return rail
+end
+
+-- Content frame + the two column halves. The content frame is the stable
+-- creation parent for every pooled widget, and it is what gets indented
+-- when the rail is showing — so the rail never has to move the window's
+-- scroll frame around. The column frames are anchored halves of it, so
+-- a widget anchored into a column resolves its width at draw time just
+-- like it used to against the body.
+local function ensureContent(panel, body)
+    local content = panel._cfgContent
+    if not content then
+        content = CreateFrame("Frame", nil, body)
+        content:SetHeight(1)
+        panel._cfgContent = content
+
+        local colL = CreateFrame("Frame", nil, content)
+        colL:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
+        colL:SetPoint("BOTTOMRIGHT", content, "BOTTOM", -COL_GAP, 0)
+        panel._cfgColL = colL
+
+        local colR = CreateFrame("Frame", nil, content)
+        colR:SetPoint("TOPLEFT", content, "TOP", COL_GAP, 0)
+        colR:SetPoint("BOTTOMRIGHT", content, "BOTTOMRIGHT", 0, 0)
+        panel._cfgColR = colR
+    end
+    return content, panel._cfgColL, panel._cfgColR
+end
+
+-- Split a def list at `page` markers. Defs ahead of the first marker
+-- form an implicit first page, so a caller that emits no markers at all
+-- still renders everything as one unlabeled page.
+local function splitPages(defs)
+    local pages, cur = {}, nil
+    for _, def in ipairs(defs) do
+        if def.type == "page" then
+            cur = { label = def.label or ("Page " .. (#pages + 1)), defs = {} }
+            pages[#pages + 1] = cur
+        else
+            if not cur then
+                cur = { label = "General", defs = {} }
+                pages[#pages + 1] = cur
+            end
+            cur.defs[#cur.defs + 1] = def
+        end
+    end
+    if #pages == 0 then pages[1] = { label = "General", defs = {} } end
+    return pages
+end
+
+-- A run of consecutive plain checkboxes (no `reorder` table) lays out two
+-- per row. Anything else — a reorder row, slider, dropdown, button,
+-- section, divider — is full width and ends the run.
+local function isPlainCheckbox(def)
+    return def and def.type == "checkbox" and not def.reorder
+end
+
 -- PopulateConfig implementation (called by PanelProto:_PopulateConfigBody)
 lib._populateConfigBody = function(panel, defs)
     local cfgFrame = panel.cfgFrame
     if not cfgFrame or not cfgFrame.body then return end
+    if not defs then return end
     local body = cfgFrame.body
 
-    poolReset(panel)
-    local yOff = 0
+    panel._cfgDefs = defs
+    local pages = splitPages(defs)
+    local paged = #pages > 1
 
-    for _, def in ipairs(defs) do
+    local pageIdx = panel._cfgPage or 1
+    if pageIdx < 1 or pageIdx > #pages then pageIdx = 1 end
+    panel._cfgPage = pageIdx
+
+    poolReset(panel)
+
+    local content, colL, colR = ensureContent(panel, body)
+    local indent = paged and (RAIL_W + RAIL_GUTTER) or 0
+    content:ClearAllPoints()
+    content:SetPoint("TOPLEFT", body, "TOPLEFT", indent, 0)
+    content:SetPoint("TOPRIGHT", body, "TOPRIGHT", 0, 0)
+
+    -- Rail. Built on first paged render and reused; hidden outright when
+    -- the def list carries no page markers.
+    if paged then
+        local rail = ensureRail(cfgFrame)
+        rail:Show()
+        for i, page in ipairs(pages) do
+            local idx = i
+            acquireRailRow(panel, rail, i, page.label, i == pageIdx, function()
+                if panel._cfgPage == idx then return end
+                panel._cfgPage = idx
+                if cfgFrame.scrollFrame then
+                    cfgFrame.scrollFrame:SetVerticalScroll(0)
+                end
+                lib._populateConfigBody(panel, panel._cfgDefs)
+            end)
+        end
+    elseif cfgFrame._cfgRail then
+        cfgFrame._cfgRail:Hide()
+    end
+
+    local pageDefs = pages[pageIdx].defs
+    local yOff = 0
+    local i, n = 1, #pageDefs
+    while i <= n do
+        local def = pageDefs[i]
         if def.type == "section" then
-            yOff = acquireSection(panel, body, yOff, def.label)
+            yOff = acquireSection(panel, content, yOff, def.label)
             yOff = yOff - 2
         elseif def.type == "divider" then
-            yOff = acquireDivider(panel, body, yOff)
+            yOff = acquireDivider(panel, content, yOff)
         elseif def.type == "checkbox" then
-            yOff = acquireCheckbox(panel, body, yOff, def)
+            if isPlainCheckbox(def) and isPlainCheckbox(pageDefs[i + 1]) then
+                local hL = acquireCheckbox(panel, content, colL, yOff, def)
+                local hR = acquireCheckbox(panel, content, colR, yOff, pageDefs[i + 1])
+                yOff = yOff - math.max(hL, hR)
+                i = i + 1
+            else
+                -- Reorder rows keep the full width (their arrows sit at
+                -- the right edge); a lone plain checkbox stays in the
+                -- left column so the grid does not jump.
+                local col = def.reorder and content or colL
+                yOff = yOff - acquireCheckbox(panel, content, col, yOff, def)
+            end
         elseif def.type == "slider" then
             local fc = def.fillColor or { 0.40, 0.40, 0.40 }
-            yOff = acquireSlider(panel, body, yOff, def.label, def.min, def.max, def.step,
+            yOff = acquireSlider(panel, content, yOff, def.label, def.min, def.max, def.step,
                 def.get, def.set, fc[1], fc[2], fc[3])
         elseif def.type == "dropdown" then
-            yOff = acquireDropdown(panel, body, yOff, def)
+            yOff = acquireDropdown(panel, content, yOff, def)
+        elseif def.type == "button" then
+            yOff = acquireButton(panel, content, yOff, def)
         end
+        i = i + 1
     end
 
     poolHideExtras(panel)
 
     local totalH = math.abs(yOff) + 8
     body:SetHeight(totalH)
+    -- The content frame is anchored top-only, so give it the same height:
+    -- the column frames hang off its BOTTOM edge, and a stale height
+    -- would leave them measuring the previous page.
+    content:SetHeight(totalH)
     -- A scrolling settings window is a fixed size: the body is its scroll
     -- child, so only the scroll range changes. The legacy side-dock grew
     -- to fit instead.
     if cfgFrame._scrolls then
+        -- Switching from a long page to a short one leaves the old scroll
+        -- offset past the new end, which reads as an empty window.
+        local sf = cfgFrame.scrollFrame
+        if sf then
+            local maxScroll = math.max(totalH - sf:GetHeight(), 0)
+            if sf:GetVerticalScroll() > maxScroll then
+                sf:SetVerticalScroll(maxScroll)
+            end
+        end
         if cfgFrame.UpdateScrollBar then cfgFrame.UpdateScrollBar() end
     else
         cfgFrame:SetHeight(24 + 4 + totalH)

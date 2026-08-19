@@ -1754,7 +1754,10 @@ function MC.CreatePanel()
             db            = MC.MakePremiumDB(),
             defaultWidth  = 980,
             defaultHeight = 680,
-            minWidth      = 760,
+            -- Floor for the header to hold the page title on the left
+            -- and, on the right, three window controls plus the whole
+            -- indicator chain (filter, peers, score, counter).
+            minWidth      = 820,
             maxWidth      = 1400,
             minHeight     = 520,
             maxHeight     = 1000,
@@ -2072,59 +2075,36 @@ end
 
 --------------------------------------------------------------------------
 -- Build the unified options panel from each module's config defs.
+--
+-- The def list is split into pages by `{ type = "page" }` markers; the
+-- renderer shows one page at a time and drives the category rail down
+-- the left of the settings window from the markers' labels. Five pages:
+-- General (actions, display, sharing), Modules (enable + reorder),
+-- Expansions (browse toggles), Trackers (per-module options), and
+-- Appearance. Every get/set below is unchanged from the single-scroll
+-- layout — only the grouping moved.
 --------------------------------------------------------------------------
 function MC.BuildConfig()
     if not MC.panel then return end
 
     local defs = {}
 
-    defs[#defs + 1] = { type = "section", label = "MODULES" }
-    local modCount = #MC.modules
-    for i, mod in ipairs(MC.modules) do
-        local key = mod.key
-        defs[#defs + 1] = {
-            type    = "checkbox",
-            label   = mod.label,
-            get     = function() return MC.IsModuleEnabled(key) end,
-            set     = function(v) MC.SetModuleEnabled(key, v) end,
-            -- Up/down arrows let the user reorder modules. The buttons
-            -- swap this module with its neighbor and then BuildConfig
-            -- re-runs so the visible position updates immediately.
-            reorder = {
-                isFirst = (i == 1),
-                isLast  = (i == modCount),
-                onUp    = function() MC.MoveModule(key, -1) end,
-                onDown  = function() MC.MoveModule(key,  1) end,
-            },
-        }
-    end
-
-    -- Browse toggles per expansion with registered content. Unchecking
-    -- hides that expansion from the tab lists only — totals, Collection
-    -- Score, and sharing still count it.
-    defs[#defs + 1] = { type = "divider" }
-    defs[#defs + 1] = { type = "section", label = "BROWSE EXPANSIONS" }
-    for _, e in ipairs(MC.EXPANSIONS or {}) do
-        if MC._registeredExpansions and MC._registeredExpansions[e.key] then
-            local expKey = e.key
-            defs[#defs + 1] = {
-                type  = "checkbox",
-                label = e.label,
-                get   = function() return MC.IsExpansionEnabled(expKey) end,
-                set   = function(v) MC.SetExpansionEnabled(expKey, v) end,
-            }
-        else
-            -- Skeleton row for expansions without content: greyed,
-            -- checked, inert — flips live once a data file registers.
-            defs[#defs + 1] = {
-                type     = "checkbox",
-                label    = e.label .. " (coming soon)",
-                disabled = true,
-                get      = function() return true end,
-                set      = function() end,
-            }
-        end
-    end
+    defs[#defs + 1] = { type = "page", label = "General" }
+    defs[#defs + 1] = { type = "section", label = "ACTIONS" }
+    -- The Scan action used to be a shell footer button; it lives here now
+    -- so both shells reach it the same way. Same body as `/mc scan`
+    -- minus the chat confirmation.
+    defs[#defs + 1] = {
+        type    = "button",
+        label   = "Rescan every collection module",
+        text    = "Scan",
+        tooltip = "Rescan all collection modules",
+        onClick = function()
+            for _, mod in ipairs(MC.modules) do
+                if mod.Scanner then MC.ScanNow(mod) end
+            end
+        end,
+    }
 
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "DISPLAY" }
@@ -2160,11 +2140,67 @@ function MC.BuildConfig()
             end
         end }
 
+    defs[#defs + 1] = { type = "page", label = "Modules" }
+    defs[#defs + 1] = { type = "section", label = "MODULES" }
+    local modCount = #MC.modules
+    for i, mod in ipairs(MC.modules) do
+        local key = mod.key
+        defs[#defs + 1] = {
+            type    = "checkbox",
+            label   = mod.label,
+            get     = function() return MC.IsModuleEnabled(key) end,
+            set     = function(v) MC.SetModuleEnabled(key, v) end,
+            -- Up/down arrows let the user reorder modules. The buttons
+            -- swap this module with its neighbor and then BuildConfig
+            -- re-runs so the visible position updates immediately.
+            reorder = {
+                isFirst = (i == 1),
+                isLast  = (i == modCount),
+                onUp    = function() MC.MoveModule(key, -1) end,
+                onDown  = function() MC.MoveModule(key,  1) end,
+            },
+        }
+    end
+
+    -- Browse toggles per expansion with registered content. Unchecking
+    -- hides that expansion from the tab lists only — totals, Collection
+    -- Score, and sharing still count it.
+    defs[#defs + 1] = { type = "page", label = "Expansions" }
+    defs[#defs + 1] = { type = "section", label = "BROWSE EXPANSIONS" }
+    for _, e in ipairs(MC.EXPANSIONS or {}) do
+        if MC._registeredExpansions and MC._registeredExpansions[e.key] then
+            local expKey = e.key
+            defs[#defs + 1] = {
+                type  = "checkbox",
+                label = e.label,
+                get   = function() return MC.IsExpansionEnabled(expKey) end,
+                set   = function(v) MC.SetExpansionEnabled(expKey, v) end,
+            }
+        else
+            -- Skeleton row for expansions without content: greyed,
+            -- checked, inert — flips live once a data file registers.
+            defs[#defs + 1] = {
+                type     = "checkbox",
+                label    = e.label .. " (coming soon)",
+                disabled = true,
+                get      = function() return true end,
+                set      = function() end,
+            }
+        end
+    end
+
     -- Inject the "Show Collected" checkbox automatically from each module's
     -- collectedKey/collectedLabel; modules only have to declare extras.
+    -- Each module's header is a sub-header inside the Trackers page.
+    defs[#defs + 1] = { type = "page", label = "Trackers" }
+    local firstTracker = true
     for _, mod in ipairs(MC.modules) do
         if MC.IsModuleEnabled(mod.key) and mod.UI then
-            defs[#defs + 1] = { type = "divider" }
+            if firstTracker then
+                firstTracker = false
+            else
+                defs[#defs + 1] = { type = "divider" }
+            end
             defs[#defs + 1] = { type = "section", label = strupper(mod.label) }
             local key   = mod.opts.collectedKey or "showCollected"
             local label = mod.opts.collectedLabel or "collected"
@@ -2182,7 +2218,7 @@ function MC.BuildConfig()
         end
     end
 
-    defs[#defs + 1] = { type = "divider" }
+    defs[#defs + 1] = { type = "page", label = "Appearance" }
     defs[#defs + 1] = { type = "section", label = "APPEARANCE" }
     defs[#defs + 1] = { type = "dropdown", label = "UI Style",
         options = {

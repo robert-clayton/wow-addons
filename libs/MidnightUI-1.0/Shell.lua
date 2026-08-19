@@ -18,10 +18,20 @@ if not lib then return end
 -- flags are set, and restore clears both). All three states share
 -- db.position. Nil db.compact keys mean legacy saves and resolve to
 -- the full state.
+-- Window controls (minimize-to-strip, size toggle, close) live in the
+-- page header's top-right corner as ONE shared set (f.minBtn /
+-- f.sizeBtn / f.winCloseBtn) used by both the full and the compact
+-- header — the two views only differ in header height, so a second set
+-- would be the same buttons drawn twice. They are children of
+-- frame.titleBar (a full-cover drag surface; a sibling would lose the
+-- click) and so hide with it in the strip state, where f.restoreBtn
+-- takes over. The footer is action-only: Options and Inspector.
 -- Behavioral hooks arrive through opts so the lib stays consumer-
--- agnostic: onRefresh, onHide, onScan, onInspector, inspectorVisible,
+-- agnostic: onRefresh, onHide, onInspector, inspectorVisible,
 -- onViewChanged(shell, mode) — fired after every non-combat state
--- apply.
+-- apply. opts.onScan is still accepted for consumers that surface a
+-- rescan action of their own (it now lives in Options); the shell no
+-- longer renders a Scan button.
 
 local SIDEBAR_W   = 220
 local BRAND_H     = 64
@@ -324,34 +334,56 @@ function ShellProto:_CreateHeader()
     progress:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
     self.titleProgressText = progress
 
-    -- Compact-state header controls (footer is hidden in compact, so
-    -- the compact header carries its own expand / to-strip buttons).
-    -- Created once, hidden until _ApplyCompactVisuals shows them.
+    -- Window controls, in the corner every desktop window puts them and
+    -- in the same order: size button rightmost, minimize to its left.
+    -- ONE pair serves both the full and the compact header — the compact
+    -- view used to carry a duplicate pair because the controls lived in
+    -- the (compact-hidden) footer; now that they are header-owned, the
+    -- two views share the buttons and only the header height differs.
+    -- Children of `bar`, which is a full-cover drag surface: a sibling
+    -- at the same frame level would never receive the click.
+    -- Not hidden at creation — full is the default view and only the
+    -- strip state (which hides `bar` outright) takes them away.
     local shell = self
     local db = self.db
     local colors = theme.colors
-    local expandBtn = lib.MakeHeaderBtn(bar, "",
+    -- Right-to-left: close, size, minimize — the order every desktop
+    -- window uses, with close outermost.
+    local winCloseBtn = lib.MakeHeaderBtn(bar, "x",
+        colors.btnCloseFg, colors.btnCloseHoverBg, colors.btnCloseHoverBd,
+        "Close", { width = 20, height = 20 })
+    winCloseBtn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -8, -8)
+    winCloseBtn:SetScript("OnClick", function() shell:Hide() end)
+    f.winCloseBtn = winCloseBtn
+
+    local sizeBtn = lib.MakeHeaderBtn(bar, "",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Maximize", { width = 20, height = 20 })
-    expandBtn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -8, -8)
-    expandBtn:Hide()
-    lib.ApplyWindowGlyph(expandBtn, "maximize")
-    expandBtn:SetScript("OnClick", function()
-        db.compact = false
+        "Compact view", { width = 20, height = 20 })
+    sizeBtn:SetPoint("RIGHT", winCloseBtn, "LEFT", -6, 0)
+    -- The size button always shows what it will do next.
+    lib.ApplyWindowGlyph(sizeBtn, db.compact and "maximize" or "restore")
+    sizeBtn:SetScript("OnClick", function()
+        db.compact = not db.compact
         shell:ApplyMinimizeState()
     end)
-    f.compactExpandBtn = expandBtn
+    -- The creation-time tooltip is captured by value; hook a second
+    -- handler so the text tracks the state the glyph is showing.
+    sizeBtn:HookScript("OnEnter", function(s)
+        GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(db.compact and "Full view" or "Compact view")
+        GameTooltip:Show()
+    end)
+    f.sizeBtn = sizeBtn
 
-    local stripBtn = lib.MakeHeaderBtn(bar, "",
+    local minBtn = lib.MakeHeaderBtn(bar, "",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Minimize", { width = 20, height = 20 })
-    stripBtn:SetPoint("RIGHT", expandBtn, "LEFT", -6, 0)
-    stripBtn:Hide()
-    lib.ApplyWindowGlyph(stripBtn, "minimize")
-    stripBtn:SetScript("OnClick", function()
+    minBtn:SetPoint("RIGHT", sizeBtn, "LEFT", -6, 0)
+    lib.ApplyWindowGlyph(minBtn, "minimize")
+    minBtn:SetScript("OnClick", function()
         shell:_Minimize()
     end)
-    f.compactStripBtn = stripBtn
+    f.minBtn = minBtn
 
     self:_AnchorProgressText(false)
 end
@@ -368,11 +400,17 @@ function ShellProto:_AnchorProgressText(mode)
     p:ClearAllPoints()
     if strip and f.restoreBtn then
         p:SetPoint("RIGHT", f.restoreBtn, "LEFT", -8, 0)
-    elseif mode == "compact" and f.compactStripBtn then
-        p:SetPoint("RIGHT", f.compactStripBtn, "LEFT", -10, 0)
+    elseif not strip and f.minBtn then
+        -- Left of the window controls (minBtn is the leftmost of the
+        -- pair) so the indicator chain Core hangs off this string can
+        -- never run under them. The full header adds a -8 nudge: the
+        -- controls sit at the header's very top (centre -18) while the
+        -- indicator row keeps sharing the page title's optical centre
+        -- at -26, exactly where it sat before they moved up here. The
+        -- compact header is one line, so there it stays on the buttons'
+        -- own centre line.
+        p:SetPoint("RIGHT", f.minBtn, "LEFT", -10, (mode == "compact") and 0 or -8)
     else
-        -- Top line, sharing the page title's optical centre: the
-        -- indicators are panel-level status, not page content.
         p:SetPoint("RIGHT", f.titleBar, "TOPRIGHT", -CONTENT_PAD, -26)
     end
 end
@@ -459,34 +497,9 @@ function ShellProto:_CreateFooter()
 
     local BTN = { width = 88, height = 30 }
 
-    -- Right side (right → left). Scan is the one primary action in the
-    -- footer (accent text over an accent-tinted fill); Close merely
-    -- dismisses and stays quiet.
-    local closeBtn = lib.MakeHeaderBtn(footer, "Close",
-        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Close", BTN)
-    closeBtn:SetPoint("RIGHT", footer, "RIGHT", -CONTENT_PAD, 0)
-    closeBtn:SetScript("OnClick", function() shell:Hide() end)
-    footer.closeBtn = closeBtn
-
-    local scanBtn = lib.MakeHeaderBtn(footer, "Scan",
-        colors.accent, colors.btnTealHoverBg, colors.accent,
-        "Rescan all collection modules", BTN)
-    scanBtn:SetPoint("RIGHT", closeBtn, "LEFT", -12, 0)
-    scanBtn:SetScript("OnClick", function()
-        if opts.onScan then opts.onScan(shell) end
-    end)
-    -- Persistent accent-tinted fill; repainted in ApplyBackdrop (the
-    -- backdrop bg renders beneath regular textures, so this overlays it
-    -- and hover backdrop changes still read through the 12% wash).
-    local scanFill = scanBtn:CreateTexture(nil, "BACKGROUND")
-    scanFill:SetPoint("TOPLEFT", 1, -1)
-    scanFill:SetPoint("BOTTOMRIGHT", -1, 1)
-    scanFill:SetTexture(WHITE8)
-    scanBtn._fill = scanFill
-    footer.scanBtn = scanBtn
-
-    -- Left side (left → right).
+    -- Actions only. Dismissal moved to the header's X alongside the
+    -- other window controls, so the footer carries nothing but the two
+    -- surfaces it opens.
     local optBtn = lib.MakeHeaderBtn(footer, "Options",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Options", BTN)
@@ -503,49 +516,14 @@ function ShellProto:_CreateFooter()
     end)
     footer.inspectorBtn = inspBtn
 
-    -- First leg of the full -> compact -> strip cycle. The footer is
-    -- hidden in compact, so the compact header's own buttons carry the
-    -- compact -> strip and compact -> full legs.
-    -- Window controls, matching the convention every desktop window
-    -- uses: minimize collapses all the way to the strip; the size
-    -- button toggles between the full window and the compact view and
-    -- shows whichever glyph describes what it will do next.
-    local minBtn = lib.MakeHeaderBtn(footer, "",
-        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Minimize", { width = 30, height = 30 })
-    minBtn:SetPoint("LEFT", inspBtn, "RIGHT", 12, 0)
-    lib.ApplyWindowGlyph(minBtn, "minimize")
-    minBtn:SetScript("OnClick", function()
-        shell:_Minimize()
-    end)
-    footer.minBtn = minBtn
-
-    local sizeBtn = lib.MakeHeaderBtn(footer, "",
-        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Compact view", { width = 30, height = 30 })
-    sizeBtn:SetPoint("LEFT", minBtn, "RIGHT", 6, 0)
-    lib.ApplyWindowGlyph(sizeBtn, "restore")
-    sizeBtn:SetScript("OnClick", function()
-        db.compact = not db.compact
-        shell:ApplyMinimizeState()
-    end)
-    -- The creation-time tooltip is captured by value; hook a second
-    -- handler so the text tracks the state the glyph is showing.
-    sizeBtn:HookScript("OnEnter", function(s)
-        GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
-        GameTooltip:SetText(db.compact and "Full view" or "Compact view")
-        GameTooltip:Show()
-    end)
-    footer.sizeBtn = sizeBtn
-
-    -- Restore button for the minimized strip (the footer — and its
-    -- minimize button — is hidden while minimized).
+    -- Restore button for the minimized strip (the header — and its
+    -- window controls — is hidden while minimized).
     --
     -- Parented to the strip bar, not the window: the strip bar is a
     -- full-cover drag surface with the mouse enabled, so a sibling at
     -- the same frame level would compete with it for the click and the
     -- strip could not be expanded. A child sits above its parent, which
-    -- is how the compact header's buttons already work.
+    -- is how the header's window controls work on the title bar.
     local restoreBtn = lib.MakeHeaderBtn(f.stripBar or f, "+",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Restore", { width = 20, height = 20 })
@@ -556,8 +534,12 @@ function ShellProto:_CreateFooter()
     f.restoreBtn = restoreBtn
 
     self.UpdateMinimizeVisual = function()
-        -- The size button always shows what it will do next.
-        lib.ApplyWindowGlyph(sizeBtn, db.compact and "maximize" or "restore")
+        -- The size button always shows what it will do next. It lives in
+        -- the header now (created before the footer), so reach it through
+        -- the frame rather than a local.
+        if f.sizeBtn then
+            lib.ApplyWindowGlyph(f.sizeBtn, db.compact and "maximize" or "restore")
+        end
         if db.minimized then restoreBtn:Show() else restoreBtn:Hide() end
     end
     self.UpdateMinimizeVisual()
@@ -737,11 +719,6 @@ function ShellProto:ApplyBackdrop()
         f.stripBar.text:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
     end
 
-    if f.footer.scanBtn and f.footer.scanBtn._fill then
-        local ac = c.accent
-        f.footer.scanBtn._fill:SetColorTexture(ac[1], ac[2], ac[3], 0.12)
-    end
-
     local tc = c.scrollTrack
     f.scrollTrack:SetColorTexture(tc[1], tc[2], tc[3], tc[4])
     local st = c.scrollThumb
@@ -752,19 +729,17 @@ function ShellProto:ApplyBackdrop()
     f.footer.hairline:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
 
     -- Inspector button visibility is consumer-driven; re-evaluated here
-    -- (staleness until the next ApplyBackdrop is accepted).
+    -- (staleness until the next ApplyBackdrop is accepted). Nothing is
+    -- anchored to it any more — it is the last button in the left run —
+    -- so hiding it leaves no gap to close.
     local showInsp = true
     if self.opts.inspectorVisible then
         showInsp = self.opts.inspectorVisible() and true or false
     end
-    local insp = f.footer.inspectorBtn
-    local minBtn = f.footer.minBtn
-    if showInsp then insp:Show() else insp:Hide() end
-    minBtn:ClearAllPoints()
     if showInsp then
-        minBtn:SetPoint("LEFT", insp, "RIGHT", 12, 0)
+        f.footer.inspectorBtn:Show()
     else
-        minBtn:SetPoint("LEFT", f.footer.optionsBtn, "RIGHT", 12, 0)
+        f.footer.inspectorBtn:Hide()
     end
 end
 
@@ -814,8 +789,12 @@ function ShellProto:_ApplyCompactVisuals()
     bar.pageTitle:ClearAllPoints()
     bar.pageTitle:SetPoint("TOPLEFT", bar, "TOPLEFT", COMPACT_PAD, -8)
     self:_ApplyTitleFont()
-    if f.compactExpandBtn then f.compactExpandBtn:Show() end
-    if f.compactStripBtn then f.compactStripBtn:Show() end
+    -- The window controls ride the header, so they need no per-view
+    -- re-anchor: TOPRIGHT -8,-8 is the same corner in both header
+    -- heights. Show() is defensive — only the strip hides them, and it
+    -- does so by hiding their parent.
+    if f.sizeBtn then f.sizeBtn:Show() end
+    if f.minBtn then f.minBtn:Show() end
 
     f.scrollFrame:Show()
     f.scrollFrame:ClearAllPoints()
@@ -853,8 +832,9 @@ function ShellProto:_ApplyFullVisuals()
     bar.pageTitle:ClearAllPoints()
     bar.pageTitle:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD, -14)
     self:_ApplyTitleFont()
-    if f.compactExpandBtn then f.compactExpandBtn:Hide() end
-    if f.compactStripBtn then f.compactStripBtn:Hide() end
+    -- Same shared pair as compact, same corner (see _ApplyCompactVisuals).
+    if f.sizeBtn then f.sizeBtn:Show() end
+    if f.minBtn then f.minBtn:Show() end
 
     f.scrollFrame:Show()
     f.scrollFrame:ClearAllPoints()

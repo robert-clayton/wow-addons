@@ -5,6 +5,7 @@
     <Script file="Widgets.lua"/>
     <Script file="Dropdown.lua"/>
     <Script file="Controls.lua"/>
+    <Script file="Window.lua"/>
     <Script file="Settings.lua"/>
     <Script file="Shell.lua"/>
 </Ui>

@@ -1,17 +1,31 @@
 local _, MC = ...
 
--- Collection Inspector: a popup with a left-side peer list and a right-
--- side comparison view. Clicking a name in the list toggles that peer
--- in/out of the comparison columns.
+-- Collection Inspector: a left-side peer list and a right-side comparison
+-- view. Clicking a name in the list toggles that peer in/out of the
+-- comparison columns.
+--
+-- The chrome is not ours: header (title + subtitle + close), drag, saved
+-- position, Escape-to-close, footer button strip, scrolling body and the
+-- PopIn/PopOut open/close motion all come from lib.CreateWindow — the
+-- same factory the Options window is built on, so the two read as one
+-- family. What stays local is the two-pane body (a vertical peer list
+-- beside a horizontally scrolling strip of comparison columns) and the
+-- add/remove column choreography, neither of which the factory models.
 
 local MUI = LibStub("MidnightUI-1.0", true)
 
-local FRAME
+local WIN       -- window object from MUI.CreateWindow
+local FRAME     -- WIN.frame; most of this file only needs the frame
 local rerender  -- forward declaration: assigned below at file scope. The
                 -- inspector-filter dropdown's onClick closures reference
                 -- this and would otherwise resolve to a nil global at
                 -- click time.
 local activePeers = {}  -- ordered list of Name-Realm keys in comparison
+
+-- Bumped by every rerender. The add/remove choreography is a chain of
+-- callbacks; a pass that gets superseded mid-flight must not land its
+-- (now stale) window size on top of the newer pass's.
+local renderToken = 0
 
 -- Inspector's own expansion filter. Initialized from the panel's
 -- filter once per open session. Mutating this here doesn't
@@ -38,83 +52,29 @@ local function inspectorFilterLabel()
     return e and e.label or (key or "?")
 end
 
-local LIST_WIDTH      = 180
-local LIST_ROW_H      = 18
-local COLUMN_WIDTH    = 220
-local COLUMN_GAP      = 12
-local TITLE_BAR_H     = 24
-local CONTENT_TOP_PAD = 12
-local BOTTOM_PAD      = 14
-local SIDE_PAD        = 14
-local LIST_GAP        = 12
+local LIST_WIDTH   = 180
+local LIST_ROW_H   = 18
+local COLUMN_WIDTH = 220
+local COLUMN_GAP   = 12
+local LIST_GAP     = 16
+
+-- Window geometry. WIN_PAD and SCROLL_GUTTER mirror the factory's body
+-- inset and scrollbar channel; they are needed here to compute the window
+-- width that leaves room for both panes, and to seed the pane widths
+-- before the first layout pass — after that the scroll frame's own
+-- OnSizeChanged is the authority (see layoutPanes). WINDOW_H is fixed:
+-- the window grows sideways with the column count, never downwards.
+local WIN_PAD       = 16
+local SCROLL_GUTTER = 6
+local WINDOW_H      = 400
+local FIXED_W       = LIST_WIDTH + LIST_GAP + WIN_PAD * 2 + SCROLL_GUTTER
 
 -- Column content height: renderColumn starts at -36 then drops -22 per
 -- module row (8 modules incl. achievements), plus a Collection Score
 -- row (+22, with a 4px gap above). Stays constant across peer counts
--- (columns are side-by-side, not stacked), so the panel only grows in
+-- (columns are side-by-side, not stacked), so the window only grows in
 -- width.
 local COLUMN_CONTENT_H = 36 + 8 * 22 + 26
-local DEFAULT_PANEL_H  = TITLE_BAR_H + CONTENT_TOP_PAD + COLUMN_CONTENT_H + BOTTOM_PAD
-
--- Smooth width/height transitions via OnUpdate lerp. Ease-out cubic so
--- the resize decelerates into place. Fires onComplete once finished.
-local function startSizeAnim(f, targetW, targetH, duration, onComplete)
-    duration = duration or 0.18
-    local fromW, fromH = f:GetWidth(), f:GetHeight()
-    -- Honor the Animations preference (MidnightUI-1.0's shared flag).
-    if MUI and MUI.animEnabled == false then
-        f:SetScript("OnUpdate", nil)
-        f:SetSize(targetW, targetH)
-        if onComplete then onComplete() end
-        return
-    end
-    if math.abs(fromW - targetW) < 0.5 and math.abs(fromH - targetH) < 0.5 then
-        f:SetScript("OnUpdate", nil)
-        f:SetSize(targetW, targetH)
-        if onComplete then onComplete() end
-        return
-    end
-    f._animElapsed = 0
-    f:SetScript("OnUpdate", function(self, dt)
-        self._animElapsed = (self._animElapsed or 0) + dt
-        local t = math.min(self._animElapsed / duration, 1)
-        local e = 1 - (1 - t) ^ 3
-        self:SetSize(fromW + (targetW - fromW) * e, fromH + (targetH - fromH) * e)
-        if t >= 1 then
-            self:SetScript("OnUpdate", nil)
-            if onComplete then onComplete() end
-        end
-    end)
-end
-
--- Linear alpha lerp via OnUpdate. Fires onComplete when done, used to
--- hide columns once their fade-out finishes.
-local function startFadeAnim(frame, targetAlpha, duration, onComplete)
-    duration = duration or 0.15
-    local fromAlpha = frame:GetAlpha()
-    if MUI and MUI.animEnabled == false then
-        frame:SetScript("OnUpdate", nil)
-        frame:SetAlpha(targetAlpha)
-        if onComplete then onComplete() end
-        return
-    end
-    if math.abs(fromAlpha - targetAlpha) < 0.01 then
-        frame:SetScript("OnUpdate", nil)
-        frame:SetAlpha(targetAlpha)
-        if onComplete then onComplete() end
-        return
-    end
-    frame._fadeElapsed = 0
-    frame:SetScript("OnUpdate", function(self, dt)
-        self._fadeElapsed = (self._fadeElapsed or 0) + dt
-        local t = math.min(self._fadeElapsed / duration, 1)
-        self:SetAlpha(fromAlpha + (targetAlpha - fromAlpha) * t)
-        if t >= 1 then
-            self:SetScript("OnUpdate", nil)
-            if onComplete then onComplete() end
-        end
-    end)
-end
 
 -- Red at 0%, yellow at 50%, green at 100%.
 local function progressColor(pct)
@@ -139,6 +99,15 @@ local MOD_LABELS = {
     achievements = "Achievements",
 }
 
+local function themeFont()
+    local t = MUI and MUI.Theme
+    return (t and t.font) or STANDARD_TEXT_FONT
+end
+
+local function fontFlags()
+    return (MUI and MUI.FontFlags and MUI.FontFlags()) or "OUTLINE"
+end
+
 local function classRGB(token)
     local c = RAID_CLASS_COLORS and RAID_CLASS_COLORS[token]
     if c then return c.r, c.g, c.b end
@@ -160,16 +129,6 @@ end
 
 local function indexOf(t, v)
     for i, x in ipairs(t) do if x == v then return i end end
-end
-
-local function sumCounts(counts)
-    if not counts then return 0, 0 end
-    local got, total = 0, 0
-    for _, c in pairs(counts) do
-        got   = got + (c.collected or 0)
-        total = total + (c.total or 0)
-    end
-    return got, total
 end
 
 local function getEntry(name)
@@ -237,216 +196,238 @@ local function buildPeerOrder()
     return list
 end
 
--- One-shot frame construction.
+-- Header line under the title: how many peers we know about, and how
+-- many of them are currently in the comparison.
+local function subtitleFor(peerCount)
+    if peerCount == 0 then return "No peers tracked yet" end
+    local s = peerCount .. (peerCount == 1 and " peer tracked" or " peers tracked")
+    local n = #activePeers
+    if n > 0 then s = s .. "  ·  " .. n .. " in comparison" end
+    return s
+end
+
+--------------------------------------------------------------------------
+-- One-shot window construction.
+--------------------------------------------------------------------------
 local function build()
     if FRAME then return FRAME end
-
-    local theme = MUI and MUI.Theme
-
-    local f = CreateFrame("Frame", "CollectionistPeerPanel", UIParent, "BackdropTemplate")
-    f:SetFrameStrata("DIALOG")
-    f:SetSize(LIST_WIDTH + LIST_GAP + COLUMN_WIDTH + SIDE_PAD * 2, DEFAULT_PANEL_H)
-    f:SetPoint("CENTER")
-    f:SetMovable(true)
-    f:EnableMouse(true)
-    f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop",  f.StopMovingOrSizing)
-    f:SetClampedToScreen(true)
-    -- Clip children to the panel's current bounds so columns extending
-    -- past the edge during a width-shrink lerp don't visually overflow.
-    if f.SetClipsChildren then f:SetClipsChildren(true) end
-    f:Hide()
-
-    -- Title bar
-    local bar = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    bar:SetHeight(TITLE_BAR_H)
-    bar:SetPoint("TOPLEFT")
-    bar:SetPoint("TOPRIGHT")
-    f.titleBar = bar
-
-    f.title = bar:CreateFontString(nil, "OVERLAY")
-    -- SetText requires a font to already be assigned; theme hook
-    -- re-applies later on theme switch.
-    f.title:SetFont((MUI and MUI.Theme and MUI.Theme.font) or STANDARD_TEXT_FONT, 12, "OUTLINE")
-    f.title:SetPoint("LEFT", 10, 0)
-    f.title:SetText("Collection Inspector")
-
-    local function applyFrameTheme()
-        local th = MUI and MUI.Theme
-        if not th then return end
-        MUI.ApplyThemedBackdrop(f, { kind = "panel", alpha = 0.97 })
-        MUI.ApplyThemedBackdrop(bar, { kind = "titlebar", alpha = 1 })
-        f.title:SetFont(th.font, 12, "OUTLINE")
-        f.title:SetTextColor(unpack(th.colors.title))
-    end
-    applyFrameTheme()
-    if MUI and MUI.RegisterThemeHook then
-        MUI.RegisterThemeHook(applyFrameTheme)
-        -- Column contents also paint via theme colors at build time, so
-        -- a re-render is needed when the user switches themes.
-        MUI.RegisterThemeHook(function()
-            if FRAME and FRAME:IsShown() then rerender(FRAME) end
-        end)
+    if not (MUI and MUI.CreateWindow) then
+        print("|cffff8888[Collectionist]|r Window.lua did not load. Restart the "
+            .. "game client fully — a /reload does not pick up newly added "
+            .. "addon files.")
+        return nil
     end
 
-    if MUI and MUI.MakeHeaderBtn then
-        local close = MUI.MakeHeaderBtn(bar, "x",
-            theme.colors.btnCloseFg,
-            theme.colors.btnCloseHoverBg,
-            theme.colors.btnCloseHoverBd,
-            "Close")
-        close:SetPoint("RIGHT", -4, 0)
-        close:SetScript("OnClick", function()
+    local theme = MUI.Theme
+
+    -- Global frame name kept as-is: it is what UISpecialFrames and any
+    -- external reference already know this window by.
+    local win = MUI.CreateWindow({
+        name         = "CollectionistPeerPanel",
+        title        = "Collection Inspector",
+        subtitle     = subtitleFor(0),
+        width        = FIXED_W + COLUMN_WIDTH,
+        height       = WINDOW_H,
+        db           = MC.db or {},
+        posKey       = "inspectorPosition",
+        scroll       = true,
+        pad          = WIN_PAD,
+        onClose      = function()
+            -- One exit path for the header x, the footer Close, and
+            -- Escape: leaving resets the session, so the next open
+            -- starts from an empty comparison and re-syncs the filter
+            -- from the main panel.
             wipe(activePeers)
             inspectorFilter = nil
-            f:Hide()
-        end)
+        end,
+    })
+    WIN = win
 
-        -- Clear peer history button. Confirms before wiping so a stray
-        -- click doesn't nuke the list. Wider than the default 16px to
-        -- fit the word.
-        local clear = MUI.MakeHeaderBtn(bar, "Clear",
-            theme.colors.btnCloseFg,
-            theme.colors.btnCloseHoverBg,
-            theme.colors.btnCloseHoverBd,
-            "Clear all peer history")
-        clear:SetSize(48, 16)
-        clear:SetPoint("RIGHT", close, "LEFT", -4, 0)
-        clear:SetScript("OnClick", function()
-            StaticPopup_Show("MIDNIGHTCOLLECTIONS_CLEAR_PEERS")
-        end)
+    local f = win.frame
+    local body = win.body
+    FRAME = f
 
-        -- Inspector-local expansion filter. Defaults to the panel's
-        -- filter at open time; changing it doesn't affect the panel.
-        local filterBtn = MUI.MakeHeaderBtn(bar, "Midnight",
-            theme.colors.btnCloseFg,
-            theme.colors.btnCloseHoverBg,
-            theme.colors.btnCloseHoverBd,
-            "Inspector expansion filter")
-        filterBtn:SetSize(80, 16)
-        filterBtn:SetPoint("RIGHT", clear, "LEFT", -4, 0)
-
-        local popup = MUI.MakeDropdown()
-        local function buildItems()
-            if not inspectorFilter then return {} end
-            local items = {
-                { label = "Current (per module)",
-                  selected = inspectorFilter.mode == "current",
-                  onClick = function()
-                      inspectorFilter.mode = "current"
-                      if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
-                      if FRAME and FRAME:IsShown() then rerender(FRAME) end
-                  end },
-                { label = "All Expansions",
-                  selected = inspectorFilter.mode == "all",
-                  onClick = function()
-                      inspectorFilter.mode = "all"
-                      if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
-                      if FRAME and FRAME:IsShown() then rerender(FRAME) end
-                  end },
-            }
-            for _, e in ipairs(MC.EXPANSIONS or {}) do
-                if not (MC._registeredExpansions and MC._registeredExpansions[e.key]) then
-                    -- Skeleton row: listed but greyed until content ships.
-                    items[#items + 1] = { label = e.label, disabled = true }
-                elseif MC.IsExpansionEnabled(e.key) then
-                    local key = e.key
-                    items[#items + 1] = {
-                        label = e.label,
-                        selected = inspectorFilter.mode == "single" and inspectorFilter.single == key,
-                        onClick = function()
-                            inspectorFilter.mode = "single"
-                            inspectorFilter.single = key
-                            if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
-                            if FRAME and FRAME:IsShown() then rerender(FRAME) end
-                        end,
-                    }
-                end
-            end
-            return items
-        end
-        filterBtn:SetScript("OnClick", function()
-            if popup:IsShown() then popup:Hide(); return end
-            popup:ShowAt(filterBtn, "BOTTOMRIGHT", "TOPRIGHT", buildItems())
-        end)
-
-        -- Re-applies the active filter's label to the button. Called
-        -- on every open (so the label tracks the panel filter) and
-        -- after every selection.
-        function f:RefreshFilterButton()
-            local fs = filterBtn:GetFontString()
-            if fs then fs:SetText(inspectorFilterLabel()) end
-        end
+    ----------------------------------------------------------------------
+    -- Header-side control: the inspector-local expansion filter. A CHILD
+    -- of win.header — the header is a full-cover mouse-enabled drag
+    -- surface, so a sibling at the same frame level never sees the click.
+    ----------------------------------------------------------------------
+    local filterBtn = MUI.MakeHeaderBtn(win.header, "Midnight",
+        theme.colors.btnCloseFg,
+        theme.colors.btnCloseHoverBg,
+        theme.colors.btnCloseHoverBd,
+        "Inspector expansion filter",
+        { width = 100, height = 20 })
+    if win.closeBtn then
+        filterBtn:SetPoint("RIGHT", win.closeBtn, "LEFT", -6, 0)
+    else
+        filterBtn:SetPoint("RIGHT", win.header, "RIGHT", -10, 0)
     end
 
-    tinsert(UISpecialFrames, "CollectionistPeerPanel")
-
-    --------------------------------------------------------------------
-    -- Left scrollable peer list
-    --------------------------------------------------------------------
-    local list = CreateFrame("ScrollFrame", nil, f)
-    list:SetPoint("TOPLEFT", f, "TOPLEFT", SIDE_PAD, -TITLE_BAR_H - CONTENT_TOP_PAD)
-    list:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", SIDE_PAD, BOTTOM_PAD)
-    list:SetWidth(LIST_WIDTH)
-    list:EnableMouseWheel(true)
-    f.listScroll = list
-
-    local listChild = CreateFrame("Frame", nil, list)
-    listChild:SetWidth(LIST_WIDTH)
-    listChild:SetHeight(1)
-    list:SetScrollChild(listChild)
-    f.listChild = listChild
-
-    list:SetScript("OnMouseWheel", function(self, delta)
-        local cur = self:GetVerticalScroll()
-        local maxScroll = math.max(listChild:GetHeight() - self:GetHeight(), 0)
-        self:SetVerticalScroll(math.max(0, math.min(cur - delta * 20, maxScroll)))
+    local popup = MUI.MakeDropdown()
+    local function buildItems()
+        if not inspectorFilter then return {} end
+        local items = {
+            { label = "Current (per module)",
+              selected = inspectorFilter.mode == "current",
+              onClick = function()
+                  inspectorFilter.mode = "current"
+                  if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                  if FRAME and FRAME:IsShown() then rerender(FRAME) end
+              end },
+            { label = "All Expansions",
+              selected = inspectorFilter.mode == "all",
+              onClick = function()
+                  inspectorFilter.mode = "all"
+                  if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                  if FRAME and FRAME:IsShown() then rerender(FRAME) end
+              end },
+        }
+        for _, e in ipairs(MC.EXPANSIONS or {}) do
+            if not (MC._registeredExpansions and MC._registeredExpansions[e.key]) then
+                -- Skeleton row: listed but greyed until content ships.
+                items[#items + 1] = { label = e.label, disabled = true }
+            elseif MC.IsExpansionEnabled(e.key) then
+                local key = e.key
+                items[#items + 1] = {
+                    label = e.label,
+                    selected = inspectorFilter.mode == "single" and inspectorFilter.single == key,
+                    onClick = function()
+                        inspectorFilter.mode = "single"
+                        inspectorFilter.single = key
+                        if FRAME and FRAME.RefreshFilterButton then FRAME:RefreshFilterButton() end
+                        if FRAME and FRAME:IsShown() then rerender(FRAME) end
+                    end,
+                }
+            end
+        end
+        return items
+    end
+    filterBtn:SetScript("OnClick", function()
+        if popup:IsShown() then popup:Hide(); return end
+        popup:ShowAt(filterBtn, "BOTTOMRIGHT", "TOPRIGHT", buildItems())
     end)
 
+    -- Re-applies the active filter's label to the button. Called on every
+    -- open (so the label tracks the panel filter) and after a selection.
+    function f:RefreshFilterButton()
+        local fs = filterBtn:GetFontString()
+        if fs then fs:SetText(inspectorFilterLabel()) end
+    end
+
+    ----------------------------------------------------------------------
+    -- Footer actions.
+    ----------------------------------------------------------------------
+    win:AddFooterButton("Close", { primary = true, tooltip = "Close the Inspector" },
+        function() win:Close() end)
+
+    win:AddFooterButton("Sync", { tooltip = "Ask guild peers to re-broadcast their collections" },
+        function()
+            -- RosterRequestSync returns false for both "sharing is off"
+            -- and "no guild to ask", so the failure line covers both.
+            local ok = MC.RosterRequestSync and MC.RosterRequestSync(true)
+            print((MC.PREFIX or "") .. (ok
+                and " Asked guild peers to re-broadcast their collections."
+                or  " Nothing to sync — roster sharing is off, or you're not in a guild."))
+        end)
+
+    win:AddFooterButton("Clear", { side = "LEFT", tooltip = "Clear all peer history" },
+        function() StaticPopup_Show("MIDNIGHTCOLLECTIONS_CLEAR_PEERS") end)
+
+    ----------------------------------------------------------------------
+    -- Body pane 1: the peer list. Rows are plain children of the factory's
+    -- scroll child, so the window's own scrollbar carries a long roster —
+    -- no nested vertical scroll frame of our own.
+    ----------------------------------------------------------------------
     f.listRows = {}
 
-    --------------------------------------------------------------------
-    -- Right-side horizontally scrollable comparison columns
-    --------------------------------------------------------------------
+    -- 1px hairline between the two panes.
+    local divider = body:CreateTexture(nil, "ARTWORK")
+    divider:SetWidth(1)
+    divider:SetPoint("TOPLEFT", body, "TOPLEFT", LIST_WIDTH + LIST_GAP / 2, 0)
+    divider:SetPoint("BOTTOMLEFT", body, "BOTTOMLEFT", LIST_WIDTH + LIST_GAP / 2, 0)
+
+    ----------------------------------------------------------------------
+    -- Body pane 2: horizontally scrollable comparison columns.
+    ----------------------------------------------------------------------
     f.columns = {}
-    local comparison = CreateFrame("ScrollFrame", nil, f)
-    comparison:SetPoint("TOPLEFT", f, "TOPLEFT",
-        SIDE_PAD + LIST_WIDTH + LIST_GAP, -TITLE_BAR_H - CONTENT_TOP_PAD)
-    comparison:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -SIDE_PAD, BOTTOM_PAD)
+    local comparison = CreateFrame("ScrollFrame", nil, body)
+    comparison:SetPoint("TOPLEFT", body, "TOPLEFT", LIST_WIDTH + LIST_GAP, 0)
+    comparison:SetHeight(COLUMN_CONTENT_H)
     comparison:EnableMouseWheel(true)
     f.comparisonScroll = comparison
 
     f.columnAnchor = CreateFrame("Frame", nil, comparison)
     f.columnAnchor:SetSize(COLUMN_WIDTH, COLUMN_CONTENT_H)
     comparison:SetScrollChild(f.columnAnchor)
+
+    -- Wheel over the columns pans them sideways, but only while there is
+    -- somewhere to pan; with everything already visible the event is
+    -- handed to the window's vertical scroll so the roster still moves.
     comparison:SetScript("OnMouseWheel", function(self, delta)
         local maxScroll = math.max(f.columnAnchor:GetWidth() - self:GetWidth(), 0)
+        if maxScroll <= 0 then
+            local outer = win.scrollFrame
+            local handler = outer and outer:GetScript("OnMouseWheel")
+            if handler then handler(outer, delta) end
+            return
+        end
         local nextScroll = self:GetHorizontalScroll() - delta * (COLUMN_WIDTH / 2)
         self:SetHorizontalScroll(math.max(0, math.min(nextScroll, maxScroll)))
     end)
 
-    -- Empty-comparison hint text (shown when activePeers is empty)
+    -- Empty-comparison hint (shown when activePeers is empty).
     f.emptyText = f.columnAnchor:CreateFontString(nil, "OVERLAY")
-    f.emptyText:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
+    f.emptyText:SetFont(themeFont(), 11, fontFlags())
     f.emptyText:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT", 0, -8)
     f.emptyText:SetWidth(220)
     f.emptyText:SetJustifyH("LEFT")
     f.emptyText:SetText("Click a name on the left to add it to the comparison.")
-    if theme then f.emptyText:SetTextColor(unpack(theme.colors.textDim)) end
     f.emptyText:Hide()
 
-    FRAME = f
+    ----------------------------------------------------------------------
+    -- Pane widths track the window live. The factory only re-derives the
+    -- body width when a resize finishes; hooking the scroll frame instead
+    -- means the panes follow every frame of the grow/shrink animation
+    -- (and the scroll frame's width IS the body width the factory sets,
+    -- so nothing is duplicated but the seed below).
+    ----------------------------------------------------------------------
+    local function layoutPanes(width)
+        if not width or width <= 0 then return end
+        body:SetWidth(width)
+        comparison:SetWidth(math.max(width - LIST_WIDTH - LIST_GAP, COLUMN_WIDTH))
+    end
+    win.scrollFrame:HookScript("OnSizeChanged", function(_, w) layoutPanes(w) end)
+    layoutPanes(f:GetWidth() - WIN_PAD * 2 - SCROLL_GUTTER)
+
+    ----------------------------------------------------------------------
+    -- Theme. The window paints its own chrome; this covers what we drew.
+    ----------------------------------------------------------------------
+    local function applyLocalTheme()
+        local th = MUI and MUI.Theme
+        if not th then return end
+        local dv = th.colors.optionsDivider
+        divider:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
+        f.emptyText:SetFont(th.font, 11, fontFlags())
+        f.emptyText:SetTextColor(unpack(th.colors.textDim))
+        -- List rows and columns paint from theme colors as they render,
+        -- so a live theme switch needs a re-render, not a repaint.
+        if FRAME and FRAME:IsShown() then rerender(FRAME) end
+    end
+    applyLocalTheme()
+    if MUI.RegisterThemeHook then MUI.RegisterThemeHook(applyLocalTheme) end
+
     return f
 end
 
+--------------------------------------------------------------------------
 -- Left-list row factory + render.
+--------------------------------------------------------------------------
 local function acquireListRow(f, idx, yOff)
-    local theme = MUI and MUI.Theme
     local row = f.listRows[idx]
     if not row then
         row = {}
-        row.frame = CreateFrame("Frame", nil, f.listChild)
+        row.frame = CreateFrame("Frame", nil, f.body)
         row.frame:SetHeight(LIST_ROW_H)
         row.frame:EnableMouse(true)
         row.bg = row.frame:CreateTexture(nil, "BACKGROUND")
@@ -456,18 +437,20 @@ local function acquireListRow(f, idx, yOff)
         row.dot:SetSize(6, 6)
         row.dot:SetPoint("LEFT", row.frame, "LEFT", 6, 0)
         row.label = row.frame:CreateFontString(nil, "OVERLAY")
-        row.label:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
         row.label:SetPoint("LEFT", row.dot, "RIGHT", 6, 0)
         row.label:SetPoint("RIGHT", row.frame, "RIGHT", -28, 0)
         row.label:SetJustifyH("LEFT")
         row.check = row.frame:CreateFontString(nil, "OVERLAY")
-        row.check:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
         row.check:SetPoint("RIGHT", row.frame, "RIGHT", -8, 0)
         f.listRows[idx] = row
     end
+    -- Fonts re-applied per render (not just at creation) so a live theme
+    -- switch re-faces the list. SetFont must precede SetText anyway.
+    row.label:SetFont(themeFont(), 11, fontFlags())
+    row.check:SetFont(themeFont(), 11, fontFlags())
     row.frame:ClearAllPoints()
-    row.frame:SetPoint("TOPLEFT", f.listChild, "TOPLEFT", 0, yOff)
-    row.frame:SetPoint("RIGHT", f.listChild, "RIGHT", 0, 0)
+    row.frame:SetPoint("TOPLEFT", f.body, "TOPLEFT", 0, yOff)
+    row.frame:SetWidth(LIST_WIDTH)
     row.frame:Show()
     return row
 end
@@ -496,6 +479,7 @@ local function renderListRow(row, item, isSelected)
     end)
 end
 
+-- Returns the number of peers listed and the pixel height they occupy.
 local function refreshList(f)
     local order = buildPeerOrder()
     local yOff = 0
@@ -509,33 +493,35 @@ local function refreshList(f)
     for i = #order + 1, #f.listRows do
         if f.listRows[i] then f.listRows[i].frame:Hide() end
     end
-    f.listChild:SetHeight(math.max(-yOff, 1))
+    return #order, -yOff
 end
 
+--------------------------------------------------------------------------
 -- Right-side comparison column factory + render. Columns are keyed by
 -- peer name (not slot index) so each peer has a stable visual identity
 -- across reorders — required for fade-in/out without flicker.
+--------------------------------------------------------------------------
 local function acquireColumn(f, peerName)
     local theme = MUI and MUI.Theme
     local col = f.columns[peerName]
     if not col then
         col = {}
         -- Columns must be descendants of the ScrollFrame's scroll child;
-        -- anchoring an outer-panel child to it moves the frame but bypasses
+        -- anchoring an outer child to it moves the frame but bypasses
         -- the comparison viewport's clipping.
         col.frame = CreateFrame("Frame", nil, f.columnAnchor)
         col.title = col.frame:CreateFontString(nil, "OVERLAY")
-        col.title:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 12, "OUTLINE")
         col.title:SetPoint("TOPLEFT", col.frame, "TOPLEFT", 0, 0)
         col.title:SetJustifyH("LEFT")
         col.subtitle = col.frame:CreateFontString(nil, "OVERLAY")
-        col.subtitle:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 9, "OUTLINE")
         col.subtitle:SetPoint("TOPLEFT", col.title, "BOTTOMLEFT", 0, -2)
         col.subtitle:SetJustifyH("LEFT")
-        if theme then col.subtitle:SetTextColor(unpack(theme.colors.textDim)) end
         col.rows = {}
         f.columns[peerName] = col
     end
+    col.title:SetFont(themeFont(), 12, fontFlags())
+    col.subtitle:SetFont(themeFont(), 9, fontFlags())
+    if theme then col.subtitle:SetTextColor(unpack(theme.colors.textDim)) end
     col.frame:Show()
     col.title:Show()
     col.subtitle:Show()
@@ -550,17 +536,14 @@ local function acquireColRow(col, key, yOff)
         row.frame = CreateFrame("Frame", nil, col.frame)
         row.frame:SetHeight(20)
         row.label = row.frame:CreateFontString(nil, "OVERLAY")
-        row.label:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
         row.label:SetPoint("LEFT", row.frame, "LEFT", 0, 0)
         row.value = row.frame:CreateFontString(nil, "OVERLAY")
-        row.value:SetFont(theme and theme.font or STANDARD_TEXT_FONT, 11, "OUTLINE")
         row.value:SetPoint("RIGHT", row.frame, "RIGHT", 0, 0)
         row.value:SetJustifyH("RIGHT")
         local bg = row.frame:CreateTexture(nil, "ARTWORK")
         bg:SetHeight(2)
         bg:SetPoint("BOTTOMLEFT", row.frame, "BOTTOMLEFT", 0, 0)
         bg:SetPoint("BOTTOMRIGHT", row.frame, "BOTTOMRIGHT", 0, 0)
-        if theme then bg:SetColorTexture(unpack(theme.colors.progressBg)) end
         row.barBg = bg
         local fill = row.frame:CreateTexture(nil, "OVERLAY")
         fill:SetHeight(2)
@@ -568,6 +551,9 @@ local function acquireColRow(col, key, yOff)
         row.barFill = fill
         col.rows[key] = row
     end
+    row.label:SetFont(themeFont(), 11, fontFlags())
+    row.value:SetFont(themeFont(), 11, fontFlags())
+    if theme then row.barBg:SetColorTexture(unpack(theme.colors.progressBg)) end
     row.frame:ClearAllPoints()
     row.frame:SetPoint("TOPLEFT", col.frame, "TOPLEFT", 0, yOff)
     row.frame:SetPoint("TOPRIGHT", col.frame, "TOPRIGHT", 0, yOff)
@@ -652,29 +638,72 @@ local function renderColumn(col, entry)
     return -yOff
 end
 
+--------------------------------------------------------------------------
+-- Resize. The window object owns the combat deferral, the body-width
+-- re-derive and the scrollbar refresh, but SetWindowSize has no slot for
+-- a completion callback and the column choreography needs one — so the
+-- motion comes from lib.SizeTo and SetWindowSize is called on landing to
+-- do the bookkeeping (the SetSize it performs is a no-op by then).
+--------------------------------------------------------------------------
+local function applySize(w, h, instant, after)
+    local f = FRAME
+    if instant then
+        -- Hidden window: no motion to see, and no stale driver allowed
+        -- to keep writing a previous target over this one.
+        MUI.StopAnims(f)
+        WIN:SetWindowSize(w, h)
+        if after then after() end
+        return
+    end
+    if InCombatLockdown and InCombatLockdown() then
+        -- Resizing is unsafe in combat; SetWindowSize owns the
+        -- PLAYER_REGEN_ENABLED queue, so hand it over and carry on.
+        -- The scroll frame clips, so columns rendered now stay inside.
+        WIN:SetWindowSize(w, h)
+        if after then after() end
+        return
+    end
+    MUI.SizeTo(f, w, h, nil, function()
+        WIN:SetWindowSize(w, h)
+        if after then after() end
+    end)
+end
+
+--------------------------------------------------------------------------
 -- Re-layout based on the current activePeers list. Animations are
--- sequenced so content never overflows the panel:
---   ADD:    size grows, then new column fades in (kept at alpha 0
---           while outside the in-progress bounds).
---   REMOVE: column fades to alpha 0 (becomes invisible), then panel
---           shrinks (so nothing is visible past the new edge).
+-- sequenced so content never overflows the window:
+--   ADD:    width grows, then the new column fades in (kept invisible
+--           while it would sit outside the in-progress bounds).
+--   REMOVE: column fades out, then the window shrinks (so nothing is
+--           visible past the new edge).
+--------------------------------------------------------------------------
 function rerender(f)  -- forward-declared at top of file
-    refreshList(f)
+    -- A hidden window has no motion worth watching, and its animation
+    -- groups would not advance anyway: snap everything into place so the
+    -- PopIn that follows shows the finished layout.
+    local instant = not f:IsShown()
+
+    renderToken = renderToken + 1
+    local token = renderToken
+
+    local peerCount, listHeight = refreshList(f)
+    WIN:SetTitle("Collection Inspector", subtitleFor(peerCount))
 
     local activeSet = {}
     for _, name in ipairs(activePeers) do activeSet[name] = true end
 
     local n = #activePeers
     local rightWidth = math.max(COLUMN_WIDTH, n * COLUMN_WIDTH + math.max(0, n - 1) * COLUMN_GAP)
-    local fixedWidth = SIDE_PAD + LIST_WIDTH + LIST_GAP + SIDE_PAD
     local screenWidth = (UIParent and UIParent.GetWidth and UIParent:GetWidth()) or 1280
     local visibleRightWidth = math.min(rightWidth,
-        math.max(COLUMN_WIDTH, screenWidth * 0.9 - fixedWidth))
-    local totalW = fixedWidth + visibleRightWidth
-    local totalH = DEFAULT_PANEL_H
+        math.max(COLUMN_WIDTH, screenWidth * 0.9 - FIXED_W))
+    local totalW = FIXED_W + visibleRightWidth
+
     f.columnAnchor:SetWidth(rightWidth)
+    f.body:SetHeight(math.max(listHeight, COLUMN_CONTENT_H, 1))
+    WIN:UpdateScrollBar()
     if f.comparisonScroll then
-        local maxScroll = math.max(rightWidth - visibleRightWidth, 0)
+        local maxScroll = math.max(rightWidth - f.comparisonScroll:GetWidth(), 0)
         f.comparisonScroll:SetHorizontalScroll(
             math.min(f.comparisonScroll:GetHorizontalScroll(), maxScroll))
     end
@@ -682,66 +711,81 @@ function rerender(f)  -- forward-declared at top of file
     -- Identify columns that need to fade out (peer removed).
     local removing = {}
     for peerName, col in pairs(f.columns) do
-        if not activeSet[peerName] and col.frame:IsShown() and col.frame:GetAlpha() > 0.01 then
+        if not activeSet[peerName] and col.frame:IsShown() then
             removing[#removing + 1] = col
         end
     end
 
-    -- Step 3: render active columns and fade in any new ones. Runs
-    -- after size finishes, so new columns appear inside the panel's
-    -- final bounds.
+    local function hideColumn(col)
+        col.frame:Hide()
+        col.title:Hide()
+        col.subtitle:Hide()
+        for _, row in pairs(col.rows) do row.frame:Hide() end
+    end
+
+    -- Step 3: render active columns and fade in any new ones. Runs after
+    -- the resize finishes, so new columns appear inside the final bounds.
     local function renderAndFadeIn()
-        if n > 0 then
-            f.emptyText:Hide()
-            for i, peerName in ipairs(activePeers) do
-                local entry = getEntry(peerName)
-                if entry then
-                    local existed = f.columns[peerName]
-                            and f.columns[peerName].frame:IsShown()
-                            and f.columns[peerName].frame:GetAlpha() > 0.01
-                    local col = acquireColumn(f, peerName)
-                    col.frame:ClearAllPoints()
-                    col.frame:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT",
-                        (i - 1) * (COLUMN_WIDTH + COLUMN_GAP), 0)
-                    col.frame:SetSize(COLUMN_WIDTH, 1)
-                    renderColumn(col, entry)
-                    -- Cancel any in-flight fade on this column. If the
-                    -- column was mid-fade-out from a prior remove and the
-                    -- user re-added the peer, the stale OnUpdate would
-                    -- continue ticking and Hide() it after we re-show.
-                    col.frame:SetScript("OnUpdate", nil)
-                    col.frame._fadeElapsed = nil
-                    if not existed then
-                        col.frame:SetAlpha(0)
-                        startFadeAnim(col.frame, 1, 0.18)
-                    else
-                        col.frame:SetAlpha(1)
-                    end
+        if token ~= renderToken then return end
+        if n == 0 then
+            f.emptyText:Show()
+            return
+        end
+        f.emptyText:Hide()
+        for i, peerName in ipairs(activePeers) do
+            local entry = getEntry(peerName)
+            if entry then
+                local existing = f.columns[peerName]
+                local existed = existing and existing.frame:IsShown()
+                local col = acquireColumn(f, peerName)
+                col.frame:ClearAllPoints()
+                col.frame:SetPoint("TOPLEFT", f.columnAnchor, "TOPLEFT",
+                    (i - 1) * (COLUMN_WIDTH + COLUMN_GAP), 0)
+                col.frame:SetSize(COLUMN_WIDTH, COLUMN_CONTENT_H)
+                renderColumn(col, entry)
+                if instant or existed then
+                    -- FadeIn on an already-visible frame is a no-op, but
+                    -- a column re-added mid-fade-out needs its alpha put
+                    -- back explicitly; StopAnims kills the outgoing group
+                    -- so its OnFinished can never hide it after the fact.
+                    MUI.StopAnims(col.frame)
+                    col.frame:SetAlpha(1)
+                else
+                    col.frame:Hide()
+                    MUI.FadeIn(col.frame, 0.18)
                 end
             end
-        else
-            f.emptyText:Show()
         end
     end
 
-    -- Step 2: animate the panel to its target size, then run step 3.
+    -- Step 2: animate the window to its target size, then run step 3.
     local function animateSize()
-        startSizeAnim(f, totalW, totalH, 0.18, renderAndFadeIn)
+        if token ~= renderToken then return end
+        applySize(totalW, WINDOW_H, instant, renderAndFadeIn)
     end
 
     -- Step 1: fade out any removed columns. Once they're all invisible,
-    -- run step 2. With no removals we skip straight to size+render.
+    -- run step 2. With no removals we skip straight to size + render.
     if #removing == 0 then
+        animateSize()
+    elseif instant then
+        for _, col in ipairs(removing) do
+            -- A fade left over from a pass that was interrupted by the
+            -- window closing would otherwise keep ticking on a frame we
+            -- are about to hide outright.
+            MUI.StopAnims(col.frame)
+            col.frame:SetAlpha(1)
+            hideColumn(col)
+        end
         animateSize()
     else
         local pending = #removing
         for _, col in ipairs(removing) do
             local fadingCol = col
-            startFadeAnim(col.frame, 0, 0.15, function()
-                fadingCol.frame:Hide()
-                fadingCol.title:Hide()
-                fadingCol.subtitle:Hide()
-                for _, row in pairs(fadingCol.rows) do row.frame:Hide() end
+            -- FadeOut hides the frame and restores alpha 1 on landing, so
+            -- a later plain Show() is never invisible.
+            MUI.FadeOut(fadingCol.frame, 0.15, function()
+                hideColumn(fadingCol)
                 pending = pending - 1
                 if pending == 0 then animateSize() end
             end)
@@ -749,7 +793,9 @@ function rerender(f)  -- forward-declared at top of file
     end
 end
 
+--------------------------------------------------------------------------
 -- Public API.
+--------------------------------------------------------------------------
 function MC.ShowPeerPanel(peerName)
     if peerName then
         if not getEntry(peerName) then return end
@@ -781,24 +827,29 @@ function MC.ShowPeerPanel(peerName)
     if not inspectorFilter and MC.GetExpansionFilter then
         inspectorFilter = copyFilter(MC.GetExpansionFilter())
     end
-    -- Even with empty activePeers we open the popup so the player can see
+    -- Even with empty activePeers we open the window so the player can see
     -- the peer list and pick someone to compare. The right pane shows a
     -- small hint until they do.
     local f = build()
+    if not f then return end
     if f.RefreshFilterButton then f:RefreshFilterButton() end
+    -- Layout first, open second: while hidden the rerender is instant, so
+    -- the window pops in already at its final size.
     rerender(f)
-    f:Show()
+    WIN:Open()
     f:Raise()
 end
 
 function MC.HidePeerPanel()
+    -- Explicit wipe as well as the window's onClose: Close() on a window
+    -- that is already hidden returns without firing OnHide.
     wipe(activePeers)
     inspectorFilter = nil  -- next open re-syncs from the panel filter
-    if FRAME then FRAME:Hide() end
+    if WIN then WIN:Close() end
 end
 
 -- Allow Comms / receive paths to refresh the list when a new peer
--- broadcast arrives while the popup is open.
+-- broadcast arrives while the window is open.
 function MC.RefreshPeerPanel()
     if FRAME and FRAME:IsShown() then rerender(FRAME) end
 end
