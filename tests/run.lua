@@ -409,12 +409,21 @@ do
     truthy(MC.modulesByKey.achievements.Scanner:Scan(), "achievement scan ready")
     equal(MC.modulesByKey.achievements.Scanner.results.collected[1].icon,
         987654, "achievement icon return slot")
-    local committed = MC.modulesByKey.achievements.Scanner.results
     C_AchievementInfo.GetAchievementInfo = function() return nil end
-    equal(MC.modulesByKey.achievements.Scanner:Scan(), false,
-        "achievement scan should defer on empty cache")
-    equal(MC.modulesByKey.achievements.Scanner.results, committed,
-        "deferred achievement scan preserves prior results")
+    equal(MC.modulesByKey.achievements.Scanner:Scan(), true,
+        "achievement scan commits while its cache is streaming")
+    local partial = MC.modulesByKey.achievements.Scanner.results
+    equal(partial._partial, 1, "streaming achievement row marked partial")
+    equal(partial.totalAll, 0, "streaming achievement row stays out of totals")
+
+    MC.modulesByKey.achievements.Scanner._warnedInvalid = true
+    C_AchievementInfo.GetAchievementInfo = function() error("removed ID") end
+    equal(MC.modulesByKey.achievements.Scanner:Scan(), true,
+        "achievement scan commits past an invalid ID")
+    equal(MC.modulesByKey.achievements.Scanner.results._invalid, 1,
+        "invalid achievement row counted")
+    equal(MC.modulesByKey.achievements.Scanner.results._partial, nil,
+        "invalid achievement rows do not hold the scan partial")
 
     local createFrame = newFrameFactory()
     CreateFrame = createFrame
@@ -448,8 +457,9 @@ do
     equal(decorScanner:GetIcon(nil, 88), 24680, "instant item icon return slot")
 end
 
--- Rare and treasure scanners also retain their committed snapshots until all
--- advertised achievement criteria are available.
+-- Rare and treasure scanners commit partial snapshots while criteria are
+-- still streaming — marked _partial for the bounded retry — and scan the
+-- live criteria count rather than aborting on a shipped-count mismatch.
 do
     CanShowAchievementUI = function() return true end
     local criteriaCount = 1
@@ -468,13 +478,13 @@ do
     rareMC.RareNPCs = { [1] = { 1, 0.1, 0.1 }, [2] = { 1, 0.2, 0.2 } }
     loadAddon("addons/Collectionist/Modules/Rares/Scanner.lua", rareMC)
     local rareScanner = rareMC.modulesByKey.rares.Scanner
-    local rarePrior = { sentinel = "rare" }
-    rareScanner.results = rarePrior
-    equal(rareScanner:Scan(), false, "partial rare criteria should defer")
-    equal(rareScanner.results, rarePrior, "rare defer preserves prior snapshot")
+    equal(rareScanner:Scan(), true, "short rare criteria still commits")
+    equal(rareScanner.results._partial, 1, "missing rare criteria marked partial")
+    equal(rareScanner.results.totalAll, 1, "only live rare criteria counted")
     criteriaCount = 2
     equal(rareScanner:Scan(), true, "complete rare criteria scan")
     equal(rareScanner.results.totalAll, 2, "rare criteria denominator")
+    equal(rareScanner.results._partial, nil, "complete rare scan is not partial")
 
     criteriaCount = 1
     local treasureMC = { modulesByKey = { treasures = {} } }
@@ -489,20 +499,24 @@ do
     }
     loadAddon("addons/Collectionist/Modules/Treasures/Scanner.lua", treasureMC)
     local treasureScanner = treasureMC.modulesByKey.treasures.Scanner
-    local treasurePrior = { sentinel = "treasure" }
-    treasureScanner.results = treasurePrior
-    equal(treasureScanner:Scan(), false, "partial treasure criteria should defer")
-    equal(treasureScanner.results, treasurePrior,
-        "treasure defer preserves prior snapshot")
+    equal(treasureScanner:Scan(), true, "short treasure criteria still commits")
+    equal(treasureScanner.results._partial, 1,
+        "missing treasure criteria marked partial")
+    equal(treasureScanner.results.totalAll, 1, "only live treasure criteria counted")
     criteriaCount = 2
     equal(treasureScanner:Scan(), true, "complete treasure criteria scan")
     equal(treasureScanner.results.totalAll, 2, "treasure criteria denominator")
+    equal(treasureScanner.results._partial, nil,
+        "complete treasure scan is not partial")
 end
 
--- Rare and treasure bitmap IDs are locale-independent criteria keys, and
--- partial achievement caches never emit a bitmap.
+-- Rare and treasure bitmap IDs are locale-independent criteria keys. During
+-- the post-login strict window a partial achievement cache never emits a
+-- bitmap; once the window elapses, criteria past the live count pack as
+-- stable 0-bits instead of blocking the whole broadcast.
 do
     CreateFrame = newFrameFactory()
+    GetTime = function() return 0 end
     local criteriaCounts = { [10] = 2, [20] = 1 }
     GetAchievementNumCriteria = function(id) return criteriaCounts[id] or 0 end
     GetAchievementCriteriaInfo = function(id, idx)
@@ -532,6 +546,17 @@ do
     equal(decoded.rares["10:1"], true, "completed rare bit")
     equal(decoded.rares["10:2"], nil, "incomplete rare bit")
     equal(decoded.treasures["20:1"], true, "completed treasure bit")
+
+    -- Hotfix shrink after the strict window: sharing keeps working and the
+    -- removed criterion packs as a stable 0-bit.
+    criteriaCounts[10] = 1
+    MC.Bitmap._criteriaReady = false
+    MC.Bitmap._loginAt = -300
+    local settled = MC.Bitmap:Build()
+    truthy(settled and settled ~= "", "post-window hotfix shrink still builds")
+    local settledDecoded = MC.Bitmap:Decode(settled)
+    equal(settledDecoded.rares["10:1"], true, "live criterion bit kept")
+    equal(settledDecoded.rares["10:2"], nil, "removed criterion packs as 0-bit")
 end
 
 -- Shipped criterion metadata must cover every stable rare/treasure bit and

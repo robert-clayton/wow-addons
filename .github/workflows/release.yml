@@ -21,6 +21,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y luajit
 
+      # Development machines symlink the shared library into the addon
+      # (see .pkgmeta); the checkout has no link, so create it for the
+      # tests. Packaging replaces it with a real copy regardless.
+      - name: Link shared MidnightUI library into the addon
+        run: ln -s ../../../libs/MidnightUI-1.0 addons/Collectionist/Libs/MidnightUI-1.0
+
       - name: Run tests
         run: |
           luajit tests/toc_smoke.lua
