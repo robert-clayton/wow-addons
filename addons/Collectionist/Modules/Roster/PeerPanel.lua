@@ -334,8 +334,10 @@ local function build()
                   end },
             }
             for _, e in ipairs(MC.EXPANSIONS or {}) do
-                if MC._registeredExpansions and MC._registeredExpansions[e.key]
-                   and MC.IsExpansionEnabled(e.key) then
+                if not (MC._registeredExpansions and MC._registeredExpansions[e.key]) then
+                    -- Skeleton row: listed but greyed until content ships.
+                    items[#items + 1] = { label = e.label, disabled = true }
+                elseif MC.IsExpansionEnabled(e.key) then
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,

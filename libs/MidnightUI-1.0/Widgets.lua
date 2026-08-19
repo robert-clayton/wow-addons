@@ -209,6 +209,14 @@ local function acquireCheckbox(panel, body, yOff, def)
     w.frame:ClearAllPoints()
     w.frame:SetPoint("TOPLEFT", body, "TOPLEFT", 6, yOff)
     w.frame:SetChecked(def.get())
+    -- Disabled defs render dim and inert (pooled widgets must reset
+    -- both ways). A disabled CheckButton never fires OnClick.
+    w.frame:SetEnabled(not def.disabled)
+    if def.disabled then
+        w.lbl:SetTextColor(0.45, 0.45, 0.45)
+    else
+        w.lbl:SetTextColor(0.88, 0.88, 0.88)
+    end
     w.frame:SetScript("OnClick", function(s)
         def.set(s:GetChecked())
         if def.onRefresh then def.onRefresh() end

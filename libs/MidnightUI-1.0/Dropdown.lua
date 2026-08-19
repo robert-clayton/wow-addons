@@ -84,6 +84,7 @@ function lib.MakeDropdown()
         -- Hover tint read live from the theme; the fallback keeps the
         -- legacy warm-gold wash for themes without colors.menuHover.
         row:SetScript("OnEnter", function()
+            if row._disabled then return end
             local h = lib.Theme.colors.menuHover or { 1, 0.85, 0.5, 0.10 }
             hl:SetColorTexture(h[1], h[2], h[3], h[4])
         end)
@@ -110,15 +111,21 @@ function lib.MakeDropdown()
         local mc = t.colors
         local selColor  = mc.menuSelected or { 1, 0.8, 0.4 }
         local textColor = mc.menuText or { 0.88, 0.88, 0.88 }
+        -- Disabled rows render dim, take no hover wash, and swallow
+        -- clicks without closing the popup.
+        local disColor  = mc.menuDisabled or { 0.45, 0.45, 0.45 }
         for i, item in ipairs(items) do
             local row = acquireRow(i)
+            row._disabled = item.disabled and true or nil
             row:ClearAllPoints()
             row:SetPoint("TOPLEFT", popup, "TOPLEFT", 0, -PAD_Y - (i - 1) * ROW_HEIGHT)
             row._fs:SetFont(t.font, t.fontSize - 1, lib.FontFlags())
             row._fs:SetText(item.label)
-            local c = item.selected and selColor or textColor
+            local c = item.disabled and disColor
+                or (item.selected and selColor or textColor)
             row._fs:SetTextColor(c[1], c[2], c[3])
             row:SetScript("OnClick", function()
+                if item.disabled then return end
                 if item.onClick then item.onClick() end
                 popup:Hide()
             end)

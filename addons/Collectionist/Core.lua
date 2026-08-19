@@ -1723,14 +1723,18 @@ function MC.CreatePanel()
                   onClick = function() MC.SetExpansionFilter("all") end },
             }
             for _, e in ipairs(MC.EXPANSIONS or {}) do
-                if MC._registeredExpansions and MC._registeredExpansions[e.key]
-                   and MC.IsExpansionEnabled(e.key) then
+                local registered = MC._registeredExpansions and MC._registeredExpansions[e.key]
+                if registered and MC.IsExpansionEnabled(e.key) then
                     local key = e.key
                     items[#items + 1] = {
                         label = e.label,
                         selected = f.mode == "single" and f.single == key,
                         onClick = function() MC.SetExpansionFilter("single", key) end,
                     }
+                elseif not registered then
+                    -- Skeleton row: every expansion is listed; ones with
+                    -- no content yet are greyed and unclickable.
+                    items[#items + 1] = { label = e.label, disabled = true }
                 end
             end
             return items
@@ -1784,8 +1788,6 @@ function MC.CreatePanel()
                     tt:AddLine(" ")
                     tt:AddDoubleLine("Legacies", tostring(legacy),
                         0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
-                    tt:AddLine("Items you've collected that are no longer obtainable. Tracked separately so retired content doesn't drag down newer collectors.",
-                        0.6, 0.6, 0.6, true)
                 end
             end,
         })
@@ -1945,6 +1947,16 @@ function MC.BuildConfig()
                 label = e.label,
                 get   = function() return MC.IsExpansionEnabled(expKey) end,
                 set   = function(v) MC.SetExpansionEnabled(expKey, v) end,
+            }
+        else
+            -- Skeleton row for expansions without content: greyed,
+            -- checked, inert — flips live once a data file registers.
+            defs[#defs + 1] = {
+                type     = "checkbox",
+                label    = e.label .. " (coming soon)",
+                disabled = true,
+                get      = function() return true end,
+                set      = function() end,
             }
         end
     end
