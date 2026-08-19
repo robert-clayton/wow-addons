@@ -187,7 +187,6 @@ MC.RegisterContent("midnight", "decorations", {
         source = "vendor",
         decorations = {
             { decorID = 21857, itemID = 271971, name = "Tome of Kings", source = "vendor", sourceInfo = "Legacy vendor - 2,000 gold", cost = { gold = 20000000 } },
-            { decorID = 18897, itemID = 267372, name = "Banner of Five Dawns", source = "vendor", sourceInfo = "Monk class hall vendor - 1,000 Order Resources", cost = { currency = { 1220, 1000 } } },
         },
     },
     {

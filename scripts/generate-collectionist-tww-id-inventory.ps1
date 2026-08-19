@@ -1,6 +1,7 @@
 param(
     [string]$Db2Root = (Join-Path $env:TEMP "collectionist-tww-db2"),
-    [string]$OutputRoot = (Join-Path $PSScriptRoot "..\research\collectionist\tww\ids")
+    [string]$OutputRoot = (Join-Path $PSScriptRoot "..\research\collectionist\tww\ids"),
+    [string]$ManifestRoot = (Join-Path $PSScriptRoot "..\research\collectionist\tww\manifests")
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,6 +10,10 @@ $dragonflightRoot = Join-Path $Db2Root "dragonflight"
 $twwRoot = Join-Path $Db2Root "tww"
 $currentRoot = Join-Path $Db2Root "current"
 $guideRoot = Join-Path $Db2Root "guides"
+$decorSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\tww\sources\housing-wowdb.csv"
+$decorDetailSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\tww\sources\housing-wowdb-details.csv"
+$decorItemAuditSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\tww\sources\housing-wowdb-item-audit.csv"
+$petPreloadAuditSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\tww\sources\pet-preload-audit.csv"
 
 foreach ($required in @($dragonflightRoot, $twwRoot, $currentRoot, $guideRoot)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -17,6 +22,7 @@ foreach ($required in @($dragonflightRoot, $twwRoot, $currentRoot, $guideRoot)) 
 }
 
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $ManifestRoot | Out-Null
 
 function Read-Table([string]$root, [string]$name) {
     $path = Join-Path $root "$name.csv"
@@ -60,9 +66,36 @@ function Join-IDs($values) {
     return (@($values | Where-Object { $_ } | Sort-Object -Unique) -join ";")
 }
 
+function Write-CsvFile([string]$path, $rows) {
+    $lines = @($rows) | ConvertTo-Csv -NoTypeInformation
+    $text = if ($lines.Count -gt 0) { ($lines -join "`n") + "`n" } else { "" }
+    $text = $text.Replace("`r`n", "`n").Replace("`r", "`n")
+    $text = [regex]::Replace($text, "[ \t]+(?=`n)", "")
+    [System.IO.File]::WriteAllText($path, $text, [System.Text.UTF8Encoding]::new($false))
+}
+
+function Get-DecorAcquisitionExpansion([string]$sourceText) {
+    if ([string]::IsNullOrWhiteSpace($sourceText)) { return $null }
+
+    # Housing decor was introduced with Midnight. Expansion ownership follows
+    # the content that awards the decor, not the row's DB2 creation date or its
+    # thematic catalog tag.
+    if ($sourceText -match "Midnight Leatherworking|Founder's Point|Razorwind Shores|Harandar|Voidlight Marl|Arcantina|The Coiled Isle|Community Coupons") {
+        return "midnight"
+    }
+    if ($sourceText -match "Amirdrassil|Dragon Isles Supplies") {
+        return "dragonflight"
+    }
+    if ($sourceText -match "Khaz Algar|Dornogal|Hallowfall|Undermine|Liberation of Undermine|Isle of Dorn|Ringing Deeps|City of Threads|K'aresh|Resonance Crystals|Kej|Sizzling Cinderpollen|Theater Troupe|Priory of the Sacred Flame|Cinderbrew Meadery|Sprinting in the Ravine|Deephaul Ravine|Lorewalking|Worldsoul-Searching|Encounter: The Darkness") {
+        return "tww"
+    }
+
+    return $null
+}
+
 function Export-Inventory([string]$name, $rows) {
     $path = Join-Path $OutputRoot "$name.csv"
-    @($rows) | Export-Csv -LiteralPath $path -NoTypeInformation -Encoding utf8
+    Write-CsvFile $path @($rows)
     return [pscustomobject]@{ file = $name; rows = @($rows).Count }
 }
 
@@ -81,7 +114,36 @@ $currentMountIDs = New-IDSet (Read-Table $currentRoot "Mount")
 $currentPetIDs = New-IDSet (Read-Table $currentRoot "BattlePetSpecies")
 $currentToyIDs = New-IDSet (Read-Table $currentRoot "Toy")
 $currentAchievementIDs = New-IDSet (Read-Table $currentRoot "Achievement")
-$currentDecorIDs = New-IDSet (Read-Table $currentRoot "HouseDecor")
+$currentDecorRows = Read-Table $currentRoot "HouseDecor"
+$currentDecorIDs = New-IDSet $currentDecorRows
+$currentDecorByID = New-Index $currentDecorRows
+$currentItems = New-Index (Read-Table $currentRoot "ItemSparse")
+$catalogDecorNames = @{}
+$catalogRows = @()
+$catalogDetailByID = @{}
+$catalogDetailRows = @()
+$catalogItemAuditByID = @{}
+$catalogItemAuditRows = @()
+$petPreloadAuditByID = @{}
+$petPreloadAuditRows = @()
+if (Test-Path -LiteralPath $decorSourcePath) {
+    $catalogRows = @(Import-Csv -LiteralPath $decorSourcePath)
+    foreach ($row in $catalogRows) {
+        $catalogDecorNames[[string]$row.decor_id] = $row.catalog_name
+    }
+}
+if (Test-Path -LiteralPath $decorDetailSourcePath) {
+    $catalogDetailRows = @(Import-Csv -LiteralPath $decorDetailSourcePath)
+    $catalogDetailByID = New-Index $catalogDetailRows "decor_id"
+}
+if (Test-Path -LiteralPath $decorItemAuditSourcePath) {
+    $catalogItemAuditRows = @(Import-Csv -LiteralPath $decorItemAuditSourcePath)
+    $catalogItemAuditByID = New-Index $catalogItemAuditRows "decor_id"
+}
+if (Test-Path -LiteralPath $petPreloadAuditSourcePath) {
+    $petPreloadAuditRows = @(Import-Csv -LiteralPath $petPreloadAuditSourcePath)
+    $petPreloadAuditByID = New-Index $petPreloadAuditRows "species_id"
+}
 $currentRecipeSpellIDs = New-IDSet (Read-Table $currentRoot "SkillLineAbility") "Spell"
 $currentSpellNameIDs = New-IDSet (Read-Table $currentRoot "SpellName")
 
@@ -110,6 +172,9 @@ foreach ($relation in $itemEffects) {
 }
 
 $twwSignalPattern = "The War Within|Khaz Algar|Isle of Dorn|Ringing Deeps|Hallowfall|Azj-Kahet|Nerub-ar|Undermine|Siren Isle|K.aresh|Manaforge Omega|Liberation of Undermine|Delve|Dastardly Duos"
+$externalCollectionPattern = "In-Game Shop|Trading Post|Promotion"
+$toySnapshotIncludeItemIDs = @("218310", "224192", "226191", "228789", "229828", "218308", "228966", "245946", "245942", "246227", "256881", "256893")
+$toyExcludedItemIDs = @("239018", "243304", "245580")
 
 $mountGuideFiles = @("mounts.html", "mounts-11-2.html", "mounts-11-2-7.html")
 $mountGuideText = ($mountGuideFiles | ForEach-Object {
@@ -141,8 +206,18 @@ $mountInventory = foreach ($mount in (Get-NewRows $dfMounts $twwMounts)) {
     } else {
         "snapshot_candidate"
     }
+    $releaseDecision = if ($mount.SourceText_lang -match $externalCollectionPattern) {
+        "exclude_policy_external"
+    } elseif ($status -in @("guide_confirmed", "db2_tww_signal")) {
+        "include_tww"
+    } elseif ($mount.SourceText_lang -match "World Event:\|r WoW Remix: Legion" -and $itemIDs.Count -gt 0 -and $mount.Name_lang -notmatch "^\(PH\)") {
+        "include_tww"
+    } else {
+        "exclude_unobtainable_or_internal"
+    }
     [pscustomobject]@{
         status             = $status
+        release_decision   = $releaseDecision
         current_exists     = $currentMountIDs.ContainsKey([string]$mount.ID)
         mount_id           = $mount.ID
         name               = $mount.Name_lang
@@ -191,11 +266,31 @@ $petInventory = foreach ($pet in (Get-NewRows $dfPets $twwPets)) {
     } else {
         "snapshot_candidate"
     }
+    $preloadAudit = $petPreloadAuditByID[[string]$pet.ID]
+    if ($preloadAudit) {
+        $status = $preloadAudit.status
+    }
+    $releaseDecision = if ($status -eq "post_tww_preload") {
+        "exclude_cross_expansion"
+    } elseif ($status -eq "noncollectible_pet_battle_npc") {
+        "exclude_noncollectible"
+    } elseif ($pet.SourceText_lang -match $externalCollectionPattern) {
+        "exclude_policy_external"
+    } elseif ($pet.ID -eq "4837") {
+        "exclude_unobtainable_or_internal"
+    } elseif ($status -in @("guide_confirmed", "db2_tww_signal")) {
+        "include_tww"
+    } elseif ($status -eq "snapshot_candidate" -and $pet.SourceText_lang -match "World Event|Vendor:|Drop:") {
+        "include_tww"
+    } else {
+        "exclude_unobtainable_or_internal"
+    }
     $creature = $creatures[[string]$pet.CreatureID]
     $name = $guideNPCNames[[string]$pet.CreatureID]
     if (-not $name -and $creature) { $name = $creature.Name_lang }
     [pscustomobject]@{
         status             = $status
+        release_decision   = $releaseDecision
         current_exists     = $currentPetIDs.ContainsKey([string]$pet.ID)
         species_id         = $pet.ID
         name               = $name
@@ -207,7 +302,17 @@ $petInventory = foreach ($pet in (Get-NewRows $dfPets $twwPets)) {
         flags              = $pet.Flags
         source_type_enum   = $pet.SourceTypeEnum
         source_text        = $pet.SourceText_lang
+        audited_release_expansion = if ($preloadAudit) { $preloadAudit.release_expansion } else { $null }
+        audited_source_content_expansion = if ($preloadAudit) { $preloadAudit.source_content_expansion } else { $null }
+        audit_source_url   = if ($preloadAudit) { $preloadAudit.source_url } else { $null }
     }
+}
+
+if (@($petPreloadAuditRows).Count -ne 2) {
+    throw "Pet preload audit row count mismatch: expected 2, got $(@($petPreloadAuditRows).Count)"
+}
+if (@($petPreloadAuditRows | Group-Object species_id | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+    throw "Pet preload audit contains duplicate species IDs"
 }
 
 $toyInventory = foreach ($toy in (Get-NewRows $dfToys $twwToys)) {
@@ -219,8 +324,22 @@ $toyInventory = foreach ($toy in (Get-NewRows $dfToys $twwToys)) {
     } else {
         "snapshot_candidate"
     }
+    $releaseDecision = if ([string]$toy.ItemID -eq "239018") {
+        "exclude_duplicate_registration"
+    } elseif ([string]$toy.ItemID -in @("243304", "245580")) {
+        "exclude_unobtainable_or_internal"
+    } elseif ($toy.SourceText_lang -match "WoW Esports|Promotion") {
+        "exclude_policy_external"
+    } elseif ([string]$toy.ItemID -in $toySnapshotIncludeItemIDs -or $status -in @("item_expansion_confirmed", "db2_tww_signal")) {
+        "include_tww"
+    } elseif ([string]::IsNullOrWhiteSpace($toy.SourceText_lang)) {
+        "exclude_unobtainable_or_internal"
+    } else {
+        "exclude_cross_expansion"
+    }
     [pscustomobject]@{
         status            = $status
+        release_decision  = $releaseDecision
         current_exists    = $currentToyIDs.ContainsKey([string]$toy.ID)
         toy_id            = $toy.ID
         item_id           = $toy.ItemID
@@ -235,8 +354,10 @@ $toyInventory = foreach ($toy in (Get-NewRows $dfToys $twwToys)) {
 $twwAchievementCategoryIDs = @("15506", "15521", "15523", "15524", "15526", "15530", "15531")
 $achievementInventory = foreach ($achievement in (Get-NewRows $dfAchievements $twwAchievements)) {
     $category = $achievementCategoryByID[[string]$achievement.Category]
+    $isTwwCategory = [string]$achievement.Category -in $twwAchievementCategoryIDs
+    $isHidden = (([int64]$achievement.Flags -band 0x100000) -ne 0)
     [pscustomobject]@{
-        status           = if ([string]$achievement.Category -in $twwAchievementCategoryIDs) { "tww_category_confirmed" } else { "snapshot_candidate" }
+        status           = if ($isTwwCategory -and $isHidden) { "tww_category_hidden" } elseif ($isTwwCategory) { "tww_category_confirmed" } else { "snapshot_candidate" }
         current_exists   = $currentAchievementIDs.ContainsKey([string]$achievement.ID)
         achievement_id   = $achievement.ID
         title            = $achievement.Title_lang
@@ -383,6 +504,12 @@ while ($tradeQueue.Count -gt 0) {
     $allowedTradeCategories[$categoryID] = $true
     foreach ($childID in @($tradeCategoryChildren[$categoryID])) { $tradeQueue.Enqueue($childID) }
 }
+$tradeCategoryByID = New-Index $tradeSkillCategories
+$houseDecorTradeCategories = @{}
+foreach ($categoryID in $allowedTradeCategories.Keys) {
+    $category = $tradeCategoryByID[$categoryID]
+    if ($category -and $category.Name_lang -eq "House Decor") { $houseDecorTradeCategories[$categoryID] = $true }
+}
 $professionNames = @{
     "171" = "Alchemy"; "164" = "Blacksmithing"; "185" = "Cooking";
     "333" = "Enchanting"; "202" = "Engineering"; "773" = "Inscription";
@@ -406,24 +533,220 @@ $recipeInventory = foreach ($ability in $skillLineAbilities | Where-Object {
         supercedes_spell_id  = $ability.SupercedesSpell
     }
 }
+$expectedHouseDecorRecipeIDs = @(
+    "1245993","1245994","1245995","1259673","1259675","1259681","1259690","1259715","1259724","1259778","1259784","1259796",
+    "1259805","1259818","1260005","1260044","1260096","1260172","1260215","1260326","1260328","1261878","1266541","1270836"
+)
+$actualHouseDecorRecipeIDs = @($recipeInventory | Where-Object { $houseDecorTradeCategories.ContainsKey([string]$_.trade_category_id) } | ForEach-Object { [string]$_.recipe_spell_id } | Sort-Object -Unique)
+$missingHouseDecorRecipeIDs = @($expectedHouseDecorRecipeIDs | Where-Object { $_ -notin $actualHouseDecorRecipeIDs })
+$extraHouseDecorRecipeIDs = @($actualHouseDecorRecipeIDs | Where-Object { $_ -notin $expectedHouseDecorRecipeIDs })
+if ($actualHouseDecorRecipeIDs.Count -ne 24 -or $missingHouseDecorRecipeIDs.Count -or $extraHouseDecorRecipeIDs.Count) {
+    throw "TWW house decor recipe mismatch: missing [$($missingHouseDecorRecipeIDs -join ', ')], extra [$($extraHouseDecorRecipeIDs -join ', ')]"
+}
 
-$decorationInventory = foreach ($decor in (Read-Table $twwRoot "HouseDecor")) {
-    $item = $items[[string]$decor.ItemID]
+$twwDecorRows = Read-Table $twwRoot "HouseDecor"
+$twwDecorIDs = New-IDSet $twwDecorRows
+$decorRowsByID = @{}
+foreach ($decor in $twwDecorRows) {
+    $decorRowsByID[[string]$decor.ID] = $decor
+}
+foreach ($sourceRow in $catalogRows) {
+    $currentDecor = $currentDecorByID[[string]$sourceRow.decor_id]
+    if ($currentDecor) {
+        $decorRowsByID[[string]$sourceRow.decor_id] = $currentDecor
+    }
+}
+$decorationInventory = foreach ($decor in $decorRowsByID.Values) {
+    $item = $currentItems[[string]$decor.ItemID]
+    if (-not $item) { $item = $items[[string]$decor.ItemID] }
     $isDNT = $decor.Name_lang -match "DNT|DO NOT USE"
     $currentExists = $currentDecorIDs.ContainsKey([string]$decor.ID)
+    $catalogName = $catalogDecorNames[[string]$decor.ID]
+    $catalogDetail = $catalogDetailByID[[string]$decor.ID]
+    $catalogItemAudit = $catalogItemAuditByID[[string]$decor.ID]
+    $auditExpansionMatch = if ($catalogItemAudit) { [regex]::Match($catalogItemAudit.acquisition_status, "^acquisition_(.+)_confirmed$") } else { $null }
+    $acquisitionExpansion = if ($auditExpansionMatch -and $auditExpansionMatch.Success) {
+        $auditExpansionMatch.Groups[1].Value
+    } elseif ($catalogDetail) {
+        Get-DecorAcquisitionExpansion $catalogDetail.source_text
+    } else {
+        $null
+    }
+    $presentInFinalTww = $twwDecorIDs.ContainsKey([string]$decor.ID)
+    $status = if ($isDNT) {
+        "internal_dnt"
+    } elseif (-not $currentExists) {
+        "removed_after_tww"
+    } elseif ($catalogItemAudit -and $catalogItemAudit.acquisition_status -eq "catalog_hidden_unobtainable") {
+        "catalog_hidden_unobtainable"
+    } elseif ($acquisitionExpansion) {
+        "acquisition_${acquisitionExpansion}_confirmed"
+    } elseif ($catalogName) {
+        "catalog_acquisition_unresolved"
+    } else {
+        "snapshot_candidate_needs_source_expansion"
+    }
     [pscustomobject]@{
-        status      = if ($isDNT) { "internal_dnt" } elseif (-not $currentExists) { "removed_after_tww" } else { "snapshot_candidate_needs_source_expansion" }
+        status      = $status
         current_exists = $currentExists
+        present_final_tww = $presentInFinalTww
+        acquisition_expansion = $acquisitionExpansion
         decor_id    = $decor.ID
         item_id     = $decor.ItemID
         decor_name  = $decor.Name_lang
+        catalog_name = $catalogName
+        category    = if ($catalogDetail) { $catalogDetail.category } else { $null }
+        source_text = if ($catalogDetail) { $catalogDetail.source_text } else { $null }
+        achievement_ids = if ($catalogDetail) { $catalogDetail.achievement_ids } else { $null }
+        quest_ids   = if ($catalogDetail) { $catalogDetail.quest_ids } else { $null }
+        npc_ids     = if ($catalogDetail) { $catalogDetail.npc_ids } else { $null }
+        spell_ids   = if ($catalogDetail) { $catalogDetail.spell_ids } else { $null }
+        currency_ids = if ($catalogDetail) { $catalogDetail.currency_ids } else { $null }
+        collection_spell_id = if ($catalogItemAudit) { $catalogItemAudit.collection_spell_id } else { $null }
+        catalog_flags = if ($catalogItemAudit) { $catalogItemAudit.catalog_flags } else { $null }
+        acquisition_note = if ($catalogItemAudit) { $catalogItemAudit.source_note } else { $null }
+        acquisition_source_url = if ($catalogItemAudit) { $catalogItemAudit.source_url } else { $null }
         item_name   = if ($item) { $item.Display_lang } else { $null }
+        item_expansion_id = if ($item) { $item.ExpansionID } else { $null }
         flags       = $decor.Flags
         type        = $decor.Type
         model_type  = $decor.ModelType
         weight_cost = $decor.WeightCost
     }
 }
+
+if (@($catalogRows).Count -ne 163) {
+    throw "Housing catalog source row count mismatch: expected 163, got $(@($catalogRows).Count)"
+}
+if (@($catalogRows | Group-Object decor_id | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+    throw "Housing catalog source contains duplicate decor IDs"
+}
+if (@($catalogDetailRows).Count -ne 169) {
+    throw "Housing catalog detail row count mismatch: expected 169, got $(@($catalogDetailRows).Count)"
+}
+if (@($catalogDetailRows | Group-Object decor_id | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+    throw "Housing catalog detail source contains duplicate decor IDs"
+}
+if (@($catalogItemAuditRows).Count -ne 21) {
+    throw "Housing catalog item-audit row count mismatch: expected 21, got $(@($catalogItemAuditRows).Count)"
+}
+if (@($catalogItemAuditRows | Group-Object decor_id | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+    throw "Housing catalog item-audit source contains duplicate decor IDs"
+}
+foreach ($sourceRow in $catalogRows) {
+    $decor = $currentDecorByID[[string]$sourceRow.decor_id]
+    if (-not $decor) {
+        throw "Housing catalog decor $($sourceRow.decor_id) is absent from current DB2"
+    }
+    if ($decor.Name_lang -ne $sourceRow.catalog_name) {
+        throw "Housing catalog decor $($sourceRow.decor_id) name mismatch: '$($sourceRow.catalog_name)' vs '$($decor.Name_lang)'"
+    }
+    $detail = $catalogDetailByID[[string]$sourceRow.decor_id]
+    if (-not $detail) {
+        throw "Housing catalog decor $($sourceRow.decor_id) has no acquisition-detail row"
+    }
+    if ($detail.catalog_name -ne $sourceRow.catalog_name) {
+        throw "Housing catalog detail $($sourceRow.decor_id) name mismatch: '$($detail.catalog_name)' vs '$($sourceRow.catalog_name)'"
+    }
+}
+foreach ($auditRow in $catalogItemAuditRows) {
+    $detail = $catalogDetailByID[[string]$auditRow.decor_id]
+    if (-not $detail) {
+        throw "Housing catalog item audit $($auditRow.decor_id) has no detail row"
+    }
+    if ($detail.catalog_name -ne $auditRow.catalog_name) {
+        throw "Housing catalog item audit $($auditRow.decor_id) name mismatch: '$($auditRow.catalog_name)' vs '$($detail.catalog_name)'"
+    }
+    if ($auditRow.acquisition_status -eq "catalog_hidden_unobtainable" -and $auditRow.catalog_flags -notmatch "\bHIDDENINCATALOG\b") {
+        throw "Housing catalog item audit $($auditRow.decor_id) is excluded without HIDDENINCATALOG evidence"
+    }
+}
+
+$expectedDecorStatusCounts = [ordered]@{
+    acquisition_tww_confirmed                  = 108
+    acquisition_dragonflight_confirmed         = 1
+    acquisition_midnight_confirmed             = 33
+    catalog_hidden_unobtainable                 = 14
+    internal_dnt                                = 91
+    removed_after_tww                           = 1
+    snapshot_candidate_needs_source_expansion   = 1231
+}
+$actualDecorStatusCounts = @{}
+foreach ($group in @($decorationInventory | Group-Object status)) {
+    $actualDecorStatusCounts[$group.Name] = $group.Count
+}
+foreach ($expectedStatus in $expectedDecorStatusCounts.Keys) {
+    $actualCount = if ($actualDecorStatusCounts.ContainsKey($expectedStatus)) { $actualDecorStatusCounts[$expectedStatus] } else { 0 }
+    if ($actualCount -ne $expectedDecorStatusCounts[$expectedStatus]) {
+        throw "Housing decor status '$expectedStatus' count mismatch: expected $($expectedDecorStatusCounts[$expectedStatus]), got $actualCount"
+    }
+}
+if (@($actualDecorStatusCounts.Keys | Where-Object { -not $expectedDecorStatusCounts.Contains($_) }).Count -gt 0) {
+    throw "Housing decor inventory contains an unexpected status"
+}
+if (@($decorationInventory | Where-Object { $_.status -eq "acquisition_tww_confirmed" -and [string]::IsNullOrWhiteSpace($_.source_text) }).Count -gt 0) {
+    throw "TWW-confirmed housing decor contains a row without acquisition evidence"
+}
+
+$twwDecorationManifest = @($decorationInventory | Where-Object { $_.status -eq "acquisition_tww_confirmed" } | Sort-Object { [int]$_.decor_id })
+if ($twwDecorationManifest.Count -ne 108) {
+    throw "TWW decoration manifest count mismatch: expected 108, got $($twwDecorationManifest.Count)"
+}
+Write-CsvFile (Join-Path $ManifestRoot "decorations.csv") $twwDecorationManifest
+
+# Freeze the exact ID sets that the addon intentionally tracks. These are
+# distinct from the broad candidate inventories above: store, promotion,
+# internal/test, cross-expansion preload, and known duplicate registrations
+# remain available for audit without silently entering a release manifest.
+$mountManifest = @($mountInventory | Where-Object { $_.release_decision -eq "include_tww" } |
+    Sort-Object { [int]$_.mount_id } | Select-Object *, @{ Name = "inclusion_reason"; Expression = {
+    if ($_.status -eq "guide_confirmed") { "tww_guide_confirmed" } elseif ($_.status -eq "db2_tww_signal") { "tww_db2_signal_triage_approved" } else { "tww_era_event_confirmed" }
+} })
+
+$petManifest = @($petInventory | Where-Object { $_.release_decision -eq "include_tww" } |
+    Sort-Object { [int]$_.species_id } | Select-Object *, @{ Name = "inclusion_reason"; Expression = {
+    if ($_.status -eq "snapshot_candidate") { "tww_era_event_triage_approved" } elseif ($_.status -eq "guide_confirmed") { "tww_guide_confirmed" } else { "tww_db2_signal_triage_approved" }
+} })
+
+$toyManifest = @($toyInventory | Where-Object { $_.release_decision -eq "include_tww" } |
+    Sort-Object { [int]$_.item_id } | Select-Object *, @{ Name = "inclusion_reason"; Expression = {
+    if ($_.item_id -in $toySnapshotIncludeItemIDs) { "tww_era_event_triage_approved" } elseif ($_.status -eq "item_expansion_confirmed") { "tww_item_expansion_confirmed" } else { "tww_db2_signal_triage_approved" }
+} })
+
+$recipeManifest = @($recipeInventory | Where-Object { $_.status -eq "named_recipe" } | Sort-Object profession, { [int]$_.recipe_spell_id })
+$rareManifest = @($rareInventory | Sort-Object { [int]$_.achievement_id }, order_path)
+$treasureManifest = @($treasureInventory | Sort-Object { [int]$_.achievement_id }, order_path)
+$achievementManifest = @($achievementInventory | Where-Object { $_.status -eq "tww_category_confirmed" } | Sort-Object { [int]$_.achievement_id })
+$achievementManifestIDs = @($achievementManifest | ForEach-Object { [string]$_.achievement_id })
+$achievementCriteriaManifest = @($achievementCriteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementManifestIDs } |
+    Sort-Object { [int]$_.achievement_id }, order_path |
+    Select-Object *, @{ Name = "achievement_tree_key"; Expression = { "$($_.achievement_id):$($_.tree_id)" } })
+
+$releaseManifests = [ordered]@{
+    mounts      = @{ rows = $mountManifest; expected = 186; id = "mount_id" }
+    pets        = @{ rows = $petManifest; expected = 200; id = "species_id" }
+    toys        = @{ rows = $toyManifest; expected = 99; id = "item_id" }
+    decorations = @{ rows = $twwDecorationManifest; expected = 108; id = "decor_id" }
+    recipes     = @{ rows = $recipeManifest; expected = 696; id = "recipe_spell_id" }
+    achievements = @{ rows = $achievementManifest; expected = 381; id = "achievement_id" }
+    "achievement-criteria" = @{ rows = $achievementCriteriaManifest; expected = 1987; id = "achievement_tree_key" }
+    rares       = @{ rows = $rareManifest; expected = 140; id = "criteria_id" }
+    treasures   = @{ rows = $treasureManifest; expected = 86; id = "criteria_id" }
+}
+$manifestSummary = foreach ($manifestName in $releaseManifests.Keys) {
+    $manifest = $releaseManifests[$manifestName]
+    $rows = @($manifest.rows)
+    if ($rows.Count -ne $manifest.expected) {
+        throw "TWW $manifestName manifest count mismatch: expected $($manifest.expected), got $($rows.Count)"
+    }
+    $uniqueIDs = @($rows | ForEach-Object { [string]$_.$($manifest.id) } | Where-Object { $_ } | Sort-Object -Unique)
+    if ($uniqueIDs.Count -ne $rows.Count) {
+        throw "TWW $manifestName manifest contains duplicate or missing $($manifest.id) values"
+    }
+    Write-CsvFile (Join-Path $ManifestRoot "$manifestName.csv") $rows
+    [pscustomobject]@{ manifest = $manifestName; rows = $rows.Count; identifier = $manifest.id }
+}
+Write-CsvFile (Join-Path $ManifestRoot "summary.csv") $manifestSummary
 
 $mapIDs = @("2214", "2215", "2248", "2255", "2274", "2339", "2346", "2369", "2371", "2472")
 $mapInventory = Read-Table $twwRoot "UiMap" | Where-Object { [string]$_.ID -in $mapIDs } | ForEach-Object {
@@ -475,5 +798,5 @@ $summary += Export-Inventory "maps" ($mapInventory | Sort-Object { [int]$_.map_i
 $summary += Export-Inventory "factions" ($factionInventory | Sort-Object { [int]$_.faction_id })
 $summary += Export-Inventory "currencies" ($currencyInventory | Sort-Object { [int]$_.currency_id })
 
-$summary | Export-Csv -LiteralPath (Join-Path $OutputRoot "summary.csv") -NoTypeInformation -Encoding utf8
+Write-CsvFile (Join-Path $OutputRoot "summary.csv") $summary
 $summary | Format-Table -AutoSize

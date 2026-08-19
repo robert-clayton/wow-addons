@@ -15,10 +15,11 @@ MC.DecoSourceLabels = {
     worldevent  = "World Event",
 }
 
--- Crafted decorations are grouped by profession. Cooking is omitted (no decor crafts).
+-- Crafted decorations are grouped by profession. TWW adds Cooking decor.
 MC.DecoProfOrder = {
     MC.PROFESSION.Alchemy,
     MC.PROFESSION.Blacksmithing,
+    MC.PROFESSION.Cooking,
     MC.PROFESSION.Enchanting,
     MC.PROFESSION.Engineering,
     MC.PROFESSION.Inscription,
@@ -569,8 +570,6 @@ MC.RegisterContent("midnight", "decorations", {
               dropInfo = { mob = "Ziekket", zone = "The Blinding Vale", boss = true, rate = "100%" } },
             { decorID = 15574, name = "Voidlight Brazier", source = "drop", sourceInfo = "Charonus, Voidscar Arena",
               dropInfo = { mob = "Charonus", zone = "Voidscar Arena", boss = true, rate = "100%" } },
-            { decorID = 15570, name = "Amani Ritual Altar", source = "drop", sourceInfo = "Nalorakk, Den of Nalorakk",
-              dropInfo = { mob = "Nalorakk", zone = "Den of Nalorakk", boss = true, rate = "100%" } },
             -- Raid drops: The Voidspire
             { decorID = 15758, name = "Banded Domanaar Storage Crate", source = "drop", sourceInfo = "Fallen-King Salhadaar, The Voidspire",
               dropInfo = { mob = "Fallen-King Salhadaar", zone = "The Voidspire", boss = true, rate = "100%" }, score = T.short },

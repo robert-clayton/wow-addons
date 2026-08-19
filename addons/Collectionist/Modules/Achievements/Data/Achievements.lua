@@ -27,6 +27,8 @@ MC.AchievementSubcategoryOrder = {
     quests      = { "metas" },
     collections = { "pets", "mounts", "toys" },
     features    = {
+        "covenants", "torghast", "dragonriding", "reputation",
+        "islands", "war_effort", "heart_of_azeroth",
         "showdowns", "prey", "void_assaults", "ritual_sites",
         "delves", "dungeons", "raid", "housing", "professions", "season",
     },
@@ -44,6 +46,13 @@ MC.AchievementSourceLabels = {
     pets          = "Pets",
     mounts        = "Mounts",
     toys          = "Toys",
+    dragonriding  = "Dragonriding",
+    covenants     = "Covenant Sanctums",
+    torghast      = "Torghast",
+    reputation    = "Reputation",
+    islands       = "Island Expeditions",
+    war_effort    = "War Effort",
+    heart_of_azeroth = "Heart of Azeroth",
     prey          = "Prey",
     void_assaults = "Void Assaults",
     ritual_sites  = "Ritual Sites",
@@ -60,6 +69,8 @@ MC.AchievementSourceLabels = {
 MC.AchievementSourceOrder = {
     "metas", "explore", "vistas", "glyphs", "lore", "paintings",
     "events", "zone", "pets", "mounts", "toys",
+    "covenants", "torghast", "dragonriding", "reputation",
+    "islands", "war_effort", "heart_of_azeroth",
     "showdowns", "prey", "void_assaults", "ritual_sites",
     "delves", "dungeons", "raid", "housing", "professions", "season",
 }

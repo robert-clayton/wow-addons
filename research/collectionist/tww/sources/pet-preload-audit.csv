@@ -1,0 +1,3 @@
+species_id,name,item_id,status,release_expansion,source_content_expansion,source_type,source_id,source_url,note
+4475,Webbers,222967,post_tww_preload,midnight,wrath,achievement,60956,https://warcraft.wiki.gg/wiki/Family_Battler_of_Northrend,Added in patch 12.0.0; reward from Family Battler of Northrend
+4497,Waddles,221495,post_tww_preload,midnight,midnight,wild,npc:222077,https://www.wowhead.com/npc=222077/waddles,Wild companion in Harandar; belongs to Midnight

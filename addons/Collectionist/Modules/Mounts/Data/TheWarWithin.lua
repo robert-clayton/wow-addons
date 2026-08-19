@@ -1,18 +1,13 @@
 local _, MC = ...
 local T = MC.SCORE_TIERS
 
--- The War Within (11.x) mounts — wave 1.
--- IDs from research/collectionist/tww/ids/mounts.csv (guide_confirmed rows plus
--- the triage-approved Darkfuse Demolisher). Source/cost enrichment parsed from
--- the DB2 source_text tooltips, cross-checked against warcraft.wiki.gg where
--- the tooltip was redacted or ambiguous. No waypoints: the inventory carries
--- no coordinates, and none are invented here.
--- Deliberately excluded beyond the triage exclusion list (catalog policy: no
--- Blizzard Shop / Trading Post / out-of-game promotion sources): 30 rows —
---   In-Game Shop: 2235, 2259, 2265, 2304, 2305, 2307, 2308, 2330, 2331
---   Trading Post: 2238, 2239, 2241, 2249, 2329, 2347, 2618-2622, 2624-2630,
---                 2823, 2825
---   Promotion (Burning Crusade Classic): 2732
+-- The War Within (11.x) mounts.
+-- Exact 186-row ID set: research/collectionist/tww/manifests/mounts.csv.
+-- Source/cost enrichment comes from DB2 tooltips and primary/current source
+-- pages where the tooltip is redacted or ambiguous. No coordinates are
+-- invented. The manifest excludes 69 shop/trading/promotion rows and five
+-- unavailable/internal candidates; the 44 time-limited Legion Remix rewards
+-- remain included because the event itself shipped during TWW.
 
 MC.RegisterContent("tww", "mounts", {
     {
@@ -316,6 +311,148 @@ MC.RegisterContent("tww", "mounts", {
             { mountID = 2605, itemID = 246264, name = "Inarius' Charger", source = "worldevent",
               sourceInfo = "Greedy Emissaries event (Treasure Goblins)",
               dropInfo = { mob = "Treasure Goblins", zone = "Greedy Emissaries event", rate = "Rare" }, score = T.medium },
+
+            -- WoW Remix: Legion (11.2.5). Blizzard's official rewards table
+            -- lists the first 33 at Hemet Nesingwary XVII for 10,000 Bronze.
+            -- The event has ended, so the historical cost remains visible but
+            -- every row is marked unavailable.
+            { mountID = 2542, itemID = 239665, name = "Bloodhunter Fel Bat", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2544, itemID = 239667, name = "Ashplague Fel Bat", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2546, itemID = 239687, name = "Wretched Fel Bat", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2574, itemID = 250721, name = "Snowy Highmountain Eagle", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2593, itemID = 250423, name = "Slag Basilisk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2653, itemID = 250192, name = "Ghastly Ur'zul", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2660, itemID = 250424, name = "Leystone Basilisk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2661, itemID = 250425, name = "Felslate Basilisk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2662, itemID = 250426, name = "Aquamarine Basilisk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2663, itemID = 250428, name = "Illidari Dreadstalker", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2664, itemID = 250427, name = "Illidari Blightstalker", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2665, itemID = 250429, name = "Highland Elderhorn", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2666, itemID = 250723, name = "Treetop Highmountain Eagle", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2670, itemID = 250728, name = "Arcberry Manasaber", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2671, itemID = 250745, name = "Fel-Scarred Mana Ray", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2672, itemID = 250746, name = "Bloodtooth Mana Ray", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2673, itemID = 250747, name = "Albino Mana Ray", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2674, itemID = 250748, name = "Luminous Mana Ray", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2675, itemID = 250751, name = "Twilight Courser", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2676, itemID = 250752, name = "Golden Sunrunner", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2677, itemID = 250756, name = "Turquoise Courser", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2678, itemID = 250757, name = "Gloomdark Nightmare", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2679, itemID = 250761, name = "Bonesteed of Triumph", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2681, itemID = 250760, name = "Bonesteed of Bloodshed", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2682, itemID = 250759, name = "Bonesteed of Plague", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2683, itemID = 250758, name = "Bonesteed of Oblivion", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2686, itemID = 250802, name = "Longhorned Sable Talbuk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2688, itemID = 250803, name = "Garnet Ruinstrider", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2689, itemID = 250804, name = "Longhorned Bleakhoof Talbuk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2690, itemID = 250805, name = "Longhorned Argussian Talbuk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2691, itemID = 250806, name = "Longhorned Beryl Talbuk", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2705, itemID = 251796, name = "Chestnut Courser", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+            { mountID = 2706, itemID = 251795, name = "Brimstone Courser", source = "worldevent",
+              sourceInfo = "Hemet Nesingwary XVII - 10,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 10000 } }, unavailable = true, score = T.medium },
+
+            -- The 11 Mount Journal class rewards were earned by reaching
+            -- level 80 on the matching Timerunner or bought from Grandmaster
+            -- Jakkus for 20,000 Bronze. The Druid reward is a flight form,
+            -- not a mount entry, so it is outside this manifest.
+            { mountID = 2720, itemID = 252954, name = "Felscorned Vilebrood Vanquisher", source = "worldevent",
+              sourceInfo = "Death Knight Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2721, itemID = 253013, name = "Slayer's Felscorned Shrieker", source = "worldevent",
+              sourceInfo = "Demon Hunter Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2723, itemID = 253025, name = "Felscorned Wolfhawk", source = "worldevent",
+              sourceInfo = "Hunter Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2724, itemID = 253026, name = "Archmage's Felscorned Disc", source = "worldevent",
+              sourceInfo = "Mage Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2725, itemID = 253027, name = "Felscorned Grandmaster's Companion", source = "worldevent",
+              sourceInfo = "Monk Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2726, itemID = 253028, name = "Felscorned Highlord's Charger", source = "worldevent",
+              sourceInfo = "Paladin Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2727, itemID = 253029, name = "High Priest's Felscorned Seeker", source = "worldevent",
+              sourceInfo = "Priest Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2728, itemID = 253030, name = "Shadowblade's Felscorned Omen", source = "worldevent",
+              sourceInfo = "Rogue Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2729, itemID = 253031, name = "Farseer's Felscorned Tempest", source = "worldevent",
+              sourceInfo = "Shaman Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2730, itemID = 253032, name = "Felscorned Netherlord's Dreadsteed", source = "worldevent",
+              sourceInfo = "Warlock Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
+            { mountID = 2731, itemID = 253033, name = "Felscorned War Wyrm", source = "worldevent",
+              sourceInfo = "Warrior Timerunner level 80 or Grandmaster Jakkus - 20,000 Bronze (WoW Remix: Legion; event ended)",
+              cost = { currency = { MC.CURRENCY.LegionRemixBronze, 20000 } }, unavailable = true, score = T.long },
         },
     },
     {

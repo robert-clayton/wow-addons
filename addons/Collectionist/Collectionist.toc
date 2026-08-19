@@ -1,6 +1,6 @@
 ## Interface: 120100
 ## Title: Collectionist
-## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements you're missing from Midnight in one panel.
+## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
 ## Version: 1.12.1
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
@@ -28,6 +28,16 @@ PremiumNav.lua
 Targets.lua
 
 # Mounts module
+Modules\Mounts\Data\Classic.lua
+Modules\Mounts\Data\TheBurningCrusade.lua
+Modules\Mounts\Data\WrathOfTheLichKing.lua
+Modules\Mounts\Data\Cataclysm.lua
+Modules\Mounts\Data\MistsOfPandaria.lua
+Modules\Mounts\Data\WarlordsOfDraenor.lua
+Modules\Mounts\Data\Legion.lua
+Modules\Mounts\Data\BattleForAzeroth.lua
+Modules\Mounts\Data\Shadowlands.lua
+Modules\Mounts\Data\Dragonflight.lua
 Modules\Mounts\Data\TheWarWithin.lua
 Modules\Mounts\Data\Mounts.lua
 Modules\Mounts\Data\Patch120007.lua
@@ -37,6 +47,16 @@ Modules\Mounts\Scanner.lua
 Modules\Mounts\UI.lua
 
 # Pets module
+Modules\Pets\Data\Classic.lua
+Modules\Pets\Data\TheBurningCrusade.lua
+Modules\Pets\Data\WrathOfTheLichKing.lua
+Modules\Pets\Data\Cataclysm.lua
+Modules\Pets\Data\MistsOfPandaria.lua
+Modules\Pets\Data\WarlordsOfDraenor.lua
+Modules\Pets\Data\Legion.lua
+Modules\Pets\Data\BattleForAzeroth.lua
+Modules\Pets\Data\Shadowlands.lua
+Modules\Pets\Data\Dragonflight.lua
 Modules\Pets\Data\TheWarWithin.lua
 Modules\Pets\Data\Pets.lua
 Modules\Pets\Data\Patch120007.lua
@@ -46,6 +66,17 @@ Modules\Pets\Scanner.lua
 Modules\Pets\UI.lua
 
 # Decorations module
+Modules\Decorations\Data\Classic.lua
+Modules\Decorations\Data\TheBurningCrusade.lua
+Modules\Decorations\Data\WrathOfTheLichKing.lua
+Modules\Decorations\Data\Cataclysm.lua
+Modules\Decorations\Data\MistsOfPandaria.lua
+Modules\Decorations\Data\WarlordsOfDraenor.lua
+Modules\Decorations\Data\Legion.lua
+Modules\Decorations\Data\BattleForAzeroth.lua
+Modules\Decorations\Data\Shadowlands.lua
+Modules\Decorations\Data\Dragonflight.lua
+Modules\Decorations\Data\TheWarWithin.lua
 Modules\Decorations\Data\Decorations.lua
 Modules\Decorations\Data\Patch120007.lua
 Modules\Decorations\Data\Patch120100.lua
@@ -54,6 +85,16 @@ Modules\Decorations\Scanner.lua
 Modules\Decorations\UI.lua
 
 # Toys module
+Modules\Toys\Data\Classic.lua
+Modules\Toys\Data\TheBurningCrusade.lua
+Modules\Toys\Data\WrathOfTheLichKing.lua
+Modules\Toys\Data\Cataclysm.lua
+Modules\Toys\Data\MistsOfPandaria.lua
+Modules\Toys\Data\WarlordsOfDraenor.lua
+Modules\Toys\Data\Legion.lua
+Modules\Toys\Data\BattleForAzeroth.lua
+Modules\Toys\Data\Shadowlands.lua
+Modules\Toys\Data\Dragonflight.lua
 Modules\Toys\Data\TheWarWithin.lua
 Modules\Toys\Data\Toys.lua
 Modules\Toys\Data\Patch120007.lua
@@ -63,6 +104,16 @@ Modules\Toys\Scanner.lua
 Modules\Toys\UI.lua
 
 # Rares module
+Modules\Rares\Data\Classic.lua
+Modules\Rares\Data\TheBurningCrusade.lua
+Modules\Rares\Data\WrathOfTheLichKing.lua
+Modules\Rares\Data\Cataclysm.lua
+Modules\Rares\Data\MistsOfPandaria.lua
+Modules\Rares\Data\WarlordsOfDraenor.lua
+Modules\Rares\Data\Legion.lua
+Modules\Rares\Data\BattleForAzeroth.lua
+Modules\Rares\Data\Shadowlands.lua
+Modules\Rares\Data\Dragonflight.lua
 Modules\Rares\Data\TheWarWithin.lua
 Modules\Rares\Data\Rares.lua
 Modules\Rares\Data\Patch120007.lua
@@ -72,6 +123,16 @@ Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
 
 # Treasures module
+Modules\Treasures\Data\Classic.lua
+Modules\Treasures\Data\TheBurningCrusade.lua
+Modules\Treasures\Data\WrathOfTheLichKing.lua
+Modules\Treasures\Data\Cataclysm.lua
+Modules\Treasures\Data\MistsOfPandaria.lua
+Modules\Treasures\Data\WarlordsOfDraenor.lua
+Modules\Treasures\Data\Legion.lua
+Modules\Treasures\Data\BattleForAzeroth.lua
+Modules\Treasures\Data\Shadowlands.lua
+Modules\Treasures\Data\Dragonflight.lua
 Modules\Treasures\Data\TheWarWithin.lua
 Modules\Treasures\Data\Treasures.lua
 Modules\Treasures\Data\Patch120100.lua
@@ -80,6 +141,17 @@ Modules\Treasures\Scanner.lua
 Modules\Treasures\UI.lua
 
 # Achievements module
+Modules\Achievements\Data\Classic.lua
+Modules\Achievements\Data\TheBurningCrusade.lua
+Modules\Achievements\Data\WrathOfTheLichKing.lua
+Modules\Achievements\Data\Cataclysm.lua
+Modules\Achievements\Data\MistsOfPandaria.lua
+Modules\Achievements\Data\WarlordsOfDraenor.lua
+Modules\Achievements\Data\Legion.lua
+Modules\Achievements\Data\BattleForAzeroth.lua
+Modules\Achievements\Data\Shadowlands.lua
+Modules\Achievements\Data\Dragonflight.lua
+Modules\Achievements\Data\TheWarWithin.lua
 Modules\Achievements\Data\Achievements.lua
 Modules\Achievements\Data\Patch120007.lua
 Modules\Achievements\Data\Patch120100.lua
@@ -98,6 +170,16 @@ Modules\Recipes\Data\Jewelcrafting.lua
 Modules\Recipes\Data\Leatherworking.lua
 Modules\Recipes\Data\Tailoring.lua
 Modules\Recipes\Data\Ownership.lua
+Modules\Recipes\Data\Classic.lua
+Modules\Recipes\Data\TheBurningCrusade.lua
+Modules\Recipes\Data\WrathOfTheLichKing.lua
+Modules\Recipes\Data\Cataclysm.lua
+Modules\Recipes\Data\MistsOfPandaria.lua
+Modules\Recipes\Data\WarlordsOfDraenor.lua
+Modules\Recipes\Data\Legion.lua
+Modules\Recipes\Data\BattleForAzeroth.lua
+Modules\Recipes\Data\Shadowlands.lua
+Modules\Recipes\Data\Dragonflight.lua
 Modules\Recipes\Data\TheWarWithin.lua
 Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua

@@ -1,0 +1,12 @@
+"current_exists","currency_id","name","description","category_id","faction_id","max_quantity","source"
+"True","1166","Timewarped Badge","Earned in Timewalking dungeons. Exchanged for goods from Timewalking Vendors in capital cities.","22","0","0","selected_collectible_source"
+"True","1728","Phantasma","This extinguished strand of anima can be used to gain power within Torghast.
+
+Leaving Torghast will destroy all Phantasma.","142","0","0","selected_collectible_source"
+"True","1754","Argent Commendation","Commendation from the Argent Crusade in northern Icecrown for actions taken against the invading forces of the Shadowlands.","245","0","0","selected_collectible_source"
+"True","1767","Stygia","The byproduct of the violent destruction of a Soul within the Maw.","245","0","0","selected_collectible_source"
+"True","1813","Reservoir Anima","A measure of the anima your covenant has at its disposal.","245","0","200000","selected_collectible_source"
+"True","1816","Sinstone Fragments","Archivist Fane can use these to recreate Inquisitor Sinstones, which will allow you to hunt inquisitors in the Halls of Atonement.","245","0","0","selected_collectible_source"
+"True","1820","Infused Ruby","Used to power shrines and devices that run on anima in Revendreth. With the drought, various dredgers have begun trading goods for them as well.","245","0","100","selected_collectible_source"
+"True","1931","Cataloged Research","As you bring the Archivist relics he will catalog it which will allow you to start Field Studies to learn more about them or identify relics in his care that you can use in the field.","245","0","0","selected_collectible_source"
+"True","1979","Cyphers of the First Ones","|L290-Echoes of the power used to forge reality itself. Can be deciphered at Firim's Cypher Console in Exile's Hollow.|l","245","0","0","selected_collectible_source"

@@ -8,10 +8,29 @@ Scanner.results = {}
 
 -- Count completed tasks in a taskList without re-checking completion
 -- per render. Mirrors the existing taskList shape used by Treasures.
+local function ensureTaskLabel(task)
+    if task.label and task.label ~= "" then return end
+    if task.achievementID and task.criteriaID then
+        local getById = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfoByID)
+                          or GetAchievementCriteriaInfoByID
+        if getById then
+            local ok, name = pcall(getById, task.achievementID, task.criteriaID)
+            if ok and name and name ~= "" then
+                task.label = name
+                return
+            end
+        end
+        task.label = "Criterion " .. task.criteriaID
+    else
+        task.label = "Achievement objective"
+    end
+end
+
 local function countTasks(taskList)
     if not (taskList and taskList.tasks) then return 0, 0 end
     local total, done = 0, 0
     for _, task in ipairs(taskList.tasks) do
+        ensureTaskLabel(task)
         total = total + 1
         if MC.IsTaskCompleted and MC.IsTaskCompleted(task) then
             done = done + 1

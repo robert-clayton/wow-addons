@@ -1,303 +1,303 @@
-"status","current_exists","species_id","name","creature_id","summon_spell_id","item_ids","item_expansion_ids","pet_type_enum","flags","source_type_enum","source_text"
-"guide_confirmed","True","3245","Helpful Workshop Bot","185425","367189","241193","-3","9","2","6","|cFFFFD200World Event:|r Children's Week"
-"snapshot_candidate","True","4450","Remembered Riverpaw","220420","441643","218086","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h|n|n|cFFFFD200Vendor: |rMemory of a Duke|n|cFFFFD200Zone: |rSearing Gorge|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h"
-"snapshot_candidate","True","4451","Remembered Construct","220675","442327","218245","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h|n|n|cFFFFD200Vendor: |rEcho of the Silver Hand|n|cFFFFD200Zone: |rDragonblight|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h"
-"snapshot_candidate","True","4452","Remembered Spawn","220680","442337","218246","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul
+"status","release_decision","current_exists","species_id","name","creature_id","summon_spell_id","item_ids","item_expansion_ids","pet_type_enum","flags","source_type_enum","source_text","audited_release_expansion","audited_source_content_expansion","audit_source_url"
+"guide_confirmed","include_tww","True","3245","Helpful Workshop Bot","185425","367189","241193","-3","9","2","6","|cFFFFD200World Event:|r Children's Week",,,
+"snapshot_candidate","include_tww","True","4450","Remembered Riverpaw","220420","441643","218086","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h|n|n|cFFFFD200Vendor: |rMemory of a Duke|n|cFFFFD200Zone: |rSearing Gorge|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h",,,
+"snapshot_candidate","include_tww","True","4451","Remembered Construct","220675","442327","218245","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h|n|n|cFFFFD200Vendor: |rEcho of the Silver Hand|n|cFFFFD200Zone: |rDragonblight|n|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h",,,
+"snapshot_candidate","include_tww","True","4452","Remembered Spawn","220680","442337","218246","-3","5","82","2","|cFFFFD200Vendor: |rRemembrancer Amuul
 |cFFFFD200Zone: |rDalaran
 |cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h
 
 |cFFFFD200Vendor: |rForgotten Hero
 |cFFFFD200Zone: |rDustwallow Marsh
-|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h"
-"guide_confirmed","True","4455","Rak-Ush Threadling","222046","446820","221486","10","7","2","2","|cFFFFD200Vendor: |rVes'trak|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h"
-"guide_confirmed","True","4456","Arachnoid Hatchling","222066","445486","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps|n"
-"guide_confirmed","True","4457","Chitin Burrower","222071","445450","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps"
-"guide_confirmed","True","4458","Illskitter","222069","445488","221195","10","7","34","0","|cFFFFD200Drop:|r |n"
-"db2_tww_signal","True","4459","Moss Skipper","222081","445493","221492","10","8","34","-1",""
-"guide_confirmed","True","4460","Arathi Chicken","222195","445803","","","2","26","4","|cFFFFD200Pet Battle: |rHallowfall"
-"guide_confirmed","True","4461","Greenlands Chicken","222194","445815","","","2","26","4","|cFFFFD200Pet Battle: |rHallowfall"
-"guide_confirmed","True","4462","Thunder","222203","445822","220782","10","7","18","1","|cFFFFD200Quest: |rTale of Tails|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4463","Tiberius","222200","445823","221848","10","7","2","2","|cFFFFD200Vendor: |rAuralia Steelstrike|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4464","Bean","222202","445824","221850","10","7","2","2","|cFFFFD200Vendor: |rPelefien|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h"
-"guide_confirmed","True","4465","Vanilla","222201","445826","221849","10","7","2","1","|cFFFFD200Quest:|r Save Tomothy|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4466","Argos","222204","445828","221851","-3","7","2","6","|cFFFFD200World Event:|r Children's Week|n"
-"guide_confirmed","True","4467","Hallowed Glowfly","222298","446004","220771","10","2","18","0","|cFFFFD200Gather: |rHallowfall Sparkfly|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4469","Bop","222318","446024","223155","10","2","2","0","|cFFFFD200Drop: |rGoldie Baronbottom|n|cFFFFD200Zone: |rCinderbrew Meadery"
-"guide_confirmed","True","4470","Oop'lajax","222319","446027","224439","10","8","2","0","|cFFFFD200Treasure: |rScary Dark Chest|n|cFFFFD200Zone: |rThe Ringing Deeps"
-"guide_confirmed","True","4471","Aubergine Scootlefish","222325","446030","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"guide_confirmed","True","4472","Shadowbog Hopper","222326","446031","221819","10","8","2","0","|cFFFFD200Treasure:|r Shadowrooted Vine|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4473","Spinner","222339","446046","222966","10","3","2","0","|cFFFFD200Treasure: |rTrapped Trove|n|cFFFFD200Zone: |rCity of Threads"
-"guide_confirmed","True","4474","Anub'Rekyute","222340","446047","222969","10","3","16386","-1",""
-"db2_tww_signal","True","4475","Webbers","222342","446048","222967","10","3","34","-1",""
-"guide_confirmed","True","4476","Itchbite","222341","446049","222968","10","3","2","2","|cFFFFD200Vendor: |rClutchmother Marn'tiq|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h"
-"guide_confirmed","True","4477","Verdant Scootlefish","222344","446050","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"guide_confirmed","True","4478","Caustic Oozeling","222348","446055","","","5","34","2","|cFFFFD200Vendor:|r |n"
-"guide_confirmed","True","4480","Shadowy Oozeling","222351","446057","","","5","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"guide_confirmed","True","4481","Voidling Ooze","222354","446058","","","5","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"guide_confirmed","True","4482","Writhing Transmutagen","222359","446059","223487","10","5","2","10","|cFFFFD200Discovery:|r Khaz Algar Thaumaturgy|n"
-"guide_confirmed","True","4483","Vile Bloodtick","222421","446115","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"guide_confirmed","True","4484","Frenzied Bloodtick","222420","446119","221762","10","4","26","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"guide_confirmed","True","4485","Mossy Snail","222499","446247","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"noncollectible_pet_battle_npc","True","4488","Haywire Servobot","222535","0","248953","","9","33824","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"guide_confirmed","True","4489","Bouncer","222532","446434","222971","10","7","2","0","|cFFFFD200Drop:|r Nerubian Delve's Heavy Trunk"
-"db2_tww_signal","True","4490","Fuzzy","222574","446435","222970;232642","10","7","82","5","|cFFFFD200Achievement:|r Family Battler of Khaz Algar|n|cFFFFD200Category:|r Battle"
-"guide_confirmed","True","4491","Jump Jump","222575","446438","222972","10","7","2","2","|cFFFFD200Vendor: |rLady Vinazian|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h|n|n|cFFFFD200Vendor: |rY'tekhi|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h"
-"guide_confirmed","True","4492","Fringe","222576","446440","222973","10","7","2","2","|cFFFFD200Vendor: |rClutchmother Marn'tiq|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h"
-"db2_tww_signal","True","4493","Redthroat Skipling","222080","446452","221493","10","8","34","-1",""
-"guide_confirmed","True","4495","Skippy","222079","446463","221494","10","8","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h"
-"guide_confirmed","True","4496","Wriggle","222078","446464","221496","10","8","2","0","|cFFFFD200Drop:|r Kobyss Delve's Heavy Trunk|n"
-"db2_tww_signal","True","4497","Waddles","222077","446465","221495","10","8","34","-1",""
-"guide_confirmed","True","4498","Ebon Ploughworm","222582","446490","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps"
-"guide_confirmed","True","4499","Common Ploughworm","222584","446492","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps"
-"guide_confirmed","True","4500","Lil' Bonechewer","222583","446493","225934","10","4","82","5","|cFFFFD200Achievement: |rWorm Theory|n|cFFFFD200Category: |rWar Within"
-"guide_confirmed","True","4502","Kaheti Bull Worm","222585","446491","","","4","34","2","|cFFFFD200Vendor:|r |n"
-"snapshot_candidate","True","4503","Sporbit","222588","446496","","","7","16416","-1",""
-"snapshot_candidate","True","4504","Sporbit","222589","446497","","","7","16416","-1",""
-"snapshot_candidate","True","4505","Sporbit","222591","446499","","","7","16416","-1",""
-"guide_confirmed","True","4506","Violet Sporbit","222590","446498","225337","10","5","2","0","|cFFFFD200Drop:|r Fungarian Delve's Heavy Trunk|n"
-"guide_confirmed","True","4507","Hemospore","222592","446500","","","5","26","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"snapshot_candidate","True","4508","Sporbit","222593","446501","","","7","16416","-1",""
-"snapshot_candidate","True","4509","Sporbit","222594","446502","","","7","16416","-1",""
-"guide_confirmed","True","4510","Winged Arachnoid","222608","446510","","","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, Hallowfall"
-"guide_confirmed","True","4511","Venomwing","222607","446512","221761","10","2","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h"
-"guide_confirmed","True","4512","Sceaduthax","222609","446513","221759","10","2","16386","-1",""
-"guide_confirmed","True","4513","Pillarnest Bonedrinker","222606","446514","221760","10","2","82","0","|cFFFFD200Treasure: |rNest Egg|n|cFFFFD200Zone: |rAzj-Kahet"
-"guide_confirmed","True","4514","Fallowspark Glowfly","222613","446583","","","2","26","4","|cFFFFD200Pet Battle: |rDornogal, Hallowfall, Isle of Dorn, The Ringing Deeps"
-"guide_confirmed","True","4515","Azure Flickerfly","222614","446584","","","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps"
-"guide_confirmed","True","4516","Vibrant Glowfly","222615","446585","228096","0","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps"
-"guide_confirmed","True","4517","Waxwick","222711","446734","221821","10","6","82","5","|cFFFFD200Achievement:|r Khaz Algar Safari|n"
-"guide_confirmed","True","4518","Magmashell Crawler","222713","446744","","","6","26","4","|cFFFFD200Pet Battle: |rDornogal, The Ringing Deeps"
-"guide_confirmed","True","4519","Burntram","222714","446750","221764","10","6","16386","-1",""
-"guide_confirmed","True","4520","Fathom Incher","222717","446755","222964","10","8","2","1","|cFFFFD200Quest:|r Return to the Sea|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4521","Subterranean Dartswog","222736","446767","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Isle of Dorn, The Ringing Deeps"
-"guide_confirmed","True","4522","Troglofrog","222739","446768","228098","0","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Deepforge Golemworks, Hallowfall, Isle of Dorn, The Ringing Deeps"
-"guide_confirmed","True","4524","Starkstripe Hopper","222764","446791","221811","10","8","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h"
-"guide_confirmed","True","4525","Fragrant Stonelamb","222774","446796","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4526","Sandstone Mosswool","222775","446797","","","4","26","4","|cFFFFD200Pet Battle: |rDornogal, Isle of Dorn"
-"guide_confirmed","True","4527","Lil' Moss Rosy","222782","446798","224450","10","4","82","0","|cFFFFD200Treasure: |rMosswool Flower|n|cFFFFD200Zone: |rIsle of Dorn"
-"snapshot_candidate","True","4528","Cobalt Mosswool","222777","446799","","","4","58","-1",""
-"guide_confirmed","True","4529","Shale Mosswool","222778","446800","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4530","Loamy","222779","446801","222965","10","4","2","2","|cFFFFD200Vendor: |rAuditor Balwurz|n|cFFFFD200Zone: |rDornogal|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4533","Meek Bloodlasher","222875","447008","","","6","26","4","|cFFFFD200Pet Battle: |rHallowfall, Isle of Dorn, The Ringing Deeps"
-"guide_confirmed","True","4534","Nightfarm Growthling","222880","447009","221546","10","6","18","0","|cFFFFD200Treasure: |rNightfarm Growthling|n|cFFFFD200Zone: |rHallowfall"
-"guide_confirmed","True","4535","Ghostcap Menace","222877","447010","","","6","26","4","|cFFFFD200Pet Battle: |rHallowfall, Isle of Dorn, The Ringing Deeps"
-"guide_confirmed","True","4536","Blightbud","222879","447012","221548","10","6","2","0","|cFFFFD200Treasure: |rDislodged Blockage|n|cFFFFD200Zone: |rThe Ringing Deeps"
-"guide_confirmed","True","4537","Chester","222883","447016","221820","10","0","2","0","|cFFFFD200Drop:|r Delve's Bountiful Coffer and Hidden Trove|n"
-"guide_confirmed","True","4538","Cobalt Ramolith","223094","447499","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4539","Granite Ramolith","223093","447501","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4540","Alabaster Stonecharger","223092","447502","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4541","Bedrock Stonecharger","223090","447503","","","7","26","4","|cFFFFD200Pet Battle: |rDornogal, Isle of Dorn"
-"guide_confirmed","True","4542","Slim","223138","447900","222980","10","8","82","1","|cFFFFD200Quest:|r Grand, Gutsy Solutions|n|cFFFFD200Zone: |rAzj-Kahet"
-"guide_confirmed","True","4543","Sir Shady Mrrgglton Junior","223135","447902","222974","10","5","2","2","|cFFFFD200Vendor: |rSir Finley Mrrgglton|n|cFFFFD200Zone: |rDornogal|n|cFFFFD200Cost: |r10000|Hcurrency:2803|h|TInterface\ICONS\INV_Misc_ElvenCoins.blp:0|t|h"
-"guide_confirmed","True","4544","Umbral Amalgam","223136","447903","","","5","26","4","|cFFFFD200Pet Battle: |rHallowfall"
-"guide_confirmed","True","4545","Clay Stonecharger","223087","447933","222979","10","7","16386","-1",""
-"guide_confirmed","True","4546","Sandstone Ramolith","223088","447934","222978","10","7","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h"
-"noncollectible_pet_battle_npc","True","4549","Tiny Cragling","223343","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"noncollectible_pet_battle_npc","True","4550","Stratus","223344","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"noncollectible_pet_battle_npc","True","4551","Ridge","223346","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"noncollectible_pet_battle_npc","True","4552","Mini Airship","223347","0","248953","","9","32","4","|cFFFFD200Pet Battle: |rHallowfall"
-"noncollectible_pet_battle_npc","True","4553","Takey-Take","223366","0","248953","","4","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"noncollectible_pet_battle_npc","True","4554","Bubs","223367","0","248953","","4","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"noncollectible_pet_battle_npc","True","4555","Sir Pounce","223368","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rHallowfall"
-"noncollectible_pet_battle_npc","True","4556","Tickler","223399","0","248953","","3","32","4","|cFFFFD200Pet Battle: |rCity of Threads"
-"noncollectible_pet_battle_npc","True","4557","Swoopgrasp","223400","0","248953","","2","32","4","|cFFFFD200Pet Battle: |rCity of Threads"
-"noncollectible_pet_battle_npc","True","4558","Four-Legs","223401","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rCity of Threads"
-"noncollectible_pet_battle_npc","True","4559","Flicker","223402","0","248953","","2","32","4","|cFFFFD200Pet Battle: |rHallowfall"
-"noncollectible_pet_battle_npc","True","4560","Zaedu","223406","0","248953","","7","33824","4","|cFFFFD200Pet Battle: |rAzj-Kahet"
-"noncollectible_pet_battle_npc","True","4561","Awakened Custodian","223407","0","248953","","9","33824","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"noncollectible_pet_battle_npc","True","4562","Guttergunk","223409","0","248953","","6","33824","4","|cFFFFD200Pet Battle: |rHallowfall"
-"noncollectible_pet_battle_npc","True","4564","Rufus","223435","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"guide_confirmed","True","4570","Cinderwold Sizzlestinger","223351","449511","223625","10","6","2","1","|cFFFFD200Quest:|r Home Is Where the Candle Is|n|cFFFFD200Zone: |rThe Ringing Deeps"
-"guide_confirmed","True","4571","Pinkskin Burrower","223706","449369","228097","0","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, The Ringing Deeps"
-"guide_confirmed","True","4573","Skittish Sniffler","223712","449472","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, The Ringing Deeps"
-"guide_confirmed","True","4574","Snuffling","223715","449473","","","7","10","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps"
-"guide_confirmed","True","4575","Sneef","223718","449475","223624","10","7","2","0","|cFFFFD200Drop:|r Kobold Delve's Heavy Trunk"
-"guide_confirmed","True","4576","Guacamole","223717","449477","223623","10","7","2","2","|cFFFFD200Vendor: |rWaxmonger Squick|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4577","Cinderhoney Emberstinger","223698","449513","223626","10","6","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn"
-"guide_confirmed","True","4581","Ruby-Eyed Stagshell","223859","449807","223802","10","7","82","5","|cFFFFD200Achievement: |rA Champion's Tour: The War Within|n|cFFFFD200Category: |rWorld"
-"guide_confirmed","True","4582","Rak-Ush Battleshell","223861","449808","223803;225935","10","7","2","1","|cFFFFD200Quest: |rPermanent Hire|n|cFFFFD200Zone: |rAzj-Kahet"
-"snapshot_candidate","True","4583","Green Stagshell","223863","449809","","","7","58","-1",""
-"snapshot_candidate","True","4584","Tan Stagshell","223862","449810","","","7","58","-1",""
-"guide_confirmed","True","4586","Brown Leafbug","224090","451193","224101","10","4","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h"
-"guide_confirmed","True","4589","Gale","224717","452221","224261","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n"
-"guide_confirmed","True","4590","Flash","224716","452222","224259","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n"
-"guide_confirmed","True","4591","Thundo","224718","452223","224260","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n"
-"snapshot_candidate","True","4592","Misty","224915","452706","224406","0","7","82","2","|cFFFFD200Vendor: |rBobadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h|n|n|cFFFFD200Vendor: |rGrannadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h"
-"snapshot_candidate","True","4593","Craggles","224916","452711","224410","0","7","82","2","|cFFFFD200Vendor: |rBobadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h|n|n|cFFFFD200Vendor: |rGrannadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h"
-"guide_confirmed","True","4594","Dalaran Sewer Turtle","225238","453076","224549","10","8","82","10","|cFFFFD200Treasure:|r Dalaran Sewer Turtle|n|cFFFFD200Zone: |rIsle of Dorn"
-"guide_confirmed","True","4596","Faithful Dog","225537","453741","224766","0","7","146","0","|cFFFFD200Treasure:|r Half-Buried Dog Bowl|n|cFFFFD200Zone: |rIsle of Dorn"
-"guide_confirmed","True","4597","Wobbles","225632","453913","224760","10","6","18","2","|cFFFFD200Vendor: |rGnawbles|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r1|Hitem:224642|h|TInterface\ICONS\INV_Jewelcrafting_NobleTopaz_02.blp:0|t|h"
-"guide_confirmed","True","4598","Coppers","225554","453923","224646","10","0","18","2","|cFFFFD200Vendor: |rGnawbles|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r1|Hitem:224642|h|TInterface\ICONS\INV_Jewelcrafting_NobleTopaz_02.blp:0|t|h"
-"guide_confirmed","True","4599","Mind Slurp","226125","455184","225544","10","5","2","0","|cFFFFD200Treasure: |rMemory Cache|n|cFFFFD200Zone: |rAzj-Kahet"
-"guide_confirmed","True","4602","Claudius","227414","457689","226104","-3","8","16466","11","|cFFFFD200Trading Post|r |n"
-"guide_confirmed","True","4614","Gizmo the Pure","229779","462942","228740","0","4","90","6","|cFFFFD200World Event:|r WoW's Anniversary|n"
-"guide_confirmed","True","4615","Parrlok","229846","463079","228758","-3","0","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4616","Gummi","229860","463148","228765","8","7","16386","7","|cFFFFD200Promotion|r |n"
-"guide_confirmed","True","4617","Thrillbot 9000","229890","463242","228790","8","9","16386","7","|cFFFFD200Promotion|r |n"
-"guide_confirmed","True","4618","Chillbot 9000","229901","463251","228793","8","9","16386","7","|cFFFFD200Promotion|r |n"
-"guide_confirmed","True","4628","Tidal Kroling","230394","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"snapshot_candidate","True","4629","Brrrgl","198987","464798","229366","-3","0","16402","7","|cFFFFD200Promotion|r |n"
-"guide_confirmed","True","4630","Gill'el","230834","464808","229368","-3","0","16466","7","|cFFFFD200Promotion|r"
-"guide_confirmed","True","4631","Foreman","231469","471902","232855","10","7","82","5","|cFFFFD200Achievement: |rFamily Battler of Undermine|n|cFFFFD200Category: |rBattle"
-"guide_confirmed","True","4632","Eepy","231468","471904","232853","10","7","2","2","|cFFFFD200Vendor: |rLab Assistant Laszly|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4633","Scruff","231467","471901","232856","10","7","34","-1",""
-"guide_confirmed","True","4634","Grinner","231465","471903","232854","10","7","34","-1",""
-"guide_confirmed","True","4635","Goggles","231466","471900","232857","10","7","2","6","|cFFFFD200World Event:|r Children's Week|n"
-"guide_confirmed","True","4636","Mutt","231464","471907","232852","10","7","2","0","|cFFFFD200Drop:|r Shipping and Handling|n|cFFFFD200Zone: |rUndermine"
-"guide_confirmed","True","4637","Wavebreaker Mechasaur","231457","471942","232839","10","9","2","2","|cFFFFD200Vendor: |rBoatswain Hardee|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4638","Crimson Mechasaur","231455","471939","232842","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r10|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4639","Viridian Mechasaur","231456","471944","232838","10","9","2","0","|cFFFFD200Drop:|r Sifted Pile of Scrap|n|cFFFFD200Zone: |rUndermine"
-"guide_confirmed","True","4640","Fun-Size Flarendo","231454","471933","232844","10","9","18","2","|cFFFFD200Vendor: |rSnix Longpocket|n|cFFFFD200Zone: |rLiberation of Undermine"
-"guide_confirmed","True","4641","Rocketfist","231450","471918","232851","10","9","2","2","|cFFFFD200Vendor: |rShredz the Scrapper|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4642","Mega-Mecha Gorilla","231451","471935","232843","10","9","18","1","Quest: Mega-Mecha Gorilla|nZone: Undermine"
-"guide_confirmed","True","4643","Tiny Torq","231448","471945","232806","10","9","18","2","|cFFFFD200Vendor: |rSkitto Screwjack|n|cFFFFD200Zone: |rLiberation of Undermine"
-"guide_confirmed","True","4644","Professor Punch","231453","471940","232841","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r8|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4645","Bilgewater Junkhauler","231458","471925","232845","10","9","2","2","|cFFFFD200Vendor: |rRocco Razzboom|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4646","Personal-Use Sapper","231463","471923","232847","10","9","2","0","|cFFFFD200Drop:|r Shipping and Handling|n|cFFFFD200Zone: |rUndermine"
-"guide_confirmed","True","4647","Mr. DELVER","231462","471922","232848","10","9","2","0","|cFFFFD200Drop:|r Goblin Delve's Heavy Trunk"
-"guide_confirmed","True","4648","Steamwheedle Flunkie","231461","471924","232846","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4649","Blackwater Kegmover","231459","471920","232850","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4650","Venture Companyman","231460","471921","232849","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4651","Wily Rat","231477","471893","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4652","Acid-Drenched Rat","231470","471896","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4653","Lab Rat","231479","471895","232859","10","4","2","2","|cFFFFD200Vendor: |rAngelo Rustbin|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r3|Hcurrency:3220|h|TInterface\ICONS\INV_Drink_21.blp:0|t|h"
-"guide_confirmed","True","4654","Underroach","231481","471897","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4655","Cruncher","231548","471899","232858","10","4","2","2","|cFFFFD200Vendor: |rAngelo Rustbin|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r1|Hcurrency:3220|h|TInterface\ICONS\INV_Drink_21.blp:0|t|h"
-"guide_confirmed","True","4656","Bombshell Crab","231550","471909","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4657","Venture Bombshell","231567","471908","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4658","Cave Crab","231570","471910","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4659","Kaja Crab","231572","471911","","","8","26","4","|cFFFFD200Pet Battle: |rZuldazar"
-"guide_confirmed","True","4660","Paleshell Crab","231574","471917","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4661","Mechagopher","231622","471941","232840","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h"
-"guide_confirmed","True","4662","Varmint MK II","231577","471932","","","9","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4663","Lime Roboclucker","231579","471934","","","9","26","4","|cFFFFD200Pet Battle:|r Undermine|n"
-"guide_confirmed","True","4664","Iron Chick","231621","471946","232807","10","9","82","5","|cFFFFD200Achievement: |rHonored with the Cartels
-|cFFFFD200Category: |rWar Within"
-"noncollectible_pet_battle_npc","True","4665","Yellow Tropical Frog","231613","0","248953","","8","42","-1",""
-"guide_confirmed","True","4666","Tropical Frog","231616","471912","","","8","26","4","|cFFFFD200Pet Battle: |rZuldazar"
-"guide_confirmed","True","4667","Spring-Loaded Ribbitron","231684","471943","","","9","26","4","|cFFFFD200Pet Battle:|r Undermine|n"
-"guide_confirmed","True","4668","Ultrahopper EX","231686","471937","","","9","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"snapshot_candidate","True","4669","Bluedoo","231713","466179","229993","-3","5","16466","7","|cFFFFD200Trading Post|r |n"
-"noncollectible_pet_battle_npc","True","4670","Hermes","231756","0","248953","","8","32","-1",""
-"noncollectible_pet_battle_npc","True","4671","Cauldrone","231757","0","248953","","9","32","-1",""
-"noncollectible_pet_battle_npc","True","4672","Finnity","231758","0","248953","","9","32","-1",""
-"noncollectible_pet_battle_npc","True","4673","Crunchy","231760","0","248953","","6","32","-1",""
-"noncollectible_pet_battle_npc","True","4674","Dosh","231762","0","248953","","6","32","-1",""
-"noncollectible_pet_battle_npc","True","4675","FO-MO Mark II","231763","0","248953","","9","32","-1",""
-"noncollectible_pet_battle_npc","True","4676","Bawkinator 2000","231628","0","248953","","9","33824","-1",""
-"noncollectible_pet_battle_npc","True","4677","Black Cave Crab","231627","0","248953","","8","33824","-1",""
-"snapshot_candidate","True","4678","Lil'Doomy","231840","466575","228781","-3","0","82","2","|cFFFFD200Vendor: |rHistorian Ma'di|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r10|Hcurrency:3100|h|TInterface\ICONS\INV_10_DungeonJewelry_Dragon_Necklace_1_Bronze.BLP:0|t|h"
-"snapshot_candidate","True","4679","Lil'Kaz","231841","466576","230011","-3","0","2","0","|cFFFFD200Drop: |rLord Kazzak|n|cFFFFD200Zone: |rBlasted Lands"
-"snapshot_candidate","True","4682","Reven","232502","468186","231294","0","7","82","9","|cFFFFD200In-Game Shop|r|n"
-"guide_confirmed","True","4684","Timbered Sky Snakelet","232533","468228","231310","-3","2","2","9","|cFFFFD200In-Game Shop|r"
-"snapshot_candidate","True","4686","Specter","232579","468317","231356","0","7","82","2","|cFFFFD200Vendor: |rAuzin|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h"
-"snapshot_candidate","True","4689","Karazhan Syphoner","232585","468338","231365","0","5","82","2","|cFFFFD200Vendor: |rCupri|n|cFFFFD200Zone: |rShattrath City|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h"
-"guide_confirmed","True","4690","Razeshi B.","233481","470914","232519","-3","0","16466","7","|cFFFFD200Promotion|r|n"
-"guide_confirmed","True","4691","Grunch","233564","471121","232531","-3","7","16386","1","|cFFFFD200Quest:|r You're A Mean One...|n|cFFFFD200World Event:|r Winter Veil|n"
-"guide_confirmed","True","4692","Sparklesnap","233797","471479","233247","-3","8","16466","0","|cFFFFD200Special Event: |rPlunderstorm"
-"guide_confirmed","True","4693","Alchemical Runoff","231728","471898","","","5","26","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4694","Portentous Present","233965","471751","232653","-3","5","16466","6","|cFFFFD200World Event:|r Winter Veil"
-"guide_confirmed","True","4695","Parley","233967","471798","235988;235989","-3","2","16466","0","|cFFFFD200Special Event: |rPlunderstorm"
-"guide_confirmed","True","4701","Spotty","234071","472194","232895","10","4","2","1","|cFFFFD200Quest:|r Unsolicited Feedback|n|cFFFFD200Zone: |rUndermine"
-"guide_confirmed","True","4702","Rusty Kroling","234097","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"guide_confirmed","True","4703","Cave Kroling","234101","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"guide_confirmed","True","4704","Living Rose","234131","472439","232923","-3","6","16386","6","|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Cost: |r40 |Hitem:49927|h|TInterface\ICONS\INV_ValentinesCard01.BLP:0|t|h"
-"guide_confirmed","True","4708","Marmaduke","234365","472536","233056","10","7","82","10","|cFFFFD200Discovery:|r Siren Isle|n"
-"guide_confirmed","True","4709","Rock Hound Mica","234366","473127","233057","10","7","16496","-1",""
-"guide_confirmed","True","4710","Pillaged Parrot","234367","0","248953","","2","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"guide_confirmed","True","4711","Snapdragon Pup","234369","0","248953","","8","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"snapshot_candidate","True","4717","Wanderer Liu","234439","473300","233190","0","0","16466","7","|cFFFFD200In-Game Shop|r"
-"guide_confirmed","True","4718","Wind-Up Wuffi","234663","473942","233361","-3","9","16466","2","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4719","Wind-Up Woofer","234664","473945","233366","-3","9","16466","2","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4723","Cliffreach Cub","234710","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle"
-"guide_confirmed","True","4724","Battleboar Piglet","234734","0","248953","","7","26","10","|cFFFFD200Pet Battle:|r Siren Isle"
-"guide_confirmed","True","4725","Titan Orb","234908","474730","","","9","16416","0","|cFFFFD200Zone: |rSiren Isle"
-"guide_confirmed","True","4726","Crackleroar","235124","1213821","234379","10","7","2","10","|cFFFFD200Zone: |rSiren Isle|n|cFFFFD200Drop: |rStormtouched Pridetalon"
-"guide_confirmed","True","4727","Skitterbite","235130","1213831","234395","10","7","18","2","|cFFFFD200Vendor: |rSoweezi|n|cFFFFD200Zone: |rSiren Isle|n|cFFFFD200Cost: |r750|Hcurrency:3090|h|TInterface\ICONS\INV_Siren_Isle_FlameBlessed_Iron.BLP:0|t|h"
-"guide_confirmed","True","4728","Teatuft Tamer","235152","1213903","234396","-3","0","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4729","Fullbelly Rollingpaw","235159","1213933","234397","-3","0","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4730","Mech-Friend Maya","236016","1215317","234905","-3","9","16466","9","|cFFFFD200In-Game Shop|r"
-"guide_confirmed","True","4731","Storm-Infused Snapdragon","236040","0","248953","","8","26","4","|cFFFFD200Pet Battle: |rSiren Isle: Seafury Tempest"
-"guide_confirmed","True","4732","Scavenging Snapdragon","236041","0","248953","","8","26","4","|cFFFFD200Pet Battle:|r Siren Isle, Seafury Tempest|n"
-"snapshot_candidate","True","4733","Merriment","236783","1216564","235358","-3","6","16466","7","|cFFFFD200Promotion|r |n"
-"noncollectible_pet_battle_npc","True","4737","Precision Powerdrill","237701","0","248953","","9","33824","4","|cFFFFD200Pet Battle:|r Undermine|n"
-"noncollectible_pet_battle_npc","True","4738","Status Symbol","237706","0","248953","","2","32802","-1",""
-"noncollectible_pet_battle_npc","True","4739","Fancier Rat","237707","0","248953","","4","32802","-1",""
-"noncollectible_pet_battle_npc","True","4740","Handbag Hyena","237708","0","248953","","7","32802","-1",""
-"noncollectible_pet_battle_npc","True","4741","Cannoneer","237713","0","248953","","8","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"noncollectible_pet_battle_npc","True","4742","Lookout","237714","0","248953","","2","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"noncollectible_pet_battle_npc","True","4743","Swabbie","237715","0","248953","","9","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"noncollectible_pet_battle_npc","True","4744","Muddy Croach","237720","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"noncollectible_pet_battle_npc","True","4745","Rusty Croach","237721","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"noncollectible_pet_battle_npc","True","4746","Sooty Croach","237719","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine"
-"guide_confirmed","True","4747","Eye of Chaos","237850","1218378","235794","10","5","2","0","|cFFFFD200Treasure:|r Valeera's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Stormwind (Revisited)"
-"guide_confirmed","True","4748","Void-Scarred Parrot","237852","1218379","235793","10","2","2","0","|cFFFFD200Treasure:|r Wyrmbane's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Stormwind (Revisited)"
-"guide_confirmed","True","4749","Void-Scarred Scorpid","237855","1218381","235795","10","7","2","2","|cFFFFD200Treasure:|r Garona's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Orgrimmar (Revisited)|n"
-"guide_confirmed","True","4750","Void-Scarred Tallstrider Chick","237856","1218383","235797","10","2","2","0","|cFFFFD200Treasure:|r Geya'rah's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Orgrimmar (Revisited)|n"
-"guide_confirmed","True","4755","Gleam","237976","1219016","235909","","6","16416","0","|cFFFFD200Drop: |rGallagio Garbage|n|cFFFFD200Zone: |rUndermine"
-"guide_confirmed","True","4756","Scourge of the Aspects","238064","1219265","235980","10","1","82","2","|cFFFFD200Vendor:|r Torie|n|cFFFFD200Zone:|r Dornogal|n|cFFFFD200Cost: |r5000|Hcurrency:3149|h|TInterface\ICONS\Archaeology_5_0_MoguCoin.blp:0|t|h"
-"guide_confirmed","True","4757","Frumpy Softpaw","238178","1219626","236409","-3","0","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4759","Craboom","238393","1220834","236768","10","8","2","0","|cFFFFD200Drop: |rSwampface|n|cFFFFD200Zone: |rOperation: Floodgate"
-"guide_confirmed","True","4761","Pascal the Wonder Pup","239362","1222968","237357","","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4762","Tock the Clocker Spaniel","240137","1224569","238261","-3","9","16466","9","|cFFFFD200In-Game Shop|r"
-"snapshot_candidate","True","4791","Thrrrdgl","198989","1226305","238796","-3","0","16466","7","|cFFFFD200Promotion|r |n"
-"guide_confirmed","True","4792","Ada the Sweetest","240994","1226412","238825","","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4793","Weechi","241150","1226743","238942","-3","7","82","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4794","Mister Mans","241297","1226942","238986","10","7","18","2","|cFFFFD200Vendor: |rLars Bronsmaelt|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4796","Sa'bak's Blessed","241416","1227251","239082","-3","8","16466","7","|cFFFFD200Promotion|r"
-"snapshot_candidate","True","4801","Tidbit","242176","1229381","239699","0","4","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion"
-"snapshot_candidate","True","4802","Morsel","242180","1229382","239705","0","4","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion"
-"guide_confirmed","True","4804","Swiftpaw","242652","1231110","241188","10","7","18","2","|cFFFFD200Vendor: |rLars Bronsmaelt|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h"
-"guide_confirmed","True","4806","Spicy Mean-Ball","241346","1227066","239019","10","9","16466","7","|cFFFFD200Promotion:|r Dastardly Duos"
-"snapshot_candidate","True","4811","Hopeflutter","244145","1234588","243062","11","1","2","7","|cFFFFD200Promotion|r |n"
-"snapshot_candidate","True","4812","Doomfeathers","244146","1234591","243063","11","1","2","7","|cFFFFD200Promotion|r "
-"guide_confirmed","True","4813","Ixthal the Observling","244263","1234822","243158","10","5","18","0","|cFFFFD200Zone:|r K'aresh"
-"guide_confirmed","True","4824","Baby Karesh Fox - Orange","245204","1237372","244464","","4","16418","-1",""
-"guide_confirmed","True","4825","Veridian Thorntail","245215","1237377","244467","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4826","Scrappy Thorntail","245217","1237379","244468","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4827","Dread Horrorling","245474","1238270","244907","10","5","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4828","Impartial Watcher","245475","1238271","244909","10","5","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4829","Penumbral Terror","245476","1238272","244910","10","5","18","2","|cFFFFD200Vendor: |rShad'anis|n|cFFFFD200Zone: |rK'aresh|n|cFFFFD200Cost: |r4|Hcurrency:3303|h|TInterface\ICONS\INV_Misc_Coin_08.blp:0|t|h"
-"guide_confirmed","True","4830","Rhay'Dahr","245477","1238273","244911","","5","16418","-1",""
-"guide_confirmed","True","4832","Looker Gaz'kreth Jr.","245479","1238275","244913","10","5","2","1","|cFFFFD200Faction: |rManaforge Vandals|n|cFFFFD200Renown: |r13|n|cFFFFD200Location: |rShadow Point"
-"guide_confirmed","True","4833","Xanthous Siphonmite","245480","1238282","244914","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4834","Jimmy","245481","1238283","244915","10","7","18","0","|cFFFFD200Drop: |rMorgil the Netherspawn|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4835","Cyan Siphonmite","245482","1238284","244916","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4836","Vitriolic Inchshifter","245494","1238328","245212","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4837","Worm, Cosmic - Critter (Red)","245495","1238329","245213","","7","16418","9","
-"
-"guide_confirmed","True","4838","Palek'ti, the Mouth of Nothingness","245496","1238330","245214","10","7","18","0","|cFFFFD200Drop: |rMalek'ta|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4839","Shimmering Inchshifter","245497","1238331","245215","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4840","Graceful Cosmic Ray Pup","245498","1238332","245252","10","2","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4841","Starlight","245499","1238333","245255","10","2","82","-1","|cFFFFD200Achievement: |rBounty Seeker
-|cFFFFD200Category: |rWar Within"
-"guide_confirmed","True","4842","Duskthief","245500","1238336","245254","10","2","18","0","|cFFFFD200Drop: |rThe Nightreaver|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4843","Sao'rhon","245501","1238334","245256","10","2","2","0","|cFFFFD200Drop:|r Ethereal Delve's Heavy Trunk|n"
-"guide_confirmed","True","4844","Inquisitive Cosmic Ray Pup","245502","1238335","245253","10","2","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4845","Mr. Long-Legs","245503","1238337","245269","10","4","18","0","|cFFFFD200Treasure: |rAncient Coffer|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4846","Heka'Tarnos, Bringer of Discord","245504","1238338","245272","10","4","18","0","|cFFFFD200Drop: |rHeka'tamos|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4847","Copper Lapbug","245505","1238341","245273","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"guide_confirmed","True","4848","Cerulean Lapbug","245506","1238346","245274","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh"
-"db2_tww_signal","True","4849","Flotsam Harvester","245545","1238913","245543","10","9","82","2","|cFFFFD200Vendor: |rChurbro|n|cFFFFD200Zone: |rZuldazar|n|cFFFFD200Zone: |rBoralus Harbor|n|cFFFFD200World Event:|r Battle for Azeroth Timewalking"
-"snapshot_candidate","True","4851","Tiny Snow Buddy","245616","1238915","245544","-3","6","16466","6","|cFFFFD200World Event:|r Feast of Winter Veil|n"
-"db2_tww_signal","True","4852","Lil' Daz'ti","245647","1239142","245574","10","7","82","6","|cFFFFD200Vendor: |rChurbro|n|cFFFFD200Zone: |rZuldazar|n|cFFFFD200Zone: |rBoralus Harbor|n|cFFFFD200World Event:|r Battle for Azeroth Timewalking|n"
-"guide_confirmed","True","4853","Rustyroot Fel Snooter","246660","1241750","246337","-3","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4854","Duskytooth Fel Snooter","246661","1241756","246339","-3","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4855","Mustyfur Fel Snooter","246662","1241760","246342","-3","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4856","Scruffyhorn Fel Snooter","246663","1241763","246343","-3","7","16466","11","|cFFFFD200Trading Post|r"
-"guide_confirmed","True","4858","Shadefur Brewthief","246983","1242265","246451","-3","0","16466","7","|cFFFFD200Promotion|r"
-"guide_confirmed","True","4859","Zo'ya","247463","1243337","246694","10","7","2","1","|cFFFFD200Faction: |rManaforge Vandals|n|cFFFFD200Renown: |r8|n|cFFFFD200Location: |rShadow Point"
-"guide_confirmed","True","4860","Unfazed Diver","247465","1243343","246723","10","7","2","-1","|cFFFFD200Source: |r???
-|cFFFFD200Zone: |rTazavesh, the Veiled Market"
-"noncollectible_pet_battle_npc","True","4894","Heartglow Listener","251511","0","248953","","2","16466","9","|cFFFFD200In-Game Shop|r"
-"snapshot_candidate","True","4895","Lil' Chompers","251804","1254162","252137","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4896","Slippery Saul","251817","1254201","252193","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4897","Fishmonger May","251819","1254207","252194","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4898","Fishstick Keith","251820","1254208","252195","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4899","Festive Eve","251821","1254212","252199","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4900","Bundled-Up Bob","251822","1254213","252200","-3","8","16466","11","|cFFFFD200Trading Post|r"
-"snapshot_candidate","True","4901","Fledgling Warden's Companion","251889","1254381","252301","0","2","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion"
-"snapshot_candidate","True","4903","Starshard Whelpling","252859","1257069","253699","-3","1","16466","7","|cFFFFD200Promotion|r "
-"snapshot_candidate","True","4907","Lil' Coalee","254356","1261676","257515","0","5","16466","9","|cFFFFD200Promotion|r "
-"snapshot_candidate","True","4908","Lil' Ashlee","254359","1261687","257518","0","5","16466","9","|cFFFFD200Promotion|r "
-"snapshot_candidate","True","4911","P.O.S.T. Assistant","253374","1258852","254876","8","5","82","2","|cFFFFD200Vendor: |rCollector Ta'steld|n|cFFFFD200Zone: |rOribos|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h"
+|cFFFFD200Cost: |r10000|Hcurrency:3089|h|TInterface\ICONS\Spell_Azerite_Essence_15.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4455","Rak-Ush Threadling","222046","446820","221486","10","7","2","2","|cFFFFD200Vendor: |rVes'trak|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4456","Arachnoid Hatchling","222066","445486","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps|n",,,
+"guide_confirmed","include_tww","True","4457","Chitin Burrower","222071","445450","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4458","Illskitter","222069","445488","221195","10","7","34","0","|cFFFFD200Drop:|r |n",,,
+"db2_tww_signal","include_tww","True","4459","Moss Skipper","222081","445493","221492","10","8","34","-1","",,,
+"guide_confirmed","include_tww","True","4460","Arathi Chicken","222195","445803","","","2","26","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4461","Greenlands Chicken","222194","445815","","","2","26","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4462","Thunder","222203","445822","220782","10","7","18","1","|cFFFFD200Quest: |rTale of Tails|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4463","Tiberius","222200","445823","221848","10","7","2","2","|cFFFFD200Vendor: |rAuralia Steelstrike|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4464","Bean","222202","445824","221850","10","7","2","2","|cFFFFD200Vendor: |rPelefien|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4465","Vanilla","222201","445826","221849","10","7","2","1","|cFFFFD200Quest:|r Save Tomothy|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4466","Argos","222204","445828","221851","-3","7","2","6","|cFFFFD200World Event:|r Children's Week|n",,,
+"guide_confirmed","include_tww","True","4467","Hallowed Glowfly","222298","446004","220771","10","2","18","0","|cFFFFD200Gather: |rHallowfall Sparkfly|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4469","Bop","222318","446024","223155","10","2","2","0","|cFFFFD200Drop: |rGoldie Baronbottom|n|cFFFFD200Zone: |rCinderbrew Meadery",,,
+"guide_confirmed","include_tww","True","4470","Oop'lajax","222319","446027","224439","10","8","2","0","|cFFFFD200Treasure: |rScary Dark Chest|n|cFFFFD200Zone: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4471","Aubergine Scootlefish","222325","446030","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4472","Shadowbog Hopper","222326","446031","221819","10","8","2","0","|cFFFFD200Treasure:|r Shadowrooted Vine|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4473","Spinner","222339","446046","222966","10","3","2","0","|cFFFFD200Treasure: |rTrapped Trove|n|cFFFFD200Zone: |rCity of Threads",,,
+"guide_confirmed","include_tww","True","4474","Anub'Rekyute","222340","446047","222969","10","3","16386","-1","",,,
+"post_tww_preload","exclude_cross_expansion","True","4475","Webbers","222342","446048","222967","10","3","34","-1","","midnight","wrath","https://warcraft.wiki.gg/wiki/Family_Battler_of_Northrend"
+"guide_confirmed","include_tww","True","4476","Itchbite","222341","446049","222968","10","3","2","2","|cFFFFD200Vendor: |rClutchmother Marn'tiq|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4477","Verdant Scootlefish","222344","446050","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4478","Caustic Oozeling","222348","446055","","","5","34","2","|cFFFFD200Vendor:|r |n",,,
+"guide_confirmed","include_tww","True","4480","Shadowy Oozeling","222351","446057","","","5","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4481","Voidling Ooze","222354","446058","","","5","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4482","Writhing Transmutagen","222359","446059","223487","10","5","2","10","|cFFFFD200Discovery:|r Khaz Algar Thaumaturgy|n",,,
+"guide_confirmed","include_tww","True","4483","Vile Bloodtick","222421","446115","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4484","Frenzied Bloodtick","222420","446119","221762","10","4","26","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4485","Mossy Snail","222499","446247","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4488","Haywire Servobot","222535","0","248953","","9","33824","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4489","Bouncer","222532","446434","222971","10","7","2","0","|cFFFFD200Drop:|r Nerubian Delve's Heavy Trunk",,,
+"db2_tww_signal","include_tww","True","4490","Fuzzy","222574","446435","222970;232642","10","7","82","5","|cFFFFD200Achievement:|r Family Battler of Khaz Algar|n|cFFFFD200Category:|r Battle",,,
+"guide_confirmed","include_tww","True","4491","Jump Jump","222575","446438","222972","10","7","2","2","|cFFFFD200Vendor: |rLady Vinazian|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h|n|n|cFFFFD200Vendor: |rY'tekhi|n|cFFFFD200Zone: |rAzj-Kahet|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4492","Fringe","222576","446440","222973","10","7","2","2","|cFFFFD200Vendor: |rClutchmother Marn'tiq|n|cFFFFD200Zone: |rCity of Threads|n|cFFFFD200Cost: |r2250|Hcurrency:3056|h|TInterface\ICONS\INV_10_Tailoring_SilkRare_Color3.BLP:0|t|h",,,
+"db2_tww_signal","include_tww","True","4493","Redthroat Skipling","222080","446452","221493","10","8","34","-1","",,,
+"guide_confirmed","include_tww","True","4495","Skippy","222079","446463","221494","10","8","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4496","Wriggle","222078","446464","221496","10","8","2","0","|cFFFFD200Drop:|r Kobyss Delve's Heavy Trunk|n",,,
+"post_tww_preload","exclude_cross_expansion","True","4497","Waddles","222077","446465","221495","10","8","34","-1","","midnight","midnight","https://www.wowhead.com/npc=222077/waddles"
+"guide_confirmed","include_tww","True","4498","Ebon Ploughworm","222582","446490","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4499","Common Ploughworm","222584","446492","","","4","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4500","Lil' Bonechewer","222583","446493","225934","10","4","82","5","|cFFFFD200Achievement: |rWorm Theory|n|cFFFFD200Category: |rWar Within",,,
+"guide_confirmed","include_tww","True","4502","Kaheti Bull Worm","222585","446491","","","4","34","2","|cFFFFD200Vendor:|r |n",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4503","Sporbit","222588","446496","","","7","16416","-1","",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4504","Sporbit","222589","446497","","","7","16416","-1","",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4505","Sporbit","222591","446499","","","7","16416","-1","",,,
+"guide_confirmed","include_tww","True","4506","Violet Sporbit","222590","446498","225337","10","5","2","0","|cFFFFD200Drop:|r Fungarian Delve's Heavy Trunk|n",,,
+"guide_confirmed","include_tww","True","4507","Hemospore","222592","446500","","","5","26","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4508","Sporbit","222593","446501","","","7","16416","-1","",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4509","Sporbit","222594","446502","","","7","16416","-1","",,,
+"guide_confirmed","include_tww","True","4510","Winged Arachnoid","222608","446510","","","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, Hallowfall",,,
+"guide_confirmed","include_tww","True","4511","Venomwing","222607","446512","221761","10","2","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4512","Sceaduthax","222609","446513","221759","10","2","16386","-1","",,,
+"guide_confirmed","include_tww","True","4513","Pillarnest Bonedrinker","222606","446514","221760","10","2","82","0","|cFFFFD200Treasure: |rNest Egg|n|cFFFFD200Zone: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4514","Fallowspark Glowfly","222613","446583","","","2","26","4","|cFFFFD200Pet Battle: |rDornogal, Hallowfall, Isle of Dorn, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4515","Azure Flickerfly","222614","446584","","","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4516","Vibrant Glowfly","222615","446585","228096","0","2","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Shadowvein Extraction Site, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4517","Waxwick","222711","446734","221821","10","6","82","5","|cFFFFD200Achievement:|r Khaz Algar Safari|n",,,
+"guide_confirmed","include_tww","True","4518","Magmashell Crawler","222713","446744","","","6","26","4","|cFFFFD200Pet Battle: |rDornogal, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4519","Burntram","222714","446750","221764","10","6","16386","-1","",,,
+"guide_confirmed","include_tww","True","4520","Fathom Incher","222717","446755","222964","10","8","2","1","|cFFFFD200Quest:|r Return to the Sea|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4521","Subterranean Dartswog","222736","446767","","","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Hallowfall, Isle of Dorn, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4522","Troglofrog","222739","446768","228098","0","8","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, City of Threads, Deepforge Golemworks, Hallowfall, Isle of Dorn, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4524","Starkstripe Hopper","222764","446791","221811","10","8","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4525","Fragrant Stonelamb","222774","446796","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4526","Sandstone Mosswool","222775","446797","","","4","26","4","|cFFFFD200Pet Battle: |rDornogal, Isle of Dorn",,,
+"guide_confirmed","include_tww","True","4527","Lil' Moss Rosy","222782","446798","224450","10","4","82","0","|cFFFFD200Treasure: |rMosswool Flower|n|cFFFFD200Zone: |rIsle of Dorn",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4528","Cobalt Mosswool","222777","446799","","","4","58","-1","",,,
+"guide_confirmed","include_tww","True","4529","Shale Mosswool","222778","446800","","","4","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4530","Loamy","222779","446801","222965","10","4","2","2","|cFFFFD200Vendor: |rAuditor Balwurz|n|cFFFFD200Zone: |rDornogal|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4533","Meek Bloodlasher","222875","447008","","","6","26","4","|cFFFFD200Pet Battle: |rHallowfall, Isle of Dorn, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4534","Nightfarm Growthling","222880","447009","221546","10","6","18","0","|cFFFFD200Treasure: |rNightfarm Growthling|n|cFFFFD200Zone: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4535","Ghostcap Menace","222877","447010","","","6","26","4","|cFFFFD200Pet Battle: |rHallowfall, Isle of Dorn, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4536","Blightbud","222879","447012","221548","10","6","2","0","|cFFFFD200Treasure: |rDislodged Blockage|n|cFFFFD200Zone: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4537","Chester","222883","447016","221820","10","0","2","0","|cFFFFD200Drop:|r Delve's Bountiful Coffer and Hidden Trove|n",,,
+"guide_confirmed","include_tww","True","4538","Cobalt Ramolith","223094","447499","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4539","Granite Ramolith","223093","447501","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4540","Alabaster Stonecharger","223092","447502","","","7","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4541","Bedrock Stonecharger","223090","447503","","","7","26","4","|cFFFFD200Pet Battle: |rDornogal, Isle of Dorn",,,
+"guide_confirmed","include_tww","True","4542","Slim","223138","447900","222980","10","8","82","1","|cFFFFD200Quest:|r Grand, Gutsy Solutions|n|cFFFFD200Zone: |rAzj-Kahet",,,
+"guide_confirmed","include_tww","True","4543","Sir Shady Mrrgglton Junior","223135","447902","222974","10","5","2","2","|cFFFFD200Vendor: |rSir Finley Mrrgglton|n|cFFFFD200Zone: |rDornogal|n|cFFFFD200Cost: |r10000|Hcurrency:2803|h|TInterface\ICONS\INV_Misc_ElvenCoins.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4544","Umbral Amalgam","223136","447903","","","5","26","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"guide_confirmed","include_tww","True","4545","Clay Stonecharger","223087","447933","222979","10","7","16386","-1","",,,
+"guide_confirmed","include_tww","True","4546","Sandstone Ramolith","223088","447934","222978","10","7","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4549","Tiny Cragling","223343","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4550","Stratus","223344","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4551","Ridge","223346","0","248953","","6","32","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4552","Mini Airship","223347","0","248953","","9","32","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4553","Takey-Take","223366","0","248953","","4","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4554","Bubs","223367","0","248953","","4","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4555","Sir Pounce","223368","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4556","Tickler","223399","0","248953","","3","32","4","|cFFFFD200Pet Battle: |rCity of Threads",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4557","Swoopgrasp","223400","0","248953","","2","32","4","|cFFFFD200Pet Battle: |rCity of Threads",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4558","Four-Legs","223401","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rCity of Threads",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4559","Flicker","223402","0","248953","","2","32","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4560","Zaedu","223406","0","248953","","7","33824","4","|cFFFFD200Pet Battle: |rAzj-Kahet",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4561","Awakened Custodian","223407","0","248953","","9","33824","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4562","Guttergunk","223409","0","248953","","6","33824","4","|cFFFFD200Pet Battle: |rHallowfall",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4564","Rufus","223435","0","248953","","7","32","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4570","Cinderwold Sizzlestinger","223351","449511","223625","10","6","2","1","|cFFFFD200Quest:|r Home Is Where the Candle Is|n|cFFFFD200Zone: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4571","Pinkskin Burrower","223706","449369","228097","0","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4573","Skittish Sniffler","223712","449472","","","7","26","4","|cFFFFD200Pet Battle: |rAzj-Kahet, The Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4574","Snuffling","223715","449473","","","7","10","4","|cFFFFD200Pet Battle: |rThe Ringing Deeps",,,
+"guide_confirmed","include_tww","True","4575","Sneef","223718","449475","223624","10","7","2","0","|cFFFFD200Drop:|r Kobold Delve's Heavy Trunk",,,
+"guide_confirmed","include_tww","True","4576","Guacamole","223717","449477","223623","10","7","2","2","|cFFFFD200Vendor: |rWaxmonger Squick|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4577","Cinderhoney Emberstinger","223698","449513","223626","10","6","26","4","|cFFFFD200Pet Battle: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4581","Ruby-Eyed Stagshell","223859","449807","223802","10","7","82","5","|cFFFFD200Achievement: |rA Champion's Tour: The War Within|n|cFFFFD200Category: |rWorld",,,
+"guide_confirmed","include_tww","True","4582","Rak-Ush Battleshell","223861","449808","223803;225935","10","7","2","1","|cFFFFD200Quest: |rPermanent Hire|n|cFFFFD200Zone: |rAzj-Kahet",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4583","Green Stagshell","223863","449809","","","7","58","-1","",,,
+"snapshot_candidate","exclude_unobtainable_or_internal","True","4584","Tan Stagshell","223862","449810","","","7","58","-1","",,,
+"guide_confirmed","include_tww","True","4586","Brown Leafbug","224090","451193","224101","10","4","2","2","|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r50|Hitem:163036|h|TInterface\ICONS\INV_Currency_PetBattle.BLP:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4589","Gale","224717","452221","224261","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n",,,
+"guide_confirmed","exclude_policy_external","True","4590","Flash","224716","452222","224259","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n",,,
+"guide_confirmed","exclude_policy_external","True","4591","Thundo","224718","452223","224260","10","2","82","7","|cFFFFD200Promotion:|r The War Within Epic Edition|n",,,
+"snapshot_candidate","include_tww","True","4592","Misty","224915","452706","224406","0","7","82","2","|cFFFFD200Vendor: |rBobadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h|n|n|cFFFFD200Vendor: |rGrannadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h",,,
+"snapshot_candidate","include_tww","True","4593","Craggles","224916","452711","224410","0","7","82","2","|cFFFFD200Vendor: |rBobadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h|n|n|cFFFFD200Vendor: |rGrannadormu|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4594","Dalaran Sewer Turtle","225238","453076","224549","10","8","82","10","|cFFFFD200Treasure:|r Dalaran Sewer Turtle|n|cFFFFD200Zone: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4596","Faithful Dog","225537","453741","224766","0","7","146","0","|cFFFFD200Treasure:|r Half-Buried Dog Bowl|n|cFFFFD200Zone: |rIsle of Dorn",,,
+"guide_confirmed","include_tww","True","4597","Wobbles","225632","453913","224760","10","6","18","2","|cFFFFD200Vendor: |rGnawbles|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r1|Hitem:224642|h|TInterface\ICONS\INV_Jewelcrafting_NobleTopaz_02.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4598","Coppers","225554","453923","224646","10","0","18","2","|cFFFFD200Vendor: |rGnawbles|n|cFFFFD200Zone: |rThe Ringing Deeps|n|cFFFFD200Cost: |r1|Hitem:224642|h|TInterface\ICONS\INV_Jewelcrafting_NobleTopaz_02.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4599","Mind Slurp","226125","455184","225544","10","5","2","0","|cFFFFD200Treasure: |rMemory Cache|n|cFFFFD200Zone: |rAzj-Kahet",,,
+"guide_confirmed","exclude_policy_external","True","4602","Claudius","227414","457689","226104","-3","8","16466","11","|cFFFFD200Trading Post|r |n",,,
+"guide_confirmed","include_tww","True","4614","Gizmo the Pure","229779","462942","228740","0","4","90","6","|cFFFFD200World Event:|r WoW's Anniversary|n",,,
+"guide_confirmed","exclude_policy_external","True","4615","Parrlok","229846","463079","228758","-3","0","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4616","Gummi","229860","463148","228765","8","7","16386","7","|cFFFFD200Promotion|r |n",,,
+"guide_confirmed","exclude_policy_external","True","4617","Thrillbot 9000","229890","463242","228790","8","9","16386","7","|cFFFFD200Promotion|r |n",,,
+"guide_confirmed","exclude_policy_external","True","4618","Chillbot 9000","229901","463251","228793","8","9","16386","7","|cFFFFD200Promotion|r |n",,,
+"guide_confirmed","include_tww","True","4628","Tidal Kroling","230394","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"snapshot_candidate","exclude_policy_external","True","4629","Brrrgl","198987","464798","229366","-3","0","16402","7","|cFFFFD200Promotion|r |n",,,
+"guide_confirmed","exclude_policy_external","True","4630","Gill'el","230834","464808","229368","-3","0","16466","7","|cFFFFD200Promotion|r",,,
+"guide_confirmed","include_tww","True","4631","Foreman","231469","471902","232855","10","7","82","5","|cFFFFD200Achievement: |rFamily Battler of Undermine|n|cFFFFD200Category: |rBattle",,,
+"guide_confirmed","include_tww","True","4632","Eepy","231468","471904","232853","10","7","2","2","|cFFFFD200Vendor: |rLab Assistant Laszly|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4633","Scruff","231467","471901","232856","10","7","34","-1","",,,
+"guide_confirmed","include_tww","True","4634","Grinner","231465","471903","232854","10","7","34","-1","",,,
+"guide_confirmed","include_tww","True","4635","Goggles","231466","471900","232857","10","7","2","6","|cFFFFD200World Event:|r Children's Week|n",,,
+"guide_confirmed","include_tww","True","4636","Mutt","231464","471907","232852","10","7","2","0","|cFFFFD200Drop:|r Shipping and Handling|n|cFFFFD200Zone: |rUndermine",,,
+"guide_confirmed","include_tww","True","4637","Wavebreaker Mechasaur","231457","471942","232839","10","9","2","2","|cFFFFD200Vendor: |rBoatswain Hardee|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4638","Crimson Mechasaur","231455","471939","232842","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r10|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4639","Viridian Mechasaur","231456","471944","232838","10","9","2","0","|cFFFFD200Drop:|r Sifted Pile of Scrap|n|cFFFFD200Zone: |rUndermine",,,
+"guide_confirmed","include_tww","True","4640","Fun-Size Flarendo","231454","471933","232844","10","9","18","2","|cFFFFD200Vendor: |rSnix Longpocket|n|cFFFFD200Zone: |rLiberation of Undermine",,,
+"guide_confirmed","include_tww","True","4641","Rocketfist","231450","471918","232851","10","9","2","2","|cFFFFD200Vendor: |rShredz the Scrapper|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4642","Mega-Mecha Gorilla","231451","471935","232843","10","9","18","1","Quest: Mega-Mecha Gorilla|nZone: Undermine",,,
+"guide_confirmed","include_tww","True","4643","Tiny Torq","231448","471945","232806","10","9","18","2","|cFFFFD200Vendor: |rSkitto Screwjack|n|cFFFFD200Zone: |rLiberation of Undermine",,,
+"guide_confirmed","include_tww","True","4644","Professor Punch","231453","471940","232841","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r8|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4645","Bilgewater Junkhauler","231458","471925","232845","10","9","2","2","|cFFFFD200Vendor: |rRocco Razzboom|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4646","Personal-Use Sapper","231463","471923","232847","10","9","2","0","|cFFFFD200Drop:|r Shipping and Handling|n|cFFFFD200Zone: |rUndermine",,,
+"guide_confirmed","include_tww","True","4647","Mr. DELVER","231462","471922","232848","10","9","2","0","|cFFFFD200Drop:|r Goblin Delve's Heavy Trunk",,,
+"guide_confirmed","include_tww","True","4648","Steamwheedle Flunkie","231461","471924","232846","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4649","Blackwater Kegmover","231459","471920","232850","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4650","Venture Companyman","231460","471921","232849","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4651","Wily Rat","231477","471893","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4652","Acid-Drenched Rat","231470","471896","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4653","Lab Rat","231479","471895","232859","10","4","2","2","|cFFFFD200Vendor: |rAngelo Rustbin|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r3|Hcurrency:3220|h|TInterface\ICONS\INV_Drink_21.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4654","Underroach","231481","471897","","","4","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4655","Cruncher","231548","471899","232858","10","4","2","2","|cFFFFD200Vendor: |rAngelo Rustbin|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r1|Hcurrency:3220|h|TInterface\ICONS\INV_Drink_21.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4656","Bombshell Crab","231550","471909","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4657","Venture Bombshell","231567","471908","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4658","Cave Crab","231570","471910","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4659","Kaja Crab","231572","471911","","","8","26","4","|cFFFFD200Pet Battle: |rZuldazar",,,
+"guide_confirmed","include_tww","True","4660","Paleshell Crab","231574","471917","","","8","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4661","Mechagopher","231622","471941","232840","10","9","2","2","|cFFFFD200Vendor: |rDitty Fuzeboy|n|cFFFFD200Zone: |rUndermine|n|cFFFFD200Cost: |r5|Hitem:234741|h|TInterface\ICONS\INV_Engineering_90_Toolbox_Orange.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4662","Varmint MK II","231577","471932","","","9","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4663","Lime Roboclucker","231579","471934","","","9","26","4","|cFFFFD200Pet Battle:|r Undermine|n",,,
+"guide_confirmed","include_tww","True","4664","Iron Chick","231621","471946","232807","10","9","82","5","|cFFFFD200Achievement: |rHonored with the Cartels
+|cFFFFD200Category: |rWar Within",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4665","Yellow Tropical Frog","231613","0","248953","","8","42","-1","",,,
+"guide_confirmed","include_tww","True","4666","Tropical Frog","231616","471912","","","8","26","4","|cFFFFD200Pet Battle: |rZuldazar",,,
+"guide_confirmed","include_tww","True","4667","Spring-Loaded Ribbitron","231684","471943","","","9","26","4","|cFFFFD200Pet Battle:|r Undermine|n",,,
+"guide_confirmed","include_tww","True","4668","Ultrahopper EX","231686","471937","","","9","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"snapshot_candidate","exclude_policy_external","True","4669","Bluedoo","231713","466179","229993","-3","5","16466","7","|cFFFFD200Trading Post|r |n",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4670","Hermes","231756","0","248953","","8","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4671","Cauldrone","231757","0","248953","","9","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4672","Finnity","231758","0","248953","","9","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4673","Crunchy","231760","0","248953","","6","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4674","Dosh","231762","0","248953","","6","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4675","FO-MO Mark II","231763","0","248953","","9","32","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4676","Bawkinator 2000","231628","0","248953","","9","33824","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4677","Black Cave Crab","231627","0","248953","","8","33824","-1","",,,
+"snapshot_candidate","include_tww","True","4678","Lil'Doomy","231840","466575","228781","-3","0","82","2","|cFFFFD200Vendor: |rHistorian Ma'di|n|cFFFFD200Zone: |rTanaris|n|cFFFFD200Cost: |r10|Hcurrency:3100|h|TInterface\ICONS\INV_10_DungeonJewelry_Dragon_Necklace_1_Bronze.BLP:0|t|h",,,
+"snapshot_candidate","include_tww","True","4679","Lil'Kaz","231841","466576","230011","-3","0","2","0","|cFFFFD200Drop: |rLord Kazzak|n|cFFFFD200Zone: |rBlasted Lands",,,
+"snapshot_candidate","exclude_policy_external","True","4682","Reven","232502","468186","231294","0","7","82","9","|cFFFFD200In-Game Shop|r|n",,,
+"guide_confirmed","exclude_policy_external","True","4684","Timbered Sky Snakelet","232533","468228","231310","-3","2","2","9","|cFFFFD200In-Game Shop|r",,,
+"snapshot_candidate","include_tww","True","4686","Specter","232579","468317","231356","0","7","82","2","|cFFFFD200Vendor: |rAuzin|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h",,,
+"snapshot_candidate","include_tww","True","4689","Karazhan Syphoner","232585","468338","231365","0","5","82","2","|cFFFFD200Vendor: |rCupri|n|cFFFFD200Zone: |rShattrath City|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4690","Razeshi B.","233481","470914","232519","-3","0","16466","7","|cFFFFD200Promotion|r|n",,,
+"guide_confirmed","include_tww","True","4691","Grunch","233564","471121","232531","-3","7","16386","1","|cFFFFD200Quest:|r You're A Mean One...|n|cFFFFD200World Event:|r Winter Veil|n",,,
+"guide_confirmed","include_tww","True","4692","Sparklesnap","233797","471479","233247","-3","8","16466","0","|cFFFFD200Special Event: |rPlunderstorm",,,
+"guide_confirmed","include_tww","True","4693","Alchemical Runoff","231728","471898","","","5","26","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4694","Portentous Present","233965","471751","232653","-3","5","16466","6","|cFFFFD200World Event:|r Winter Veil",,,
+"guide_confirmed","include_tww","True","4695","Parley","233967","471798","235988;235989","-3","2","16466","0","|cFFFFD200Special Event: |rPlunderstorm",,,
+"guide_confirmed","include_tww","True","4701","Spotty","234071","472194","232895","10","4","2","1","|cFFFFD200Quest:|r Unsolicited Feedback|n|cFFFFD200Zone: |rUndermine",,,
+"guide_confirmed","include_tww","True","4702","Rusty Kroling","234097","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"guide_confirmed","include_tww","True","4703","Cave Kroling","234101","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"guide_confirmed","include_tww","True","4704","Living Rose","234131","472439","232923","-3","6","16386","6","|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Cost: |r40 |Hitem:49927|h|TInterface\ICONS\INV_ValentinesCard01.BLP:0|t|h",,,
+"guide_confirmed","include_tww","True","4708","Marmaduke","234365","472536","233056","10","7","82","10","|cFFFFD200Discovery:|r Siren Isle|n",,,
+"guide_confirmed","include_tww","True","4709","Rock Hound Mica","234366","473127","233057","10","7","16496","-1","",,,
+"guide_confirmed","include_tww","True","4710","Pillaged Parrot","234367","0","248953","","2","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"guide_confirmed","include_tww","True","4711","Snapdragon Pup","234369","0","248953","","8","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"snapshot_candidate","exclude_policy_external","True","4717","Wanderer Liu","234439","473300","233190","0","0","16466","7","|cFFFFD200In-Game Shop|r",,,
+"guide_confirmed","exclude_policy_external","True","4718","Wind-Up Wuffi","234663","473942","233361","-3","9","16466","2","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4719","Wind-Up Woofer","234664","473945","233366","-3","9","16466","2","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","include_tww","True","4723","Cliffreach Cub","234710","0","248953","","7","26","4","|cFFFFD200Pet Battle: |rSiren Isle",,,
+"guide_confirmed","include_tww","True","4724","Battleboar Piglet","234734","0","248953","","7","26","10","|cFFFFD200Pet Battle:|r Siren Isle",,,
+"guide_confirmed","include_tww","True","4725","Titan Orb","234908","474730","","","9","16416","0","|cFFFFD200Zone: |rSiren Isle",,,
+"guide_confirmed","include_tww","True","4726","Crackleroar","235124","1213821","234379","10","7","2","10","|cFFFFD200Zone: |rSiren Isle|n|cFFFFD200Drop: |rStormtouched Pridetalon",,,
+"guide_confirmed","include_tww","True","4727","Skitterbite","235130","1213831","234395","10","7","18","2","|cFFFFD200Vendor: |rSoweezi|n|cFFFFD200Zone: |rSiren Isle|n|cFFFFD200Cost: |r750|Hcurrency:3090|h|TInterface\ICONS\INV_Siren_Isle_FlameBlessed_Iron.BLP:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4728","Teatuft Tamer","235152","1213903","234396","-3","0","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4729","Fullbelly Rollingpaw","235159","1213933","234397","-3","0","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4730","Mech-Friend Maya","236016","1215317","234905","-3","9","16466","9","|cFFFFD200In-Game Shop|r",,,
+"guide_confirmed","include_tww","True","4731","Storm-Infused Snapdragon","236040","0","248953","","8","26","4","|cFFFFD200Pet Battle: |rSiren Isle: Seafury Tempest",,,
+"guide_confirmed","include_tww","True","4732","Scavenging Snapdragon","236041","0","248953","","8","26","4","|cFFFFD200Pet Battle:|r Siren Isle, Seafury Tempest|n",,,
+"snapshot_candidate","exclude_policy_external","True","4733","Merriment","236783","1216564","235358","-3","6","16466","7","|cFFFFD200Promotion|r |n",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4737","Precision Powerdrill","237701","0","248953","","9","33824","4","|cFFFFD200Pet Battle:|r Undermine|n",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4738","Status Symbol","237706","0","248953","","2","32802","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4739","Fancier Rat","237707","0","248953","","4","32802","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4740","Handbag Hyena","237708","0","248953","","7","32802","-1","",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4741","Cannoneer","237713","0","248953","","8","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4742","Lookout","237714","0","248953","","2","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4743","Swabbie","237715","0","248953","","9","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4744","Muddy Croach","237720","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4745","Rusty Croach","237721","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4746","Sooty Croach","237719","0","248953","","4","32802","4","|cFFFFD200Pet Battle: |rUndermine",,,
+"guide_confirmed","include_tww","True","4747","Eye of Chaos","237850","1218378","235794","10","5","2","0","|cFFFFD200Treasure:|r Valeera's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Stormwind (Revisited)",,,
+"guide_confirmed","include_tww","True","4748","Void-Scarred Parrot","237852","1218379","235793","10","2","2","0","|cFFFFD200Treasure:|r Wyrmbane's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Stormwind (Revisited)",,,
+"guide_confirmed","include_tww","True","4749","Void-Scarred Scorpid","237855","1218381","235795","10","7","2","2","|cFFFFD200Treasure:|r Garona's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Orgrimmar (Revisited)|n",,,
+"guide_confirmed","include_tww","True","4750","Void-Scarred Tallstrider Chick","237856","1218383","235797","10","2","2","0","|cFFFFD200Treasure:|r Geya'rah's Corrupted Chest|n|cFFFFD200Zone:|r Vision of Orgrimmar (Revisited)|n",,,
+"guide_confirmed","include_tww","True","4755","Gleam","237976","1219016","235909","","6","16416","0","|cFFFFD200Drop: |rGallagio Garbage|n|cFFFFD200Zone: |rUndermine",,,
+"guide_confirmed","include_tww","True","4756","Scourge of the Aspects","238064","1219265","235980","10","1","82","2","|cFFFFD200Vendor:|r Torie|n|cFFFFD200Zone:|r Dornogal|n|cFFFFD200Cost: |r5000|Hcurrency:3149|h|TInterface\ICONS\Archaeology_5_0_MoguCoin.blp:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4757","Frumpy Softpaw","238178","1219626","236409","-3","0","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","include_tww","True","4759","Craboom","238393","1220834","236768","10","8","2","0","|cFFFFD200Drop: |rSwampface|n|cFFFFD200Zone: |rOperation: Floodgate",,,
+"guide_confirmed","exclude_policy_external","True","4761","Pascal the Wonder Pup","239362","1222968","237357","","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4762","Tock the Clocker Spaniel","240137","1224569","238261","-3","9","16466","9","|cFFFFD200In-Game Shop|r",,,
+"snapshot_candidate","exclude_policy_external","True","4791","Thrrrdgl","198989","1226305","238796","-3","0","16466","7","|cFFFFD200Promotion|r |n",,,
+"guide_confirmed","exclude_policy_external","True","4792","Ada the Sweetest","240994","1226412","238825","","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4793","Weechi","241150","1226743","238942","-3","7","82","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","include_tww","True","4794","Mister Mans","241297","1226942","238986","10","7","18","2","|cFFFFD200Vendor: |rLars Bronsmaelt|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4796","Sa'bak's Blessed","241416","1227251","239082","-3","8","16466","7","|cFFFFD200Promotion|r",,,
+"snapshot_candidate","include_tww","True","4801","Tidbit","242176","1229381","239699","0","4","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion",,,
+"snapshot_candidate","include_tww","True","4802","Morsel","242180","1229382","239705","0","4","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion",,,
+"guide_confirmed","include_tww","True","4804","Swiftpaw","242652","1231110","241188","10","7","18","2","|cFFFFD200Vendor: |rLars Bronsmaelt|n|cFFFFD200Zone: |rHallowfall|n|cFFFFD200Cost: |r6500|Hcurrency:2815|h|TInterface\ICONS\SPELL_AZERITE_ESSENCE14.BLP:0|t|h",,,
+"guide_confirmed","exclude_policy_external","True","4806","Spicy Mean-Ball","241346","1227066","239019","10","9","16466","7","|cFFFFD200Promotion:|r Dastardly Duos",,,
+"snapshot_candidate","exclude_policy_external","True","4811","Hopeflutter","244145","1234588","243062","11","1","2","7","|cFFFFD200Promotion|r |n",,,
+"snapshot_candidate","exclude_policy_external","True","4812","Doomfeathers","244146","1234591","243063","11","1","2","7","|cFFFFD200Promotion|r ",,,
+"guide_confirmed","include_tww","True","4813","Ixthal the Observling","244263","1234822","243158","10","5","18","0","|cFFFFD200Zone:|r K'aresh",,,
+"guide_confirmed","include_tww","True","4824","Baby Karesh Fox - Orange","245204","1237372","244464","","4","16418","-1","",,,
+"guide_confirmed","include_tww","True","4825","Veridian Thorntail","245215","1237377","244467","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4826","Scrappy Thorntail","245217","1237379","244468","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4827","Dread Horrorling","245474","1238270","244907","10","5","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4828","Impartial Watcher","245475","1238271","244909","10","5","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4829","Penumbral Terror","245476","1238272","244910","10","5","18","2","|cFFFFD200Vendor: |rShad'anis|n|cFFFFD200Zone: |rK'aresh|n|cFFFFD200Cost: |r4|Hcurrency:3303|h|TInterface\ICONS\INV_Misc_Coin_08.blp:0|t|h",,,
+"guide_confirmed","include_tww","True","4830","Rhay'Dahr","245477","1238273","244911","","5","16418","-1","",,,
+"guide_confirmed","include_tww","True","4832","Looker Gaz'kreth Jr.","245479","1238275","244913","10","5","2","1","|cFFFFD200Faction: |rManaforge Vandals|n|cFFFFD200Renown: |r13|n|cFFFFD200Location: |rShadow Point",,,
+"guide_confirmed","include_tww","True","4833","Xanthous Siphonmite","245480","1238282","244914","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4834","Jimmy","245481","1238283","244915","10","7","18","0","|cFFFFD200Drop: |rMorgil the Netherspawn|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4835","Cyan Siphonmite","245482","1238284","244916","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4836","Vitriolic Inchshifter","245494","1238328","245212","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","exclude_unobtainable_or_internal","True","4837","Worm, Cosmic - Critter (Red)","245495","1238329","245213","","7","16418","9","
+",,,
+"guide_confirmed","include_tww","True","4838","Palek'ti, the Mouth of Nothingness","245496","1238330","245214","10","7","18","0","|cFFFFD200Drop: |rMalek'ta|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4839","Shimmering Inchshifter","245497","1238331","245215","10","7","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4840","Graceful Cosmic Ray Pup","245498","1238332","245252","10","2","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4841","Starlight","245499","1238333","245255","10","2","82","-1","|cFFFFD200Achievement: |rBounty Seeker
+|cFFFFD200Category: |rWar Within",,,
+"guide_confirmed","include_tww","True","4842","Duskthief","245500","1238336","245254","10","2","18","0","|cFFFFD200Drop: |rThe Nightreaver|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4843","Sao'rhon","245501","1238334","245256","10","2","2","0","|cFFFFD200Drop:|r Ethereal Delve's Heavy Trunk|n",,,
+"guide_confirmed","include_tww","True","4844","Inquisitive Cosmic Ray Pup","245502","1238335","245253","10","2","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4845","Mr. Long-Legs","245503","1238337","245269","10","4","18","0","|cFFFFD200Treasure: |rAncient Coffer|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4846","Heka'Tarnos, Bringer of Discord","245504","1238338","245272","10","4","18","0","|cFFFFD200Drop: |rHeka'tamos|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4847","Copper Lapbug","245505","1238341","245273","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"guide_confirmed","include_tww","True","4848","Cerulean Lapbug","245506","1238346","245274","10","4","2","0","|cFFFFD200Drop:|r Vibrating Box|n|cFFFFD200Zone: |rK'aresh",,,
+"db2_tww_signal","include_tww","True","4849","Flotsam Harvester","245545","1238913","245543","10","9","82","2","|cFFFFD200Vendor: |rChurbro|n|cFFFFD200Zone: |rZuldazar|n|cFFFFD200Zone: |rBoralus Harbor|n|cFFFFD200World Event:|r Battle for Azeroth Timewalking",,,
+"snapshot_candidate","include_tww","True","4851","Tiny Snow Buddy","245616","1238915","245544","-3","6","16466","6","|cFFFFD200World Event:|r Feast of Winter Veil|n",,,
+"db2_tww_signal","include_tww","True","4852","Lil' Daz'ti","245647","1239142","245574","10","7","82","6","|cFFFFD200Vendor: |rChurbro|n|cFFFFD200Zone: |rZuldazar|n|cFFFFD200Zone: |rBoralus Harbor|n|cFFFFD200World Event:|r Battle for Azeroth Timewalking|n",,,
+"guide_confirmed","exclude_policy_external","True","4853","Rustyroot Fel Snooter","246660","1241750","246337","-3","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4854","Duskytooth Fel Snooter","246661","1241756","246339","-3","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4855","Mustyfur Fel Snooter","246662","1241760","246342","-3","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4856","Scruffyhorn Fel Snooter","246663","1241763","246343","-3","7","16466","11","|cFFFFD200Trading Post|r",,,
+"guide_confirmed","exclude_policy_external","True","4858","Shadefur Brewthief","246983","1242265","246451","-3","0","16466","7","|cFFFFD200Promotion|r",,,
+"guide_confirmed","include_tww","True","4859","Zo'ya","247463","1243337","246694","10","7","2","1","|cFFFFD200Faction: |rManaforge Vandals|n|cFFFFD200Renown: |r8|n|cFFFFD200Location: |rShadow Point",,,
+"guide_confirmed","include_tww","True","4860","Unfazed Diver","247465","1243343","246723","10","7","2","-1","|cFFFFD200Source: |r???
+|cFFFFD200Zone: |rTazavesh, the Veiled Market",,,
+"noncollectible_pet_battle_npc","exclude_noncollectible","True","4894","Heartglow Listener","251511","0","248953","","2","16466","9","|cFFFFD200In-Game Shop|r",,,
+"snapshot_candidate","exclude_policy_external","True","4895","Lil' Chompers","251804","1254162","252137","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","exclude_policy_external","True","4896","Slippery Saul","251817","1254201","252193","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","exclude_policy_external","True","4897","Fishmonger May","251819","1254207","252194","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","exclude_policy_external","True","4898","Fishstick Keith","251820","1254208","252195","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","exclude_policy_external","True","4899","Festive Eve","251821","1254212","252199","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","exclude_policy_external","True","4900","Bundled-Up Bob","251822","1254213","252200","-3","8","16466","11","|cFFFFD200Trading Post|r",,,
+"snapshot_candidate","include_tww","True","4901","Fledgling Warden's Companion","251889","1254381","252301","0","2","16466","6","|cFFFFD200World Event:|r WoW Remix: Legion",,,
+"snapshot_candidate","exclude_policy_external","True","4903","Starshard Whelpling","252859","1257069","253699","-3","1","16466","7","|cFFFFD200Promotion|r ",,,
+"snapshot_candidate","exclude_policy_external","True","4907","Lil' Coalee","254356","1261676","257515","0","5","16466","9","|cFFFFD200Promotion|r ",,,
+"snapshot_candidate","exclude_policy_external","True","4908","Lil' Ashlee","254359","1261687","257518","0","5","16466","9","|cFFFFD200Promotion|r ",,,
+"snapshot_candidate","include_tww","True","4911","P.O.S.T. Assistant","253374","1258852","254876","8","5","82","2","|cFFFFD200Vendor: |rCollector Ta'steld|n|cFFFFD200Zone: |rOribos|n|cFFFFD200Cost: |r2200|Hcurrency:1166|h|TInterface\ICONS\PVECurrency-Justice.blp:0|t|h",,,

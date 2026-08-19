@@ -1,6 +1,6 @@
 # Collectionist
 
-Collectionist tracks Midnight mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements in one panel. Its eight tracker tabs group collectibles by their actual source, and clicking a row routes you toward the next objective.
+Collectionist tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements from Classic through Midnight in one panel. Its eight tracker tabs group collectibles by their actual source, and clicking a row routes you toward the next objective.
 
 Hover an entry for costs, requirements, progress, and drop information. Shift-click copies its Wowhead URL; Ctrl-click prints its IDs and source data for troubleshooting. TomTom is optional—without it, Collectionist falls back to Blizzard map pins.
 

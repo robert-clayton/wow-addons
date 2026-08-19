@@ -1,0 +1,67 @@
+local _, MC = ...
+
+-- Cataclysm mounts. Generated from the exact 48-row release manifest.
+MC.RegisterContent("cata", "mounts", {
+    { source = "reputation", mounts = {
+        { mountID = 394, name = "Drake of the West Wind", source = "reputation", sourceInfo = "|cFFFFD200Vendor: |rQuartermaster Brazie|n|cFFFFD200Zone: |rTol Barad Peninsula|n|cFFFFD200Faction: |rBaradin's Wardens - Exalted" },
+        { mountID = 398, name = "Brown Riding Camel", source = "reputation", sourceInfo = "|cFFFFD200Vendor: |rBlacksmith Abasi|n|cFFFFD200Zone: |rUldum|n|cFFFFD200Faction: |rRamkahen - Exalted|n|cFFFFD200Cost: |r100|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 399, name = "Tan Riding Camel", source = "reputation", sourceInfo = "|cFFFFD200Vendor: |rBlacksmith Abasi|n|cFFFFD200Zone: |rUldum|n|cFFFFD200Faction: |rRamkahen - Exalted|n|cFFFFD200Cost: |r100|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 405, name = "Spectral Steed", source = "reputation", sourceInfo = "|cFFFFD200Vendor: |rQuartermaster Brazie|n|cFFFFD200Zone: |rTol Barad Peninsula|n|cFFFFD200Faction: |rBaradin's Wardens - Exalted|n|cFFFFD200Cost: |r165|Hcurrency:391|h|Tinterface\\icons\\achievement_zone_tolbarad.blp:0|t|h" },
+        { mountID = 406, name = "Spectral Wolf", source = "reputation", sourceInfo = "|cFFFFD200Vendor: |rPogg|n|cFFFFD200Zone: |rTol Barad Peninsula|n|cFFFFD200Faction: |rHellscream's Reach - Exalted|n|cFFFFD200Cost: |r165|Hcurrency:391|h|TInterface\\ICONS\\Achievement_Zone_TolBarad.blp:0|t|h" },
+    } },
+    { source = "drop", mounts = {
+        { mountID = 350, name = "Sunwalker Kodo", source = "drop", sourceInfo = "|cFFFFD200Paladin|r" },
+        { mountID = 351, name = "Great Sunwalker Kodo", source = "drop", sourceInfo = "|cFFFFD200Paladin|r" },
+        { mountID = 367, name = "Exarch's Elekk", source = "drop", sourceInfo = "|cFFFFD200Legacy|r" },
+        { mountID = 368, name = "Great Exarch's Elekk", source = "drop", sourceInfo = "|cFFFFD200Quest|r |n" },
+        { mountID = 393, name = "Phosphorescent Stone Drake", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Aeonaxx|n|cFFFFD200Location:|r Deepholm|n" },
+        { mountID = 395, name = "Drake of the North Wind", source = "drop", sourceInfo = "|cFFFFD200Drop: |rAltairus|n|cFFFFD200Zone: |rThe Vortex Pinnacle" },
+        { mountID = 396, name = "Drake of the South Wind", source = "drop", sourceInfo = "|cFFFFD200Drop: |rAl'Akir|n|cFFFFD200Zone: |rThrone of the Four Winds" },
+        { mountID = 397, name = "Vitreous Stone Drake", source = "drop", sourceInfo = "|cFFFFD200Drop: |rSlabhide|n|cFFFFD200Zone: |rThe Stonecore" },
+        { mountID = 400, name = "Grey Riding Camel", source = "drop", sourceInfo = "|cFFFFD200Drop: |rDormus the Camel-Hoarder|n|cFFFFD200Zone: |rFeralas" },
+        { mountID = 410, name = "Armored Razzashi Raptor", source = "drop", sourceInfo = "|cFFFFD200Drop: |rBloodlord Mandokir|n|cFFFFD200Zone: |rZul'Gurub" },
+        { mountID = 411, name = "Swift Zulian Panther", source = "drop", sourceInfo = "|cFFFFD200Drop: |rHigh Priestess Kilnara|n|cFFFFD200Zone: |rZul'Gurub" },
+        { mountID = 415, name = "Pureblood Fire Hawk", source = "drop", sourceInfo = "|cFFFFD200Drop: |rRagnaros|n|cFFFFD200Zone: |rFirelands" },
+        { mountID = 419, name = "Amani Battle Bear", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Kasha's Bag" },
+        { mountID = 420, name = "Subdued Seahorse", source = "drop", sourceInfo = "|cFFFFD200Drop: |rPoseidus|n|cFFFFD200Zone: |rVashj'ir" },
+        { mountID = 424, name = "Vicious Gladiator's Twilight Drake", source = "drop", sourceInfo = "|cFFFFD200Legacy|r", unavailable = true },
+        { mountID = 425, name = "Flametalon of Alysrazor", source = "drop", sourceInfo = "|cFFFFD200Drop: |rAlysrazor|n|cFFFFD200Zone: |rFirelands" },
+        { mountID = 428, name = "Ruthless Gladiator's Twilight Drake", source = "drop", sourceInfo = "|cFFFFD200Legacy|r", unavailable = true },
+        { mountID = 442, name = "Blazing Drake", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Elementium Fragment|n|cFFFFD200Location:|r Dragon Soul" },
+        { mountID = 444, name = "Life-Binder's Handmaiden", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Elementium Fragment|n|cFFFFD200Location:|r Dragon Soul|n|n" },
+        { mountID = 445, name = "Experiment 12-B", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Lesser Cache of the Aspects|n|cFFFFD200Location:|r Dragon Soul|n" },
+        { mountID = 467, name = "Cataclysmic Gladiator's Twilight Drake", source = "drop", sourceInfo = "|cFFFFD200Legacy|r", unavailable = true },
+    } },
+    { source = "achievement", mounts = {
+        { mountID = 391, name = "Volcanic Stone Drake", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rGlory of the Cataclysm Hero|n|cFFFFD200Category: |rDungeons & Raids" },
+        { mountID = 392, name = "Drake of the East Wind", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rGlory of the Cataclysm Raider|n|cFFFFD200Category: |rDungeons & Raids" },
+        { mountID = 413, name = "Flameward Hippogryph", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rThe Molten Front Offensive|n|cFFFFD200Category: |rCataclysm" },
+        { mountID = 417, name = "Corrupted Fire Hawk", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rGlory of the Firelands Raider|n|cFFFFD200Category: |rDungeons & Raids" },
+        { mountID = 422, name = "Vicious War Steed", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rVeteran of the Alliance II|n|cFFFFD200Category: |rRated Battleground" },
+        { mountID = 423, name = "Vicious War Wolf", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rVeteran of the Horde II|n|cFFFFD200Category: |rRated Battleground" },
+        { mountID = 443, name = "Twilight Harbinger", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rGlory of the Dragon Soul Raider|n|cFFFFD200Category: |rDungeons & Raids" },
+    } },
+    { source = "quest", mounts = {
+        { mountID = 373, name = "Vashj'ir Seahorse", source = "quest", sourceInfo = "|cFFFFD200Quest: |rThe Abyssal Ride|n|cFFFFD200Zone: |rKelp'thar Forest" },
+    } },
+    { source = "profession", mounts = {
+        { mountID = 386, name = "Fossilized Raptor", source = "profession", sourceInfo = "|cFFFFD200Profession: |rArchaeology" },
+        { mountID = 404, name = "Ultramarine Qiraji Battle Tank", source = "profession", sourceInfo = "|cFFFFD200Profession: |rArchaeology" },
+        { mountID = 407, name = "Sandstone Drake", source = "profession", sourceInfo = "|cFFFFD200Profession: |rAlchemy" },
+    } },
+    { source = "vendor", mounts = {
+        { mountID = 388, name = "Goblin Trike", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rKall Worthaton|n|cFFFFD200Zone: |rOrgrimmar|n|cFFFFD200Cost: |r1|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 389, name = "Goblin Turbo-Trike", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rKall Worthaton|n|cFFFFD200Zone: |rOrgrimmar|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 401, name = "Dark Phoenix", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGuild Vendors|n|cFFFFD200Cost: |r3000|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 403, name = "Golden King", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r1500|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 409, name = "Kor'kron Annihilator", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGoram|n|cFFFFD200Zone: |rOrgrimmar|n|cFFFFD200Cost: |r1500|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 429, name = "Swift Forest Strider", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rLhara|n|cFFFFD200Zone: |rDarkmoon Island|n|cFFFFD200Cost: |r180 |Hcurrency:515|h|Tinterface\\icons\\inv_misc_ticket_darkmoon_01.blp:0|t|h|n" },
+        { mountID = 430, name = "Swift Springstrider", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rNoblegarden Merchant|n|cFFFFD200Zone: |rDurotar, Eversong Woods (Burning Crusade), Mulgore, Tirisfal Glades, Azuremyst Isle, |nDun Morogh, Elwynn Forest, Teldrassil|n|cFFFFD200Cost: |r500|TINTERFACE\\ICONS\\ACHIEVEMENT_NOBLEGARDEN_CHOCOLATE_EGG.BLP:0|t|n" },
+        { mountID = 434, name = "Darkmoon Dancing Bear", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rLhara|n|cFFFFD200Zone: |rDarkmoon Island|n|cFFFFD200Cost: |r180|Hcurrency:515|h|TINTERFACE\\ICONS\\INV_Misc_Ticket_Darkmoon_01.blp:0|t|h|n|n" },
+        { mountID = 435, name = "Mountain Horse", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rAstrid Langstrump|n|cFFFFD200Zone: |rDarnassus|n|cFFFFD200Cost: |r1|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { mountID = 436, name = "Swift Mountain Horse", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rAstrid Langstrump|n|cFFFFD200Zone: |rDarnassus|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+    } },
+    { source = "worldevent", mounts = {
+        { mountID = 431, name = "Swift Lovebird", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air|n|n|cFFFFD200Vendor: |rLovely Merchant (Alliance)|n|cFFFFD200Zone: |rStormwind City|n|cFFFFD200Cost: |r270|Hitem:49927|h|TINTERFACE\\ICONS\\INV_VALENTINESCARD01.BLP:0|t|h|n|n|cFFFFD200Vendor: |rLovely Merchant (Horde)|n|cFFFFD200Zone: |rOrgrimmar|n|cFFFFD200Cost: |r270|Hitem:49927|h|TINTERFACE\\ICONS\\INV_VALENTINESCARD01.BLP:0|t|h" },
+    } },
+})

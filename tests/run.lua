@@ -246,6 +246,1296 @@ do
     equal(MC.GetLatestExpansion(), "midnight", "global latest expansion")
 end
 
+-- Shadowlands, Dragonflight, and TWW content are additive, collision-free,
+-- and use the same expansion visibility/account-score contract as Midnight.
+do
+    local createFrame = newFrameFactory()
+    CreateFrame = createFrame
+    SlashCmdList = {}
+    StaticPopupDialogs = {}
+
+    local MC = {}
+    loadAddon("addons/Collectionist/Core.lua", MC)
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    loadAddon("addons/Collectionist/Data/Locations.lua", MC)
+    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
+
+    local recipeBaseFiles = {
+        "Alchemy.lua", "Blacksmithing.lua", "Cooking.lua",
+        "Enchanting.lua", "Engineering.lua", "Inscription.lua",
+        "Jewelcrafting.lua", "Leatherworking.lua", "Tailoring.lua",
+    }
+    for _, name in ipairs(recipeBaseFiles) do
+        loadAddon("addons/Collectionist/Modules/Recipes/Data/" .. name, MC)
+    end
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Ownership.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Classic.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/TheBurningCrusade.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/WrathOfTheLichKing.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Cataclysm.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/MistsOfPandaria.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/WarlordsOfDraenor.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Legion.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/BattleForAzeroth.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Shadowlands.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Dragonflight.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/TheWarWithin.lua", MC)
+
+    equal(MC.GetLatestExpansion("recipes"), "midnight",
+        "recipe Current expansion after TWW registration")
+
+    local recipeSeen, classicRecipes, tbcRecipes, wrathRecipes, cataRecipes, mopRecipes, wodRecipes, legionRecipes, bfaRecipes, slRecipes, dfRecipes, twwRecipes, midnightRecipes = {}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
+        for _, category in ipairs(MC[dataKey]) do
+            truthy(category.expansion == "classic" or category.expansion == "tbc" or category.expansion == "wrath" or category.expansion == "cata" or category.expansion == "mop" or category.expansion == "wod" or category.expansion == "legion"
+                or category.expansion == "bfa"
+                or category.expansion == "shadowlands"
+                or category.expansion == "df" or category.expansion == "tww"
+                or category.expansion == "midnight",
+                "recipe category expansion stamp")
+            for _, recipe in ipairs(category.recipes) do
+                truthy(not recipeSeen[recipe.id],
+                    "duplicate cross-expansion recipe spell ID " .. recipe.id)
+                recipeSeen[recipe.id] = true
+                equal(recipe.expansion, category.expansion,
+                    "recipe/category expansion agreement " .. recipe.id)
+                if recipe.expansion == "classic" then
+                    classicRecipes = classicRecipes + 1
+                elseif recipe.expansion == "tbc" then
+                    tbcRecipes = tbcRecipes + 1
+                elseif recipe.expansion == "wrath" then
+                    wrathRecipes = wrathRecipes + 1
+                elseif recipe.expansion == "cata" then
+                    cataRecipes = cataRecipes + 1
+                elseif recipe.expansion == "mop" then
+                    mopRecipes = mopRecipes + 1
+                elseif recipe.expansion == "wod" then
+                    wodRecipes = wodRecipes + 1
+                elseif recipe.expansion == "legion" then
+                    legionRecipes = legionRecipes + 1
+                elseif recipe.expansion == "bfa" then
+                    bfaRecipes = bfaRecipes + 1
+                elseif recipe.expansion == "shadowlands" then
+                    slRecipes = slRecipes + 1
+                elseif recipe.expansion == "df" then
+                    dfRecipes = dfRecipes + 1
+                elseif recipe.expansion == "tww" then
+                    twwRecipes = twwRecipes + 1
+                else
+                    midnightRecipes = midnightRecipes + 1
+                end
+            end
+        end
+    end
+    equal(classicRecipes, 1223, "Classic recipe count")
+    equal(tbcRecipes, 755, "TBC recipe count")
+    equal(wrathRecipes, 860, "Wrath recipe count")
+    equal(cataRecipes, 690, "Cataclysm recipe count")
+    equal(mopRecipes, 978, "Pandaria recipe count")
+    equal(wodRecipes, 337, "Warlords recipe count")
+    equal(legionRecipes, 773, "Legion recipe count")
+    equal(bfaRecipes, 1253, "BFA recipe count")
+    equal(slRecipes, 634, "Shadowlands recipe count")
+    equal(dfRecipes, 973, "Dragonflight recipe count")
+    equal(twwRecipes, 696, "TWW recipe count")
+    truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
+
+    MC.db = { expansionFilter = { mode = "single", single = "tww" },
+              disabledExpansions = {} }
+    for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
+        for _, category in ipairs(MC[dataKey]) do
+            equal(MC.IsGroupVisible(category, "recipes"), category.expansion == "tww",
+                "TWW-only recipe visibility")
+        end
+    end
+    MC.db.expansionFilter.mode = "current"
+    for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
+        for _, category in ipairs(MC[dataKey]) do
+            equal(MC.IsGroupVisible(category, "recipes"), category.expansion == "midnight",
+                "Current recipe visibility")
+        end
+    end
+
+    local oldDB, oldIsPlayerSpell = CollectionistDB, IsPlayerSpell
+    CollectionistDB = { recipesLearned = {} }
+    IsPlayerSpell = function(spellID)
+        return spellID == 425137 or spellID == 1230866
+    end
+    MC.modulesByKey.recipes = { db = {}, professions = { [171] = {} } }
+    loadAddon("addons/Collectionist/Modules/Recipes/Scanner.lua", MC)
+    local scanner = MC.modulesByKey.recipes.Scanner
+
+    MC.db.expansionFilter = { mode = "single", single = "classic" }
+    scanner:Scan()
+    local classicResult = scanner.results[171]
+    equal(classicResult.total, 114, "Classic-only Alchemy visible count")
+    equal(classicResult.learnedCount, 0, "Classic-only Alchemy learned count")
+    equal(classicResult.learnedCountAll, 2, "account Alchemy learned count from Classic view")
+
+    MC.db.expansionFilter = { mode = "single", single = "tbc" }
+    scanner:Scan()
+    local tbcResult = scanner.results[171]
+    equal(tbcResult.total, 75, "TBC-only Alchemy visible count")
+    equal(tbcResult.learnedCount, 0, "TBC-only Alchemy learned count")
+    equal(tbcResult.learnedCountAll, 2, "account Alchemy learned count from TBC view")
+
+    MC.db.expansionFilter = { mode = "single", single = "wrath" }
+    scanner:Scan()
+    local wrathResult = scanner.results[171]
+    equal(wrathResult.total, 69, "Wrath-only Alchemy visible count")
+    equal(wrathResult.learnedCount, 0, "Wrath-only Alchemy learned count")
+    equal(wrathResult.learnedCountAll, 2, "account Alchemy learned count from Wrath view")
+
+    MC.db.expansionFilter = { mode = "single", single = "cata" }
+    scanner:Scan()
+    local cataResult = scanner.results[171]
+    equal(cataResult.total, 47, "Cataclysm-only Alchemy visible count")
+    equal(cataResult.learnedCount, 0, "Cataclysm-only Alchemy learned count")
+    equal(cataResult.learnedCountAll, 2, "account Alchemy learned count from Cataclysm view")
+
+    MC.db.expansionFilter = { mode = "single", single = "mop" }
+    scanner:Scan()
+    local mopResult = scanner.results[171]
+    equal(mopResult.total, 37, "Pandaria-only Alchemy visible count")
+    equal(mopResult.learnedCount, 0, "Pandaria-only Alchemy learned count")
+    equal(mopResult.learnedCountAll, 2, "account Alchemy learned count from Pandaria view")
+
+    MC.db.expansionFilter = { mode = "single", single = "wod" }
+    scanner:Scan()
+    local wodResult = scanner.results[171]
+    equal(wodResult.total, 53, "Warlords-only Alchemy visible count")
+    equal(wodResult.learnedCount, 0, "Warlords-only Alchemy learned count")
+    equal(wodResult.learnedCountAll, 2, "account Alchemy learned count from Warlords view")
+
+    MC.db.expansionFilter = { mode = "single", single = "legion" }
+    scanner:Scan()
+    local legionResult = scanner.results[171]
+    equal(legionResult.total, 85, "Legion-only Alchemy visible count")
+    equal(legionResult.learnedCount, 0, "Legion-only Alchemy learned count")
+    equal(legionResult.learnedCountAll, 2, "account Alchemy learned count from Legion view")
+
+    MC.db.expansionFilter = { mode = "single", single = "bfa" }
+    scanner:Scan()
+    local bfaResult = scanner.results[171]
+    equal(bfaResult.total, 150, "BFA-only Alchemy visible count")
+    equal(bfaResult.learnedCount, 0, "BFA-only Alchemy learned count")
+    equal(bfaResult.learnedCountAll, 2, "account Alchemy learned count from BFA view")
+
+    MC.db.expansionFilter = { mode = "single", single = "shadowlands" }
+    scanner:Scan()
+    local slResult = scanner.results[171]
+    equal(slResult.total, 66, "Shadowlands-only Alchemy visible count")
+    equal(slResult.learnedCount, 0, "Shadowlands-only Alchemy learned count")
+    equal(slResult.learnedCountAll, 2, "account Alchemy learned count from Shadowlands view")
+
+    MC.db.expansionFilter = { mode = "single", single = "df" }
+    scanner:Scan()
+    local dfResult = scanner.results[171]
+    equal(dfResult.total, 68, "Dragonflight-only Alchemy visible count")
+    equal(dfResult.learnedCount, 0, "Dragonflight-only Alchemy learned count")
+    equal(dfResult.learnedCountAll, 2, "account Alchemy learned count from DF view")
+
+    MC.db.expansionFilter = { mode = "single", single = "tww" }
+    scanner:Scan()
+    local twwResult = scanner.results[171]
+    equal(twwResult.total, 53, "TWW-only Alchemy visible count")
+    equal(twwResult.learnedCount, 1, "TWW-only Alchemy learned count")
+    equal(twwResult.learnedCountAll, 2, "account Alchemy learned count")
+    local accountTotal, accountScore = twwResult.totalAll, twwResult.score
+
+    MC.db.expansionFilter = { mode = "single", single = "midnight" }
+    scanner:Scan()
+    local midnightResult = scanner.results[171]
+    truthy(midnightResult.total > 0 and midnightResult.total ~= twwResult.total,
+        "Midnight-only Alchemy visible count")
+    equal(midnightResult.learnedCount, 1, "Midnight-only Alchemy learned count")
+    equal(midnightResult.totalAll, accountTotal,
+        "recipe account denominator ignores browse filter")
+    equal(midnightResult.learnedCountAll, 2,
+        "recipe account ownership ignores browse filter")
+    equal(midnightResult.score, accountScore,
+        "recipe account score ignores browse filter")
+
+    MC.db.disabledExpansions = { tww = true }
+    scanner:Scan()
+    equal(scanner.results[171].score, accountScore,
+        "recipe account score ignores expansion browse toggle")
+
+    local oldUnitClass, oldUnitName, oldGetRealmName =
+        UnitClass, UnitName, GetRealmName
+    UnitClass = function() return "Mage", "MAGE" end
+    UnitName = function() return "Crafter" end
+    GetRealmName = function() return "Test Realm" end
+    MC.modules = { { key = "recipes", Scanner = scanner } }
+    loadAddon("addons/Collectionist/Modules/Roster/Init.lua", MC)
+    local me = MC.GetMeRosterEntry()
+    equal(me.counts.recipes.total, accountTotal,
+        "shared recipe denominator ignores browse filter")
+    equal(me.counts.recipes.collected, 2,
+        "shared recipe ownership ignores browse filter")
+    UnitClass, UnitName, GetRealmName =
+        oldUnitClass, oldUnitName, oldGetRealmName
+    CollectionistDB, IsPlayerSpell = oldDB, oldIsPlayerSpell
+
+    local classicUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    local tbcUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 169, 199, 201, 207, 223, 241 }) do
+        tbcUnavailableIDs.mounts[id] = true
+    end
+    local wrathUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 263, 266, 313, 317, 340, 342, 343, 344, 345, 358 }) do
+        wrathUnavailableIDs.mounts[id] = true
+    end
+    local cataUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 424, 428, 467 }) do
+        cataUnavailableIDs.mounts[id] = true
+    end
+    for _, id in ipairs({ 46709, 54653, 54651 }) do
+        cataUnavailableIDs.toys[id] = true
+    end
+    local mopUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 503, 518, 519, 520, 541, 550, 558, 562, 563, 564 }) do
+        mopUnavailableIDs.mounts[id] = true
+    end
+    local wodUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 606, 651, 654, 759, 760, 761, 764 }) do
+        wodUnavailableIDs.mounts[id] = true
+    end
+    local legionUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 848, 849, 850, 851, 852, 853, 878, 948, 978 }) do
+        legionUnavailableIDs.mounts[id] = true
+    end
+    for _, id in ipairs({ 1889, 2022 }) do
+        legionUnavailableIDs.pets[id] = true
+    end
+    local bfaUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 1030, 1031, 1032, 1035, 1220, 1265, 1326 }) do
+        bfaUnavailableIDs.mounts[id] = true
+    end
+    local dfUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    local slUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
+    for _, id in ipairs({ 1363, 1405, 1419, 1480, 1520, 1544, 1552, 1572, 1576, 1599 }) do
+        slUnavailableIDs.mounts[id] = true
+    end
+    slUnavailableIDs.pets[3046] = true
+    for _, id in ipairs({
+        482, 994, 1259, 1660, 1681, 1725, 1739, 1801, 1822, 1831, 1959,
+        2055, 2060, 2063, 2064, 2065, 2067, 2068, 2069, 2070, 2071, 2072,
+        2073, 2074, 2075, 2076, 2077, 2078, 2080, 2081, 2083, 2084, 2085,
+        2086, 2087, 2088, 2089, 2090, 2091, 2118, 2142, 2143,
+    }) do dfUnavailableIDs.mounts[id] = true end
+    for _, id in ipairs({ 4265, 4425, 4426, 4435, 4579, 4580 }) do
+        dfUnavailableIDs.pets[id] = true
+    end
+    for _, id in ipairs({ 206267, 206008, 206343, 210497, 211869, 211946, 212337, 170197 }) do
+        dfUnavailableIDs.toys[id] = true
+    end
+
+    local dataFixtures = {
+        mounts = {
+            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 93, cataCount = 48, mopCount = 89, wodCount = 68, legionCount = 124, bfaCount = 140, slCount = 179, dfCount = 161, twwCount = 186,
+            files = {
+                "Modules/Mounts/Data/Classic.lua",
+                "Modules/Mounts/Data/TheBurningCrusade.lua",
+                "Modules/Mounts/Data/WrathOfTheLichKing.lua",
+                "Modules/Mounts/Data/Cataclysm.lua",
+                "Modules/Mounts/Data/MistsOfPandaria.lua",
+                "Modules/Mounts/Data/WarlordsOfDraenor.lua",
+                "Modules/Mounts/Data/Legion.lua",
+                "Modules/Mounts/Data/BattleForAzeroth.lua",
+                "Modules/Mounts/Data/Shadowlands.lua",
+                "Modules/Mounts/Data/Dragonflight.lua", "Modules/Mounts/Data/TheWarWithin.lua",
+                "Modules/Mounts/Data/Mounts.lua",
+                "Modules/Mounts/Data/Patch120007.lua", "Modules/Mounts/Data/Patch120100.lua",
+            },
+        },
+        pets = {
+            field = "PetData", list = "pets", id = "speciesID", classicCount = 59, tbcCount = 65, wrathCount = 50, cataCount = 42, mopCount = 152, wodCount = 84, legionCount = 106, bfaCount = 236, slCount = 175, dfCount = 164, twwCount = 200,
+            files = {
+                "Modules/Pets/Data/Classic.lua",
+                "Modules/Pets/Data/TheBurningCrusade.lua",
+                "Modules/Pets/Data/WrathOfTheLichKing.lua",
+                "Modules/Pets/Data/Cataclysm.lua",
+                "Modules/Pets/Data/MistsOfPandaria.lua",
+                "Modules/Pets/Data/WarlordsOfDraenor.lua",
+                "Modules/Pets/Data/Legion.lua",
+                "Modules/Pets/Data/BattleForAzeroth.lua",
+                "Modules/Pets/Data/Shadowlands.lua",
+                "Modules/Pets/Data/Dragonflight.lua", "Modules/Pets/Data/TheWarWithin.lua",
+                "Modules/Pets/Data/Pets.lua",
+                "Modules/Pets/Data/Patch120007.lua", "Modules/Pets/Data/Patch120100.lua",
+            },
+        },
+        toys = {
+            field = "ToyData", list = "toys", id = "itemID", classicCount = 10, tbcCount = 22, wrathCount = 36, cataCount = 40, mopCount = 59, wodCount = 91, legionCount = 154, bfaCount = 135, slCount = 115, dfCount = 171, twwCount = 99,
+            files = {
+                "Modules/Toys/Data/Classic.lua",
+                "Modules/Toys/Data/TheBurningCrusade.lua",
+                "Modules/Toys/Data/WrathOfTheLichKing.lua",
+                "Modules/Toys/Data/Cataclysm.lua",
+                "Modules/Toys/Data/MistsOfPandaria.lua",
+                "Modules/Toys/Data/WarlordsOfDraenor.lua",
+                "Modules/Toys/Data/Legion.lua",
+                "Modules/Toys/Data/BattleForAzeroth.lua",
+                "Modules/Toys/Data/Shadowlands.lua",
+                "Modules/Toys/Data/Dragonflight.lua", "Modules/Toys/Data/TheWarWithin.lua",
+                "Modules/Toys/Data/Toys.lua",
+                "Modules/Toys/Data/Patch120007.lua", "Modules/Toys/Data/Patch120100.lua",
+            },
+        },
+        decorations = {
+            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 136, slCount = 26, dfCount = 76, twwCount = 108,
+            files = {
+                "Modules/Decorations/Data/Classic.lua",
+                "Modules/Decorations/Data/TheBurningCrusade.lua",
+                "Modules/Decorations/Data/WrathOfTheLichKing.lua",
+                "Modules/Decorations/Data/Cataclysm.lua",
+                "Modules/Decorations/Data/MistsOfPandaria.lua",
+                "Modules/Decorations/Data/WarlordsOfDraenor.lua",
+                "Modules/Decorations/Data/Legion.lua",
+                "Modules/Decorations/Data/BattleForAzeroth.lua",
+                "Modules/Decorations/Data/Shadowlands.lua",
+                "Modules/Decorations/Data/Dragonflight.lua", "Modules/Decorations/Data/TheWarWithin.lua",
+                "Modules/Decorations/Data/Decorations.lua",
+                "Modules/Decorations/Data/Patch120007.lua", "Modules/Decorations/Data/Patch120100.lua",
+            },
+        },
+        achievements = {
+            field = "AchievementData", list = "achievements", id = "achievementID", classicCount = 199, tbcCount = 99, wrathCount = 384, cataCount = 233, mopCount = 407, wodCount = 402, legionCount = 305, bfaCount = 452, slCount = 419, dfCount = 569, twwCount = 381,
+            files = {
+                "Modules/Achievements/Data/Classic.lua",
+                "Modules/Achievements/Data/TheBurningCrusade.lua",
+                "Modules/Achievements/Data/WrathOfTheLichKing.lua",
+                "Modules/Achievements/Data/Cataclysm.lua",
+                "Modules/Achievements/Data/MistsOfPandaria.lua",
+                "Modules/Achievements/Data/WarlordsOfDraenor.lua",
+                "Modules/Achievements/Data/Legion.lua",
+                "Modules/Achievements/Data/BattleForAzeroth.lua",
+                "Modules/Achievements/Data/Shadowlands.lua",
+                "Modules/Achievements/Data/Dragonflight.lua", "Modules/Achievements/Data/TheWarWithin.lua",
+                "Modules/Achievements/Data/Achievements.lua",
+                "Modules/Achievements/Data/Patch120007.lua", "Modules/Achievements/Data/Patch120100.lua",
+            },
+        },
+        rares = {
+            field = "RareData", id = "achievementID", classicCount = 0, tbcCount = 1, wrathCount = 1, cataCount = 0, mopCount = 4, wodCount = 3, legionCount = 6, bfaCount = 8, slCount = 10, dfCount = 7, twwCount = 7,
+            files = {
+                "Modules/Rares/Data/Classic.lua",
+                "Modules/Rares/Data/TheBurningCrusade.lua",
+                "Modules/Rares/Data/WrathOfTheLichKing.lua",
+                "Modules/Rares/Data/Cataclysm.lua",
+                "Modules/Rares/Data/MistsOfPandaria.lua",
+                "Modules/Rares/Data/WarlordsOfDraenor.lua",
+                "Modules/Rares/Data/Legion.lua",
+                "Modules/Rares/Data/BattleForAzeroth.lua",
+                "Modules/Rares/Data/Shadowlands.lua",
+                "Modules/Rares/Data/Dragonflight.lua", "Modules/Rares/Data/TheWarWithin.lua",
+                "Modules/Rares/Data/Rares.lua",
+                "Modules/Rares/Data/Patch120007.lua", "Modules/Rares/Data/Patch120100.lua",
+            },
+        },
+        treasures = {
+            field = "TreasureData", id = "achievementID", classicCount = 0, tbcCount = 0, wrathCount = 0, cataCount = 0, mopCount = 6, wodCount = 3, legionCount = 6, bfaCount = 8, slCount = 7, dfCount = 7, twwCount = 7,
+            files = {
+                "Modules/Treasures/Data/Classic.lua",
+                "Modules/Treasures/Data/TheBurningCrusade.lua",
+                "Modules/Treasures/Data/WrathOfTheLichKing.lua",
+                "Modules/Treasures/Data/Cataclysm.lua",
+                "Modules/Treasures/Data/MistsOfPandaria.lua",
+                "Modules/Treasures/Data/WarlordsOfDraenor.lua",
+                "Modules/Treasures/Data/Legion.lua",
+                "Modules/Treasures/Data/BattleForAzeroth.lua",
+                "Modules/Treasures/Data/Shadowlands.lua",
+                "Modules/Treasures/Data/Dragonflight.lua", "Modules/Treasures/Data/TheWarWithin.lua",
+                "Modules/Treasures/Data/Treasures.lua",
+                "Modules/Treasures/Data/Patch120100.lua",
+            },
+        },
+    }
+
+    for moduleKey, fixture in pairs(dataFixtures) do
+        for _, relative in ipairs(fixture.files) do
+            loadAddon("addons/Collectionist/" .. relative, MC)
+        end
+        local seen, classicCount, tbcCount, wrathCount, cataCount, mopCount, wodCount, legionCount, bfaCount, slCount, dfCount, twwCount = {}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        local classicCriteriaCount, tbcCriteriaCount, wrathCriteriaCount, cataCriteriaCount, mopCriteriaCount, wodCriteriaCount, legionCriteriaCount, bfaCriteriaCount, slCriteriaCount, dfCriteriaCount, criteriaCount = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        local endedClassicMounts, endedClassicPets, endedClassicToys = 0, 0, 0
+        local endedTbcMounts, endedTbcPets, endedTbcToys = 0, 0, 0
+        local endedWrathMounts, endedWrathPets, endedWrathToys = 0, 0, 0
+        local endedCataMounts, endedCataPets, endedCataToys = 0, 0, 0
+        local endedMopMounts, endedMopPets, endedMopToys = 0, 0, 0
+        local endedWodMounts, endedWodPets, endedWodToys = 0, 0, 0
+        local endedLegionMounts, endedLegionPets, endedLegionToys = 0, 0, 0
+        local endedShadowlandsMounts, endedShadowlandsPets, endedShadowlandsToys = 0, 0, 0
+        local endedBfaMounts, endedBfaPets, endedBfaToys = 0, 0, 0
+        local mopRemixMounts, endedDragonflightMounts = 0, 0
+        local endedDragonflightPets, endedDragonflightToys = 0, 0
+        local slDecorationSources, slCraftedDecorations = {}, 0
+        local slAchievementSources, slAchievementTasks = {}, 0
+        local bfaDecorationSources, bfaCraftedDecorations = {}, 0
+        local bfaAchievementSources, bfaAchievementTasks = {}, 0
+        local bfaRareObjects = 0
+        local classicDecorationSources, classicCraftedDecorations = {}, 0
+        local classicAchievementSources, classicAchievementTasks = {}, 0
+        local tbcDecorationSources, tbcCraftedDecorations = {}, 0
+        local tbcAchievementSources, tbcAchievementTasks = {}, 0
+        local wrathDecorationSources, wrathCraftedDecorations = {}, 0
+        local wrathAchievementSources, wrathAchievementTasks = {}, 0
+        local cataDecorationSources, cataCraftedDecorations = {}, 0
+        local cataAchievementSources, cataAchievementTasks = {}, 0
+        local mopDecorationSources, mopCraftedDecorations = {}, 0
+        local mopAchievementSources, mopAchievementTasks = {}, 0
+        local wodDecorationSources, wodCraftedDecorations = {}, 0
+        local wodAchievementSources, wodAchievementTasks = {}, 0
+        local legionDecorationSources, legionCraftedDecorations = {}, 0
+        local legionAchievementSources, legionAchievementTasks = {}, 0
+        local legionRareObjects = 0
+        local dfDecorationSources, dfCraftedDecorations = {}, 0
+        local dfAchievementSources, dfAchievementTasks = {}, 0
+        local legionRemixMounts, remixVendorMounts, remixClassMounts = 0, 0, 0
+        local twwDecorationSources, twwCookingDecorations = {}, 0
+        local twwAchievementSources, twwAchievementTasks = {}, 0
+        for _, group in ipairs(MC[fixture.field]) do
+            local rows = fixture.list and group[fixture.list] or { group }
+            for _, entry in ipairs(rows) do
+                local id = entry[fixture.id]
+                truthy(id, moduleKey .. " fixture missing primary ID")
+                truthy(not seen[id],
+                    "duplicate cross-expansion " .. moduleKey .. " ID " .. id)
+                seen[id] = true
+                if entry.expansion == "classic" then
+                    classicCount = classicCount + 1
+                    local unavailableIDs = classicUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Classic unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Classic source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedClassicMounts = endedClassicMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedClassicPets = endedClassicPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedClassicToys = endedClassicToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        classicDecorationSources[entry.source] =
+                            (classicDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Classic crafted decoration profession " .. id)
+                            classicCraftedDecorations = classicCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Classic achievement source " .. id)
+                        classicAchievementSources[source] =
+                            (classicAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Classic achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Classic achievement task criteria ID " .. id)
+                                classicAchievementTasks = classicAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        classicCriteriaCount = classicCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        classicCriteriaCount = classicCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "tbc" then
+                    tbcCount = tbcCount + 1
+                    local unavailableIDs = tbcUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "TBC unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "TBC source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedTbcMounts = endedTbcMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedTbcPets = endedTbcPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedTbcToys = endedTbcToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        tbcDecorationSources[entry.source] =
+                            (tbcDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "TBC crafted decoration profession " .. id)
+                            tbcCraftedDecorations = tbcCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "TBC achievement source " .. id)
+                        tbcAchievementSources[source] =
+                            (tbcAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "TBC achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "TBC achievement task criteria ID " .. id)
+                                tbcAchievementTasks = tbcAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "TBC rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "TBC rare NPC metadata " .. id)
+                        tbcCriteriaCount = tbcCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        tbcCriteriaCount = tbcCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "wrath" then
+                    wrathCount = wrathCount + 1
+                    local unavailableIDs = wrathUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Wrath unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Wrath source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedWrathMounts = endedWrathMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedWrathPets = endedWrathPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedWrathToys = endedWrathToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        wrathDecorationSources[entry.source] =
+                            (wrathDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Wrath crafted decoration profession " .. id)
+                            wrathCraftedDecorations = wrathCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Wrath achievement source " .. id)
+                        wrathAchievementSources[source] =
+                            (wrathAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Wrath achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Wrath achievement task criteria ID " .. id)
+                                wrathAchievementTasks = wrathAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Wrath rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Wrath rare NPC metadata " .. id)
+                        wrathCriteriaCount = wrathCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        wrathCriteriaCount = wrathCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "cata" then
+                    cataCount = cataCount + 1
+                    local unavailableIDs = cataUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Cataclysm unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Cataclysm source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedCataMounts = endedCataMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedCataPets = endedCataPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedCataToys = endedCataToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        cataDecorationSources[entry.source] =
+                            (cataDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Cataclysm crafted decoration profession " .. id)
+                            cataCraftedDecorations = cataCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Cataclysm achievement source " .. id)
+                        cataAchievementSources[source] =
+                            (cataAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Cataclysm achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Cataclysm achievement task criteria ID " .. id)
+                                cataAchievementTasks = cataAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        cataCriteriaCount = cataCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        cataCriteriaCount = cataCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "mop" then
+                    mopCount = mopCount + 1
+                    local unavailableIDs = mopUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Pandaria unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Pandaria source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedMopMounts = endedMopMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedMopPets = endedMopPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedMopToys = endedMopToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        mopDecorationSources[entry.source] =
+                            (mopDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Pandaria crafted decoration profession " .. id)
+                            mopCraftedDecorations = mopCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Pandaria achievement source " .. id)
+                        mopAchievementSources[source] =
+                            (mopAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Pandaria achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Pandaria achievement task criteria ID " .. id)
+                                mopAchievementTasks = mopAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Pandaria rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Pandaria rare NPC metadata " .. id)
+                        mopCriteriaCount = mopCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Pandaria treasure criteria-tree metadata " .. id)
+                        if entry.criteriaNames then
+                            equal(#entry.criteriaNames, entry.criteriaCount,
+                                "Pandaria treasure criteria metadata " .. id)
+                        end
+                        mopCriteriaCount = mopCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "wod" then
+                    wodCount = wodCount + 1
+                    local unavailableIDs = wodUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Warlords unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Warlords source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedWodMounts = endedWodMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedWodPets = endedWodPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedWodToys = endedWodToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        wodDecorationSources[entry.source] =
+                            (wodDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Warlords crafted decoration profession " .. id)
+                            wodCraftedDecorations = wodCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Warlords achievement source " .. id)
+                        wodAchievementSources[source] =
+                            (wodAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Warlords achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Warlords achievement task criteria ID " .. id)
+                                wodAchievementTasks = wodAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Warlords rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Warlords rare NPC metadata " .. id)
+                        wodCriteriaCount = wodCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Warlords treasure criteria-tree metadata " .. id)
+                        if entry.criteriaNames then
+                            equal(#entry.criteriaNames, entry.criteriaCount,
+                                "Warlords treasure criteria metadata " .. id)
+                        end
+                        wodCriteriaCount = wodCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "legion" then
+                    legionCount = legionCount + 1
+                    local unavailableIDs = legionUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Legion unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Legion source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedLegionMounts = endedLegionMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedLegionPets = endedLegionPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedLegionToys = endedLegionToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        legionDecorationSources[entry.source] =
+                            (legionDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Legion crafted decoration profession " .. id)
+                            legionCraftedDecorations = legionCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Legion achievement source " .. id)
+                        legionAchievementSources[source] =
+                            (legionAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Legion achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Legion achievement task criteria ID " .. id)
+                                legionAchievementTasks = legionAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Legion rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Legion rare NPC metadata " .. id)
+                        equal(#entry.criteriaObjectIDs, entry.criteriaCount,
+                            "Legion rare object metadata " .. id)
+                        for _, objectID in ipairs(entry.criteriaObjectIDs) do
+                            if objectID then legionRareObjects = legionRareObjects + 1 end
+                        end
+                        legionCriteriaCount = legionCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Legion treasure criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNames, entry.criteriaCount,
+                            "Legion treasure criteria metadata " .. id)
+                        legionCriteriaCount = legionCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "bfa" then
+                    bfaCount = bfaCount + 1
+                    local unavailableIDs = bfaUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "BFA unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "BFA source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedBfaMounts = endedBfaMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedBfaPets = endedBfaPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedBfaToys = endedBfaToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        bfaDecorationSources[entry.source] =
+                            (bfaDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "BFA crafted decoration profession " .. id)
+                            bfaCraftedDecorations = bfaCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "BFA achievement source " .. id)
+                        bfaAchievementSources[source] =
+                            (bfaAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "BFA achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "BFA achievement task criteria ID " .. id)
+                                bfaAchievementTasks = bfaAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "BFA rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "BFA rare NPC metadata " .. id)
+                        equal(#entry.criteriaObjectIDs, entry.criteriaCount,
+                            "BFA rare object metadata " .. id)
+                        for _, objectID in ipairs(entry.criteriaObjectIDs) do
+                            if objectID then bfaRareObjects = bfaRareObjects + 1 end
+                        end
+                        bfaCriteriaCount = bfaCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "BFA treasure criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNames, entry.criteriaCount,
+                            "BFA treasure criteria metadata " .. id)
+                        bfaCriteriaCount = bfaCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "shadowlands" then
+                    slCount = slCount + 1
+                    local unavailableIDs = slUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Shadowlands unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(entry.sourceInfo ~= "",
+                            "Shadowlands source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedShadowlandsMounts = endedShadowlandsMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedShadowlandsPets = endedShadowlandsPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedShadowlandsToys = endedShadowlandsToys + 1
+                    end
+                    if moduleKey == "decorations" then
+                        slDecorationSources[entry.source] =
+                            (slDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Shadowlands crafted decoration profession " .. id)
+                            slCraftedDecorations = slCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Shadowlands achievement source " .. id)
+                        slAchievementSources[source] =
+                            (slAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Shadowlands achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Shadowlands achievement task criteria ID " .. id)
+                                slAchievementTasks = slAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Shadowlands rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Shadowlands rare NPC metadata " .. id)
+                        slCriteriaCount = slCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Shadowlands treasure criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNames, entry.criteriaCount,
+                            "Shadowlands treasure criteria metadata " .. id)
+                        slCriteriaCount = slCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "df" then
+                    dfCount = dfCount + 1
+                    local unavailableIDs = dfUnavailableIDs[moduleKey]
+                    if unavailableIDs then
+                        equal(entry.unavailable and true or false,
+                            unavailableIDs[id] and true or false,
+                            "Dragonflight unavailable classification " .. moduleKey .. " " .. id)
+                    end
+                    if entry.sourceInfo then
+                        truthy(not entry.sourceInfo:find("Source details unavailable", 1, true),
+                            "Dragonflight source coverage " .. moduleKey .. " " .. id)
+                    end
+                    if moduleKey == "mounts" and entry.unavailable then
+                        endedDragonflightMounts = endedDragonflightMounts + 1
+                    elseif moduleKey == "pets" and entry.unavailable then
+                        endedDragonflightPets = endedDragonflightPets + 1
+                    elseif moduleKey == "toys" and entry.unavailable then
+                        endedDragonflightToys = endedDragonflightToys + 1
+                    end
+                    if moduleKey == "mounts" and entry.sourceInfo
+                        and entry.sourceInfo:find("Remix", 1, true) then
+                        mopRemixMounts = mopRemixMounts + 1
+                        truthy(entry.unavailable,
+                            "ended Mists of Pandaria Remix mount unavailable flag " .. id)
+                    elseif moduleKey == "decorations" then
+                        dfDecorationSources[entry.source] =
+                            (dfDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "Dragonflight crafted decoration profession " .. id)
+                            dfCraftedDecorations = dfCraftedDecorations + 1
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "Dragonflight achievement source " .. id)
+                        dfAchievementSources[source] =
+                            (dfAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "Dragonflight achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "Dragonflight achievement task criteria ID " .. id)
+                                dfAchievementTasks = dfAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Dragonflight rare criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "Dragonflight rare criteria metadata " .. id)
+                        dfCriteriaCount = dfCriteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaTreeIDs, entry.criteriaCount,
+                            "Dragonflight treasure criteria-tree metadata " .. id)
+                        equal(#entry.criteriaNames, entry.criteriaCount,
+                            "Dragonflight treasure criteria metadata " .. id)
+                        dfCriteriaCount = dfCriteriaCount + entry.criteriaCount
+                    end
+                elseif entry.expansion == "tww" then
+                    twwCount = twwCount + 1
+                    if moduleKey == "mounts" and entry.sourceInfo
+                        and entry.sourceInfo:find("WoW Remix: Legion", 1, true) then
+                        legionRemixMounts = legionRemixMounts + 1
+                        truthy(entry.unavailable,
+                            "ended Legion Remix mount unavailable flag " .. id)
+                        truthy(entry.cost and entry.cost.currency,
+                            "Legion Remix mount currency cost " .. id)
+                        equal(entry.cost.currency[1], MC.CURRENCY.LegionRemixBronze,
+                            "Legion Remix Bronze currency " .. id)
+                        if entry.cost.currency[2] == 10000 then
+                            remixVendorMounts = remixVendorMounts + 1
+                            truthy(entry.sourceInfo:find("Hemet Nesingwary XVII", 1, true),
+                                "Legion Remix vendor source " .. id)
+                        elseif entry.cost.currency[2] == 20000 then
+                            remixClassMounts = remixClassMounts + 1
+                            truthy(entry.sourceInfo:find("Grandmaster Jakkus", 1, true),
+                                "Legion Remix class source " .. id)
+                        else
+                            error("unexpected Legion Remix mount cost " .. id)
+                        end
+                    elseif moduleKey == "decorations" then
+                        twwDecorationSources[entry.source] =
+                            (twwDecorationSources[entry.source] or 0) + 1
+                        if entry.source == "crafted" then
+                            truthy(entry.skillLine,
+                                "TWW crafted decoration profession " .. id)
+                            if entry.skillLine == MC.PROFESSION.Cooking then
+                                twwCookingDecorations = twwCookingDecorations + 1
+                            end
+                        end
+                    elseif moduleKey == "achievements" then
+                        local source = entry.source or group.source
+                        truthy(source, "TWW achievement source " .. id)
+                        twwAchievementSources[source] =
+                            (twwAchievementSources[source] or 0) + 1
+                        if entry.taskList and entry.taskList.tasks then
+                            for _, task in ipairs(entry.taskList.tasks) do
+                                equal(task.achievementID, id,
+                                    "TWW achievement task parent " .. id)
+                                truthy(task.criteriaID,
+                                    "TWW achievement task criteria ID " .. id)
+                                twwAchievementTasks = twwAchievementTasks + 1
+                            end
+                        end
+                    elseif moduleKey == "rares" then
+                        equal(#entry.criteriaNPCIDs, entry.criteriaCount,
+                            "TWW rare criteria metadata " .. id)
+                        criteriaCount = criteriaCount + entry.criteriaCount
+                    elseif moduleKey == "treasures" then
+                        equal(#entry.criteriaNames, entry.criteriaCount,
+                            "TWW treasure criteria metadata " .. id)
+                        criteriaCount = criteriaCount + entry.criteriaCount
+                    end
+                end
+            end
+        end
+        equal(classicCount, fixture.classicCount, moduleKey .. " Classic count")
+        equal(tbcCount, fixture.tbcCount, moduleKey .. " TBC count")
+        equal(wrathCount, fixture.wrathCount, moduleKey .. " Wrath count")
+        equal(cataCount, fixture.cataCount, moduleKey .. " Cataclysm count")
+        equal(mopCount, fixture.mopCount, moduleKey .. " Pandaria count")
+        equal(wodCount, fixture.wodCount, moduleKey .. " Warlords count")
+        equal(legionCount, fixture.legionCount, moduleKey .. " Legion count")
+        equal(bfaCount, fixture.bfaCount, moduleKey .. " BFA count")
+        equal(slCount, fixture.slCount, moduleKey .. " Shadowlands count")
+        equal(dfCount, fixture.dfCount, moduleKey .. " Dragonflight count")
+        equal(twwCount, fixture.twwCount, moduleKey .. " TWW count")
+        if moduleKey == "mounts" then
+            equal(endedClassicMounts, 0, "unavailable Classic mount count")
+            equal(endedTbcMounts, 6, "unavailable TBC mount count")
+            equal(endedWrathMounts, 10, "unavailable Wrath mount count")
+            equal(endedCataMounts, 3, "unavailable Cataclysm mount count")
+            equal(endedMopMounts, 10, "unavailable Pandaria mount count")
+            equal(endedWodMounts, 7, "unavailable Warlords mount count")
+            equal(endedLegionMounts, 9, "unavailable Legion mount count")
+            equal(endedBfaMounts, 7, "unavailable BFA mount count")
+            equal(endedShadowlandsMounts, 10, "unavailable Shadowlands mount count")
+            equal(endedDragonflightMounts, 42, "unavailable Dragonflight mount count")
+            equal(mopRemixMounts, 29, "Dragonflight Mists of Pandaria Remix mount count")
+            equal(legionRemixMounts, 44, "TWW Legion Remix mount count")
+            equal(remixVendorMounts, 33, "TWW Legion Remix vendor mount count")
+            equal(remixClassMounts, 11, "TWW Legion Remix class mount count")
+        elseif moduleKey == "pets" then
+            equal(endedClassicPets, 0, "unavailable Classic pet count")
+            equal(endedTbcPets, 0, "unavailable TBC pet count")
+            equal(endedWrathPets, 0, "unavailable Wrath pet count")
+            equal(endedCataPets, 0, "unavailable Cataclysm pet count")
+            equal(endedMopPets, 0, "unavailable Pandaria pet count")
+            equal(endedWodPets, 0, "unavailable Warlords pet count")
+            equal(endedLegionPets, 2, "unavailable Legion pet count")
+            equal(endedBfaPets, 0, "unavailable BFA pet count")
+            equal(endedShadowlandsPets, 1, "unavailable Shadowlands pet count")
+            equal(endedDragonflightPets, 6, "unavailable Dragonflight pet count")
+        elseif moduleKey == "toys" then
+            equal(endedClassicToys, 0, "unavailable Classic toy count")
+            equal(endedTbcToys, 0, "unavailable TBC toy count")
+            equal(endedWrathToys, 0, "unavailable Wrath toy count")
+            equal(endedCataToys, 3, "unavailable Cataclysm toy count")
+            equal(endedMopToys, 0, "unavailable Pandaria toy count")
+            equal(endedWodToys, 0, "unavailable Warlords toy count")
+            equal(endedLegionToys, 0, "unavailable Legion toy count")
+            equal(endedBfaToys, 0, "unavailable BFA toy count")
+            equal(endedShadowlandsToys, 0, "unavailable Shadowlands toy count")
+            equal(endedDragonflightToys, 8, "unavailable Dragonflight toy count")
+        elseif moduleKey == "decorations" then
+            equal(classicDecorationSources.crafted, 19, "Classic crafted decoration count")
+            equal(classicDecorationSources.achievement, 1, "Classic achievement decoration count")
+            equal(classicDecorationSources.quest, 1, "Classic quest decoration count")
+            equal(classicDecorationSources.drop, 1, "Classic drop decoration count")
+            equal(classicCraftedDecorations, 19, "Classic crafted decoration profession count")
+            equal(tbcDecorationSources.crafted, 26, "TBC crafted decoration count")
+            equal(tbcDecorationSources.achievement, 2, "TBC achievement decoration count")
+            equal(tbcDecorationSources.drop, 1, "TBC drop decoration count")
+            equal(tbcCraftedDecorations, 26, "TBC crafted decoration profession count")
+            equal(wrathDecorationSources.crafted, 21, "Wrath crafted decoration count")
+            equal(wrathDecorationSources.quest, 3, "Wrath quest decoration count")
+            equal(wrathDecorationSources.achievement, 2, "Wrath achievement decoration count")
+            equal(wrathDecorationSources.drop, 1, "Wrath drop decoration count")
+            equal(wrathCraftedDecorations, 21, "Wrath crafted decoration profession count")
+            equal(cataDecorationSources.crafted, 20, "Cataclysm crafted decoration count")
+            equal(cataDecorationSources.quest, 20, "Cataclysm quest decoration count")
+            equal(cataDecorationSources.achievement, 2, "Cataclysm achievement decoration count")
+            equal(cataDecorationSources.vendor, 2, "Cataclysm vendor decoration count")
+            equal(cataDecorationSources.drop, 2, "Cataclysm drop decoration count")
+            equal(cataCraftedDecorations, 20, "Cataclysm crafted decoration profession count")
+            equal(mopDecorationSources.crafted, 21, "Pandaria crafted decoration count")
+            equal(mopDecorationSources.vendor, 11, "Pandaria vendor decoration count")
+            equal(mopDecorationSources.quest, 5, "Pandaria quest decoration count")
+            equal(mopDecorationSources.achievement, 2, "Pandaria achievement decoration count")
+            equal(mopDecorationSources.drop, 2, "Pandaria drop decoration count")
+            equal(mopCraftedDecorations, 21, "Pandaria crafted decoration profession count")
+            equal(wodDecorationSources.crafted, 21, "Warlords crafted decoration count")
+            equal(wodDecorationSources.vendor, 26, "Warlords vendor decoration count")
+            equal(wodDecorationSources.quest, 27, "Warlords quest decoration count")
+            equal(wodDecorationSources.achievement, 1, "Warlords achievement decoration count")
+            equal(wodDecorationSources.drop, 5, "Warlords drop decoration count")
+            equal(wodCraftedDecorations, 21, "Warlords crafted decoration profession count")
+            equal(legionDecorationSources.crafted, 23, "Legion crafted decoration count")
+            equal(legionDecorationSources.vendor, 75, "Legion vendor decoration count")
+            equal(legionDecorationSources.quest, 34, "Legion quest decoration count")
+            equal(legionDecorationSources.achievement, 71, "Legion achievement decoration count")
+            equal(legionDecorationSources.drop, 8, "Legion drop decoration count")
+            equal(legionCraftedDecorations, 23, "Legion crafted decoration profession count")
+            equal(bfaDecorationSources.crafted, 28, "BFA crafted decoration count")
+            equal(bfaDecorationSources.vendor, 44, "BFA vendor decoration count")
+            equal(bfaDecorationSources.quest, 28, "BFA quest decoration count")
+            equal(bfaDecorationSources.achievement, 21, "BFA achievement decoration count")
+            equal(bfaDecorationSources.drop, 15, "BFA drop decoration count")
+            equal(bfaCraftedDecorations, 28, "BFA crafted decoration profession count")
+            equal(slDecorationSources.crafted, 23, "Shadowlands crafted decoration count")
+            equal(slDecorationSources.vendor, 1, "Shadowlands vendor decoration count")
+            equal(slDecorationSources.achievement, 1, "Shadowlands achievement decoration count")
+            equal(slDecorationSources.quest, 1, "Shadowlands quest decoration count")
+            equal(slCraftedDecorations, 23, "Shadowlands crafted decoration profession count")
+            equal(dfDecorationSources.crafted, 25, "Dragonflight crafted decoration count")
+            equal(dfDecorationSources.vendor, 26, "Dragonflight vendor decoration count")
+            equal(dfDecorationSources.quest, 12, "Dragonflight quest decoration count")
+            equal(dfDecorationSources.achievement, 10, "Dragonflight achievement decoration count")
+            equal(dfDecorationSources.drop, 3, "Dragonflight drop decoration count")
+            equal(dfCraftedDecorations, 25, "Dragonflight crafted decoration profession count")
+            equal(twwDecorationSources.crafted, 24, "TWW crafted decoration count")
+            equal(twwDecorationSources.vendor, 41, "TWW vendor decoration count")
+            equal(twwDecorationSources.quest, 22, "TWW quest decoration count")
+            equal(twwDecorationSources.achievement, 15, "TWW achievement decoration count")
+            equal(twwDecorationSources.drop, 6, "TWW drop decoration count")
+            equal(twwCookingDecorations, 4, "TWW Cooking decoration count")
+        elseif moduleKey == "achievements" then
+            equal(classicAchievementSources.zone, 41, "Classic exploration achievement count")
+            equal(classicAchievementSources.alterac, 19, "Classic Alterac Valley achievement count")
+            equal(classicAchievementSources.arathi, 16, "Classic Arathi Basin achievement count")
+            equal(classicAchievementSources.warsong, 19, "Classic Warsong Gulch achievement count")
+            equal(classicAchievementSources.dungeons, 24, "Classic dungeon achievement count")
+            equal(classicAchievementSources.raid, 25, "Classic raid achievement count")
+            equal(classicAchievementSources.metas, 51, "Classic quest/meta achievement count")
+            equal(classicAchievementSources.reputation, 4, "Classic reputation achievement count")
+            equal(classicAchievementTasks, 1149, "Classic attached achievement criteria count")
+            equal(tbcAchievementSources.zone, 14, "TBC exploration achievement count")
+            equal(tbcAchievementSources.eye_of_storm, 13, "TBC Eye of the Storm achievement count")
+            equal(tbcAchievementSources.dungeons, 40, "TBC dungeon and raid achievement count")
+            equal(tbcAchievementSources.metas, 16, "TBC quest/meta achievement count")
+            equal(tbcAchievementSources.reputation, 16, "TBC reputation achievement count")
+            equal(tbcAchievementTasks, 651, "TBC attached achievement criteria count")
+            equal(wrathAchievementSources.zone, 12, "Wrath exploration achievement count")
+            equal(wrathAchievementSources.dungeons, 80, "Wrath dungeon achievement count")
+            equal(wrathAchievementSources.metas, 21, "Wrath quest/meta achievement count")
+            equal(wrathAchievementSources.reputation, 14, "Wrath reputation achievement count")
+            equal(wrathAchievementSources.wintergrasp, 19, "Wrath Wintergrasp achievement count")
+            equal(wrathAchievementSources.raid, 203, "Wrath raid achievement count")
+            equal(wrathAchievementSources.tournament, 35, "Wrath Argent Tournament achievement count")
+            equal(wrathAchievementTasks, 1207, "Wrath attached achievement criteria count")
+            equal(cataAchievementSources.dungeons, 62, "Cataclysm dungeon achievement count")
+            equal(cataAchievementSources.raid, 62, "Cataclysm raid achievement count")
+            equal(cataAchievementSources.zone, 8, "Cataclysm exploration achievement count")
+            equal(cataAchievementSources.metas, 43, "Cataclysm quest/meta achievement count")
+            equal(cataAchievementSources.reputation, 9, "Cataclysm reputation achievement count")
+            equal(cataAchievementSources.gilneas, 15, "Cataclysm Battle for Gilneas achievement count")
+            equal(cataAchievementSources.twinpeaks, 20, "Cataclysm Twin Peaks achievement count")
+            equal(cataAchievementSources.tolbarad, 14, "Cataclysm Tol Barad achievement count")
+            equal(cataAchievementTasks, 500, "Cataclysm attached achievement criteria count")
+            equal(mopAchievementSources.dungeons, 44, "Pandaria dungeon achievement count")
+            equal(mopAchievementSources.raid, 106, "Pandaria raid achievement count")
+            equal(mopAchievementSources.metas, 64, "Pandaria quest/meta achievement count")
+            equal(mopAchievementSources.zone, 48, "Pandaria exploration achievement count")
+            equal(mopAchievementSources.reputation, 20, "Pandaria reputation achievement count")
+            equal(mopAchievementSources.silvershard, 11, "Pandaria Silvershard achievement count")
+            equal(mopAchievementSources.kotmogu, 10, "Pandaria Kotmogu achievement count")
+            equal(mopAchievementSources.deepwind, 10, "Pandaria Deepwind achievement count")
+            equal(mopAchievementSources.proving, 19, "Pandaria Proving Grounds achievement count")
+            equal(mopAchievementSources.scenarios, 69, "Pandaria scenario achievement count")
+            equal(mopAchievementSources.timeless, 6, "Pandaria Timeless Isle achievement count")
+            equal(mopAchievementTasks, 1002, "Pandaria attached achievement criteria count")
+            equal(wodAchievementSources.metas, 77, "Warlords quest/meta achievement count")
+            equal(wodAchievementSources.dungeons, 49, "Warlords dungeon achievement count")
+            equal(wodAchievementSources.raid, 75, "Warlords raid achievement count")
+            equal(wodAchievementSources.reputation, 13, "Warlords reputation achievement count")
+            equal(wodAchievementSources.zone, 21, "Warlords exploration achievement count")
+            equal(wodAchievementSources.garrison, 15, "Warlords garrison achievement count")
+            equal(wodAchievementSources.buildings, 51, "Warlords garrison-building achievement count")
+            equal(wodAchievementSources.followers, 13, "Warlords follower achievement count")
+            equal(wodAchievementSources.missions, 15, "Warlords mission achievement count")
+            equal(wodAchievementSources.ashran, 21, "Warlords Ashran achievement count")
+            equal(wodAchievementSources.monuments, 7, "Warlords monument achievement count")
+            equal(wodAchievementSources.invasions, 18, "Warlords invasion achievement count")
+            equal(wodAchievementSources.shipyard, 27, "Warlords shipyard achievement count")
+            equal(wodAchievementTasks, 981, "Warlords attached achievement criteria count")
+            equal(legionAchievementSources.metas, 44, "Legion quest/meta achievement count")
+            equal(legionAchievementSources.dungeons, 76, "Legion dungeon achievement count")
+            equal(legionAchievementSources.raid, 100, "Legion raid achievement count")
+            equal(legionAchievementSources.artifacts, 22, "Legion artifact achievement count")
+            equal(legionAchievementSources.zone, 35, "Legion exploration achievement count")
+            equal(legionAchievementSources.reputation, 11, "Legion reputation achievement count")
+            equal(legionAchievementSources.class_hall, 5, "Legion class-hall achievement count")
+            equal(legionAchievementSources.missions, 12, "Legion mission achievement count")
+            equal(legionAchievementTasks, 642, "Legion attached achievement criteria count")
+            equal(bfaAchievementSources.metas, 77, "BFA quest/meta achievement count")
+            equal(bfaAchievementSources.dungeons, 59, "BFA dungeon achievement count")
+            equal(bfaAchievementSources.raid, 97, "BFA raid achievement count")
+            equal(bfaAchievementSources.zone, 95, "BFA exploration achievement count")
+            equal(bfaAchievementSources.reputation, 16, "BFA reputation achievement count")
+            equal(bfaAchievementSources.islands, 64, "BFA island achievement count")
+            equal(bfaAchievementSources.war_effort, 34, "BFA war-effort achievement count")
+            equal(bfaAchievementSources.heart_of_azeroth, 10, "BFA Heart of Azeroth achievement count")
+            equal(bfaAchievementTasks, 1310, "BFA attached achievement criteria count")
+            equal(slAchievementSources.metas, 48, "Shadowlands quest/meta achievement count")
+            equal(slAchievementSources.dungeons, 57, "Shadowlands dungeon achievement count")
+            equal(slAchievementSources.zone, 74, "Shadowlands exploration achievement count")
+            equal(slAchievementSources.raid, 93, "Shadowlands raid achievement count")
+            equal(slAchievementSources.reputation, 9, "Shadowlands reputation achievement count")
+            equal(slAchievementSources.torghast, 63, "Shadowlands Torghast achievement count")
+            equal(slAchievementSources.covenants, 75, "Shadowlands covenant achievement count")
+            equal(slAchievementTasks, 1676, "Shadowlands attached achievement criteria count")
+            equal(dfAchievementSources.metas, 53, "Dragonflight quest/meta achievement count")
+            equal(dfAchievementSources.dragonriding, 164, "Dragonflight dragonriding achievement count")
+            equal(dfAchievementSources.zone, 151, "Dragonflight exploration achievement count")
+            equal(dfAchievementSources.reputation, 50, "Dragonflight reputation achievement count")
+            equal(dfAchievementSources.dungeons, 59, "Dragonflight dungeon achievement count")
+            equal(dfAchievementSources.raid, 72, "Dragonflight raid achievement count")
+            equal(dfAchievementSources.mounts, 20, "Dragonflight collection achievement count")
+            equal(dfAchievementTasks, 2879, "Dragonflight attached achievement criteria count")
+            equal(twwAchievementSources.zone, 161, "TWW general achievement count")
+            equal(twwAchievementSources.delves, 113, "TWW delve achievement count")
+            equal(twwAchievementSources.dungeons, 34, "TWW dungeon achievement count")
+            equal(twwAchievementSources.raid, 73, "TWW raid achievement count")
+            equal(twwAchievementTasks, 1485, "TWW attached achievement criteria count")
+        end
+        if moduleKey == "rares" then
+            equal(classicCriteriaCount, 0, "Classic rare criteria count")
+            equal(tbcCriteriaCount, 20, "TBC rare criteria count")
+            equal(wrathCriteriaCount, 23, "Wrath rare criteria count")
+            equal(cataCriteriaCount, 0, "Cataclysm rare criteria count")
+            equal(mopCriteriaCount, 104, "Pandaria rare criteria count")
+            equal(wodCriteriaCount, 72, "Warlords rare criteria count")
+            equal(legionCriteriaCount, 185, "Legion rare criteria count")
+            equal(legionRareObjects, 7, "Legion rare object-provider count")
+            equal(bfaCriteriaCount, 256, "BFA rare criteria count")
+            equal(bfaRareObjects, 5, "BFA rare object-provider count")
+            equal(slCriteriaCount, 211, "Shadowlands rare criteria count")
+            equal(dfCriteriaCount, 197, "Dragonflight rare criteria count")
+            equal(criteriaCount, 140, "TWW rare criteria count")
+        end
+        if moduleKey == "treasures" then
+            equal(classicCriteriaCount, 0, "Classic treasure criteria count")
+            equal(tbcCriteriaCount, 0, "TBC treasure criteria count")
+            equal(wrathCriteriaCount, 0, "Wrath treasure criteria count")
+            equal(cataCriteriaCount, 0, "Cataclysm treasure criteria count")
+            equal(mopCriteriaCount, 98, "Pandaria treasure criteria count")
+            equal(wodCriteriaCount, 368, "Warlords treasure criteria count")
+            equal(legionCriteriaCount, 314, "Legion treasure criteria count")
+            equal(bfaCriteriaCount, 98, "BFA treasure criteria count")
+            equal(slCriteriaCount, 103, "Shadowlands treasure criteria count")
+            equal(dfCriteriaCount, 57, "Dragonflight treasure criteria count")
+            equal(criteriaCount, 86, "TWW treasure criteria count")
+        end
+    end
+end
+
 -- Communication queues survive encounters and report actual send success.
 do
     CreateFrame = newFrameFactory()
@@ -485,6 +1775,13 @@ do
     equal(rareScanner:Scan(), true, "complete rare criteria scan")
     equal(rareScanner.results.totalAll, 2, "rare criteria denominator")
     equal(rareScanner.results._partial, nil, "complete rare scan is not partial")
+    rareMC.RareData[1].criteriaNPCIDs = { 1, false }
+    rareMC.RareData[1].criteriaObjectIDs = { false, 777 }
+    equal(rareScanner:Scan(), true, "mixed rare NPC/object criteria scan")
+    local objectEncounter = rareScanner.results.bySource.coiled_isle[1]
+    equal(objectEncounter.objectID, 777, "rare object-provider metadata")
+    equal(objectEncounter.npcID, nil,
+        "rare object criterion must not treat completion quest as NPC")
 
     criteriaCount = 1
     local treasureMC = { modulesByKey = { treasures = {} } }
@@ -833,7 +2130,7 @@ do
     equal(patchRareCount, 2, "Showdown rare achievement records")
     equal(patchRareCoords, 20, "Showdown rare coordinate count")
 
-    equal(#entries("decorations") - baseCounts.decorations, 117, "12.0.7 decoration count")
+    equal(#entries("decorations") - baseCounts.decorations, 116, "12.0.7 decoration count")
     local neighborhood, special = 0, 0
     for _, decor in ipairs(entries("decorations")) do
         if decor.sourceInfo == "Neighborhood decor vendor (Patch 12.0.7)" then
@@ -842,11 +2139,11 @@ do
     end
     equal(neighborhood, 102, "12.0.7 neighborhood vendor decoration count")
     special = (#entries("decorations") - baseCounts.decorations) - neighborhood
-    equal(special, 15, "12.0.7 special decoration count")
+    equal(special, 14, "12.0.7 special decoration count")
     assertIDs("decorations", "decorID", {
         25664, 25665, 25564, 25566, 18802, 25565,
         25307, 20679, 24194, 24193, 23706, 2606,
-        21857, 18897, 16813,
+        21857, 16813,
     }, "12.0.7 special decoration")
 
     -- The achievement module deliberately includes 14 non-Showdown patch

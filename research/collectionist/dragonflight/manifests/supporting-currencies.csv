@@ -1,0 +1,13 @@
+"currency_id","name","description","category_id","faction_id","max_quantity","source"
+"1508","Veiled Argunite","This dull-colored crystal is highly valued by ethereal traders, especially Thaumaturge Vashreen aboard the Vindicaar.","141","0","2000","selected_collectible_source"
+"2003","Dragon Isles Supplies","Various resources and building materials that can assist the friendly factions of the Dragon Isles in their fight against the Primalists. Used to purchase items unlocked from renown.","250","0","0","selected_collectible_source"
+"2118","Elemental Overflow","The essence of fallen foes imbued with the power of a primal storm.
+
+Used to procure items from Mythressa in Valdrakken and various vendors in Morqut village.","250","0","0","selected_collectible_source"
+"2123","Bloody Tokens","Obtained from the bloody battles of the Dragon Isles.","2","0","20000000","selected_collectible_source"
+"2588","Riders of Azeroth Badge","Earned in Riders of Azeroth contests. Exchanged for goods from Riders of Azeroth vendors in Valdrakken.","1","0","0","selected_collectible_source"
+"2594","Paracausal Flakes","Specks of temporal energy imbued with enough power to be tangible. Valuable to vendors in the Tyrhold Reservoir.","250","0","0","selected_collectible_source"
+"2657","Mysterious Fragment","Obtained by assisting the Azerothian Archivists in the Dragon Isles. Bring them to Provisioner Aristta in Thaldraszus to exchange for items.","250","0","0","selected_collectible_source"
+"2777","Dream Infusion","Used to draw forth a creature's dreaming essence.
+
+Elianna at the Central Encampment would be interested in this.","250","0","0","selected_collectible_source"

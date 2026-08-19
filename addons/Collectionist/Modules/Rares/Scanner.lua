@@ -69,8 +69,19 @@ function Scanner:Scan()
             else
                 -- Criterion order is stable across locales; the shipped NPC
                 -- map also covers criteria whose assetID reuses another NPC.
-                local npcID = (trustPositional and ach.criteriaNPCIDs and ach.criteriaNPCIDs[i])
-                           or ((assetID and assetID > 0) and assetID or nil)
+                -- Some older "Adventurer" achievements mix rare NPCs with
+                -- interactable objects while exposing completion-quest IDs
+                -- through the achievement API. When a generated positional
+                -- entity map exists, do not fall back to that quest ID.
+                local hasPositionalEntityMap = trustPositional
+                    and (ach.criteriaNPCIDs or ach.criteriaObjectIDs)
+                local npcID = hasPositionalEntityMap
+                    and ach.criteriaNPCIDs and ach.criteriaNPCIDs[i] or nil
+                local objectID = hasPositionalEntityMap
+                    and ach.criteriaObjectIDs and ach.criteriaObjectIDs[i] or nil
+                if not hasPositionalEntityMap then
+                    npcID = (assetID and assetID > 0) and assetID or nil
+                end
                 -- Per-rare stable NPC-ID override wins over
                 -- the achievement-level source default. Used to bump
                 -- rare-elites + PvP-zone rares above the standard per-zone tier.
@@ -87,6 +98,7 @@ function Scanner:Scan()
                         moduleKey     = "rares",
                         name          = name,
                         npcID         = npcID,
+                        objectID      = objectID,
                         source        = ach.source,
                         sourceInfo    = "Rare in " .. ach.zone,
                         achievementID = ach.achievementID,

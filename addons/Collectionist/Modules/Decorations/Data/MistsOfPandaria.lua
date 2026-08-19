@@ -1,0 +1,56 @@
+local _, MC = ...
+
+-- Pandaria-acquisition housing decor. Ownership follows the awarding content, not the Midnight housing row or visual theme.
+MC.RegisterContent("mop", "decorations", {
+    { source = "crafted", decorations = {
+        { decorID = 1169, itemID = 245513, name = "Square Pandaren Table", source = "crafted", sourceInfo = "1 Square Pandaren Table Furnishings › Tables and Desks Crafting: Inscription Profession: Pandaria Inscription (60)", skillLine = MC.PROFESSION.Inscription },
+        { decorID = 1187, itemID = 245514, name = "Pandaren Wooden Table", source = "crafted", sourceInfo = "3 Pandaren Wooden Table Furnishings › Tables and Desks Crafting: Inscription Profession: Pandaria Inscription (60)", skillLine = MC.PROFESSION.Inscription },
+        { decorID = 1194, itemID = 245509, name = "Pandaren Stone Wall", source = "crafted", sourceInfo = "1 Pandaren Stone Wall Structural › Misc Structural Crafting: Jewelcrafting Profession: Pandaria Jewelcrafting (60)", skillLine = MC.PROFESSION.Jewelcrafting },
+        { decorID = 2591, itemID = 247220, name = "Mushan Dumpling Stack", source = "crafted", sourceInfo = "1 Mushan Dumpling Stack Accents › Food and Drink Crafting: Cooking Profession: Pandaria Cooking (60)", skillLine = MC.PROFESSION.Cooking },
+        { decorID = 3831, itemID = 247661, name = "Pandaren Signal Brazier", source = "crafted", sourceInfo = "1 Pandaren Signal Brazier Lighting › Large Lights Crafting: Blacksmithing Profession: Pandaria Blacksmithing (60)", skillLine = MC.PROFESSION.Blacksmithing },
+        { decorID = 3839, itemID = 247669, name = "Lorewalker's Bookcase", source = "crafted", sourceInfo = "5 Lorewalker's Bookcase Furnishings › Storage Crafting: Inscription Profession: Pandaria Inscription (60)", skillLine = MC.PROFESSION.Inscription },
+        { decorID = 3868, itemID = 247728, name = "Pandaren Stone Post", source = "crafted", sourceInfo = "1 Pandaren Stone Post Structural › Misc Structural Crafting: Jewelcrafting Profession: Pandaria Jewelcrafting (60)", skillLine = MC.PROFESSION.Jewelcrafting },
+        { decorID = 3871, itemID = 247731, name = "Hanging Paper Lanterns", source = "crafted", sourceInfo = "5 Hanging Paper Lanterns Accents › Ornamental Crafting: Inscription Profession: Pandaria Inscription (60)", skillLine = MC.PROFESSION.Inscription },
+        { decorID = 3873, itemID = 247733, name = "Halfhill Cookpot", source = "crafted", sourceInfo = "3 Halfhill Cookpot Functional › Utility Crafting: Engineering Profession: Pandaria Engineering (60)", skillLine = MC.PROFESSION.Engineering },
+        { decorID = 3875, itemID = 247735, name = "Lucky Traveler's Bench", source = "crafted", sourceInfo = "1 Lucky Traveler's Bench Furnishings › Seating Crafting: Inscription Profession: Pandaria Inscription (60)", skillLine = MC.PROFESSION.Inscription },
+        { decorID = 3876, itemID = 247736, name = "Jade Temple Dragon Fountain", source = "crafted", sourceInfo = "5 Jade Temple Dragon Fountain Structural › Large Structures Crafting: Jewelcrafting Profession: Pandaria Jewelcrafting (60)", skillLine = MC.PROFESSION.Jewelcrafting },
+        { decorID = 3878, itemID = 247738, name = "Pandaren Meander Rug", source = "crafted", sourceInfo = "5 Pandaren Meander Rug Accents › Floor Crafting: Tailoring Profession: Pandaria Tailoring (60)", skillLine = MC.PROFESSION.Tailoring },
+        { decorID = 3892, itemID = 247752, name = "Pandaren Fireplace", source = "crafted", sourceInfo = "5 Pandaren Fireplace Lighting › Misc Lighting Crafting: Blacksmithing Profession: Pandaria Blacksmithing (60)", skillLine = MC.PROFESSION.Blacksmithing },
+        { decorID = 3904, itemID = 247767, name = "Wise Pandaren's Bed", source = "crafted", sourceInfo = "3 Wise Pandaren's Bed Furnishings › Beds Crafting: Leatherworking Profession: Pandaria Leatherworking (60)", skillLine = MC.PROFESSION.Leatherworking },
+        { decorID = 3994, itemID = 247856, name = "Serenity Peak Tent", source = "crafted", sourceInfo = "5 Serenity Peak Tent Structural › Large Structures Crafting: Leatherworking Profession: Pandaria Leatherworking (60)", skillLine = MC.PROFESSION.Leatherworking },
+        { decorID = 11378, itemID = 257043, name = "Pandaren Alchemist's Retort", source = "crafted", sourceInfo = "1 Pandaren Alchemist's Retort Accents › Ornamental Crafting: Alchemy Profession: Pandaria Alchemy (60)", skillLine = MC.PROFESSION.Alchemy },
+        { decorID = 11434, itemID = 257096, name = "Pandaren Table Lamp", source = "crafted", sourceInfo = "1 Pandaren Table Lamp Lighting › Small Lights Crafting: Enchanting Profession: Pandaria Enchanting (60)", skillLine = MC.PROFESSION.Enchanting },
+        { decorID = 11435, itemID = 257097, name = "Intense Mogu Brazier", source = "crafted", sourceInfo = "3 Intense Mogu Brazier Lighting › Large Lights Crafting: Enchanting Profession: Pandaria Enchanting (60)", skillLine = MC.PROFESSION.Enchanting },
+        { decorID = 11902, itemID = 258214, name = "Pandaren Alchemist's Kit", source = "crafted", sourceInfo = "1 Pandaren Alchemist's Kit Accents › Ornamental Crafting: Alchemy Profession: Pandaria Alchemy (60)", skillLine = MC.PROFESSION.Alchemy },
+        { decorID = 11904, itemID = 258216, name = "Reconstructed Mogu Lightning Drill", source = "crafted", sourceInfo = "5 Reconstructed Mogu Lightning Drill Miscellaneous › Miscellaneous - All Crafting: Engineering Profession: Pandaria Engineering (60)", skillLine = MC.PROFESSION.Engineering },
+        { decorID = 11945, itemID = 258302, name = "Pandaren Fishing Net", source = "crafted", sourceInfo = "3 Pandaren Fishing Net Accents › Ornamental Crafting: Tailoring Profession: Pandaria Tailoring (60)", skillLine = MC.PROFESSION.Tailoring },
+    } },
+    { source = "vendor", decorations = {
+        { decorID = 1172, itemID = 245512, name = "Pandaren Cradle Stool", source = "vendor", sourceInfo = "1 Pandaren Cradle Stool Furnishings › Seating Tan Shin Tiao (Vale of Eternal Blossoms) 240", npcID = 64605 },
+        { decorID = 1201, itemID = 245508, name = "Pandaren Cooking Table", source = "vendor", sourceInfo = "5 Pandaren Cooking Table Furnishings › Tables and Desks Gina Mudclaw (Valley of the Four Winds) 800", skillLine = MC.PROFESSION.Cooking, npcID = 58706 },
+        { decorID = 3832, itemID = 247662, name = "Pandaren Scholar's Lectern", source = "vendor", sourceInfo = "3 Pandaren Scholar's Lectern Furnishings › Tables and Desks Tan Shin Tiao (Vale of Eternal Blossoms) 400", npcID = 64605 },
+        { decorID = 3833, itemID = 247663, name = "Pandaren Scholar's Bookcase", source = "vendor", sourceInfo = "5 Pandaren Scholar's Bookcase Furnishings › Storage Tan Shin Tiao (Vale of Eternal Blossoms) 1600", npcID = 64605 },
+        { decorID = 3840, itemID = 247670, name = "Pandaren Pantry", source = "vendor", sourceInfo = "5 Pandaren Pantry Furnishings › Storage Gina Mudclaw (Valley of the Four Winds) 800", npcID = 58706 },
+        { decorID = 3870, itemID = 247730, name = "Red Crane Kite", source = "vendor", sourceInfo = "5 Red Crane Kite Accents › Ornamental San Redscale (The Jade Forest) 800", npcID = 58414 },
+        { decorID = 3872, itemID = 247732, name = "Lucky Hanging Lantern", source = "vendor", sourceInfo = "5 Lucky Hanging Lantern Lighting › Ceiling Lights San Redscale (The Jade Forest) 400", npcID = 58414 },
+        { decorID = 3874, itemID = 247734, name = "Paw'don Well", source = "vendor", sourceInfo = "5 Paw'don Well Structural › Large Structures Gina Mudclaw (Valley of the Four Winds) 640", npcID = 58706 },
+        { decorID = 3877, itemID = 247737, name = "Stormstout Brew Keg", source = "vendor", sourceInfo = "1 Stormstout Brew Keg Furnishings › Storage Gina Mudclaw (Valley of the Four Winds) 240", npcID = 58706 },
+        { decorID = 3993, itemID = 247855, name = "Pandaren Lacquered Crate", source = "vendor", sourceInfo = "1 Pandaren Lacquered Crate Furnishings › Storage Tan Shin Tiao (Vale of Eternal Blossoms) 240", npcID = 64605 },
+        { decorID = 11873, itemID = 258147, name = "Empty Lorewalker's Bookcase", source = "vendor", sourceInfo = "5 Empty Lorewalker's Bookcase Furnishings › Storage Tan Shin Tiao (Vale of Eternal Blossoms) 800", npcID = 64605 },
+    } },
+    { source = "achievement", decorations = {
+        { decorID = 3880, itemID = 247740, name = "Kotmogu Pedestal", source = "achievement", sourceInfo = "1 Kotmogu Pedestal Accents › Ornamental Master of Temple of Kotmogu Joruh (Orgrimmar) 2000 Honor +1 more source", achievementID = 6981, npcID = 254606 },
+        { decorID = 3881, itemID = 247741, name = "Kotmogu Orb of Power", source = "achievement", sourceInfo = "1 Kotmogu Orb of Power Accents › Ornamental Master of Temple of Kotmogu Joruh (Orgrimmar) 1000 Honor +1 more source", achievementID = 6981, npcID = 254606 },
+    } },
+    { source = "quest", decorations = {
+        { decorID = 3869, itemID = 247729, name = "Pandaren Stone Lamppost", source = "quest", sourceInfo = "3 Pandaren Stone Lamppost Structural › Misc Structural Welcome to Dawn's Blossom Sage Lotusbloom (Shrine of Two Moons, Vale of Eternal Blossoms) 240 +1 more source", questID = 31230, npcID = 64001 },
+        { decorID = 3995, itemID = 247858, name = "Shaohao Ceremonial Bell", source = "quest", sourceInfo = "5 Shaohao Ceremonial Bell Structural › Large Structures Path of the Last Emperor (Kun-Lai Summit) Tan Shin Tiao (Vale of Eternal Blossoms) 1600", questID = 32816, npcID = 64605 },
+        { decorID = 4488, itemID = 248663, name = "Wooden Doghouse", source = "quest", sourceInfo = "3 Wooden Doghouse Structural › Misc Structural Lost and Lonely (Valley of the Four Winds) Gina Mudclaw (Valley of the Four Winds) 240", questID = 30526, npcID = 58706 },
+        { decorID = 15595, itemID = 264349, name = "Kun-Lai Lacquered Rickshaw", source = "quest", sourceInfo = "5 Kun-Lai Lacquered Rickshaw Miscellaneous › Miscellaneous - All The Leader Hozen (Kun-Lai Summit) Brother Furtrim (Kun-Lai Summit)", questID = 30612, npcID = 59698 },
+        { decorID = 15605, itemID = 264362, name = "Golden Pandaren Privacy Screen", source = "quest", sourceInfo = "3 Golden Pandaren Privacy Screen Furnishings › Misc Furnishings The Jade Serpent (The Jade Forest)", questID = 30000 },
+    } },
+    { source = "drop", decorations = {
+        { decorID = 2512, itemID = 246846, name = "Tome of Pandaren Wisdom", source = "drop", sourceInfo = "1 Tome of Pandaren Wisdom Accents › Ornamental Encounter: Sha of Doubt (Temple of the Jade Serpent)" },
+        { decorID = 5111, itemID = 248934, name = "Golden Cloud Serpent Treasure Chest", source = "drop", sourceInfo = "3 Golden Cloud Serpent Treasure Chest Furnishings › Storage Treasure: Golden Cloud Serpent Treasure Chest (Jade Forest) Second Chair Pawdo (Dornogal)", npcID = 252312 },
+    } },
+})
