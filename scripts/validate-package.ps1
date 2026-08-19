@@ -146,7 +146,9 @@ try {
         throw "Shipped Lua/XML files are not reachable from the TOC: $($relativeUnreferenced -join ', ')"
     }
 
-    $compiler = Get-Command $LuaExecutable -CommandType Application -ErrorAction Stop
+    # Get-Command returns every PATH match; usrmerge distros list luajit at
+    # both /usr/bin and /bin, so take the first.
+    $compiler = @(Get-Command $LuaExecutable -CommandType Application -ErrorAction Stop)[0]
     $bytecodePath = Join-Path ([System.IO.Path]::GetTempPath()) (
         'collectionist-validation-' + [guid]::NewGuid().ToString('N') + '.ljbc')
     try {
