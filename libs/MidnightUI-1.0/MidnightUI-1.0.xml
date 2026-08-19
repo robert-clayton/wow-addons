@@ -3,4 +3,6 @@
     <Script file="Panel.lua"/>
     <Script file="Widgets.lua"/>
     <Script file="Dropdown.lua"/>
+    <Script file="Controls.lua"/>
+    <Script file="Shell.lua"/>
 </Ui>

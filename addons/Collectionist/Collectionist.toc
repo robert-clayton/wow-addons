@@ -23,6 +23,8 @@ Data\Expansions.lua
 TabBar.lua
 MinimapButton.lua
 Onboarding.lua
+PremiumShell.lua
+PremiumNav.lua
 
 # Mounts module
 Modules\Mounts\Data\TheWarWithin.lua

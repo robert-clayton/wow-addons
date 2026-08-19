@@ -1315,6 +1315,7 @@ end
 --------------------------------------------------------------------------
 function MC.OnScanComplete(mod)
     if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+    if MC.PremiumNav and MC.PremiumNav.RefreshCounts then MC.PremiumNav:RefreshCounts() end
     if MC.RosterDebouncedBroadcast then MC.RosterDebouncedBroadcast() end
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
     if MC.activeModule == mod.key and mod.UI and MC.panel
@@ -1673,19 +1674,53 @@ function MC.CreatePanel()
         if MC.RefreshActive then MC.RefreshActive() end
     end)
 
-    local panel = MUI:CreatePanel({
-        name          = "Collectionist",
-        title         = "Collectionist",
-        icon          = "Interface\\Icons\\INV_Misc_Book_09",
-        db            = MC.db,
-        defaultWidth  = 520,
-        defaultHeight = 560,
-        minWidth      = 520,
-        maxWidth      = 700,
-        minHeight     = 140,
-        maxHeight     = 900,
-        onRefresh     = function() MC.RefreshActive() end,
-    })
+    local panel
+    if MC.GetUIStyle and MC.GetUIStyle() == "premium"
+       and MUI.CreatePremiumShell and MC.MakePremiumDB then
+        panel = MUI:CreatePremiumShell({
+            name          = "CollectionistPremium",
+            title         = "Collectionist",
+            icon          = "Interface\\Icons\\INV_Misc_Book_09",
+            version       = MC.version,
+            db            = MC.MakePremiumDB(),
+            defaultWidth  = 980,
+            defaultHeight = 680,
+            minWidth      = 760,
+            maxWidth      = 1400,
+            minHeight     = 520,
+            maxHeight     = 1000,
+            onRefresh     = function() MC.RefreshActive() end,
+            -- Footer behaviors: the lib shell is consumer-agnostic, so
+            -- the /mc-scan body and the Inspector hook arrive as opts.
+            onScan        = function()
+                for _, mod in ipairs(MC.modules) do
+                    if mod.Scanner then MC.ScanNow(mod) end
+                end
+            end,
+            onInspector   = function()
+                if MC.ShowPeerPanel then MC.ShowPeerPanel() end
+            end,
+            inspectorVisible = function()
+                return (MC.db and MC.db.rosterEnabled) and true or false
+            end,
+        })
+        -- PremiumNav duck-types TabBar's Create/SetActive/Reflow.
+        MC.TabBar = MC.PremiumNav or MC.TabBar
+    else
+        panel = MUI:CreatePanel({
+            name          = "Collectionist",
+            title         = "Collectionist",
+            icon          = "Interface\\Icons\\INV_Misc_Book_09",
+            db            = MC.db,
+            defaultWidth  = 520,
+            defaultHeight = 560,
+            minWidth      = 520,
+            maxWidth      = 700,
+            minHeight     = 140,
+            maxHeight     = 900,
+            onRefresh     = function() MC.RefreshActive() end,
+        })
+    end
 
     MC.panel = panel
 
@@ -2022,6 +2057,13 @@ function MC.BuildConfig()
         get = function() return MC.GetTheme() end,
         set = function(v) MC.SetTheme(v) end,
         onRefresh = MC.BuildConfig }
+    defs[#defs + 1] = { type = "dropdown", label = "UI Style",
+        options = {
+            { label = "Simple (compact)", value = "classic" },
+            { label = "Premium", value = "premium" },
+        },
+        get = function() return MC.GetUIStyle and MC.GetUIStyle() or "classic" end,
+        set = function(v) if MC.SetUIStyle then MC.SetUIStyle(v) end end }
     defs[#defs + 1] = { type = "slider", label = "Background Opacity", min = 0.1, max = 1.0, step = 0.05,
         get = function() return MC.db.frameAlpha or 1.0 end,
         set = function(v)
@@ -2059,7 +2101,8 @@ local function PrintHelp()
     print("  /mc sharing on|off|announce|sync|prune|clear|status - optional sharing")
     print("  /mc filter all|current|<expansion> - filter visible expansions")
     print("  /mc score - show your Collection Score breakdown")
-    print("  /mc theme modern|simple - switch UI theme")
+    print("  /mc theme modern|simple|ellesmere - switch UI theme")
+    print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -2108,16 +2151,48 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         end
         -- Replace the whole position table so a stale relativePoint from a
         -- previous drag doesn't survive the reset and put us off-screen.
-        MC.db.position = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 }
-        MC.db.panelWidth = 520
-        MC.db.panelHeight = 560
-        MC.db.frameAlpha = 1.0
-        MC.db.frameScale = 1.0
-        if MC.panel and MC.panel.frame then
-            MC.panel.frame:ClearAllPoints()
-            MC.panel.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
-            MC.panel.frame:SetSize(MC.db.panelWidth, MC.db.panelHeight)
-            MC.panel.frame:SetScale(1.0)
+        if MC.panel and MC.panel._ContentWidth then
+            -- Gate on the actual shell type, not the saved style: if the
+            -- premium shell failed to build (stale embedded lib), the
+            -- classic branch below must handle the classic panel.
+            -- Premium geometry lives in MC.db.premium; the shell's db
+            -- proxy reads it dynamically, so wholesale replacement is
+            -- safe.
+            MC.db.premium = {
+                position   = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 },
+                panelWidth = 980, panelHeight = 680, minimized = false,
+            }
+            MC.db.frameAlpha = 1.0
+            MC.db.frameScale = 1.0
+            if MC.panel and MC.panel.frame then
+                MC.panel.frame:ClearAllPoints()
+                MC.panel.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+                MC.panel.frame:SetSize(980, 680)
+                MC.panel.frame:SetScale(1.0)
+                -- Re-set the scroll child width first (bar fills read
+                -- parent:GetWidth()), then un-hide the regions a
+                -- minimized strip had collapsed — this order keeps the
+                -- onRefresh inside ApplyMinimizeState from rendering one
+                -- frame at the stale width.
+                if MC.panel.scrollChild then
+                    MC.panel.scrollChild:SetWidth(MC.panel:_ContentWidth())
+                end
+                if MC.panel.ApplyMinimizeState then MC.panel:ApplyMinimizeState() end
+                if MC.panel.ApplyBackdrop then MC.panel:ApplyBackdrop() end
+                MC.RefreshActive()
+            end
+        else
+            MC.db.position = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 }
+            MC.db.panelWidth = 520
+            MC.db.panelHeight = 560
+            MC.db.frameAlpha = 1.0
+            MC.db.frameScale = 1.0
+            if MC.panel and MC.panel.frame then
+                MC.panel.frame:ClearAllPoints()
+                MC.panel.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+                MC.panel.frame:SetSize(MC.db.panelWidth, MC.db.panelHeight)
+                MC.panel.frame:SetScale(1.0)
+            end
         end
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
@@ -2169,13 +2244,23 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         local a = (arg or ""):lower()
         if a == "" or a == "status" then
             print(format("%s Theme: %s", PREFIX, MC.GetTheme()))
-            print("    available: modern, simple")
+            print("    available: modern, simple, ellesmere")
         elseif MUI.Themes[a] then
             MC.SetTheme(a)
             print(format("%s Theme set to %s.", PREFIX, a))
             if MC.BuildConfig then MC.BuildConfig() end
         else
-            print(PREFIX .. " /mc theme modern|simple")
+            print(PREFIX .. " /mc theme modern|simple|ellesmere")
+        end
+    elseif cmd == "style" then
+        local a = (arg or ""):lower()
+        if a == "" or a == "status" then
+            print(format("%s UI style: %s", PREFIX, MC.GetUIStyle and MC.GetUIStyle() or "classic"))
+            print("    available: classic, premium (takes effect after /reload)")
+        elseif (a == "classic" or a == "premium") and MC.SetUIStyle then
+            MC.SetUIStyle(a)
+        else
+            print(PREFIX .. " /mc style classic|premium")
         end
     elseif cmd == "help" then
         PrintHelp()
