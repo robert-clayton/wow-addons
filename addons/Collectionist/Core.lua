@@ -2005,6 +2005,7 @@ function MC.BuildConfig()
         options = {
             { label = "Modern", value = "modern" },
             { label = "Simple", value = "simple" },
+            { label = "Ellesmere", value = "ellesmere" },
         },
         get = function() return MC.GetTheme() end,
         set = function(v) MC.SetTheme(v) end,
