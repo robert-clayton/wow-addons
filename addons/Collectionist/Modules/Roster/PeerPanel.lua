@@ -61,6 +61,13 @@ local DEFAULT_PANEL_H  = TITLE_BAR_H + CONTENT_TOP_PAD + COLUMN_CONTENT_H + BOTT
 local function startSizeAnim(f, targetW, targetH, duration, onComplete)
     duration = duration or 0.18
     local fromW, fromH = f:GetWidth(), f:GetHeight()
+    -- Honor the Animations preference (MidnightUI-1.0's shared flag).
+    if MUI and MUI.animEnabled == false then
+        f:SetScript("OnUpdate", nil)
+        f:SetSize(targetW, targetH)
+        if onComplete then onComplete() end
+        return
+    end
     if math.abs(fromW - targetW) < 0.5 and math.abs(fromH - targetH) < 0.5 then
         f:SetScript("OnUpdate", nil)
         f:SetSize(targetW, targetH)
@@ -85,6 +92,12 @@ end
 local function startFadeAnim(frame, targetAlpha, duration, onComplete)
     duration = duration or 0.15
     local fromAlpha = frame:GetAlpha()
+    if MUI and MUI.animEnabled == false then
+        frame:SetScript("OnUpdate", nil)
+        frame:SetAlpha(targetAlpha)
+        if onComplete then onComplete() end
+        return
+    end
     if math.abs(fromAlpha - targetAlpha) < 0.01 then
         frame:SetScript("OnUpdate", nil)
         frame:SetAlpha(targetAlpha)

@@ -506,7 +506,7 @@ end
 
 -- Show / Hide / Toggle
 function PanelProto:Show()
-    self.frame:Show()
+    lib.FadeIn(self.frame)
     self.db.panelShown = true
     if self.opts.onRefresh then self.opts.onRefresh(self) end
     if self.db.minimized then
@@ -515,14 +515,18 @@ function PanelProto:Show()
 end
 
 function PanelProto:Hide()
-    self.frame:Hide()
+    -- State commits now; the frame hides when the fade finishes.
     self.db.panelShown = false
-    if self.cfgFrame then self.cfgFrame:Hide() end
+    lib.FadeOut(self.frame)
+    if self.cfgFrame then lib.FadeOut(self.cfgFrame) end
     if self.opts.onHide then self.opts.onHide(self) end
 end
 
 function PanelProto:Toggle()
-    if self.frame:IsShown() then
+    -- A frame mid-fade-out is still shown but on its way out; toggling
+    -- then means "bring it back", not "close it again".
+    local closing = self.frame._muiFadeOut and self.frame._muiFadeOut:IsPlaying()
+    if self.frame:IsShown() and not closing then
         self:Hide()
     else
         self:Show()
@@ -596,7 +600,7 @@ end
 
 function PanelProto:ToggleConfig()
     if self.cfgFrame and self.cfgFrame:IsShown() then
-        self.cfgFrame:Hide()
+        lib.FadeOut(self.cfgFrame)
         return
     end
     if not self.cfgFrame then
@@ -610,7 +614,7 @@ function PanelProto:ToggleConfig()
     if self.pendingConfigDefs then
         self:_PopulateConfigBody(self.pendingConfigDefs)
     end
-    self.cfgFrame:Show()
+    lib.FadeIn(self.cfgFrame)
 end
 
 function PanelProto:PopulateConfig(defs)

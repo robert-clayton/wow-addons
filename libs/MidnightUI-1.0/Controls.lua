@@ -31,25 +31,36 @@ function lib.MakePillToggle(parent, opts)
     local knob = btn:CreateTexture(nil, "ARTWORK")
     knob:SetSize(h - 4, h - 4)
     knob:SetTexture(WHITE8)
+    -- Anchored from LEFT in both states so the travel is a pure x-offset
+    -- slide (SlideTo only lerps offsets — a LEFT/RIGHT anchor swap would
+    -- snap instead).
+    local KNOB_OFF = w - (h - 4) - 2
 
-    local function paint(on)
+    local function paint(on, instant)
         local c = lib.Theme.colors
-        knob:ClearAllPoints()
         if on then
             local ac = c.accent
-            track:SetColorTexture(ac[1], ac[2], ac[3], 0.75)
+            lib.FadeTexture(track, ac[1], ac[2], ac[3], 0.75)
             knob:SetColorTexture(1, 1, 1, 1)
-            knob:SetPoint("RIGHT", btn, "RIGHT", -2, 0)
         else
-            track:SetColorTexture(0.27, 0.27, 0.27, 0.65)
+            lib.FadeTexture(track, 0.27, 0.27, 0.27, 0.65)
             local t = c.text
             knob:SetColorTexture(t[1], t[2], t[3], 0.5)
-            knob:SetPoint("LEFT", btn, "LEFT", 2, 0)
+        end
+        local x = on and KNOB_OFF or 2
+        if instant then
+            lib.StopAnims(knob)
+            knob:ClearAllPoints()
+            knob:SetPoint("LEFT", btn, "LEFT", x, 0)
+        else
+            lib.SlideTo(knob, "LEFT", btn, "LEFT", x, 0)
         end
     end
 
+    -- SnapToState repaints without motion (theme switches, rebuilds);
+    -- the click path slides.
     function btn:SnapToState()
-        paint(opts.get and opts.get() and true or false)
+        paint(opts.get and opts.get() and true or false, true)
     end
     btn.Refresh = btn.SnapToState
 
@@ -57,11 +68,61 @@ function lib.MakePillToggle(parent, opts)
         if opts.set and opts.get then
             opts.set(not opts.get())
         end
-        btn:SnapToState()
+        paint(opts.get and opts.get() and true or false, false)
     end)
 
     btn:SnapToState()
     return btn
+end
+
+-- MakeNavIndicator: the sidebar's single accent bar. One shared bar that
+-- travels to the selected row reads as one object moving; per-row bars
+-- blinking on and off read as two unrelated events. A Frame, not a
+-- texture, so the travel can use a native Translation.
+--   :MoveTo(row, instant) — slide to a nav row (nil hides the bar)
+--   :Repaint()            — re-read the theme accent
+function lib.MakeNavIndicator(container)
+    local bar = CreateFrame("Frame", nil, container)
+    bar:SetWidth(2)
+    bar:SetHeight(32)
+    bar:Hide()
+
+    local tex = bar:CreateTexture(nil, "ARTWORK")
+    tex:SetAllPoints()
+    tex:SetTexture(WHITE8)
+    bar._tex = tex
+
+    function bar:Repaint()
+        local ac = lib.Theme.colors.accent
+        tex:SetColorTexture(ac[1], ac[2], ac[3], 1)
+    end
+
+    function bar:MoveTo(row, instant)
+        if not row then
+            lib.StopAnims(self)
+            self:Hide()
+            return
+        end
+        local _, _, _, _, y = row:GetPoint()
+        self:SetHeight(row:GetHeight())
+        -- First appearance has nowhere to travel from: place it, fade in.
+        if not self:IsShown() then
+            self:ClearAllPoints()
+            self:SetPoint("TOPLEFT", container, "TOPLEFT", 0, y or 0)
+            lib.FadeIn(self)
+            return
+        end
+        if instant then
+            lib.StopAnims(self)
+            self:ClearAllPoints()
+            self:SetPoint("TOPLEFT", container, "TOPLEFT", 0, y or 0)
+        else
+            lib.SlideTo(self, "TOPLEFT", container, "TOPLEFT", 0, y or 0)
+        end
+    end
+
+    bar:Repaint()
+    return bar
 end
 
 -- MakeNavRow: one sidebar navigation row (the Premium tab analog).
@@ -81,13 +142,8 @@ function lib.MakeNavRow(parent, opts)
     row:SetHeight(32)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
-    local activeBar = row:CreateTexture(nil, "ARTWORK")
-    activeBar:SetWidth(2)
-    activeBar:SetPoint("TOPLEFT")
-    activeBar:SetPoint("BOTTOMLEFT")
-    activeBar:SetTexture(WHITE8)
-    activeBar:Hide()
-
+    -- No per-row accent bar: the sidebar owns one shared indicator that
+    -- travels between rows (lib.MakeNavIndicator).
     local activeWash = row:CreateTexture(nil, "BACKGROUND", nil, 2)
     activeWash:SetAllPoints()
     activeWash:SetTexture(WHITE8)
@@ -130,24 +186,20 @@ function lib.MakeNavRow(parent, opts)
         local th = lib.Theme
         local c = th.colors
         local ac = c.accent
-        activeBar:SetColorTexture(ac[1], ac[2], ac[3], 1)
         lib.SetGradient(activeWash, "HORIZONTAL",
             { ac[1], ac[2], ac[3], 0.10 },
             { ac[1], ac[2], ac[3], 0 })
         label:SetFont(th.font, th.fontSize, lib.FontFlags())
         count:SetFont(th.font, th.fontSize - 1, lib.FontFlags())
         if self._active then
-            activeBar:Show()
             activeWash:Show()
             label:SetTextColor(c.title[1], c.title[2], c.title[3], c.title[4] or 1)
             icon:SetVertexColor(ac[1], ac[2], ac[3])
         elseif self._enabled then
-            activeBar:Hide()
             activeWash:Hide()
             label:SetTextColor(c.text[1], c.text[2], c.text[3], c.text[4] or 1)
             icon:SetVertexColor(0.9, 0.9, 0.9)
         else
-            activeBar:Hide()
             activeWash:Hide()
             label:SetTextColor(c.textDim[1], c.textDim[2], c.textDim[3])
             icon:SetVertexColor(0.7, 0.7, 0.7)
@@ -187,7 +239,7 @@ function lib.MakeNavRow(parent, opts)
 
     row:SetScript("OnEnter", function(s)
         local rh = lib.Theme.colors.rowHover
-        hover:SetColorTexture(rh[1], rh[2], rh[3], rh[4] or 0.05)
+        lib.FadeTexture(hover, rh[1], rh[2], rh[3], rh[4] or 0.05, 0.08)
         local tt = opts.tooltip
         if type(tt) == "string" then
             GameTooltip:SetOwner(s, "ANCHOR_RIGHT")
@@ -200,7 +252,8 @@ function lib.MakeNavRow(parent, opts)
         end
     end)
     row:SetScript("OnLeave", function()
-        hover:SetColorTexture(1, 1, 1, 0)
+        local rh = lib.Theme.colors.rowHover
+        lib.FadeTexture(hover, rh[1], rh[2], rh[3], 0, 0.12)
         GameTooltip:Hide()
     end)
     row:SetScript("OnClick", function(s, btn)

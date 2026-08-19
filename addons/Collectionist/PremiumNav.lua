@@ -91,8 +91,14 @@ function Nav:Create(panel, modules, onSwitch)
         self.rows[key] = row
     end
 
+    -- The single accent bar that travels between rows.
+    self.indicator = MUI.MakeNavIndicator(panel.navContainer)
+
     -- One theme hook for the whole nav; rows repaint through Reflow.
-    MUI.RegisterThemeHook(function() Nav:Reflow() end)
+    MUI.RegisterThemeHook(function()
+        if Nav.indicator then Nav.indicator:Repaint() end
+        Nav:Reflow()
+    end)
 
     self:Reflow()
 end
@@ -103,6 +109,8 @@ function Nav:SetActive(key)
     for k, row in pairs(self.rows) do
         row:SetActive(k == key)
     end
+    -- Tab switch: the bar travels to the newly selected row.
+    if self.indicator then self.indicator:MoveTo(self.rows[key], false) end
     if self.panel and self.panel.SetPageHeader then
         local mod = MC.modulesByKey and MC.modulesByKey[key]
         local tagline = TAGLINES[key] or (mod and mod.label) or ""
@@ -133,6 +141,11 @@ function Nav:Reflow()
             row._c, row._t = ModuleCounts(mod)
             row:Repaint()
         end
+    end
+    -- Reflow is a layout change (reorder, enable/disable, theme switch),
+    -- not a selection change: the bar re-seats without travelling.
+    if self.indicator then
+        self.indicator:MoveTo(self.activeKey and self.rows[self.activeKey], true)
     end
 end
 

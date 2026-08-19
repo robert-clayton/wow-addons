@@ -135,11 +135,15 @@ function ShellProto:Create()
 
     f:Hide()
     if db.panelShown then
+        -- Restoring a saved session: land in the saved view directly
+        -- rather than animating a collapse the player didn't ask for.
+        self._initializing = true
         f:Show()
         if opts.onRefresh then opts.onRefresh(self) end
         if db.minimized or db.compact then
             self:ApplyMinimizeState()
         end
+        self._initializing = nil
     end
 end
 
@@ -741,7 +745,7 @@ function ShellProto:_ApplyMinimizedVisuals()
     f.brand:Hide()
     if f.stripBar then f.stripBar:Show() end
     if f.dragger then f.dragger:Hide() end
-    f:SetSize(MINI_W, MINI_H)
+    self:_SizeTo(MINI_W, MINI_H)
     self:_AnchorProgressText("strip")
     if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
 end
@@ -786,7 +790,7 @@ function ShellProto:_ApplyCompactVisuals()
 
     local w, h = ClampCompact(self.opts,
         db.compactWidth or 380, db.compactHeight or 560)
-    f:SetSize(w, h)
+    self:_SizeTo(w, h)
     if f.dragger and not db.locked then f.dragger:Show() end
     self:_AnchorProgressText("compact")
     self:UpdateSpine()
@@ -834,11 +838,25 @@ function ShellProto:_ApplyFullVisuals()
     local w, h = ClampSize(self.opts,
         db.panelWidth or self.opts.defaultWidth or 980,
         db.panelHeight or self.opts.defaultHeight or 680)
-    f:SetSize(w, h)
+    self:_SizeTo(w, h)
     if f.dragger and not db.locked then f.dragger:Show() end
     self:_AnchorProgressText("full")
     self:UpdateSpine()
     if self.UpdateMinimizeVisual then self.UpdateMinimizeVisual() end
+end
+
+-- View transitions animate the window between state geometries. The
+-- chrome for the new state is applied immediately and every region is
+-- anchored to the frame edges, so the content is revealed (or clipped)
+-- as the window travels. Construction and the idempotent re-asserts in
+-- RefreshScrollContent land instantly — SizeTo short-circuits when it is
+-- already there, and _initializing covers the login collapse.
+function ShellProto:_SizeTo(w, h)
+    if self._initializing then
+        self.frame:SetSize(w, h)
+        return
+    end
+    lib.SizeTo(self.frame, w, h)
 end
 
 -- "full" | "compact" | "strip". Strip wins when both flags are set
@@ -898,7 +916,7 @@ function ShellProto:ApplyMinimizeState()
 end
 
 function ShellProto:Show()
-    self.frame:Show()
+    lib.FadeIn(self.frame)
     self.db.panelShown = true
     if self.opts.onRefresh then self.opts.onRefresh(self) end
     if self.db.minimized or self.db.compact then
@@ -907,16 +925,22 @@ function ShellProto:Show()
 end
 
 function ShellProto:Hide()
-    self.frame:Hide()
+    -- State commits now; the frame hides when the fade finishes. Toggle
+    -- reads IsShown, so a second click mid-fade re-enters Show and the
+    -- fade-in cancels the fade-out (FadeIn stops the opposing group).
     self.db.panelShown = false
+    lib.FadeOut(self.frame)
     -- The config dock is parented to UIParent and only anchored to the
     -- window; hide it explicitly or it outlives Close.
-    if self.cfgFrame then self.cfgFrame:Hide() end
+    if self.cfgFrame then lib.FadeOut(self.cfgFrame) end
     if self.opts.onHide then self.opts.onHide(self) end
 end
 
 function ShellProto:Toggle()
-    if self.frame:IsShown() then
+    -- A frame mid-fade-out is still shown but on its way out; toggling
+    -- then means "bring it back", not "close it again".
+    local closing = self.frame._muiFadeOut and self.frame._muiFadeOut:IsPlaying()
+    if self.frame:IsShown() and not closing then
         self:Hide()
     else
         self:Show()
@@ -1060,7 +1084,7 @@ end
 
 function ShellProto:ToggleConfig()
     if self.cfgFrame and self.cfgFrame:IsShown() then
-        self.cfgFrame:Hide()
+        lib.FadeOut(self.cfgFrame)
         return
     end
     if not self.cfgFrame then
@@ -1073,7 +1097,7 @@ function ShellProto:ToggleConfig()
     if self.pendingConfigDefs then
         self:_PopulateConfigBody(self.pendingConfigDefs)
     end
-    self.cfgFrame:Show()
+    lib.FadeIn(self.cfgFrame)
 end
 
 function ShellProto:PopulateConfig(defs)

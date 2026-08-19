@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="MidnightUI-1.0.lua"/>
+    <Script file="Anim.lua"/>
     <Script file="Panel.lua"/>
     <Script file="Widgets.lua"/>
     <Script file="Dropdown.lua"/>

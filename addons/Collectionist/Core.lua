@@ -359,6 +359,7 @@ local charDefaults = {
     panelWidth       = 520,
     panelHeight      = 560,
     disabledModules  = {},
+    animations       = true,
     -- Expansions hidden from the browse lists. Purely a display filter:
     -- totals, Collection Score, Legacies, and sharing keep counting a
     -- disabled expansion's content.
@@ -1572,6 +1573,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- lib's hook list is empty at this point so the call is just a
         -- palette swap; CreatePanel later reads the active palette.
         MC.SetTheme(MC.GetTheme())
+        -- Motion preference, applied before any frame animates.
+        MUI.animEnabled = (MC.db.animations ~= false)
         print(PREFIX .. " v" .. MC.version .. " loaded. Type /mc to toggle.")
 
     elseif event == "PLAYER_LOGIN" then
@@ -2104,6 +2107,12 @@ function MC.BuildConfig()
         set = function(v)
             if MC.db.minimap then MC.db.minimap.hide = v end
             if MC.MinimapButton and MC.MinimapButton.Update then MC.MinimapButton:Update() end
+        end }
+    defs[#defs + 1] = { type = "checkbox", label = "Animations",
+        get = function() return MC.db.animations ~= false end,
+        set = function(v)
+            MC.db.animations = v and true or false
+            MUI.animEnabled = v and true or false
         end }
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "SHARING" }

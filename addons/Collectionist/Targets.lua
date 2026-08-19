@@ -382,8 +382,9 @@ function Targets:Refresh()
         if not self:_EnsureFrame() then return end
     end
     local f = self.frame
+    local MUI = LibStub and LibStub("MidnightUI-1.0", true)
     if n == 0 or (t and t.hidden) then
-        f:Hide()
+        if MUI then MUI.FadeOut(f) else f:Hide() end
         return
     end
     if InCombatLockdown and InCombatLockdown() then
@@ -409,8 +410,15 @@ function Targets:Refresh()
         end
     end
     f.count:SetText(tostring(n))
-    f:SetHeight(HEADER_H + 2 + n * ROW_H + PAD)
-    f:Show()
+    local h = HEADER_H + 2 + n * ROW_H + PAD
+    -- Already open: grow/shrink into the new pin count. Opening: land at
+    -- the right height, then fade in.
+    if f:IsShown() and MUI then
+        MUI.SizeTo(f, f:GetWidth(), h)
+    else
+        f:SetHeight(h)
+    end
+    if MUI then MUI.FadeIn(f) else f:Show() end
 end
 
 function Targets:Toggle()
