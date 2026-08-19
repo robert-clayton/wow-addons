@@ -149,8 +149,9 @@ end
 
 -- Drag handling shared by the brand block and the header. Position is
 -- only persisted after real cursor movement so a static click can't
--- clobber relativePoint.
-function ShellProto:_MakeDragHandler(region)
+-- clobber relativePoint. onClick, when given, fires for a press that
+-- never moved — a drag surface can double as a button.
+function ShellProto:_MakeDragHandler(region, onClick)
     local f = self.frame
     local db = self.db
     local downX, downY, didDrag
@@ -173,6 +174,8 @@ function ShellProto:_MakeDragHandler(region)
             if didDrag and not db.locked then
                 local point, _, relativePoint, x, y = f:GetPoint()
                 db.position = { point = point, relativePoint = relativePoint, x = x, y = y }
+            elseif not didDrag and onClick then
+                onClick()
             end
         end
     end)
@@ -234,7 +237,15 @@ function ShellProto:_CreateSidebar()
     strip:SetAllPoints(f)
     strip:Hide()
     f.stripBar = strip
-    self:_MakeDragHandler(strip)
+    -- Drag to move, click to expand. The restore button is the obvious
+    -- affordance; this makes the whole pill work, and means a collapsed
+    -- window can always be recovered.
+    self:_MakeDragHandler(strip, function()
+        if not self.db.minimized then return end
+        self.db.minimized = false
+        self.db.compact = false
+        self:ApplyMinimizeState()
+    end)
 
     local sIcon = strip:CreateTexture(nil, "ARTWORK")
     sIcon:SetSize(14, 14)
@@ -501,9 +512,15 @@ function ShellProto:_CreateFooter()
     end)
     footer.minBtn = minBtn
 
-    -- Restore button for the minimized brand strip (the footer — and
-    -- its minimize button — is hidden while minimized).
-    local restoreBtn = lib.MakeHeaderBtn(f, "+",
+    -- Restore button for the minimized strip (the footer — and its
+    -- minimize button — is hidden while minimized).
+    --
+    -- Parented to the strip bar, not the window: the strip bar is a
+    -- full-cover drag surface with the mouse enabled, so a sibling at
+    -- the same frame level would compete with it for the click and the
+    -- strip could not be expanded. A child sits above its parent, which
+    -- is how the compact header's buttons already work.
+    local restoreBtn = lib.MakeHeaderBtn(f.stripBar or f, "+",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Restore", { width = 20, height = 20 })
     restoreBtn:SetPoint("RIGHT", f, "RIGHT", -6, 0)
