@@ -47,7 +47,17 @@ end
 
 function UI:GetConfigDefs()
     -- Show Learned toggle is auto-injected by Core.BuildConfig
-    return {}
+    return {
+        {
+            type  = "checkbox",
+            label = "Only professions this character has",
+            get   = function() return mod.db.hideUnlearnedProfs end,
+            set   = function(v)
+                mod.db.hideUnlearnedProfs = v
+                MC.RefreshActive()
+            end,
+        },
+    }
 end
 
 function UI:Refresh()
@@ -64,7 +74,7 @@ function UI:Refresh()
     for _, skillLine in ipairs(MC.RecipeProfOrder) do
         local result = mod.Scanner.results[skillLine]
         local profInfo = mod.professions and mod.professions[skillLine]
-        if result and profInfo then
+        if result and profInfo and MC.RecipeProfessionShown(mod, skillLine) then
             totalLearned = totalLearned + result.learnedCount
             totalRecipes = totalRecipes + result.total
             yOff = self:RenderProfession(child, profInfo, result, skillLine, yOff)
@@ -114,7 +124,11 @@ function UI:RenderProfession(parent, profInfo, result, skillLine, yOff)
             collKey       = tostring(profInfo.skillLine),
             accentR       = ar, accentG = ag, accentB = ab,
             label         = profInfo.name,
-            labelColor    = allLearned and theme.colors.textComplete or theme.colors.text,
+            -- A profession this character hasn't trained still lists its
+            -- recipes (ownership is account-wide), but reads dimmer so
+            -- the ones you can train right now stand out.
+            labelColor    = allLearned and theme.colors.textComplete
+                or (profInfo.learned and theme.colors.text or theme.colors.textDim),
             count         = format("%d/%d", result.learnedCount, result.total),
             countColor    = { cr, cg, cb },
             icon          = profInfo.icon,

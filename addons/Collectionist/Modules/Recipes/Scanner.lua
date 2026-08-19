@@ -34,10 +34,13 @@ function Scanner:Scan()
         end
     end
 
-    -- Off-profession pass: recipes count account-wide, so professions
-    -- this character doesn't have still score via the ledger. Held
-    -- professions are skipped — ScanProfession already credited their
-    -- ledger score above, and double-counting would inflate the CS.
+    -- Off-profession pass. DetectProfessions now seeds all nine, so this
+    -- normally finds nothing: ScanProfession credits ledger score for
+    -- every profession, trained or not. It still matters in the window
+    -- before detection has run (professions is empty at first scan),
+    -- where it is the only thing crediting the account's score.
+    -- Professions already present are skipped — ScanProfession credited
+    -- them above, and double-counting would inflate the CS.
     -- Stored with a score field ONLY: Roster's GetLocalScore sums any
     -- results sub-table with .score, while BuildLocalCounts requires
     -- .total, so this entry feeds the score without touching counts.
