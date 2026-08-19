@@ -3,6 +3,13 @@ local _, MC = ...
 local MUI = LibStub("MidnightUI-1.0")
 
 local NAV_ROW_H = 32
+-- The Options row sits apart from the trackers: a gap, and a hairline
+-- across it, so it still reads as part of the same list.
+local OPT_GAP    = 14
+-- Clear of the container's bottom edge (which is already GAP above the
+-- window's), so the row doesn't sit flush against the frame border.
+local OPT_INSET  = 4
+local OPT_ICON   = "Interface\\Icons\\INV_Misc_Gear_01"
 
 -- Per-module taglines for the Premium page header subtitle.
 -- No tagline repeats its module's name — the page title directly above
@@ -91,7 +98,39 @@ function Nav:Create(panel, modules, onSwitch)
         self.rows[key] = row
     end
 
-    -- The single accent bar that travels between rows.
+    -- Options: one more row in the same list, pinned to the BOTTOM of the
+    -- nav container rather than laid out after the last module. Modules
+    -- are enabled, disabled and reordered at runtime and Reflow re-anchors
+    -- every one of them; anchoring Options to the container's bottom edge
+    -- keeps it where the player left it through all of that, and off
+    -- Reflow's list entirely. (The travelling indicator converts the
+    -- bottom anchor for itself — see lib.MakeNavIndicator.)
+    local optRow = MUI.MakeNavRow(panel.navContainer, {
+        icon    = OPT_ICON,
+        label   = "Options",
+        onClick = function() onSwitch(MC.OPTIONS_KEY) end,
+        tooltip = function(_, tt)
+            tt:SetText("Options")
+            tt:AddLine("Modules, expansions, trackers and appearance.",
+                0.7, 0.7, 0.7, true)
+        end,
+    })
+    optRow:SetHeight(NAV_ROW_H)
+    optRow:SetPoint("BOTTOMLEFT", panel.navContainer, "BOTTOMLEFT", 0, OPT_INSET)
+    optRow:SetPoint("BOTTOMRIGHT", panel.navContainer, "BOTTOMRIGHT", 0, OPT_INSET)
+    self.rows[MC.OPTIONS_KEY] = optRow
+    self.optionsRow = optRow
+
+    -- The hairline that separates it from the trackers. Inset from both
+    -- edges so it reads as a divider inside the list, not as chrome.
+    local sep = panel.navContainer:CreateTexture(nil, "ARTWORK")
+    sep:SetHeight(1)
+    sep:SetPoint("BOTTOMLEFT", optRow, "TOPLEFT", 12, OPT_GAP / 2)
+    sep:SetPoint("BOTTOMRIGHT", optRow, "TOPRIGHT", -12, OPT_GAP / 2)
+    self.optionsSep = sep
+
+    -- The single accent bar that travels between rows. Created last so it
+    -- draws above every row at the same frame level.
     self.indicator = MUI.MakeNavIndicator(panel.navContainer)
 
     -- One theme hook for the whole nav; rows repaint through Reflow.
@@ -109,14 +148,21 @@ function Nav:SetActive(key)
     for k, row in pairs(self.rows) do
         row:SetActive(k == key)
     end
-    -- Tab switch: the bar travels to the newly selected row.
+    -- Tab switch: the bar travels to the newly selected row — Options
+    -- included, from either direction.
     if self.indicator then self.indicator:MoveTo(self.rows[key], false) end
     if self.panel and self.panel.SetPageHeader then
-        local mod = MC.modulesByKey and MC.modulesByKey[key]
-        local tagline = TAGLINES[key] or (mod and mod.label) or ""
-        local scope = MC.GetExpansionFilterLabel and MC.GetExpansionFilterLabel()
-        local subtitle = (scope and scope ~= "") and (tagline .. "  \194\183  " .. scope) or tagline
-        self.panel:SetPageHeader((mod and mod.label) or key, subtitle)
+        if key == MC.OPTIONS_KEY then
+            -- No expansion scope here: Options is not a filtered list.
+            self.panel:SetPageHeader("Options",
+                "How Collectionist tracks, and how it looks")
+        else
+            local mod = MC.modulesByKey and MC.modulesByKey[key]
+            local tagline = TAGLINES[key] or (mod and mod.label) or ""
+            local scope = MC.GetExpansionFilterLabel and MC.GetExpansionFilterLabel()
+            local subtitle = (scope and scope ~= "") and (tagline .. "  \194\183  " .. scope) or tagline
+            self.panel:SetPageHeader((mod and mod.label) or key, subtitle)
+        end
     end
 end
 
@@ -142,8 +188,21 @@ function Nav:Reflow()
             row:Repaint()
         end
     end
-    -- Reflow is a layout change (reorder, enable/disable, theme switch),
-    -- not a selection change: the bar re-seats without travelling.
+    -- Options keeps its own bottom anchor through every reorder; only its
+    -- active state and palette need re-deriving here.
+    local optRow = self.rows[MC.OPTIONS_KEY]
+    if optRow then
+        optRow._active = (self.activeKey == MC.OPTIONS_KEY)
+        optRow:Repaint()
+    end
+    if self.optionsSep then
+        local dv = MUI.Theme.colors.optionsDivider
+        self.optionsSep:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
+    end
+    -- Reflow is a layout change (reorder, enable/disable, theme switch,
+    -- window resize), not a selection change: the bar re-seats without
+    -- travelling. The resize case matters for Options specifically — its
+    -- row moves with the container's bottom edge.
     if self.indicator then
         self.indicator:MoveTo(self.activeKey and self.rows[self.activeKey], true)
     end

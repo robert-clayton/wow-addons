@@ -45,6 +45,25 @@ MC.modules = {}
 MC.modulesByKey = {}
 MC.activeModule = nil
 
+--------------------------------------------------------------------------
+-- What the content area is showing. One selection, two kinds: a module
+-- key, or MC.OPTIONS_KEY for the Options view (premium shell only — the
+-- classic panel keeps its settings window). MC.SwitchTab takes either and
+-- runs the same cross-fade for both.
+--
+-- MC.activeModule keeps naming the last TRACKER shown even while Options
+-- is up, so the expansion filter, the score tooltip and `/mc collected`
+-- all still have a module to talk about; MC.IsOptionsSelected() is what
+-- the render paths branch on. The sentinel is namespaced so it can never
+-- collide with a module key.
+--------------------------------------------------------------------------
+MC.OPTIONS_KEY = "__options"
+MC.activeSelection = nil
+
+function MC.IsOptionsSelected()
+    return MC.activeSelection == MC.OPTIONS_KEY
+end
+
 function MC.RegisterModule(key, opts)
     local mod = {
         key   = key,
@@ -489,10 +508,18 @@ function MC.SetModuleEnabled(key, enabled)
     -- show a placeholder if everything is off.
     if not enabled and MC.activeModule == key then
         local first = MC.FirstEnabledModule()
-        if first then
+        if MC.IsOptionsSelected() then
+            -- The toggle came from the Options page itself, which owns
+            -- the content area. Re-point the "last tracker" so leaving
+            -- Options lands on something enabled, but do not yank the
+            -- user off the page they are still using.
+            MC.activeModule = first
+            if first and MC.cdb then MC.cdb.activeTab = first end
+        elseif first then
             MC.SwitchTab(first)
         else
             MC.activeModule = nil
+            MC.activeSelection = nil
             if MC.panel and MC.panel.scrollChild and MC.panel.scrollChild._children then
                 for _, child in pairs(MC.panel.scrollChild._children) do
                     if child.Hide then child:Hide() end
@@ -1369,8 +1396,11 @@ function MC.OnScanComplete(mod)
     if MC.Targets and MC.Targets.OnScanComplete then MC.Targets:OnScanComplete(mod) end
     if MC.RosterDebouncedBroadcast then MC.RosterDebouncedBroadcast() end
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
+    -- Not while Options owns the content area: the module's rows would
+    -- render straight over the settings page.
     if MC.activeModule == mod.key and mod.UI and MC.panel
-       and MC.panel.frame and MC.panel.frame:IsShown() then
+       and MC.panel.frame and MC.panel.frame:IsShown()
+       and not MC.IsOptionsSelected() then
         mod.UI:Refresh()
     end
 end
@@ -1716,23 +1746,56 @@ end)
 --------------------------------------------------------------------------
 -- Panel creation
 --------------------------------------------------------------------------
--- Premium compact/strip states condense the title bar; the indicator
--- chain (filter/score/peer) would overlap the page title at compact
--- widths, so it hides whenever the shell is not in the full state.
--- Never called under classic, so MC._indicatorsHidden stays unset there.
-local function ApplyIndicatorVisibility(mode)
-    MC._indicatorsHidden = (mode ~= "full")
-    local hidden = MC._indicatorsHidden
-    local function setShown(btn)
-        if not btn then return end
-        if hidden then btn:Hide() else btn:Show() end
-    end
-    setShown(MC.expansionFilterBtn)
-    setShown(MC.scoreIndicator)
-    setShown(MC.peerIndicator)
+-- Two independent reasons to take indicators off the header:
+--
+--   view      premium compact/strip states condense the title bar; the
+--             BUTTON chain (filter/score/peer) would overlap the page
+--             title at compact widths, so those hide. The progress
+--             counter is exempt: both condensed views are built around
+--             it — the strip is icon + wordmark + counter + restore, and
+--             the compact header is title + counter + spine — and each
+--             re-anchors it rather than dropping it. Hiding it here
+--             would also stick, because nothing on the way back into
+--             those views shows it again.
+--   options   the Options view owns the content area. The expansion
+--             filter and the progress counter describe a tracker list and
+--             have nothing to say about a settings page; Collection Score
+--             and the peer count are account-wide and stay.
+--
+-- MC._indicatorsHidden keeps its original meaning — the VIEW-driven "the
+-- whole chain is gone" flag, which RefreshPeerIndicator consults when it
+-- self-shows from an event. Premium only: under classic nothing here ever
+-- runs, so the peer indicator's roster-driven visibility is untouched.
+local function setIndicatorShown(btn, hidden)
+    if not btn then return end
+    if hidden then btn:Hide() else btn:Show() end
+end
+
+function MC._ApplyIndicatorVisibility()
+    if not MC._premiumShell then return end
+    local viewHidden = MC._viewIndicatorsHidden and true or false
+    MC._indicatorsHidden = viewHidden
+
+    -- The filter is module-scoped, so it goes with the view state OR with
+    -- Options.
+    setIndicatorShown(MC.expansionFilterBtn, viewHidden or MC.IsOptionsSelected())
+    setIndicatorShown(MC.scoreIndicator, viewHidden)
+    setIndicatorShown(MC.peerIndicator, viewHidden)
+    -- The counter hides for Options, since it counts a tracker list.
+    -- Exception: the strip is built around it (icon, wordmark, counter,
+    -- restore) and would collapse to a gap without it. Its value is the
+    -- last tracker's and stays accurate while Options is up, so the
+    -- strip keeps showing it. It is a FontString, and the
+    -- score/peer/filter chain hangs off it — hiding a region does not
+    -- break anchors that reference it, so the rest keeps its place.
+    local stripView = MC.panel and MC.panel.GetViewMode
+        and MC.panel:GetViewMode() == "strip"
+    setIndicatorShown(MC.panel and MC.panel.titleProgressText,
+        MC.IsOptionsSelected() and not stripView)
+
     -- Peer visibility also depends on rosterEnabled; re-derive it on
     -- return to full rather than blanket-showing.
-    if not hidden and MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+    if not viewHidden and MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
 end
 
 function MC.CreatePanel()
@@ -1749,6 +1812,9 @@ function MC.CreatePanel()
     local panel
     if MC.GetUIStyle and MC.GetUIStyle() == "premium"
        and MUI.CreatePremiumShell and MC.MakePremiumDB then
+        -- Set before construction: the shell fires onViewChanged from its
+        -- own constructor, and the indicator applier is premium-only.
+        MC._premiumShell = true
         panel = MUI:CreatePremiumShell({
             name          = "CollectionistPremium",
             title         = "Collectionist",
@@ -1764,7 +1830,29 @@ function MC.CreatePanel()
             maxWidth      = 1400,
             minHeight     = 520,
             maxHeight     = 1000,
-            onRefresh     = function() MC.RefreshActive() end,
+            onRefresh     = function(shell)
+                -- Resizes and view-state applies move the nav container's
+                -- bottom edge, and with it the bottom-anchored Options
+                -- row. The indicator re-seats itself off the container's
+                -- OnSizeChanged (lib.MakeNavIndicator) — that is the path
+                -- that sees the END of an animated resize, which this one
+                -- cannot: ApplyMinimizeState calls onRefresh before
+                -- lib.SizeTo has moved anything. This stays as the row
+                -- re-anchor for the same event. onRefresh also fires for
+                -- every section expand/collapse, where the sidebar has
+                -- not moved at all; a full Reflow there would re-anchor
+                -- all eight rows and re-derive every module's counts for
+                -- nothing, so gate on the one measurement that changes.
+                local nav = shell and shell.navContainer
+                local h = nav and nav:GetHeight() or 0
+                if h ~= MC._navContainerHeight then
+                    MC._navContainerHeight = h
+                    if MC.PremiumNav and MC.PremiumNav.Reflow then
+                        MC.PremiumNav:Reflow()
+                    end
+                end
+                MC.RefreshActive()
+            end,
             -- Footer behaviors: the lib shell is consumer-agnostic, so
             -- the /mc-scan body and the Inspector hook arrive as opts.
             onScan        = function()
@@ -1783,13 +1871,25 @@ function MC.CreatePanel()
             -- nil-guards each button and CreatePanel re-applies after
             -- the chain is built.
             onViewChanged = function(_, mode)
-                ApplyIndicatorVisibility(mode)
+                MC._viewIndicatorsHidden = (mode ~= "full")
+                MC._ApplyIndicatorVisibility()
             end,
+            -- The footer's Options button selects the Options row in the
+            -- sidebar rather than opening a second window. It still
+            -- toggles, as it did when it owned a window: pressing it
+            -- while Options is showing goes back to the tracker the
+            -- player came from, which is the only way to dismiss Options
+            -- without picking a specific tab.
+            onOptions     = function() MC.ToggleOptions() end,
             -- Collection spine data: per-source {collected, total} for
             -- the active tab, filter-scoped like the 17/90 counter (both
             -- read the same visible result sets). Recipes' per-skillLine
             -- results don't fit the source shape — nil hides the spine.
             spineData = function()
+                -- Options is not a tracker list: nothing for the spine to
+                -- describe, so the header falls back to its plain accent
+                -- hairline rather than showing the last module's data.
+                if MC.IsOptionsSelected() then return nil end
                 local mod = MC.modulesByKey[MC.activeModule]
                 local r = mod and mod.Scanner and mod.Scanner.results
                 if not r or not r.bySource or mod.key == "recipes" then return nil end
@@ -1979,7 +2079,8 @@ function MC.CreatePanel()
         -- (saved from last session); its initial onViewChanged fired
         -- before this chain existed, so re-apply visibility now.
         if panel.GetViewMode and panel:GetViewMode() ~= "full" then
-            ApplyIndicatorVisibility(panel:GetViewMode())
+            MC._viewIndicatorsHidden = true
+            MC._ApplyIndicatorVisibility()
         end
     end
 end
@@ -2021,26 +2122,25 @@ end
 --------------------------------------------------------------------------
 -- Tab switching
 --------------------------------------------------------------------------
-function MC.SwitchTab(key)
-    local mod = MC.modulesByKey[key]
-    if not mod or not MC.IsModuleEnabled(key) then return end
+-- The Options category rail sits beside the scroll child rather than
+-- inside it (it must not scroll), so the cross-fade has to reach it
+-- separately. nil for tracker views and before the first options render.
+local function ConfigRail()
+    local p = MC.panel
+    return p and p.GetConfigContentRail and p:GetConfigContentRail() or nil
+end
 
-    MC.activeModule = key
-    if MC.cdb then MC.cdb.activeTab = key end
-
-    -- Tooltip and row frames are about to be reused by the new tab.
+-- One cross-fade, shared by every selection — tracker or Options: the
+-- outgoing content is gone the instant the row is clicked, and the
+-- incoming one fades up. Alpha is dropped before the rebuild so the
+-- rebuild itself is never seen, then raised from zero — a plain FadeIn
+-- would no-op at full alpha.
+local function TransitionContent(rebuild)
+    -- Tooltip and row frames are about to be reused by the new view.
     MC.HideInfoTooltip()
     if GameTooltip then GameTooltip:Hide() end
 
-    if MC.TabBar then MC.TabBar:SetActive(key) end
-    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
-
-    if mod.UI and not mod.UI._initialized then
-        mod.UI:Init(MC.panel, mod)
-        mod.UI._initialized = true
-    end
-
-    -- Hide stale GetOrCreate children left behind by the previous tab
+    -- Hide stale GetOrCreate children left behind by the previous view
     -- (progress bars, emptyText, etc).
     if MC.panel and MC.panel.scrollChild and MC.panel.scrollChild._children then
         for _, child in pairs(MC.panel.scrollChild._children) do
@@ -2052,20 +2152,147 @@ function MC.SwitchTab(key)
         MC.panel.scrollFrame:SetVerticalScroll(0)
     end
 
-    -- Cross-tab transition: the outgoing list is gone the instant the
-    -- tab is clicked, and the incoming one fades up. Alpha is dropped
-    -- before RefreshActive so the rebuild itself is never seen, then
-    -- raised from zero — a plain FadeIn would no-op at full alpha.
     local child = MC.panel and MC.panel.scrollChild
     if child then child:SetAlpha(0) end
-    MC.RefreshActive()
+    local outgoingRail = ConfigRail()
+    if outgoingRail then outgoingRail:SetAlpha(0) end
+
+    rebuild()
+
     if child then MUI.FadeIn(child, MC.TAB_FADE) end
+    -- Only fade a rail the rebuild actually left on screen: FadeIn shows
+    -- what it fades, which would resurrect the rail over a tracker list.
+    local rail = ConfigRail()
+    if rail then
+        if rail:IsShown() then
+            rail:SetAlpha(0)
+            MUI.FadeIn(rail, MC.TAB_FADE)
+        else
+            rail:SetAlpha(1)
+        end
+    end
+end
+
+-- Accepts a module key or MC.OPTIONS_KEY. The sidebar hands whichever the
+-- clicked row carries straight through, so both kinds land here.
+function MC.SwitchTab(key)
+    if key == MC.OPTIONS_KEY then return MC.SelectOptions() end
+
+    local mod = MC.modulesByKey[key]
+    if not mod or not MC.IsModuleEnabled(key) then return end
+
+    local wasOptions = MC.IsOptionsSelected()
+    MC.activeSelection = key
+    MC.activeModule = key
+    if MC.cdb then MC.cdb.activeTab = key end
+
+    if MC.TabBar then MC.TabBar:SetActive(key) end
+    if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
+    if wasOptions then MC._ApplyIndicatorVisibility() end
+
+    if mod.UI and not mod.UI._initialized then
+        mod.UI:Init(MC.panel, mod)
+        mod.UI._initialized = true
+    end
+
+    TransitionContent(function()
+        -- Leaving Options: its pooled widgets share the scroll child with
+        -- the tracker list that is about to render, so take them off it
+        -- before the module draws.
+        if wasOptions and MC.panel.ClearConfigContent then
+            MC.panel:ClearConfigContent()
+        end
+        MC.RefreshActive()
+    end)
+end
+
+-- Options as a view of the main window. Premium only: the classic panel
+-- has no sidebar to select it from, so it keeps the settings window.
+function MC.SelectOptions()
+    if not MC.panel then return end
+    if not MC.panel.RenderConfigInContent then
+        -- Classic shell (or a lib too old to render options in place).
+        if MC.panel.ToggleConfig then MC.panel:ToggleConfig() end
+        return
+    end
+    -- Already the selection: re-clicking the row (or the footer button
+    -- landing here) would release every pooled widget and cross-fade the
+    -- page back in over itself, which reads as a flicker for no change.
+    -- RefreshActive is the path for redrawing a page that is already up.
+    if MC.IsOptionsSelected() then return end
+
+    MC.activeSelection = MC.OPTIONS_KEY
+
+    if MC.TabBar and MC.TabBar.SetActive then
+        MC.TabBar:SetActive(MC.OPTIONS_KEY)
+    end
+    -- The expansion filter and the progress counter describe a tracker
+    -- list; neither has anything to say about Options.
+    MC._ApplyIndicatorVisibility()
+
+    TransitionContent(function()
+        -- The tracker rows are pooled on the shell, not on the module, so
+        -- nothing releases them unless we do — they would sit under the
+        -- options page otherwise.
+        if MC.panel.pool then MC.panel.pool:ReleaseAll() end
+        MC.BuildConfig()
+    end)
+end
+
+-- The footer button's behavior: in, then back out. Under classic this is
+-- still the settings window's own open/close (SelectOptions forwards to
+-- ToggleConfig). Under premium, "out" means the tracker that was last
+-- selected — MC.activeModule is untouched while Options is showing — or
+-- the first enabled one if that module was disabled from the page the
+-- player is standing on.
+function MC.ToggleOptions()
+    if not MC.IsOptionsSelected() then return MC.SelectOptions() end
+    local back = MC.activeModule
+    if not back or not MC.IsModuleEnabled(back) then
+        back = MC.FirstEnabledModule()
+    end
+    -- Everything disabled: there is nothing to go back to, so Options
+    -- stays up rather than leaving an empty content area behind.
+    if back then MC.SwitchTab(back) end
+end
+
+-- Re-render the options page on the next frame, once, however many
+-- callers ask for it.
+--
+-- Off the current call stack on purpose: RefreshActive is what an option
+-- setter calls to redraw the list behind it ("Show <collected>" from a
+-- checkbox's OnClick, Background Opacity from a slider's OnMouseUp), and
+-- with Options in the content area that redraw is the options page
+-- itself. Rendering it synchronously would poolReset — hide — the very
+-- widget whose handler is still running, then re-acquire and re-show it
+-- underneath itself. The settings window never had that shape: it only
+-- ever re-rendered a page nothing was standing on. Same reason
+-- SetModuleEnabled defers its own BuildConfig.
+function MC.QueueConfigRebuild()
+    if MC._configRebuildQueued then return end
+    MC._configRebuildQueued = true
+    C_Timer.After(0, function()
+        MC._configRebuildQueued = false
+        -- The player can leave Options inside that frame; SwitchTab has
+        -- already rendered the tracker by then and must not be painted
+        -- over.
+        if MC.IsOptionsSelected() then MC.BuildConfig() end
+    end)
 end
 
 -- Refresh hides the tooltip first, otherwise it can stay pinned to a row
 -- that's about to be released back to the pool.
 function MC.RefreshActive()
     if not MC.panel or not MC.panel.scrollChild then return end
+    -- Every "the content area is stale" path funnels through here —
+    -- scans, theme switches, resizes, filter changes. While Options owns
+    -- the content area it is the thing that has to be redrawn; letting a
+    -- module render would paint a tracker list over it.
+    if MC.IsOptionsSelected() then
+        MC.QueueConfigRebuild()
+        if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        return
+    end
     local mod = MC.modulesByKey[MC.activeModule]
     if not mod or not mod.UI then return end
     MC.HideInfoTooltip()
@@ -2246,7 +2473,13 @@ function MC.BuildConfig()
         end,
         fillColor = { 0.16, 0.78, 0.75 } }
 
-    MC.panel:PopulateConfig(defs)
+    -- Options-as-a-view renders the same defs into the main content area;
+    -- the settings window path is unchanged for everyone else.
+    if MC.IsOptionsSelected() and MC.panel.RenderConfigInContent then
+        MC.panel:RenderConfigInContent(defs)
+    else
+        MC.panel:PopulateConfig(defs)
+    end
 end
 
 --------------------------------------------------------------------------

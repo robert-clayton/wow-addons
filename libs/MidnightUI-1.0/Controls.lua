@@ -144,12 +144,52 @@ function lib.ApplyWindowGlyph(btn, kind)
     end
 end
 
+-- Where a nav row's top edge sits relative to the container's, which is
+-- the one coordinate the indicator travels in. Most rows anchor to the
+-- container's TOP edge and their own y offset is already that number; a
+-- row pinned to the container's BOTTOM edge (so it holds its place as
+-- rows above it come and go) has to be converted, or the indicator would
+-- travel to y = 0 and sit at the top of the list.
+--
+-- A TOP-anchored row already carries the answer in its own anchor, and
+-- reading it back is exact the moment it is written: the sidebar
+-- re-anchors its rows and then asks for the selected one's offset inside
+-- the same layout pass, so the anchor is the only source guaranteed to
+-- describe where the row is about to be rather than where it was. Such a
+-- row does not move under a resize either.
+--
+-- Only the BOTTOM-anchored case needs converting, and the container's
+-- height is the one term that moves it. Derive from that height rather
+-- than from resolved rects: a resize is applied over many frames (SizeTo
+-- lerps SetSize), so a rect sampled during one describes the size being
+-- left, not the one being travelled to — the same trap ShellProto's
+-- UpdateSpine(targetW) exists to avoid. `containerH` is the height to
+-- resolve against; callers that have the authoritative one (OnSizeChanged
+-- hands it over) pass it, everyone else gets the live measurement.
+-- Live rects stay the fallback for a row anchored to something other than
+-- the container, where the height math does not apply.
+local function rowTopOffset(container, row, containerH)
+    local _, relTo, relPoint, _, y = row:GetPoint()
+    if type(relPoint) == "string" and not relPoint:find("BOTTOM") then
+        return y or 0
+    end
+    if relTo and relTo ~= container then
+        local rowTop, containerTop = row:GetTop(), container:GetTop()
+        if rowTop and containerTop then return rowTop - containerTop end
+    end
+    local h = containerH or container:GetHeight() or 0
+    return (y or 0) - (h - (row:GetHeight() or 0))
+end
+
 -- MakeNavIndicator: the sidebar's single accent bar. One shared bar that
 -- travels to the selected row reads as one object moving; per-row bars
 -- blinking on and off read as two unrelated events. A Frame, not a
 -- texture, so the travel can use a native Translation.
 --   :MoveTo(row, instant) — slide to a nav row (nil hides the bar)
 --   :Repaint()            — re-read the theme accent
+-- The bar always anchors TOPLEFT-to-container whichever edge the row
+-- itself is pinned to: SlideTo only lerps offsets, so swapping the
+-- anchor point per row would snap instead of travelling.
 function lib.MakeNavIndicator(container)
     local bar = CreateFrame("Frame", nil, container)
     bar:SetWidth(2)
@@ -166,29 +206,60 @@ function lib.MakeNavIndicator(container)
         tex:SetColorTexture(ac[1], ac[2], ac[3], 1)
     end
 
+    -- Place the bar with no travel, against a specific container height.
+    -- Stops the slide only: a re-seat can land mid fade-in (the bar's
+    -- first appearance during a window animation), and StopAnims would
+    -- take the fade with it and strand the bar at alpha 0.
+    function bar:_Seat(row, containerH)
+        local y = rowTopOffset(container, row, containerH)
+        lib.StopSlide(self)
+        self:ClearAllPoints()
+        self:SetPoint("TOPLEFT", container, "TOPLEFT", 0, y or 0)
+    end
+
     function bar:MoveTo(row, instant)
         if not row then
+            self._row = nil
             lib.StopAnims(self)
             self:Hide()
             return
         end
-        local _, _, _, _, y = row:GetPoint()
+        self._row = row
         self:SetHeight(row:GetHeight())
         -- First appearance has nowhere to travel from: place it, fade in.
         if not self:IsShown() then
-            self:ClearAllPoints()
-            self:SetPoint("TOPLEFT", container, "TOPLEFT", 0, y or 0)
+            self:_Seat(row)
             lib.FadeIn(self)
             return
         end
         if instant then
-            lib.StopAnims(self)
-            self:ClearAllPoints()
-            self:SetPoint("TOPLEFT", container, "TOPLEFT", 0, y or 0)
+            self:_Seat(row)
         else
-            lib.SlideTo(self, "TOPLEFT", container, "TOPLEFT", 0, y or 0)
+            lib.SlideTo(self, "TOPLEFT", container, "TOPLEFT", 0,
+                rowTopOffset(container, row) or 0)
         end
     end
+
+    -- A bottom-anchored row's offset is a function of the container's
+    -- height, so the bar has to be re-seated every time that height moves
+    -- — and the container is the only place that hears about all of them.
+    -- A window resize animates SetSize over many frames, so a re-seat
+    -- driven from the START of one (ApplyMinimizeState fires its refresh
+    -- before SizeTo has moved anything) resolves against the height being
+    -- left: restoring from the 30px strip would seat the bar above the
+    -- sidebar entirely, and nothing would correct it until an unrelated
+    -- layout change. Watching the container catches every intermediate
+    -- frame and the final one, and covers the drag-resize path for free.
+    -- Top-anchored rows are height-independent, so this is a no-op for
+    -- them and never interrupts a travel in progress.
+    container:HookScript("OnSizeChanged", function(_, _, h)
+        local row = bar._row
+        if not row or not bar:IsShown() then return end
+        local _, _, relPoint = row:GetPoint()
+        if type(relPoint) == "string" and relPoint:find("BOTTOM") then
+            bar:_Seat(row, h)
+        end
+    end)
 
     bar:Repaint()
     return bar

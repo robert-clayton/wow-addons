@@ -6,7 +6,8 @@ local theme = lib.Theme
 local WHITE8 = "Interface\\Buttons\\WHITE8x8"
 
 -- Paged options layout.
---   RAIL_W      width of the category rail down the left of the window
+--   RAIL_W      width of the category rail down the left of the options
+--               surface (the settings window, or a shell's content area)
 --   RAIL_GUTTER gap between the rail and the first content column
 --   RAIL_ROW_H  one rail row
 --   COL_GAP     half-gutter between the two content columns
@@ -14,6 +15,19 @@ local RAIL_W      = 130
 local RAIL_GUTTER = 14
 local RAIL_ROW_H  = 28
 local COL_GAP     = 8
+
+-- Narrow-surface fallbacks, used only by a target that reports its own
+-- width (see `width` in the target contract). The settings window is a
+-- fixed 680 and never reports one, so it always gets the full rail and
+-- two columns — exactly what it rendered before these existed.
+--   RAIL_NARROW  below this surface width the rail is a bad deal: 144px
+--                of a compact shell's ~290 leaves two columns of ~65
+--   RAIL_MIN_W   the rail still has to hold "Appearance" on one line
+--   COL_MIN_W    below this per column, one full-width column reads
+--                better than two cramped ones
+local RAIL_NARROW = 420
+local RAIL_MIN_W  = 84
+local COL_MIN_W   = 150
 
 -- File-local widget helpers
 local function OptionsDivider(body, yOff)
@@ -102,9 +116,15 @@ end
 
 -- WoW frames can't be GC'd. Pool each widget type by index so toggling a
 -- setting 50 times in a session doesn't leak 50 sets of CheckButtons.
-local function getPool(panel)
-    if not panel._cfgPools then
-        panel._cfgPools = {
+--
+-- `store` is the render TARGET's own state table, not the panel: the same
+-- defs can render into the settings window or into a shell's main content
+-- area, and a widget created under one parent can never be re-anchored
+-- into the other. One pool set per target keeps them disjoint — see the
+-- target builders at the bottom of this file.
+local function getPool(store)
+    if not store._cfgPools then
+        store._cfgPools = {
             section  = { items = {}, idx = 0 },
             divider  = { items = {}, idx = 0 },
             checkbox = { items = {}, idx = 0 },
@@ -114,7 +134,7 @@ local function getPool(panel)
             railrow  = { items = {}, idx = 0 },
         }
     end
-    return panel._cfgPools
+    return store._cfgPools
 end
 
 -- Every pool item lists the regions it owns at the top level in `_hide`.
@@ -126,15 +146,15 @@ local function hideWidget(w)
     for _, r in ipairs(w._hide) do r:Hide() end
 end
 
-local function poolReset(panel)
-    for _, pool in pairs(getPool(panel)) do
+local function poolReset(store)
+    for _, pool in pairs(getPool(store)) do
         pool.idx = 0
         for _, w in ipairs(pool.items) do hideWidget(w) end
     end
 end
 
-local function poolHideExtras(panel)
-    for _, pool in pairs(getPool(panel)) do
+local function poolHideExtras(store)
+    for _, pool in pairs(getPool(store)) do
         for i = pool.idx + 1, #pool.items do
             hideWidget(pool.items[i])
         end
@@ -142,8 +162,8 @@ local function poolHideExtras(panel)
 end
 
 -- Acquire-or-create handlers per widget type
-local function acquireSection(panel, body, yOff, text)
-    local pool = getPool(panel).section
+local function acquireSection(store, body, yOff, text)
+    local pool = getPool(store).section
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -164,8 +184,8 @@ local function acquireSection(panel, body, yOff, text)
     return yOff - 14
 end
 
-local function acquireDivider(panel, body, yOff)
-    local pool = getPool(panel).divider
+local function acquireDivider(store, body, yOff)
+    local pool = getPool(store).divider
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -195,8 +215,8 @@ end
 -- row, or one of the two half-width column frames. Returns the row
 -- HEIGHT (positive), because a two-column row advances by the taller of
 -- its two halves, not by whatever the last one rendered.
-local function acquireCheckbox(panel, parent, col, yOff, def)
-    local pool = getPool(panel).checkbox
+local function acquireCheckbox(store, parent, col, yOff, def)
+    local pool = getPool(store).checkbox
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -291,8 +311,8 @@ local function acquireCheckbox(panel, parent, col, yOff, def)
     return math.max(22, lh + 8)
 end
 
-local function acquireSlider(panel, body, yOff, label, min, max, step, getVal, setVal, fillR, fillG, fillB)
-    local pool = getPool(panel).slider
+local function acquireSlider(store, body, yOff, label, min, max, step, getVal, setVal, fillR, fillG, fillB)
+    local pool = getPool(store).slider
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -363,8 +383,8 @@ end
 -- Single-select dropdown. `def.options` is `{ { label, value }, ... }`;
 -- `def.get()` returns the current value; `def.set(v)` applies it.
 -- Clicking the button opens MUI.MakeDropdown popup with the options.
-local function acquireDropdown(panel, body, yOff, def)
-    local pool = getPool(panel).dropdown
+local function acquireDropdown(store, body, yOff, def)
+    local pool = getPool(store).dropdown
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -466,8 +486,8 @@ end
 -- `label` is the explanatory caption, `text` the button face (default
 -- "Run"). The button is lib.MakeHeaderBtn with the accent treatment the
 -- window's primary footer button uses.
-local function acquireButton(panel, body, yOff, def)
-    local pool = getPool(panel).button
+local function acquireButton(store, body, yOff, def)
+    local pool = getPool(store).button
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -547,8 +567,8 @@ end
 -- for an icon and a right-hand count column, neither of which a 130px
 -- category rail has room for. Same visual language though — shared
 -- accent indicator, hover wash, title-colored active label.
-local function acquireRailRow(panel, rail, index, label, active, onClick)
-    local pool = getPool(panel).railrow
+local function acquireRailRow(store, rail, index, label, active, onClick)
+    local pool = getPool(store).railrow
     pool.idx = pool.idx + 1
     local w = pool.items[pool.idx]
     if not w then
@@ -626,28 +646,23 @@ local function acquireRailRow(panel, rail, index, label, active, onClick)
     return w
 end
 
--- The rail lives on the window frame, not in the scrolling body: it must
--- stay put while the page scrolls. Anchored between the header and the
--- footer so it inherits whatever heights the window factory used.
-local function ensureRail(cfgFrame)
-    if cfgFrame._cfgRail then return cfgFrame._cfgRail end
-    local rail = CreateFrame("Frame", nil, cfgFrame)
+-- The rail never lives in the scrolling body: it must stay put while the
+-- page scrolls. WHERE it hangs is the target's business — between the
+-- settings window's header and footer, or down the left edge of a shell's
+-- main content area — so the anchors arrive as target.railTop /
+-- target.railBottom, each { relativeFrame, relativePoint, x, y }.
+local function ensureRail(target)
+    local store = target.store
+    if store._cfgRail then return store._cfgRail end
+    local rail = CreateFrame("Frame", nil, target.railParent)
     rail:SetWidth(RAIL_W)
-    if cfgFrame.header then
-        rail:SetPoint("TOPLEFT", cfgFrame.header, "BOTTOMLEFT", 16, -8)
-    else
-        rail:SetPoint("TOPLEFT", cfgFrame, "TOPLEFT", 16, -54)
-    end
-    if cfgFrame.footer then
-        rail:SetPoint("BOTTOMLEFT", cfgFrame.footer, "TOPLEFT", 16, 8)
-    else
-        rail:SetPoint("BOTTOMLEFT", cfgFrame, "BOTTOMLEFT", 16, 16)
-    end
-    -- The scroll frame spans the full body width and is a sibling created
-    -- earlier; lifting the rail above it keeps both the draw order and
-    -- the hit testing unambiguous.
-    if cfgFrame.scrollFrame then
-        rail:SetFrameLevel(cfgFrame.scrollFrame:GetFrameLevel() + 5)
+    local t, b = target.railTop, target.railBottom
+    rail:SetPoint("TOPLEFT", t[1], t[2], t[3], t[4])
+    rail:SetPoint("BOTTOMLEFT", b[1], b[2], b[3], b[4])
+    -- The scroll frame spans the full body width; lifting the rail above
+    -- it keeps both the draw order and the hit testing unambiguous.
+    if target.railAbove then
+        rail:SetFrameLevel(target.railAbove:GetFrameLevel() + 5)
     end
 
     local edge = rail:CreateTexture(nil, "ARTWORK")
@@ -662,7 +677,7 @@ local function ensureRail(cfgFrame)
     paint()
     if lib.RegisterThemeHook then lib.RegisterThemeHook(paint) end
 
-    cfgFrame._cfgRail = rail
+    store._cfgRail = rail
     return rail
 end
 
@@ -672,24 +687,27 @@ end
 -- scroll frame around. The column frames are anchored halves of it, so
 -- a widget anchored into a column resolves its width at draw time just
 -- like it used to against the body.
-local function ensureContent(panel, body)
-    local content = panel._cfgContent
+local function ensureContent(store, body)
+    local content = store._cfgContent
     if not content then
         content = CreateFrame("Frame", nil, body)
         content:SetHeight(1)
-        panel._cfgContent = content
+        store._cfgContent = content
 
         local colL = CreateFrame("Frame", nil, content)
         colL:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
         colL:SetPoint("BOTTOMRIGHT", content, "BOTTOM", -COL_GAP, 0)
-        panel._cfgColL = colL
+        store._cfgColL = colL
 
         local colR = CreateFrame("Frame", nil, content)
         colR:SetPoint("TOPLEFT", content, "TOP", COL_GAP, 0)
         colR:SetPoint("BOTTOMRIGHT", content, "BOTTOMRIGHT", 0, 0)
-        panel._cfgColR = colR
+        store._cfgColR = colR
     end
-    return content, panel._cfgColL, panel._cfgColR
+    -- A target can be cleared (_clearConfigBody hides the whole subtree);
+    -- rendering into it again has to bring it back.
+    content:Show()
+    return content, store._cfgColL, store._cfgColR
 end
 
 -- Split a def list at `page` markers. Defs ahead of the first marker
@@ -720,25 +738,123 @@ local function isPlainCheckbox(def)
     return def and def.type == "checkbox" and not def.reorder
 end
 
--- PopulateConfig implementation (called by PanelProto:_PopulateConfigBody)
-lib._populateConfigBody = function(panel, defs)
-    local cfgFrame = panel.cfgFrame
-    if not cfgFrame or not cfgFrame.body then return end
-    if not defs then return end
-    local body = cfgFrame.body
+--------------------------------------------------------------------------
+-- Render targets
+--
+-- A target says WHERE a def list renders. Everything the renderer needs
+-- that differs between the settings window and a shell's main content
+-- area lives here, so the layout pass below is target-agnostic:
+--   store        this target's own state (pools, content/column frames,
+--                rail, current page, last defs) — one table per target,
+--                which is what keeps the two sets of pooled widgets from
+--                ever being re-anchored into each other's parent
+--   body         the frame widgets anchor into (a scroll child)
+--   scrollFrame  scrolled by the rail (page change resets it to the top)
+--   railParent   creation parent for the category rail
+--   railTop/railBottom  { relativeFrame, relativePoint, x, y }
+--   width        optional function returning the surface's usable width.
+--                A target that can be resized narrow supplies it and gets
+--                the narrow fallbacks (thinner rail, single column); one
+--                that omits it renders at full width unconditionally.
+--                Authoritative numbers only — body:GetWidth() is 0 until
+--                the surface has been shown once.
+--   finish(totalH)      commit the measured height
+--------------------------------------------------------------------------
 
-    panel._cfgDefs = defs
+-- The settings window: the original — and still the only — target under
+-- the classic shell. Rendering state stays on the panel exactly where it
+-- has always been, so a panel that only ever opens the window behaves
+-- identically to before targets existed.
+local function windowTarget(panel)
+    local cfgFrame = panel.cfgFrame
+    if not cfgFrame or not cfgFrame.body then return nil end
+    local target = panel._cfgWindowTarget
+    if target and target.frame == cfgFrame then return target end
+    target = {
+        frame       = cfgFrame,
+        store       = panel,
+        body        = cfgFrame.body,
+        scrollFrame = cfgFrame.scrollFrame,
+        railParent  = cfgFrame,
+        railAbove   = cfgFrame.scrollFrame,
+        railTop     = cfgFrame.header
+            and { cfgFrame.header, "BOTTOMLEFT", 16, -8 }
+            or  { cfgFrame, "TOPLEFT", 16, -54 },
+        railBottom  = cfgFrame.footer
+            and { cfgFrame.footer, "TOPLEFT", 16, 8 }
+            or  { cfgFrame, "BOTTOMLEFT", 16, 16 },
+        finish = function(totalH)
+            -- A scrolling settings window is a fixed size: the body is
+            -- its scroll child, so only the scroll range changes. The
+            -- legacy side-dock grew to fit instead.
+            if cfgFrame._scrolls then
+                -- Switching from a long page to a short one leaves the
+                -- old scroll offset past the new end, which reads as an
+                -- empty window.
+                local sf = cfgFrame.scrollFrame
+                if sf then
+                    local maxScroll = math.max(totalH - sf:GetHeight(), 0)
+                    if sf:GetVerticalScroll() > maxScroll then
+                        sf:SetVerticalScroll(maxScroll)
+                    end
+                end
+                if cfgFrame.UpdateScrollBar then cfgFrame.UpdateScrollBar() end
+            else
+                cfgFrame:SetHeight(24 + 4 + totalH)
+            end
+        end,
+    }
+    panel._cfgWindowTarget = target
+    return target
+end
+
+-- Hide everything a target has on screen without discarding it: the
+-- pooled widgets, the content subtree, and the rail. Used when the
+-- surface the target renders into is about to show something else (the
+-- premium content area going back to a tracker list).
+lib._clearConfigBody = function(target)
+    if not target or not target.store then return end
+    local store = target.store
+    if store._cfgPools then poolReset(store) end
+    if store._cfgContent then store._cfgContent:Hide() end
+    if store._cfgRail then store._cfgRail:Hide() end
+end
+
+-- PopulateConfig implementation (called by PanelProto:_PopulateConfigBody
+-- and ShellProto:RenderConfigInContent). `target` defaults to the
+-- settings window.
+lib._populateConfigBody = function(panel, defs, target)
+    target = target or windowTarget(panel)
+    if not target or not target.body then return end
+    if not defs then return end
+    local store = target.store
+    local body = target.body
+
+    store._cfgDefs = defs
     local pages = splitPages(defs)
     local paged = #pages > 1
 
-    local pageIdx = panel._cfgPage or 1
+    local pageIdx = store._cfgPage or 1
     if pageIdx < 1 or pageIdx > #pages then pageIdx = 1 end
-    panel._cfgPage = pageIdx
+    store._cfgPage = pageIdx
 
-    poolReset(panel)
+    poolReset(store)
 
-    local content, colL, colR = ensureContent(panel, body)
-    local indent = paged and (RAIL_W + RAIL_GUTTER) or 0
+    local content, colL, colR = ensureContent(store, body)
+
+    -- Layout width. A target that reports one can be dragged narrow
+    -- (the shell's content area follows the window), so the rail is
+    -- re-measured on every render rather than fixed at creation, and the
+    -- two-column grid gives way to one column before the columns get too
+    -- thin to read.
+    local availW = target.width and target.width() or nil
+    local railW = RAIL_W
+    if availW and availW < RAIL_NARROW then
+        railW = math.max(RAIL_MIN_W, math.min(RAIL_W, math.floor(availW * 0.30)))
+    end
+    local indent = paged and (railW + RAIL_GUTTER) or 0
+    local twoCol = (not availW) or ((availW - indent) >= 2 * COL_MIN_W)
+
     content:ClearAllPoints()
     content:SetPoint("TOPLEFT", body, "TOPLEFT", indent, 0)
     content:SetPoint("TOPRIGHT", body, "TOPRIGHT", 0, 0)
@@ -746,21 +862,22 @@ lib._populateConfigBody = function(panel, defs)
     -- Rail. Built on first paged render and reused; hidden outright when
     -- the def list carries no page markers.
     if paged then
-        local rail = ensureRail(cfgFrame)
+        local rail = ensureRail(target)
+        rail:SetWidth(railW)
         rail:Show()
         for i, page in ipairs(pages) do
             local idx = i
-            acquireRailRow(panel, rail, i, page.label, i == pageIdx, function()
-                if panel._cfgPage == idx then return end
-                panel._cfgPage = idx
-                if cfgFrame.scrollFrame then
-                    cfgFrame.scrollFrame:SetVerticalScroll(0)
+            acquireRailRow(store, rail, i, page.label, i == pageIdx, function()
+                if store._cfgPage == idx then return end
+                store._cfgPage = idx
+                if target.scrollFrame then
+                    target.scrollFrame:SetVerticalScroll(0)
                 end
-                lib._populateConfigBody(panel, panel._cfgDefs)
+                lib._populateConfigBody(panel, store._cfgDefs, target)
             end)
         end
-    elseif cfgFrame._cfgRail then
-        cfgFrame._cfgRail:Hide()
+    elseif store._cfgRail then
+        store._cfgRail:Hide()
     end
 
     local pageDefs = pages[pageIdx].defs
@@ -769,36 +886,37 @@ lib._populateConfigBody = function(panel, defs)
     while i <= n do
         local def = pageDefs[i]
         if def.type == "section" then
-            yOff = acquireSection(panel, content, yOff, def.label)
+            yOff = acquireSection(store, content, yOff, def.label)
             yOff = yOff - 2
         elseif def.type == "divider" then
-            yOff = acquireDivider(panel, content, yOff)
+            yOff = acquireDivider(store, content, yOff)
         elseif def.type == "checkbox" then
-            if isPlainCheckbox(def) and isPlainCheckbox(pageDefs[i + 1]) then
-                local hL = acquireCheckbox(panel, content, colL, yOff, def)
-                local hR = acquireCheckbox(panel, content, colR, yOff, pageDefs[i + 1])
+            if twoCol and isPlainCheckbox(def) and isPlainCheckbox(pageDefs[i + 1]) then
+                local hL = acquireCheckbox(store, content, colL, yOff, def)
+                local hR = acquireCheckbox(store, content, colR, yOff, pageDefs[i + 1])
                 yOff = yOff - math.max(hL, hR)
                 i = i + 1
             else
                 -- Reorder rows keep the full width (their arrows sit at
                 -- the right edge); a lone plain checkbox stays in the
-                -- left column so the grid does not jump.
-                local col = def.reorder and content or colL
-                yOff = yOff - acquireCheckbox(panel, content, col, yOff, def)
+                -- left column so the grid does not jump — unless there is
+                -- no grid, where half-width would just waste the room.
+                local col = (def.reorder or not twoCol) and content or colL
+                yOff = yOff - acquireCheckbox(store, content, col, yOff, def)
             end
         elseif def.type == "slider" then
             local fc = def.fillColor or { 0.40, 0.40, 0.40 }
-            yOff = acquireSlider(panel, content, yOff, def.label, def.min, def.max, def.step,
+            yOff = acquireSlider(store, content, yOff, def.label, def.min, def.max, def.step,
                 def.get, def.set, fc[1], fc[2], fc[3])
         elseif def.type == "dropdown" then
-            yOff = acquireDropdown(panel, content, yOff, def)
+            yOff = acquireDropdown(store, content, yOff, def)
         elseif def.type == "button" then
-            yOff = acquireButton(panel, content, yOff, def)
+            yOff = acquireButton(store, content, yOff, def)
         end
         i = i + 1
     end
 
-    poolHideExtras(panel)
+    poolHideExtras(store)
 
     local totalH = math.abs(yOff) + 8
     body:SetHeight(totalH)
@@ -806,21 +924,5 @@ lib._populateConfigBody = function(panel, defs)
     -- the column frames hang off its BOTTOM edge, and a stale height
     -- would leave them measuring the previous page.
     content:SetHeight(totalH)
-    -- A scrolling settings window is a fixed size: the body is its scroll
-    -- child, so only the scroll range changes. The legacy side-dock grew
-    -- to fit instead.
-    if cfgFrame._scrolls then
-        -- Switching from a long page to a short one leaves the old scroll
-        -- offset past the new end, which reads as an empty window.
-        local sf = cfgFrame.scrollFrame
-        if sf then
-            local maxScroll = math.max(totalH - sf:GetHeight(), 0)
-            if sf:GetVerticalScroll() > maxScroll then
-                sf:SetVerticalScroll(maxScroll)
-            end
-        end
-        if cfgFrame.UpdateScrollBar then cfgFrame.UpdateScrollBar() end
-    else
-        cfgFrame:SetHeight(24 + 4 + totalH)
-    end
+    if target.finish then target.finish(totalH) end
 end

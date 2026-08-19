@@ -9,6 +9,7 @@ if not lib then return end
 --   titleProgressText, navContainer, searchInput,
 --   Show/Hide/Toggle, RefreshScrollContent, ApplyBackdrop,
 --   SetPageHeader, PopulateConfig/ToggleConfig,
+--   RenderConfigInContent/ClearConfigContent/IsConfigInContent,
 --   ApplyMinimizeState/UpdateMinimizeVisual, UpdateDraggerVisibility,
 --   GetViewMode ("full" | "compact" | "strip").
 -- View states: full (sidebar + header + footer), compact (db.compact —
@@ -29,9 +30,11 @@ if not lib then return end
 -- Behavioral hooks arrive through opts so the lib stays consumer-
 -- agnostic: onRefresh, onHide, onInspector, inspectorVisible,
 -- onViewChanged(shell, mode) — fired after every non-combat state
--- apply. opts.onScan is still accepted for consumers that surface a
--- rescan action of their own (it now lives in Options); the shell no
--- longer renders a Scan button.
+-- apply — and onOptions, which claims the footer's Options button for a
+-- consumer that renders options as a view of its own (see
+-- RenderConfigInContent) instead of the settings window. opts.onScan is
+-- still accepted for consumers that surface a rescan action of their own
+-- (it now lives in Options); the shell no longer renders a Scan button.
 
 local SIDEBAR_W   = 220
 local BRAND_H     = 64
@@ -504,7 +507,16 @@ function ShellProto:_CreateFooter()
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
         "Options", BTN)
     optBtn:SetPoint("LEFT", footer, "LEFT", CONTENT_PAD, 0)
-    optBtn:SetScript("OnClick", function() shell:ToggleConfig() end)
+    -- Consumers that render options as a view of their own (an Options
+    -- entry in the sidebar) take the click through opts.onOptions; with
+    -- no hook the button falls back to the free-floating settings window.
+    optBtn:SetScript("OnClick", function()
+        if opts.onOptions then
+            opts.onOptions(shell)
+        else
+            shell:ToggleConfig()
+        end
+    end)
     footer.optionsBtn = optBtn
 
     local inspBtn = lib.MakeHeaderBtn(footer, "Inspector",
@@ -1106,7 +1118,9 @@ end
 
 function ShellProto:PopulateConfig(defs)
     self.pendingConfigDefs = defs
-    if self.cfgFrame and self.cfgFrame:IsShown() then
+    if self._cfgInContent then
+        self:RenderConfigInContent(defs)
+    elseif self.cfgFrame and self.cfgFrame:IsShown() then
         self:_PopulateConfigBody(defs)
     end
 end
@@ -1115,6 +1129,90 @@ function ShellProto:_PopulateConfigBody(defs)
     if lib._populateConfigBody then
         lib._populateConfigBody(self, defs)
     end
+end
+
+--------------------------------------------------------------------------
+-- Options as a view, not a window.
+--
+-- The same pooled renderer draws the same defs into the main content
+-- area, so a consumer can list Options alongside its own pages instead of
+-- popping a second window. The two surfaces are independent render
+-- targets: separate widget pools, separate content frames, separate rail,
+-- separate current page — nothing a window render created can end up
+-- anchored inside the content area, or the reverse.
+--
+-- The category rail is parented to the scroll FRAME rather than the
+-- scroll child (it must not scroll with the page) and rather than the
+-- window (hiding the scroll frame for the strip view has to take the
+-- rail with it).
+--------------------------------------------------------------------------
+function ShellProto:_ContentConfigTarget()
+    local target = self._cfgContentTarget
+    if not target then
+        local shell = self
+        local scroll = self.scrollFrame
+        target = {
+            store       = {},
+            body        = self.scrollChild,
+            scrollFrame = scroll,
+            railParent  = scroll,
+            railAbove   = scroll,
+            railTop     = { scroll, "TOPLEFT", 0, 0 },
+            railBottom  = { scroll, "BOTTOMLEFT", 0, 0 },
+            -- The content area is as wide as the window the player last
+            -- dragged it to, and the compact view is narrower still. The
+            -- renderer thins its rail and drops to one column off this
+            -- number; _ContentWidth is the same authority the scroll
+            -- child is sized from, so it is right before a first draw
+            -- too (where GetWidth would still read 0).
+            width       = function() return shell:_ContentWidth() end,
+            finish      = function(totalH)
+                -- Same guard the window uses: a shorter page must not
+                -- leave the view scrolled past its own end.
+                local maxScroll = math.max(totalH - scroll:GetHeight(), 0)
+                if scroll:GetVerticalScroll() > maxScroll then
+                    scroll:SetVerticalScroll(maxScroll)
+                end
+                shell:RefreshScrollContent(totalH)
+            end,
+        }
+        self._cfgContentTarget = target
+    end
+    return target
+end
+
+function ShellProto:RenderConfigInContent(defs)
+    if not lib._populateConfigBody then return end
+    self._cfgInContent = true
+    -- Recorded for the same reason PopulateConfig records it: if this
+    -- shell ever also opened the settings window, ToggleConfig replays
+    -- pendingConfigDefs, and a stale list would render there.
+    self.pendingConfigDefs = defs
+    lib._populateConfigBody(self, defs, self:_ContentConfigTarget())
+end
+
+-- Take the options surface back off the content area. The consumer calls
+-- this before rendering one of its own pages there; without it the
+-- pooled option widgets — children of the same scroll child — would
+-- survive underneath the incoming list.
+function ShellProto:ClearConfigContent()
+    if not self._cfgInContent then return end
+    self._cfgInContent = nil
+    if lib._clearConfigBody then
+        lib._clearConfigBody(self:_ContentConfigTarget())
+    end
+end
+
+function ShellProto:IsConfigInContent()
+    return self._cfgInContent and true or false
+end
+
+-- The rail is deliberately NOT a child of the scroll child, so a consumer
+-- cross-fading the content area has to include it by hand. nil until the
+-- first paged render.
+function ShellProto:GetConfigContentRail()
+    local target = self._cfgContentTarget
+    return target and target.store and target.store._cfgRail or nil
 end
 
 function ShellProto:RefreshScrollContent(height)

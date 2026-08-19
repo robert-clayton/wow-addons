@@ -245,6 +245,27 @@ function lib.SlideTo(region, point, relativeTo, relativePoint, x, y, duration, o
     ag:Play()
 end
 
+-- Cancel a slide in flight and nothing else. lib.StopAnims is the blunt
+-- version: it also stops the fade groups, and stopping an Alpha group
+-- reverts the region to the alpha the animation started FROM — kill a
+-- fade-in that way and the region is left invisible for good. Callers
+-- that only need the travel to stop, because they are about to place the
+-- region themselves, use this. The pending anchor is dropped rather than
+-- committed for the same reason: the caller's own SetPoint is the answer.
+function lib.StopSlide(region)
+    if not region then return end
+    if region._muiSlide then
+        -- Stop() fires OnFinished, which commits the pending anchor
+        -- before the clear below lands — so the region ends where the
+        -- slide was heading, and an onComplete passed to SlideTo runs on
+        -- cancel too. Callers that want a different resting place must
+        -- re-anchor after calling this (see MakeNavIndicator's _Seat).
+        region._muiSlide:Stop()
+        region._muiSlidePending = nil
+    end
+    stopDriver(region, "slide")
+end
+
 --------------------------------------------------------------------------
 -- Size lerp (no native equivalent that re-lays out children).
 --------------------------------------------------------------------------
