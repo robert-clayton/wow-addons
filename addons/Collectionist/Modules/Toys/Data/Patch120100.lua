@@ -20,6 +20,9 @@ MC.RegisterContent("midnight", "toys", {
             { itemID = 280419, name = "Cursed Badge of the Soulcoilers", source = "achievement",
               sourceInfo = "Student of Hissstory", zone = "The Coiled Isle",
               achievementID = 63662, score = T.medium },
+            { itemID = 275825, name = "Ula'tek's Sssacrificial Rain", source = "achievement",
+              sourceInfo = "Tour of Duty: The Coiled Isle - earn 1,000 honor on the Coiled Isle in War Mode",
+              zone = "The Coiled Isle", achievementID = 63167, score = T.medium },
         },
     },
     {
@@ -57,6 +60,15 @@ MC.RegisterContent("midnight", "toys", {
         },
     },
     {
+        source = "drop",
+        toys = {
+            { itemID = 276207, name = "Preyhunter's Masquerade", source = "drop",
+              sourceInfo = "Ral'kala during Prey: A Ghostly Nightmare (Season 2)", zone = "Prey",
+              dropInfo = { mob = "Ral'kala", zone = "Prey: A Ghostly Nightmare", boss = true },
+              availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2, score = T.long },
+        },
+    },
+    {
         source = "vendor",
         toys = {
             { itemID = 276189, name = "Effigy of Dundun", source = "vendor",
@@ -70,6 +82,22 @@ MC.RegisterContent("midnight", "toys", {
               sourceInfo = "Construct V'anore - Prey Season 2 reward track level 4", waypoint = MC.LOC.ConstructVanore,
               zone = "Silvermoon City", cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 600 } },
               score = T.medium },
+            { itemID = 274817, name = "Gold Starfish", source = "vendor",
+              sourceInfo = "Navigator Otoola - 10 Pristine Polygon and 750 Voidlight Marl (starfish are fished on the Coiled Isle)",
+              waypoint = MC.LOC.NavigatorOtoola, zone = "The Coiled Isle",
+              cost = { item = { 274595, 10 }, currency = { MC.CURRENCY.VoidlightMarl, 750 } }, score = T.short },
+            { itemID = 278557, name = "Otoola's Recognition", source = "vendor",
+              sourceInfo = "Navigator Otoola - 10 Pristine Polygon and 750 Voidlight Marl (starfish are fished on the Coiled Isle)",
+              waypoint = MC.LOC.NavigatorOtoola, zone = "The Coiled Isle",
+              cost = { item = { 274595, 10 }, currency = { MC.CURRENCY.VoidlightMarl, 750 } }, score = T.short },
+        },
+    },
+    {
+        source = "profession",
+        toys = {
+            { itemID = 275683, name = "G-00", source = "profession",
+              sourceInfo = "Midnight Engineering (50) craft - Schematic: G-00 from Thalassian Recipe in a Bottle, fished on the Coiled Isle",
+              zone = "The Coiled Isle" },
         },
     },
     {

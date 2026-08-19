@@ -10,7 +10,7 @@ MC.RitualSitesGate = {
     intro = "Two Ritual Sites meta-achievements gate this collectible.",
     tasks = {
         { achievementID = 62563, label = "Void Response Team" },
-        { achievementID = 62561, label = "Ritual Site Disruptor" },
+        { achievementID = 62562, label = "Ritual Site Disruptor" },
     },
 }
 
@@ -374,7 +374,7 @@ MC.RegisterContent("midnight", "mounts", {
     {
         source = "void_assaults",
         mounts = {
-            { mountID = 2176, name = "Unbound Manawyrm", source = "void_assaults",
+            { mountID = 2915, name = "Unbound Manawyrm", source = "void_assaults",
               sourceInfo = "Sergeant Vornin (Silvermoon Bazaar) - 6,000 Voidlight Marl after earning both Void Response Team and Ritual Site Disruptor",
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } },
@@ -413,7 +413,7 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 2608, name = "Light-Forged Mechsuit", source = "prepatch", sourceInfo = "Two Minutes to Midnight achievement (Twilight Ascension pre-patch event, no longer earnable)",
               achievementID = 42300, unavailable = true },
-            { mountID = 1798, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)",
+            { mountID = 2220, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)",
               unavailable = true },
         },
     },

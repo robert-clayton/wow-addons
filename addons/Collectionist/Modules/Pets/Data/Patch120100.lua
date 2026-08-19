@@ -4,6 +4,41 @@ local T = MC.SCORE_TIERS
 local COILED_ISLE = MC.MAP.CoiledIsle
 local VAULTS_OF_ATAL_UTEK = MC.MAP.VaultsOfAtalUtek
 
+-- 12.1 Family Battler chains (continue the pre-patch series in Pets.lua).
+-- Criterion order verified against CriteriaTree OrderIndex: the 10 family
+-- sub-achievements are alphabetical.
+local FAMILY_BATTLER_OUTLAND_TASKS = {
+    intro = "Defeat all 10 Outland pet families.",
+    tasks = {
+        { achievementID = 62460, criteriaIndex = 1,  label = "Aquatic Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 2,  label = "Beast Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 3,  label = "Critter Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 4,  label = "Dragonkin Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 5,  label = "Elemental Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 6,  label = "Flying Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 7,  label = "Humanoid Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 8,  label = "Magic Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 9,  label = "Mechanical Battler of Outland" },
+        { achievementID = 62460, criteriaIndex = 10, label = "Undead Battler of Outland" },
+    },
+}
+
+local FAMILY_BATTLER_CATACLYSM_TASKS = {
+    intro = "Defeat all 10 Cataclysm pet families.",
+    tasks = {
+        { achievementID = 62461, criteriaIndex = 1,  label = "Aquatic Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 2,  label = "Beast Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 3,  label = "Critter Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 4,  label = "Dragonkin Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 5,  label = "Elemental Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 6,  label = "Flying Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 7,  label = "Humanoid Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 8,  label = "Magic Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 9,  label = "Mechanical Battler of Cataclysm" },
+        { achievementID = 62461, criteriaIndex = 10, label = "Undead Battler of Cataclysm" },
+    },
+}
+
 MC.RegisterContent("midnight", "pets", {
     {
         source = "wild",
@@ -42,7 +77,7 @@ MC.RegisterContent("midnight", "pets", {
               canBattle = false, waypoint = { VAULTS_OF_ATAL_UTEK, 0.512, 0.624, "Skull of Er'inye" }, zone = "Vaults of Atal'Utek",
               cost = { currency = { 3448, 5000 } }, score = T.medium },
             { speciesID = 5072, itemID = 275632, npcID = 266469, name = "Volatile Venomfang",
-              petType = 3, source = "vendor", sourceInfo = "Skull of Er'inye - 5,000 Corrosive Coin",
+              petType = 8, source = "vendor", sourceInfo = "Skull of Er'inye - 5,000 Corrosive Coin",
               canBattle = false, waypoint = { VAULTS_OF_ATAL_UTEK, 0.512, 0.624, "Skull of Er'inye" }, zone = "Vaults of Atal'Utek",
               cost = { currency = { 3448, 5000 } }, score = T.medium },
             { speciesID = 5070, itemID = 275020, npcID = 265786, name = "Venom Elemental",
@@ -70,17 +105,22 @@ MC.RegisterContent("midnight", "pets", {
         source = "drop",
         pets = {
             { speciesID = 5137, itemID = 280540, name = "Lil' Mon",
-              petType = 5, source = "drop", sourceInfo = "Big Mon",
+              petType = 8, source = "drop", sourceInfo = "Big Mon",
               canBattle = false, zone = "The Coiled Isle",
               dropInfo = { mob = "Big Mon", zone = "The Coiled Isle" } },
             { speciesID = 5092, itemID = 276234, name = "Vibrant Venomfang",
-              petType = 3, source = "drop", sourceInfo = "Wriggling Venom-Soaked Satchel",
+              petType = 8, source = "drop", sourceInfo = "Wriggling Venom-Soaked Satchel",
               canBattle = false, zone = "The Coiled Isle",
               dropInfo = { mob = "Wriggling Venom-Soaked Satchel", zone = "The Coiled Isle" } },
             { speciesID = 5125, itemID = 280305, name = "Soulcoil Remnant",
-              petType = 4, source = "drop", sourceInfo = "Nek'zali the Soulcoiler, The Venomous Abyss",
+              petType = 6, source = "drop", sourceInfo = "Nek'zali the Soulcoiler, The Venomous Abyss",
               canBattle = false, zone = "The Venomous Abyss",
               dropInfo = { mob = "Nek'zali the Soulcoiler", zone = "The Venomous Abyss", boss = true },
+              availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2, score = T.long },
+            { speciesID = 5126, itemID = 278572, npcID = 269712, name = "Pale Hexscale",
+              petType = 8, source = "drop", sourceInfo = "Ral'kala during Prey: A Ghostly Nightmare (Season 2)",
+              canBattle = true, zone = "Prey",
+              dropInfo = { mob = "Ral'kala", zone = "Prey: A Ghostly Nightmare", boss = true },
               availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2, score = T.long },
         },
     },
@@ -90,18 +130,30 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5011, itemID = 268644, npcID = 260792, name = "Zan",
               petType = 8, source = "quest", sourceInfo = "Quest: A Little Kindness",
               canBattle = false, waypoint = { COILED_ISLE, 0.609, 0.326, "A Little Kindness" }, zone = "The Coiled Isle" },
+            -- Journal name is Three-Eyed Fish; the summon item tooltip says
+            -- "Blorp". Quest-giver coords unpublished, so no waypoint yet.
+            { speciesID = 3526, itemID = 279483, npcID = 269295, name = "Three-Eyed Fish",
+              petType = 9, source = "quest", sourceInfo = "Quest: Tipping the Scaled - Captain Tokka rank 4 (Venom Trawler)",
+              canBattle = true, zone = "The Coiled Isle", score = T.medium },
         },
     },
     {
         source = "treasure",
         pets = {
             { speciesID = 5134, itemID = 280189, name = "Cauldron Concoction",
-              petType = 7, source = "treasure", sourceInfo = "Discovery: Ofi's Offerings",
+              petType = 6, source = "treasure", sourceInfo = "Discovery: Ofi's Offerings",
               canBattle = false, zone = "The Coiled Isle" },
             { speciesID = 5133, itemID = 280178, name = "Poison Dart Frog",
-              petType = 9, source = "treasure", sourceInfo = "Unfortunate Scout's Satchel",
+              petType = 8, source = "treasure", sourceInfo = "Unfortunate Scout's Satchel",
               canBattle = false, zone = "The Coiled Isle",
               dropInfo = { mob = "Unfortunate Scout's Satchel", zone = "The Coiled Isle" } },
+            -- Hotfix-added Aug 2026 secret (pet the Silvermoon raccoon for the
+            -- Stubby Whistle). Blizzard confirmed the secret is not active
+            -- yet; drop `unavailable` once it is.
+            { speciesID = 5164, itemID = 282417, npcID = 273775, name = "J'imothy",
+              petType = 5, source = "treasure",
+              sourceInfo = "Discovery: Silvermoon City secret (not yet activated by Blizzard)",
+              canBattle = false, zone = "Silvermoon City", unavailable = true },
         },
     },
     {
@@ -122,6 +174,17 @@ MC.RegisterContent("midnight", "pets", {
               petType = 8, source = "achievement", sourceInfo = "In Case Of Emergency - Altar of Fangs",
               canBattle = false, zone = "Altar of Fangs", achievementID = 63679,
               score = T.medium },
+        },
+    },
+    {
+        source = "event",
+        pets = {
+            { speciesID = 5026, itemID = 270191, npcID = 262210, name = "Lil'Kruul",
+              petType = 1, source = "event", sourceInfo = "Family Battler of Outland",
+              canBattle = true, achievementID = 62460, taskList = FAMILY_BATTLER_OUTLAND_TASKS, score = T.long },
+            { speciesID = 5027, itemID = 270211, npcID = 262220, name = "Furiostraza",
+              petType = 2, source = "event", sourceInfo = "Family Battler of Cataclysm",
+              canBattle = true, achievementID = 62461, taskList = FAMILY_BATTLER_CATACLYSM_TASKS, score = T.long },
         },
     },
 })

@@ -1,3 +1,15 @@
+# 1.12.1
+### Added
+- Now tracking 11 collectibles that were missing: the Umbral Ashes mount; pets Three-Eyed Fish, Pale Hexscale, J'imothy, Lil'Kruul, and Furiostraza (the last two with full Family Battler of Outland and Cataclysm checklists); toys Gold Starfish, Otoola's Recognition, G-00, Ula'tek's Sssacrificial Rain, and Preyhunter's Masquerade.
+
+### Fixed
+- Rare and treasure waypoints, scores, and puzzle notes now point at the right target. The lists had been copied from the achievement window's two columns in the wrong order, so most rows carried a neighbor's info.
+- Unbound Manawyrm and Retrained Skyrazor track the right mounts. They had Alunira's and Azure Worldchiller's IDs.
+- The Silvermoon Court and Hara'ti Inscription contracts are now recognized once you learn them.
+- Ten pets show their real battle family.
+- The Ever Painting checklist and three relic tasks in the Arcantina and Zul'Aman tick the correct criteria.
+- The Ritual Sites gate tracks the actual "Ritual Site Disruptor" achievement.
+
 # 1.12.0
 ### Added
 - Expansion filter in the title bar: Current, All Expansions, or pin one expansion. Also `/mc filter all|current|<expansion>`. The Collection Inspector rescopes peer columns to match.

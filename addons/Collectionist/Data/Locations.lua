@@ -61,6 +61,7 @@ MC.LOC = {
     SecondMateSluggs      = { MC.MAP.CoiledIsle, 0.516, 0.498, "Second Mate Sluggs, Coiled Isle" },
     SkullOfErinye         = { MC.MAP.VaultsOfAtalUtek, 0.512, 0.624, "Skull of Er'inye, Vaults of Atal'Utek" },
     Dugal                 = { MC.MAP.VaultsOfAtalUtek, 0.505, 0.639, "Du'gal, Vaults of Atal'Utek" },
+    NavigatorOtoola       = { MC.MAP.CoiledIsle, 0.572, 0.482, "Navigator Otoola, Tokka's Landing" },
 
     -- Silvermoon City portals to other Midnight zones (used by MC.PORTALS routing)
     SilvermoonHarandarPortal  = { MC.MAP.Silvermoon, 0.367, 0.686, "Portal to Harandar (Gardens of Remembrance)" },

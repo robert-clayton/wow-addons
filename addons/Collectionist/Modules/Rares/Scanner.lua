@@ -56,7 +56,10 @@ function Scanner:Scan()
         local trustPositional = (n == (ach.criteriaCount or 0))
         for i = 1, n do
             -- Returns: name, type, completed, qty, totalQty, charName, flags, assetID, ...
-            -- For "kill creature" criteria (type 0), assetID is the NPC ID.
+            -- The Midnight zone-rare criteria are quest-complete type (27),
+            -- so assetID is a QUEST ID there — the positional NPC map is the
+            -- only npcID source and the assetID fallback only helps if a
+            -- future achievement uses kill-creature criteria (type 0).
             -- pcall: the API hard-errors on criteria the client hasn't
             -- streamed in, even after the count preflight passed.
             local ok, name, _, completed, _, _, _, _, assetID =

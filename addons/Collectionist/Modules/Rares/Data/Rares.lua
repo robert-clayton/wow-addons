@@ -17,26 +17,26 @@ MC.RareSourceLabels = {
 MC.RegisterContent("midnight", "rares", {
     { source = "eversong", achievementID = 61507, criteriaCount = 15,
       criteriaNPCIDs = {
-          246332, 240129, 250719, 250754, 250841, 250826, 255302, 255348,
-          246633, 250582, 250683, 250876, 250780, 250806, 255329,
+          246332, 246633, 240129, 250582, 250719, 250683, 250754, 250876,
+          250841, 250780, 250826, 250806, 255302, 255329, 255348,
       }, name = "A Bloody Song",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
     { source = "zulaman", achievementID = 62122, criteriaCount = 15,
       criteriaNPCIDs = {
-          242023, 242025, 245975, 242031, 242033, 242035, 242027, 245692,
-          242024, 242028, 247976, 242032, 242034, 242026, 245691,
+          242023, 242024, 242025, 242028, 245975, 247976, 242031, 242032,
+          242033, 242034, 242035, 242026, 242027, 245691, 245692,
       }, name = "Tallest Tree in the Forest",
       zoneMapID = MC.MAP.ZulAman, zone = "Zul'Aman" },
     { source = "harandar", achievementID = 61264, criteriaCount = 15,
       criteriaNPCIDs = {
-          248741, 249849, 249962, 250086, 250226, 250246, 250321, 250358,
-          249844, 249902, 249997, 250180, 250231, 250317, 250347,
+          248741, 249844, 249849, 249902, 249962, 249997, 250086, 250180,
+          250226, 250231, 250246, 250317, 250321, 250347, 250358,
       }, name = "Leaf None Behind",
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
     { source = "voidstorm", achievementID = 62130, criteriaCount = 14,
       criteriaNPCIDs = {
-          244272, 241443, 256923, 256925, 256808, 256770, 245044, 238498,
-          256922, 256924, 256926, 257027, 245182, 256821,
+          244272, 238498, 241443, 256922, 256923, 256924, 256925, 256926,
+          256808, 257027, 256770, 245182, 245044, 256821,
       }, name = "The Ultimate Predator",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
 })

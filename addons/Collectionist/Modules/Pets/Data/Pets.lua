@@ -224,7 +224,7 @@ MC.RegisterContent("midnight", "pets", {
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } },
               renown = { factionID = MC.FACTION.RitualSites, level = 6, factionName = "Ritual Sites" } },
             -- Patch 12.0.5: Depthdiver Tu'nakit (Angler Pearls, currency 3373)
-            { speciesID = 5065, npcID = 264933, name = "Ka'bubb",                  petType = 3, source = "vendor", sourceInfo = "Depthdiver Tu'nakit - 2,400 Angler Pearls (Abyss Anglers)",
+            { speciesID = 5065, npcID = 264933, name = "Ka'bubb",                  petType = 5, source = "vendor", sourceInfo = "Depthdiver Tu'nakit - 2,400 Angler Pearls (Abyss Anglers)",
               canBattle = false, waypoint = LOC.DepthdiverTunakit, zone = "Zul'Aman",
               cost = { currency = { MC.CURRENCY.AnglerPearls, 2400 } } },
         },
@@ -303,7 +303,7 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5019, npcID = 261684, name = "Chubs", petType = 8, source = "treasure",
               sourceInfo = "Broken Throne Tier 2+ — find the stealthed Lost Bear Cub and feed Practically Pork (drops from beasts) or Sin'dorei Swarmer (fishing)",
               canBattle = true, waypoint = LOC.LostBearCub, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman" },
-            { speciesID = 5017, npcID = 261676, name = "Void-Scarred Eaglet", petType = 2, source = "treasure",
+            { speciesID = 5017, npcID = 261676, name = "Void-Scarred Eaglet", petType = 3, source = "treasure",
               sourceInfo = "Earn the Void-Corrupted Hex Eagle mount first; mount it to follow the Void-Tainted Feather trail and ride the wind gale up to loot the Void-Tainted Nest",
               canBattle = true, waypoint = LOC.VoidTaintedNest, overworldWaypoint = LOC.BrokenThroneEntrance, zone = "Zul'Aman", score = T.long },
         },

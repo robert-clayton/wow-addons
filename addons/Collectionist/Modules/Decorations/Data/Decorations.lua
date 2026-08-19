@@ -86,18 +86,19 @@ local ULTIMATE_PREDATOR_TASKS = {
 }
 
 -- Ever Painting (62185) — 7 paintings from Hesta Forlath in Eversong Woods.
--- No public quest IDs surfaced; using criteriaIndex 1-7. Coords absent —
+-- Keyed by stable criteriaID; the old positional indices matched an
+-- alphabetical listing, not Blizzard's criterion order. Coords absent —
 -- player can use the existing Decorations vendor waypoint to reach Hesta.
 local EVER_PAINTING_TASKS = {
     intro = "Buy all 7 Eversong paintings from Hesta Forlath.",
     tasks = {
-        { achievementID = 62185, criteriaIndex = 1, label = "Sway of Red and Gold" },
-        { achievementID = 62185, criteriaIndex = 2, label = "Anar'alah Belore" },
-        { achievementID = 62185, criteriaIndex = 3, label = "Babble and Brook" },
-        { achievementID = 62185, criteriaIndex = 4, label = "Elrendar's Song" },
-        { achievementID = 62185, criteriaIndex = 5, label = "Lost Lamppost" },
-        { achievementID = 62185, criteriaIndex = 6, label = "Light Consuming" },
-        { achievementID = 62185, criteriaIndex = 7, label = "Memories of Ghosts" },
+        { achievementID = 62185, criteriaID = 111993, label = "Sway of Red and Gold" },
+        { achievementID = 62185, criteriaID = 112031, label = "Anar'alah Belore" },
+        { achievementID = 62185, criteriaID = 112033, label = "Babble and Brook" },
+        { achievementID = 62185, criteriaID = 112035, label = "Elrendar's Song" },
+        { achievementID = 62185, criteriaID = 112030, label = "Lost Lamppost" },
+        { achievementID = 62185, criteriaID = 112032, label = "Light Consuming" },
+        { achievementID = 62185, criteriaID = 112034, label = "Memories of Ghosts" },
     },
 }
 

@@ -264,7 +264,7 @@ MC.RegisterContent("midnight", "achievements", {
                 taskList = {
                     intro = "Missed relics remain retrievable after their related quest, but use the character that completed that quest.",
                     tasks = {
-                        { achievementID = 61083, criteriaID = 108607, label = "Scarred Spear" },
+                        { achievementID = 61083, criteriaID = 117459, label = "Scarred Spear" },
                         { achievementID = 61083, criteriaID = 108608, label = "Ebon Banner" },
                         { achievementID = 61083, criteriaID = 108609, label = "Corrupted Lantern" },
                         { achievementID = 61083, criteriaID = 108610, label = "Ancient Zandalari Scroll" },

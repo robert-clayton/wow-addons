@@ -407,7 +407,7 @@ MC.RegisterContent("midnight", "achievements", {
                 taskList = {
                     intro = "Complete both visitor pair questlines in the Arcantina.",
                     tasks = {
-                        { achievementID = 63619, criteriaID = 108597, label = "Chen and Flynn" },
+                        { achievementID = 63619, criteriaID = 117457, label = "Chen and Flynn" },
                         { achievementID = 63619, criteriaID = 108598, label = "Vanessa and Garona" },
                     },
                 },
@@ -420,7 +420,7 @@ MC.RegisterContent("midnight", "achievements", {
                 taskList = {
                     intro = "Recover and display both optional quest relics.",
                     tasks = {
-                        { achievementID = 63620, criteriaID = 108608, label = "Stormstout Brewery Lantern" },
+                        { achievementID = 63620, criteriaID = 117458, label = "Stormstout Brewery Lantern" },
                         { achievementID = 63620, criteriaID = 108607, label = "Wooden Toy Sword" },
                     },
                 },

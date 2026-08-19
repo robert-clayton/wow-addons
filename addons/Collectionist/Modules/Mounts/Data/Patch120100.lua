@@ -74,6 +74,9 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 3064, itemID = 276882, name = "Breath of Ruin", source = "achievement",
               sourceInfo = "Midnight Keystone Legend: Season 2 (available at the regional Season 2 reset)", achievementID = 62449,
               availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2, score = T.legendary },
+            { mountID = 3069, itemID = 277192, name = "Umbral Ashes", source = "achievement",
+              sourceInfo = "Umbral Champion: Midnight Season 1 - top 1% Mythic+ rating at the Season 1 close (no longer earnable)",
+              achievementID = 63104, unavailable = true, score = T.legendary },
         },
     },
     {

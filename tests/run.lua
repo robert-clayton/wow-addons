@@ -890,10 +890,11 @@ do
         "Patch 12.1 vendor locations")
     truthy(MC.LOC.ConstructAlia, "Construct Ali'a vendor location")
 
-    equal(#entries("mounts") - patch120007Counts.mounts, 23, "12.1 mount count")
+    equal(#entries("mounts") - patch120007Counts.mounts, 24, "12.1 mount count")
     assertIDs("mounts", "mountID", {
         3060, 3054, 3019, 2980, 3061, 3051, 3023, 3053, 3062, 3029, 3063,
         3064, 3043, 2839, 3032, 3031, 3058, 3021, 3030, 2821, 3002, 3003, 3020,
+        3069,
     }, "12.1 mount")
     local arcaneGolem = findEntry("mounts", "mountID", 2839)
     equal(arcaneGolem.itemID, 262496, "Delver's Arcane Golem item ID")
@@ -903,17 +904,18 @@ do
     equal(arcaneGolem.availableAfter, nil,
         "ordinary 12.1 delve chest must not be Season 2 gated")
 
-    equal(#entries("pets") - patch120007Counts.pets, 24, "12.1 pet count")
+    equal(#entries("pets") - patch120007Counts.pets, 29, "12.1 pet count")
     assertIDs("pets", "speciesID", {
         5035, 5031, 5029, 5030, 5032, 5028, 5033, 5034, 5071, 5072, 5070,
         5093, 5078, 5076, 5137, 5092, 5125, 5011, 5134, 5133, 5131, 5132,
-        5130, 5129,
+        5130, 5129, 3526, 5126, 5164, 5026, 5027,
     }, "12.1 pet")
 
-    equal(#entries("toys") - patch120007Counts.toys, 14, "12.1 toy count")
+    equal(#entries("toys") - patch120007Counts.toys, 19, "12.1 toy count")
     assertIDs("toys", "itemID", {
         276925, 280419, 280201, 275988, 279054, 274921, 279021,
         277954, 268504, 279052, 276189, 276229, 276258, 267472,
+        275825, 276207, 274817, 278557, 275683,
     }, "12.1 toy")
 
     equal(#entries("rares") - patch120007Counts.rares, 2,
@@ -1035,11 +1037,11 @@ do
         end
     end
     equal(futureCounts.mounts, 9, "Season 2 mount gate count")
-    equal(futureCounts.pets, 2, "Season 2 pet gate count")
-    equal(futureCounts.toys or 0, 0, "Season 2 toy gate count")
+    equal(futureCounts.pets, 3, "Season 2 pet gate count")
+    equal(futureCounts.toys or 0, 1, "Season 2 toy gate count")
     equal(futureCounts.decorations, 14, "Season 2 decoration gate count")
     equal(futureCounts.achievements, 83, "Season 2 achievement gate count")
-    equal(futureTotal, 108, "all Season 2 gated catalog rows")
+    equal(futureTotal, 110, "all Season 2 gated catalog rows")
 
     local function assertAvailability(moduleKey, idField, ids, expected, label)
         for _, id in ipairs(ids) do

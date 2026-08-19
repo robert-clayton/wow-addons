@@ -11,31 +11,32 @@ MC.TreasureSourceLabels = {
 MC.RegisterContent("midnight", "treasures", {
     { source = "eversong", achievementID = 61960, criteriaCount = 9,
       criteriaNames = {
-          "Rookery Cache", "Gift of the Phoenix", "Gilded Armillary Sphere",
-          "Farstrider's Lost Quiver", "Burbling Paint Pot", "Triple-Locked Safebox",
-          "Forgotten Ink and Quill", "Antique Nobleman's Signet Ring", "Stone Vat of Wine",
+          "Rookery Cache", "Triple-Locked Safebox", "Gift of the Phoenix",
+          "Forgotten Ink and Quill", "Gilded Armillary Sphere",
+          "Antique Nobleman's Signet Ring", "Farstrider's Lost Quiver",
+          "Stone Vat of Wine", "Burbling Paint Pot",
       }, name = "Treasures of Eversong Woods",
       zoneMapID = MC.MAP.Eversong, zone = "Eversong Woods" },
     { source = "zulaman", achievementID = 62125, criteriaCount = 7,
       criteriaNames = {
-          "Honored Warrior's Cache", "Bait and Tackle", "Mrruk's Mangy Trove",
-          "Abandoned Nest", "Sealed Twilight Blade Bounty", "Burrow Bounty", "Secret Formula",
+          "Honored Warrior's Cache", "Sealed Twilight Blade Bounty", "Bait and Tackle",
+          "Burrow Bounty", "Mrruk's Mangy Trove", "Secret Formula", "Abandoned Nest",
       }, name = "Treasures of Zul'Aman",
       zoneMapID = MC.MAP.ZulAman, zone = "Zul'Aman" },
     { source = "harandar", achievementID = 61263, criteriaCount = 9,
       criteriaNames = {
-          "Failed Shroom Jumper's Satchel", "Sporelord's Fight Prize",
-          "Kemet's Simmering Cauldron", "Impenetrably Sealed Gourd", "Peculiar Cauldron",
-          "Burning Branch of the World Tree", "Reliquary's Lost Paintbrush",
-          "Gift of the Cycle", "Sporespawned Cache",
+          "Failed Shroom Jumper's Satchel", "Burning Branch of the World Tree",
+          "Sporelord's Fight Prize", "Reliquary's Lost Paintbrush",
+          "Kemet's Simmering Cauldron", "Gift of the Cycle",
+          "Impenetrably Sealed Gourd", "Sporespawned Cache", "Peculiar Cauldron",
       }, name = "Treasures of Harandar",
       zoneMapID = MC.MAP.Harandar, zone = "Harandar" },
     { source = "voidstorm", achievementID = 62126, criteriaCount = 13,
       criteriaNames = {
-          "Final Clutch of Predaxas", "Bloody Sack", "Stellar Stash", "Scout's Pack",
-          "Quivering Egg", "Discarded Energy Pike", "Half-Digested Viscera",
-          "Void-Shielded Tomb", "Malignant Chest", "Forgotten Researcher's Cache",
-          "Embedded Spear", "Exaliburn", "Faindel's Quiver",
+          "Final Clutch of Predaxas", "Void-Shielded Tomb", "Bloody Sack",
+          "Malignant Chest", "Stellar Stash", "Forgotten Researcher's Cache",
+          "Scout's Pack", "Embedded Spear", "Quivering Egg", "Exaliburn",
+          "Discarded Energy Pike", "Faindel's Quiver", "Half-Digested Viscera",
       }, name = "Treasures of Voidstorm",
       zoneMapID = MC.MAP.Voidstorm, zone = "Voidstorm" },
 })
@@ -94,6 +95,8 @@ MC.TreasureCoords = {
 local NAME_ALIASES = {
     -- HandyNotes typo: missing 'e'
     ["Impenatrably Sealed Gourd"] = "Impenetrably Sealed Gourd",
+    -- Live criterion name dropped the suffix in 12.1; metadata keys keep it
+    ["Stone Vat"] = "Stone Vat of Wine",
 }
 for criterion, handyName in pairs(NAME_ALIASES) do
     MC.TreasureCoords[criterion] = MC.TreasureCoords[handyName]

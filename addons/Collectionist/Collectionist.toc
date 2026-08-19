@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks the mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements you're missing from Midnight in one panel.
 ## Author: robert-clayton
-## Version: 1.12.0
+## Version: 1.12.1
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB

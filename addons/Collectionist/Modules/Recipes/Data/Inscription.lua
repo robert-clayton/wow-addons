@@ -77,8 +77,8 @@ MC.InscriptionRecipes = {
         recipes = {
             { id = 1230052, name = "Contract: The Amani Tribe",      source = "vendor", sourceInfo = "Magovu (Amani Renown 5)",        priority = 1, waypoint = LOC.Magovu, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
             { id = 1230054, name = "Contract: The Singularity",      source = "vendor", sourceInfo = "Anomander (Singularity Renown 5)", priority = 1, waypoint = LOC.Anomander, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
-            { id = 1241690, name = "Contract: The Silvermoon Court",  source = "vendor", sourceInfo = "Caeris Fairdawn (Court Renown 5)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
-            { id = 1241985, name = "Contract: The Hara'ti",          source = "vendor", sourceInfo = "Naynar (Hara'ti Renown 5)",       priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1230051, name = "Contract: The Silvermoon Court",  source = "vendor", sourceInfo = "Caeris Fairdawn (Court Renown 5)", priority = 1, waypoint = LOC.CaerisFairdawn, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
+            { id = 1230053, name = "Contract: The Hara'ti",          source = "vendor", sourceInfo = "Naynar (Hara'ti Renown 5)",       priority = 1, waypoint = LOC.Naynar, cost = { currency = { MC.CURRENCY.InscriptionMoxie, 150 }, currency2 = { MC.CURRENCY.VoidlightMarl, 1500 } } },
         },
     },
     {
