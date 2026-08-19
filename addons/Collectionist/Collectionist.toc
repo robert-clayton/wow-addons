@@ -97,6 +97,7 @@ Modules\Recipes\Data\Inscription.lua
 Modules\Recipes\Data\Jewelcrafting.lua
 Modules\Recipes\Data\Leatherworking.lua
 Modules\Recipes\Data\Tailoring.lua
+Modules\Recipes\Data\Ownership.lua
 Modules\Recipes\Data\TheWarWithin.lua
 Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua

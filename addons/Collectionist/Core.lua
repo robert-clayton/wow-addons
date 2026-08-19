@@ -124,6 +124,16 @@ end
 --   { skillLine = 171, name = "The War Within", recipes = { ... } }
 -- Entry fields match the existing per-profession Data files (id, name,
 -- source, sourceInfo, priority, waypoint, cost, dropInfo, score, ...).
+local function StampRecipeGroup(expansionKey, group)
+    group.expansion = group.expansion or expansionKey
+    group.moduleKey = group.moduleKey or "recipes"
+    for _, recipe in ipairs(group.recipes) do
+        recipe.expansion = recipe.expansion or expansionKey
+        recipe.moduleKey = recipe.moduleKey or "recipes"
+        recipe.availableAfter = recipe.availableAfter or group.availableAfter
+    end
+end
+
 local function RegisterRecipeContent(expansionKey, groups)
     local registeredAny = false
     for _, group in ipairs(groups) do
@@ -135,13 +145,7 @@ local function RegisterRecipeContent(expansionKey, groups)
             print(format("|cffff8888[Collectionist]|r RegisterContent: recipes group '%s' has no recipes list",
                 tostring(group.name)))
         else
-            group.expansion = group.expansion or expansionKey
-            group.moduleKey = group.moduleKey or "recipes"
-            for _, recipe in ipairs(group.recipes) do
-                recipe.expansion = recipe.expansion or expansionKey
-                recipe.moduleKey = recipe.moduleKey or "recipes"
-                recipe.availableAfter = recipe.availableAfter or group.availableAfter
-            end
+            StampRecipeGroup(expansionKey, group)
             if not MC[targetField] then MC[targetField] = {} end
             local target = MC[targetField]
             target[#target + 1] = group
@@ -151,6 +155,28 @@ local function RegisterRecipeContent(expansionKey, groups)
     if registeredAny then
         markContentRegistered(expansionKey, "recipes")
     end
+end
+
+-- Adopt a profession table that was assigned directly by a legacy data file.
+-- This stamps its existing categories without appending or copying them, then
+-- registers the expansion so Current/single-expansion filters can resolve it.
+-- New expansion files should continue using RegisterContent instead.
+function MC.RegisterExistingRecipeContent(expansionKey, skillLine)
+    local targetField = MC.RECIPE_DATA_KEYS[skillLine]
+    local target = targetField and MC[targetField]
+    if not expansionKey or type(target) ~= "table" then return false end
+
+    local registeredAny = false
+    for _, group in ipairs(target) do
+        if type(group.recipes) == "table" then
+            StampRecipeGroup(expansionKey, group)
+            registeredAny = true
+        end
+    end
+    if registeredAny then
+        markContentRegistered(expansionKey, "recipes")
+    end
+    return registeredAny
 end
 
 function MC.RegisterContent(expansionKey, moduleKey, groups)
@@ -2020,7 +2046,14 @@ function MC.SwitchTab(key)
         MC.panel.scrollFrame:SetVerticalScroll(0)
     end
 
+    -- Cross-tab transition: the outgoing list is gone the instant the
+    -- tab is clicked, and the incoming one fades up. Alpha is dropped
+    -- before RefreshActive so the rebuild itself is never seen, then
+    -- raised from zero — a plain FadeIn would no-op at full alpha.
+    local child = MC.panel and MC.panel.scrollChild
+    if child then child:SetAlpha(0) end
     MC.RefreshActive()
+    if child then MUI.FadeIn(child, 0.1) end
 end
 
 -- Refresh hides the tooltip first, otherwise it can stay pinned to a row

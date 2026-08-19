@@ -189,15 +189,14 @@ local function BuildLocalCounts(includePartial)
         local r = m.Scanner and m.Scanner.results
         if WIRE_KEY[m.key] and r then
             if m.key == "recipes" then
-                -- Recipes' results table is keyed by skill-line and
-                -- doesn't go through the expansion filter (yet), so
-                -- learnedCount/total per skill-line is already
-                -- account-wide and isn't sliced by expansion.
+                -- Recipes' results table is keyed by skill-line. Visible
+                -- counters follow the expansion filter, while the All fields
+                -- remain stable for account-wide sharing.
                 local learned, total = 0, 0
                 for _, sub in pairs(r) do
-                    if type(sub) == "table" and sub.total then
-                        learned = learned + (sub.learnedCount or 0)
-                        total   = total + sub.total
+                    if type(sub) == "table" and (sub.totalAll or sub.total) then
+                        learned = learned + (sub.learnedCountAll or sub.learnedCount or 0)
+                        total   = total + (sub.totalAll or sub.total)
                     end
                 end
                 if total > 0 then

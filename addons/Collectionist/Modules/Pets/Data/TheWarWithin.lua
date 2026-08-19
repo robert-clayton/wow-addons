@@ -204,7 +204,7 @@ MC.RegisterContent("tww", "pets", {
         },
     },
 
-    -- Drop pets. 39 entries.
+    -- Drop pets. 37 entries.
     {
         source = "drop",
         pets = {
@@ -268,16 +268,7 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true },
             { speciesID = 4493, itemID = 221493, npcID = 222080, name = "Redthroat Skipling",  petType = 9, source = "drop", sourceInfo = "Source not yet documented",
               canBattle = true },
-            -- Waddles also appears in the Midnight base file as a Harandar wild
-            -- capture (species reused by Blizzard); collection state keys on
-            -- speciesID, so both entries flip together.
-            { speciesID = 4497, itemID = 221495, npcID = 222077, name = "Waddles",             petType = 9, source = "drop", sourceInfo = "Source not yet documented",
-              canBattle = false },
             { speciesID = 4474, itemID = 222969, npcID = 222340, name = "Anub'Rekyute",        petType = 4, source = "drop", sourceInfo = "Source not yet documented",
-              canBattle = true, zone = "Azj-Kahet" },
-            -- Webbers is also the Family Battler of Northrend reward in the
-            -- Midnight base file (species reused); same speciesID-keyed state.
-            { speciesID = 4475, itemID = 222967, npcID = 222342, name = "Webbers",             petType = 4, source = "drop", sourceInfo = "Source not yet documented",
               canBattle = true, zone = "Azj-Kahet" },
             { speciesID = 4512, itemID = 221759, npcID = 222609, name = "Sceaduthax",          petType = 3, source = "drop", sourceInfo = "Source not yet documented",
               canBattle = true },

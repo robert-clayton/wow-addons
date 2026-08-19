@@ -49,14 +49,12 @@ function Scanner:Scan()
                 local recipeData = MC[dataKey]
                 if recipeData then
                     for _, category in ipairs(recipeData) do
-                        -- Expansion filter: categories without an expansion
-                        -- stamp (the base per-profession files) are always
-                        -- visible, so pre-existing behavior is unchanged.
-                        if MC.IsGroupVisible(category, "recipes") then
-                            for _, recipe in ipairs(category.recipes) do
-                                if recipe.id and ledger[recipe.id] == true then
-                                    offScore = offScore + MC.ScoreFor(recipe)
-                                end
+                        -- Account score is independent of the browse filter.
+                        -- Off-profession recipes never render here, so there
+                        -- is no display work to gate on IsGroupVisible.
+                        for _, recipe in ipairs(category.recipes) do
+                            if recipe.id and ledger[recipe.id] == true then
+                                offScore = offScore + MC.ScoreFor(recipe)
                             end
                         end
                     end
@@ -73,32 +71,34 @@ function Scanner:ScanProfession(skillLine, recipeData)
         total          = 0,
         learnedCount   = 0,
         unlearnedCount = 0,
+        totalAll       = 0,
+        learnedCountAll = 0,
         score          = 0,
         bySource       = {},
         learned        = {},
     }
 
     for _, category in ipairs(recipeData) do
-        -- Expansion filter: categories without an expansion stamp (the
-        -- base per-profession files) are always visible, so pre-existing
-        -- behavior is unchanged. RegisterContent-added categories carry
-        -- an expansion stamp and follow the user's filter mode.
-        if MC.IsGroupVisible(category, "recipes") then
-            for _, recipe in ipairs(category.recipes) do
+        local visible = MC.IsGroupVisible(category, "recipes")
+        for _, recipe in ipairs(category.recipes) do
+            result.totalAll = result.totalAll + 1
+            local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
+
+            -- Update the account-wide ledger even when this expansion is
+            -- hidden, so browsing cannot erase newly observed ownership.
+            if known and ledger and recipe.id then
+                ledger[recipe.id] = true
+            end
+
+            local accountKnown = known
+                or (ledger and recipe.id and ledger[recipe.id] == true)
+            if accountKnown then
+                result.learnedCountAll = result.learnedCountAll + 1
+                result.score = result.score + MC.ScoreFor(recipe)
+            end
+
+            if visible then
                 result.total = result.total + 1
-                local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
-
-                -- Update the account-wide ledger so other alts can score
-                -- this recipe even when not on this character.
-                if known and ledger and recipe.id then
-                    ledger[recipe.id] = true
-                end
-
-                -- Score reads from the ledger so any alt that's learned
-                -- this recipe credits the score on every character.
-                local accountKnown = known
-                    or (ledger and recipe.id and ledger[recipe.id] == true)
-
                 local entry = {
                     id         = recipe.id,
                     name       = recipe.name,
@@ -110,10 +110,6 @@ function Scanner:ScanProfession(skillLine, recipeData)
                     dropInfo   = recipe.dropInfo,
                     learned    = known,
                 }
-
-                if accountKnown then
-                    result.score = result.score + MC.ScoreFor(recipe)
-                end
 
                 if known then
                     result.learnedCount = result.learnedCount + 1
