@@ -80,12 +80,16 @@ function lib.BuildSettingsWindow(owner, opts)
     hairline:SetPoint("BOTTOMRIGHT")
     hairline:SetTexture(WHITE8)
 
+    -- Font before SetText: a FontString with no font set drops the
+    -- string instead of storing it for later.
     local title = header:CreateFontString(nil, "OVERLAY")
+    title:SetFont(lib.FontBold(), lib.Theme.fontSize + 6, lib.FontFlags())
     title:SetPoint("LEFT", header, "LEFT", PAD, 6)
     title:SetJustifyH("LEFT")
     title:SetText(opts.title or "Options")
 
     local subtitle = header:CreateFontString(nil, "OVERLAY")
+    subtitle:SetFont(lib.Theme.font, lib.Theme.fontSize - 1, lib.FontFlags())
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -2)
     subtitle:SetJustifyH("LEFT")
     subtitle:SetText(opts.subtitle or "")

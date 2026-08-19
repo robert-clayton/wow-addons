@@ -26,7 +26,9 @@ if not lib then return end
 local SIDEBAR_W   = 220
 local BRAND_H     = 64
 local NAV_TOP     = 88
-local HEADER_H    = 96
+-- Title and the indicator chain share one line, so the header needs
+-- room for two rows (title, subtitle) rather than three.
+local HEADER_H    = 76
 local FOOTER_H    = 56
 local CONTENT_PAD = 24
 local GAP         = 8
@@ -242,9 +244,7 @@ function ShellProto:_CreateSidebar()
     -- window can always be recovered.
     self:_MakeDragHandler(strip, function()
         if not self.db.minimized then return end
-        self.db.minimized = false
-        self.db.compact = false
-        self:ApplyMinimizeState()
+        self:_Restore()
     end)
 
     local sIcon = strip:CreateTexture(nil, "ARTWORK")
@@ -311,14 +311,15 @@ function ShellProto:_CreateHeader()
     local subtitle = bar:CreateFontString(nil, "OVERLAY")
     subtitle:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     subtitle:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD + 1, -44)
-    subtitle:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -(CONTENT_PAD + 140), -44)
+    subtitle:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -CONTENT_PAD, -44)
     subtitle:SetJustifyH("LEFT")
     subtitle:SetWordWrap(false)
     bar.pageSubtitle = subtitle
 
-    -- Progress counter. Parented to the window (not the header) so the
-    -- minimized strip keeps showing it; normally anchored into the
-    -- header's bottom indicator strip.
+    -- Progress counter, and through it the whole indicator chain (Core
+    -- anchors the filter / peers / score buttons leftward off this
+    -- string). Parented to the window rather than the header so the
+    -- minimized strip can keep showing it.
     local progress = f:CreateFontString(nil, "OVERLAY")
     progress:SetFont(lib.FontBold(), theme.fontSize + 5, lib.FontFlags())
     self.titleProgressText = progress
@@ -329,25 +330,26 @@ function ShellProto:_CreateHeader()
     local shell = self
     local db = self.db
     local colors = theme.colors
-    local expandBtn = lib.MakeHeaderBtn(bar, "+",
+    local expandBtn = lib.MakeHeaderBtn(bar, "",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Expand", { width = 20, height = 20 })
+        "Maximize", { width = 20, height = 20 })
     expandBtn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -8, -8)
     expandBtn:Hide()
+    lib.ApplyWindowGlyph(expandBtn, "maximize")
     expandBtn:SetScript("OnClick", function()
         db.compact = false
         shell:ApplyMinimizeState()
     end)
     f.compactExpandBtn = expandBtn
 
-    local stripBtn = lib.MakeHeaderBtn(bar, "-",
+    local stripBtn = lib.MakeHeaderBtn(bar, "",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Minimize to strip", { width = 20, height = 20 })
+        "Minimize", { width = 20, height = 20 })
     stripBtn:SetPoint("RIGHT", expandBtn, "LEFT", -6, 0)
     stripBtn:Hide()
+    lib.ApplyWindowGlyph(stripBtn, "minimize")
     stripBtn:SetScript("OnClick", function()
-        db.minimized = true
-        shell:ApplyMinimizeState()
+        shell:_Minimize()
     end)
     f.compactStripBtn = stripBtn
 
@@ -369,7 +371,9 @@ function ShellProto:_AnchorProgressText(mode)
     elseif mode == "compact" and f.compactStripBtn then
         p:SetPoint("RIGHT", f.compactStripBtn, "LEFT", -10, 0)
     else
-        p:SetPoint("RIGHT", f.titleBar, "BOTTOMRIGHT", -CONTENT_PAD, 16)
+        -- Top line, sharing the page title's optical centre: the
+        -- indicators are panel-level status, not page content.
+        p:SetPoint("RIGHT", f.titleBar, "TOPRIGHT", -CONTENT_PAD, -26)
     end
 end
 
@@ -502,15 +506,37 @@ function ShellProto:_CreateFooter()
     -- First leg of the full -> compact -> strip cycle. The footer is
     -- hidden in compact, so the compact header's own buttons carry the
     -- compact -> strip and compact -> full legs.
-    local minBtn = lib.MakeHeaderBtn(footer, "-",
+    -- Window controls, matching the convention every desktop window
+    -- uses: minimize collapses all the way to the strip; the size
+    -- button toggles between the full window and the compact view and
+    -- shows whichever glyph describes what it will do next.
+    local minBtn = lib.MakeHeaderBtn(footer, "",
         colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
-        "Compact view", { width = 30, height = 30 })
+        "Minimize", { width = 30, height = 30 })
     minBtn:SetPoint("LEFT", inspBtn, "RIGHT", 12, 0)
+    lib.ApplyWindowGlyph(minBtn, "minimize")
     minBtn:SetScript("OnClick", function()
-        db.compact = true
-        shell:ApplyMinimizeState()
+        shell:_Minimize()
     end)
     footer.minBtn = minBtn
+
+    local sizeBtn = lib.MakeHeaderBtn(footer, "",
+        colors.btnTealFg, colors.btnTealHoverBg, colors.btnTealHoverBd,
+        "Compact view", { width = 30, height = 30 })
+    sizeBtn:SetPoint("LEFT", minBtn, "RIGHT", 6, 0)
+    lib.ApplyWindowGlyph(sizeBtn, "restore")
+    sizeBtn:SetScript("OnClick", function()
+        db.compact = not db.compact
+        shell:ApplyMinimizeState()
+    end)
+    -- The creation-time tooltip is captured by value; hook a second
+    -- handler so the text tracks the state the glyph is showing.
+    sizeBtn:HookScript("OnEnter", function(s)
+        GameTooltip:SetOwner(s, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(db.compact and "Full view" or "Compact view")
+        GameTooltip:Show()
+    end)
+    footer.sizeBtn = sizeBtn
 
     -- Restore button for the minimized strip (the footer — and its
     -- minimize button — is hidden while minimized).
@@ -525,17 +551,13 @@ function ShellProto:_CreateFooter()
         "Restore", { width = 20, height = 20 })
     restoreBtn:SetPoint("RIGHT", f, "RIGHT", -6, 0)
     restoreBtn:Hide()
-    restoreBtn:SetScript("OnClick", function()
-        -- Strip restore always returns to the full state, even when the
-        -- strip was entered from compact.
-        db.minimized = false
-        db.compact = false
-        shell:ApplyMinimizeState()
-    end)
+    lib.ApplyWindowGlyph(restoreBtn, "maximize")
+    restoreBtn:SetScript("OnClick", function() shell:_Restore() end)
     f.restoreBtn = restoreBtn
 
     self.UpdateMinimizeVisual = function()
-        minBtn._label:SetText(db.minimized and "+" or "-")
+        -- The size button always shows what it will do next.
+        lib.ApplyWindowGlyph(sizeBtn, db.compact and "maximize" or "restore")
         if db.minimized then restoreBtn:Show() else restoreBtn:Hide() end
     end
     self.UpdateMinimizeVisual()
@@ -876,6 +898,20 @@ function ShellProto:_SizeTo(w, h)
     lib.SizeTo(self.frame, w, h)
 end
 
+-- Collapse to the strip from whichever view is current, remembering
+-- which one so expanding returns there rather than always to full.
+function ShellProto:_Minimize()
+    self.db.prevCompact = self.db.compact and true or false
+    self.db.minimized = true
+    self:ApplyMinimizeState()
+end
+
+function ShellProto:_Restore()
+    self.db.minimized = false
+    self.db.compact = self.db.prevCompact and true or false
+    self:ApplyMinimizeState()
+end
+
 -- "full" | "compact" | "strip". Strip wins when both flags are set
 -- (strip entered from compact); restore clears both.
 function ShellProto:GetViewMode()
@@ -1045,6 +1081,12 @@ end
 -- shells present an identical surface. It renders through the same
 -- pooled config renderer via `.body`.
 function ShellProto:BuildConfigFrame()
+    if not lib.BuildSettingsWindow then
+        print("|cffff8888[MidnightUI]|r Settings.lua did not load. Restart the "
+            .. "game client fully — a /reload does not pick up newly added "
+            .. "addon files.")
+        return nil
+    end
     return lib.BuildSettingsWindow(self, {
         name     = self.opts.name or "MidnightUIShell",
         title    = "Options",

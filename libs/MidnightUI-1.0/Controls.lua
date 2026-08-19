@@ -75,6 +75,69 @@ function lib.MakePillToggle(parent, opts)
     return btn
 end
 
+-- Window controls (minimize / maximize / restore-down) drawn from
+-- WHITE8x8 rather than typed as glyphs: the box characters those
+-- controls conventionally use are outside the Latin range the UI font
+-- ships, so a text label would render as tofu. Sizing carries the
+-- meaning — a big square grows the window, a small one shrinks it.
+--   kind: "minimize" | "maximize" | "restore"
+-- Re-callable: the same button swaps glyph as the view state changes.
+function lib.ApplyWindowGlyph(btn, kind)
+    if not btn then return end
+    btn._glyphKind = kind
+    if btn._label then btn._label:SetText("") end
+    btn._glyphs = btn._glyphs or {}
+    for _, t in ipairs(btn._glyphs) do t:Hide() end
+
+    local n = 0
+    local function part(w, h, point, x, y)
+        n = n + 1
+        local t = btn._glyphs[n]
+        if not t then
+            t = btn:CreateTexture(nil, "OVERLAY")
+            t:SetTexture(WHITE8)
+            btn._glyphs[n] = t
+        end
+        t:SetSize(w, h)
+        t:ClearAllPoints()
+        t:SetPoint(point, btn, "CENTER", x, y)
+        t:Show()
+        return t
+    end
+
+    -- Square outline of side `s`, centred with optional offset.
+    local function box(s, ox, oy)
+        local half = s / 2
+        part(s, 1, "CENTER", ox, oy + half)          -- top
+        part(s, 1, "CENTER", ox, oy - half)          -- bottom
+        part(1, s, "CENTER", ox - half, oy)          -- left
+        part(1, s, "CENTER", ox + half, oy)          -- right
+    end
+
+    if kind == "minimize" then
+        part(10, 1, "CENTER", 0, -3)
+    elseif kind == "maximize" then
+        box(11, 0, 0)
+    elseif kind == "restore" then
+        box(8, -1, -1)
+    end
+
+    -- Paints every texture the button has ever created, not just this
+    -- glyph's: the hook is registered once but the glyph can change, and
+    -- the registry is append-only.
+    local function paint()
+        local c = btn._fgColor or lib.Theme.colors.btnTealFg
+        for _, t in ipairs(btn._glyphs) do
+            t:SetColorTexture(c[1], c[2], c[3], 1)
+        end
+    end
+    paint()
+    if not btn._glyphHooked then
+        btn._glyphHooked = true
+        lib.RegisterThemeHook(paint)
+    end
+end
+
 -- MakeNavIndicator: the sidebar's single accent bar. One shared bar that
 -- travels to the selected row reads as one object moving; per-row bars
 -- blinking on and off read as two unrelated events. A Frame, not a

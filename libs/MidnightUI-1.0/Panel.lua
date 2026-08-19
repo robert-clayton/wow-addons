@@ -536,6 +536,12 @@ end
 -- Config frame. The options surface is the shared settings window, so
 -- both shells present identical options.
 function PanelProto:BuildConfigFrame()
+    if not lib.BuildSettingsWindow then
+        print("|cffff8888[MidnightUI]|r Settings.lua did not load. Restart the "
+            .. "game client fully — a /reload does not pick up newly added "
+            .. "addon files.")
+        return nil
+    end
     return lib.BuildSettingsWindow(self, {
         name     = self.opts.name or "MidnightUIPanel",
         title    = "Options",

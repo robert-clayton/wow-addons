@@ -51,7 +51,9 @@ StaticPopupDialogs["COLLECTIONIST_UISTYLE_RELOAD"] = {
 -- the logout snapshot are automatic.
 --------------------------------------------------------------------------
 local GEO = { position = true, panelWidth = true, panelHeight = true, minimized = true,
-              compact = true, compactWidth = true, compactHeight = true }
+              compact = true, compactWidth = true, compactHeight = true,
+              -- View to return to when the strip is expanded again.
+              prevCompact = true }
 
 function MC.MakePremiumDB()
     MC.db.premium = MC.db.premium or {}
