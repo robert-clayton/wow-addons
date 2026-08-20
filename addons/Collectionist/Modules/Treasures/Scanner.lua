@@ -23,11 +23,13 @@ function Scanner:Scan()
     -- mark the result partial, let the bounded retry settle the rest.
     local criteriaCounts, pending = {}, 0
     for _, ach in ipairs(MC.TreasureData) do
-        local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
-        live = (ok and live) or 0
-        criteriaCounts[ach] = live
-        local expected = ach.criteriaCount or 0
-        if live < expected then pending = pending + (expected - live) end
+        if not ach.navigationOnly then
+            local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+            live = (ok and live) or 0
+            criteriaCounts[ach] = live
+            local expected = ach.criteriaCount or 0
+            if live < expected then pending = pending + (expected - live) end
+        end
     end
 
     -- See Mounts/Scanner.lua for the rationale on totalAll.
@@ -45,6 +47,7 @@ function Scanner:Scan()
     }
 
     for _, ach in ipairs(MC.TreasureData) do
+        if not ach.navigationOnly then
         local visible = MC.IsGroupVisible(ach, "treasures")
         local n = criteriaCounts[ach]
         -- When the live count disagrees with the shipped one, the criterion
@@ -114,7 +117,10 @@ function Scanner:Scan()
                 end
             end
         end
+        end
     end
+
+    MC.BucketNavigationGroups(result, MC.TreasureData, "treasures", "treasures", "Treasure")
 
     result._partial = pending > 0 and pending or nil
     self.results = result

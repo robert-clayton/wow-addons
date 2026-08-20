@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 
 $shadowlandsRoot = Join-Path $Db2Root "shadowlands"
 $dragonflightRoot = Join-Path $Db2Root "dragonflight"
@@ -286,6 +287,8 @@ $petInventory = foreach ($pet in (Get-NewRows $slPets $dfPets)) {
     } elseif ($petGuideSpells.ContainsKey([string]$pet.SummonSpellID) -or
                   $petGuideNPCIDs.ContainsKey([string]$pet.CreatureID)) {
         "guide_confirmed"
+    } elseif (Test-CollectionistCollectibleWildPet $pet) {
+        "collectible_wild_pet_shared_audit"
     } elseif ($pet.SummonSpellID -eq "0") {
         "noncollectible_pet_battle_npc"
     } elseif ($itemExpansionIDs -contains "9") {
@@ -297,6 +300,8 @@ $petInventory = foreach ($pet in (Get-NewRows $slPets $dfPets)) {
     }
     $releaseDecision = if ($status -eq "noncollectible_pet_battle_npc") {
         "exclude_noncollectible"
+    } elseif ($status -eq "collectible_wild_pet_shared_audit") {
+        "exclude_shared_wild_audit"
     } elseif ($status -eq "cross_expansion_shop_pet") {
         "exclude_policy_external"
     } elseif ($petSourceText -match $externalCollectionPattern) {
@@ -728,7 +733,8 @@ Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "exclude
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_dragonflight" }).Count 164 "Dragonflight pet manifest row count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 33 "Dragonflight pet external-policy exclusion count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 34 "Dragonflight pet unavailable/internal exclusion count"
-Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 124 "Dragonflight noncollectible pet exclusion count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 71 "Dragonflight noncollectible pet exclusion count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_shared_wild_audit" }).Count 53 "Dragonflight shared-audit wild pet count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "include_dragonflight" }).Count 171 "Dragonflight toy manifest row count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 16 "Dragonflight toy external-policy exclusion count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_cross_expansion" }).Count 2 "Dragonflight toy cross-expansion exclusion count"

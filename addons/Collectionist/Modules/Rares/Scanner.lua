@@ -26,11 +26,13 @@ function Scanner:Scan()
     -- Blizzard added criteria; scan those too.
     local criteriaCounts, pending = {}, 0
     for _, ach in ipairs(MC.RareData) do
-        local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
-        live = (ok and live) or 0
-        criteriaCounts[ach] = live
-        local expected = ach.criteriaCount or 0
-        if live < expected then pending = pending + (expected - live) end
+        if not ach.navigationOnly then
+            local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+            live = (ok and live) or 0
+            criteriaCounts[ach] = live
+            local expected = ach.criteriaCount or 0
+            if live < expected then pending = pending + (expected - live) end
+        end
     end
 
     -- See Mounts/Scanner.lua for the rationale on totalAll.
@@ -48,6 +50,7 @@ function Scanner:Scan()
     }
 
     for _, ach in ipairs(MC.RareData) do
+        if not ach.navigationOnly then
         local visible = MC.IsGroupVisible(ach, "rares")
         local n = criteriaCounts[ach]
         -- When the live count disagrees with the shipped one, the criterion
@@ -125,7 +128,10 @@ function Scanner:Scan()
                 end
             end
         end
+        end
     end
+
+    MC.BucketNavigationGroups(result, MC.RareData, "rares", "rares", "Rare")
 
     result._partial = pending > 0 and pending or nil
     self.results = result

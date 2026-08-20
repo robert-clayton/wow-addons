@@ -504,9 +504,13 @@ do
     for _, id in ipairs({ 169, 199, 201, 207, 223, 241 }) do
         tbcUnavailableIDs.mounts[id] = true
     end
+    tbcUnavailableIDs.pets[187] = true
     local wrathUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
     for _, id in ipairs({ 263, 266, 313, 317, 340, 342, 343, 344, 345, 358 }) do
         wrathUnavailableIDs.mounts[id] = true
+    end
+    for _, id in ipairs({ 202, 243 }) do
+        wrathUnavailableIDs.pets[id] = true
     end
     local cataUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
     for _, id in ipairs({ 424, 428, 467 }) do
@@ -517,6 +521,9 @@ do
     end
     local mopUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
     for _, id in ipairs({ 503, 518, 519, 520, 541, 550, 558, 562, 563, 564 }) do
+        mopUnavailableIDs.mounts[id] = true
+    end
+    for _, id in ipairs({ 462, 484, 485 }) do
         mopUnavailableIDs.mounts[id] = true
     end
     local wodUnavailableIDs = { mounts = {}, pets = {}, toys = {} }
@@ -555,7 +562,7 @@ do
 
     local dataFixtures = {
         mounts = {
-            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 93, cataCount = 48, mopCount = 89, wodCount = 68, legionCount = 124, bfaCount = 140, slCount = 180, dfCount = 161, twwCount = 186,
+            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 94, cataCount = 48, mopCount = 93, wodCount = 69, legionCount = 125, bfaCount = 140, slCount = 181, dfCount = 161, twwCount = 186,
             files = {
                 "Modules/Mounts/Data/Classic.lua",
                 "Modules/Mounts/Data/TheBurningCrusade.lua",
@@ -567,12 +574,13 @@ do
                 "Modules/Mounts/Data/BattleForAzeroth.lua",
                 "Modules/Mounts/Data/Shadowlands.lua",
                 "Modules/Mounts/Data/Dragonflight.lua", "Modules/Mounts/Data/TheWarWithin.lua",
+                "Modules/Mounts/Data/DB2Gaps.lua",
                 "Modules/Mounts/Data/Mounts.lua",
                 "Modules/Mounts/Data/Patch120007.lua", "Modules/Mounts/Data/Patch120100.lua",
             },
         },
         pets = {
-            field = "PetData", list = "pets", id = "speciesID", classicCount = 59, tbcCount = 65, wrathCount = 52, cataCount = 43, mopCount = 152, wodCount = 84, legionCount = 106, bfaCount = 236, slCount = 176, dfCount = 164, twwCount = 201,
+            field = "PetData", list = "pets", id = "speciesID", classicCount = 204, tbcCount = 70, wrathCount = 81, cataCount = 82, mopCount = 173, wodCount = 117, legionCount = 158, bfaCount = 300, slCount = 237, dfCount = 217, twwCount = 208,
             files = {
                 "Modules/Pets/Data/Classic.lua",
                 "Modules/Pets/Data/TheBurningCrusade.lua",
@@ -584,12 +592,14 @@ do
                 "Modules/Pets/Data/BattleForAzeroth.lua",
                 "Modules/Pets/Data/Shadowlands.lua",
                 "Modules/Pets/Data/Dragonflight.lua", "Modules/Pets/Data/TheWarWithin.lua",
+                "Modules/Pets/Data/WildPets.lua",
+                "Modules/Pets/Data/DB2Gaps.lua",
                 "Modules/Pets/Data/Pets.lua",
                 "Modules/Pets/Data/Patch120007.lua", "Modules/Pets/Data/Patch120100.lua",
             },
         },
         toys = {
-            field = "ToyData", list = "toys", id = "itemID", classicCount = 10, tbcCount = 22, wrathCount = 36, cataCount = 40, mopCount = 59, wodCount = 91, legionCount = 154, bfaCount = 135, slCount = 115, dfCount = 171, twwCount = 99,
+            field = "ToyData", list = "toys", id = "itemID", classicCount = 14, tbcCount = 22, wrathCount = 36, cataCount = 43, mopCount = 79, wodCount = 128, legionCount = 158, bfaCount = 136, slCount = 115, dfCount = 173, twwCount = 99,
             files = {
                 "Modules/Toys/Data/Classic.lua",
                 "Modules/Toys/Data/TheBurningCrusade.lua",
@@ -601,6 +611,7 @@ do
                 "Modules/Toys/Data/BattleForAzeroth.lua",
                 "Modules/Toys/Data/Shadowlands.lua",
                 "Modules/Toys/Data/Dragonflight.lua", "Modules/Toys/Data/TheWarWithin.lua",
+                "Modules/Toys/Data/DB2Gaps.lua",
                 "Modules/Toys/Data/Toys.lua",
                 "Modules/Toys/Data/Patch120007.lua", "Modules/Toys/Data/Patch120100.lua",
             },
@@ -623,7 +634,7 @@ do
             },
         },
         achievements = {
-            field = "AchievementData", list = "achievements", id = "achievementID", classicCount = 199, tbcCount = 99, wrathCount = 384, cataCount = 233, mopCount = 407, wodCount = 402, legionCount = 305, bfaCount = 452, slCount = 419, dfCount = 569, twwCount = 381,
+            field = "AchievementData", list = "achievements", id = "achievementID", classicCount = 203, tbcCount = 101, wrathCount = 390, cataCount = 235, mopCount = 413, wodCount = 410, legionCount = 308, bfaCount = 475, slCount = 433, dfCount = 606, twwCount = 441,
             files = {
                 "Modules/Achievements/Data/Classic.lua",
                 "Modules/Achievements/Data/TheBurningCrusade.lua",
@@ -635,6 +646,7 @@ do
                 "Modules/Achievements/Data/BattleForAzeroth.lua",
                 "Modules/Achievements/Data/Shadowlands.lua",
                 "Modules/Achievements/Data/Dragonflight.lua", "Modules/Achievements/Data/TheWarWithin.lua",
+                "Modules/Achievements/Data/HandyNotes.lua",
                 "Modules/Achievements/Data/Achievements.lua",
                 "Modules/Achievements/Data/Patch120007.lua", "Modules/Achievements/Data/Patch120100.lua",
             },
@@ -1334,7 +1346,7 @@ do
             equal(endedTbcMounts, 6, "unavailable TBC mount count")
             equal(endedWrathMounts, 10, "unavailable Wrath mount count")
             equal(endedCataMounts, 3, "unavailable Cataclysm mount count")
-            equal(endedMopMounts, 10, "unavailable Pandaria mount count")
+            equal(endedMopMounts, 13, "unavailable Pandaria mount count")
             equal(endedWodMounts, 7, "unavailable Warlords mount count")
             equal(endedLegionMounts, 9, "unavailable Legion mount count")
             equal(endedBfaMounts, 7, "unavailable BFA mount count")
@@ -1346,8 +1358,8 @@ do
             equal(remixClassMounts, 11, "TWW Legion Remix class mount count")
         elseif moduleKey == "pets" then
             equal(endedClassicPets, 0, "unavailable Classic pet count")
-            equal(endedTbcPets, 0, "unavailable TBC pet count")
-            equal(endedWrathPets, 0, "unavailable Wrath pet count")
+            equal(endedTbcPets, 1, "unavailable TBC pet count")
+            equal(endedWrathPets, 2, "unavailable Wrath pet count")
             equal(endedCataPets, 0, "unavailable Cataclysm pet count")
             equal(endedMopPets, 0, "unavailable Pandaria pet count")
             equal(endedWodPets, 0, "unavailable Warlords pet count")
@@ -1429,7 +1441,7 @@ do
             equal(twwDecorationSources.drop, 6, "TWW drop decoration count")
             equal(twwCookingDecorations, 4, "TWW Cooking decoration count")
         elseif moduleKey == "achievements" then
-            equal(classicAchievementSources.zone, 41, "Classic exploration achievement count")
+            equal(classicAchievementSources.zone, 42, "Classic exploration achievement count")
             equal(classicAchievementSources.alterac, 19, "Classic Alterac Valley achievement count")
             equal(classicAchievementSources.arathi, 16, "Classic Arathi Basin achievement count")
             equal(classicAchievementSources.warsong, 19, "Classic Warsong Gulch achievement count")
@@ -1444,7 +1456,7 @@ do
             equal(tbcAchievementSources.metas, 16, "TBC quest/meta achievement count")
             equal(tbcAchievementSources.reputation, 16, "TBC reputation achievement count")
             equal(tbcAchievementTasks, 651, "TBC attached achievement criteria count")
-            equal(wrathAchievementSources.zone, 12, "Wrath exploration achievement count")
+            equal(wrathAchievementSources.zone, 16, "Wrath exploration achievement count")
             equal(wrathAchievementSources.dungeons, 80, "Wrath dungeon achievement count")
             equal(wrathAchievementSources.metas, 21, "Wrath quest/meta achievement count")
             equal(wrathAchievementSources.reputation, 14, "Wrath reputation achievement count")
@@ -1454,7 +1466,7 @@ do
             equal(wrathAchievementTasks, 1207, "Wrath attached achievement criteria count")
             equal(cataAchievementSources.dungeons, 62, "Cataclysm dungeon achievement count")
             equal(cataAchievementSources.raid, 62, "Cataclysm raid achievement count")
-            equal(cataAchievementSources.zone, 8, "Cataclysm exploration achievement count")
+            equal(cataAchievementSources.zone, 9, "Cataclysm exploration achievement count")
             equal(cataAchievementSources.metas, 43, "Cataclysm quest/meta achievement count")
             equal(cataAchievementSources.reputation, 9, "Cataclysm reputation achievement count")
             equal(cataAchievementSources.gilneas, 15, "Cataclysm Battle for Gilneas achievement count")
@@ -1464,7 +1476,7 @@ do
             equal(mopAchievementSources.dungeons, 44, "Pandaria dungeon achievement count")
             equal(mopAchievementSources.raid, 106, "Pandaria raid achievement count")
             equal(mopAchievementSources.metas, 64, "Pandaria quest/meta achievement count")
-            equal(mopAchievementSources.zone, 48, "Pandaria exploration achievement count")
+            equal(mopAchievementSources.zone, 52, "Pandaria exploration achievement count")
             equal(mopAchievementSources.reputation, 20, "Pandaria reputation achievement count")
             equal(mopAchievementSources.silvershard, 11, "Pandaria Silvershard achievement count")
             equal(mopAchievementSources.kotmogu, 10, "Pandaria Kotmogu achievement count")
@@ -1477,7 +1489,7 @@ do
             equal(wodAchievementSources.dungeons, 49, "Warlords dungeon achievement count")
             equal(wodAchievementSources.raid, 75, "Warlords raid achievement count")
             equal(wodAchievementSources.reputation, 13, "Warlords reputation achievement count")
-            equal(wodAchievementSources.zone, 21, "Warlords exploration achievement count")
+            equal(wodAchievementSources.zone, 25, "Warlords exploration achievement count")
             equal(wodAchievementSources.garrison, 15, "Warlords garrison achievement count")
             equal(wodAchievementSources.buildings, 51, "Warlords garrison-building achievement count")
             equal(wodAchievementSources.followers, 13, "Warlords follower achievement count")
@@ -1491,7 +1503,7 @@ do
             equal(legionAchievementSources.dungeons, 76, "Legion dungeon achievement count")
             equal(legionAchievementSources.raid, 100, "Legion raid achievement count")
             equal(legionAchievementSources.artifacts, 22, "Legion artifact achievement count")
-            equal(legionAchievementSources.zone, 35, "Legion exploration achievement count")
+            equal(legionAchievementSources.zone, 36, "Legion exploration achievement count")
             equal(legionAchievementSources.reputation, 11, "Legion reputation achievement count")
             equal(legionAchievementSources.class_hall, 5, "Legion class-hall achievement count")
             equal(legionAchievementSources.missions, 12, "Legion mission achievement count")
@@ -1499,10 +1511,10 @@ do
             equal(bfaAchievementSources.metas, 77, "BFA quest/meta achievement count")
             equal(bfaAchievementSources.dungeons, 59, "BFA dungeon achievement count")
             equal(bfaAchievementSources.raid, 97, "BFA raid achievement count")
-            equal(bfaAchievementSources.zone, 95, "BFA exploration achievement count")
+            equal(bfaAchievementSources.zone, 96, "BFA exploration achievement count")
             equal(bfaAchievementSources.reputation, 16, "BFA reputation achievement count")
             equal(bfaAchievementSources.islands, 64, "BFA island achievement count")
-            equal(bfaAchievementSources.war_effort, 34, "BFA war-effort achievement count")
+            equal(bfaAchievementSources.war_effort, 37, "BFA war-effort achievement count")
             equal(bfaAchievementSources.heart_of_azeroth, 10, "BFA Heart of Azeroth achievement count")
             equal(bfaAchievementTasks, 1310, "BFA attached achievement criteria count")
             equal(slAchievementSources.metas, 48, "Shadowlands quest/meta achievement count")
@@ -1514,14 +1526,14 @@ do
             equal(slAchievementSources.covenants, 75, "Shadowlands covenant achievement count")
             equal(slAchievementTasks, 1676, "Shadowlands attached achievement criteria count")
             equal(dfAchievementSources.metas, 53, "Dragonflight quest/meta achievement count")
-            equal(dfAchievementSources.dragonriding, 164, "Dragonflight dragonriding achievement count")
-            equal(dfAchievementSources.zone, 151, "Dragonflight exploration achievement count")
+            equal(dfAchievementSources.dragonriding, 167, "Dragonflight dragonriding achievement count")
+            equal(dfAchievementSources.zone, 154, "Dragonflight exploration achievement count")
             equal(dfAchievementSources.reputation, 50, "Dragonflight reputation achievement count")
             equal(dfAchievementSources.dungeons, 59, "Dragonflight dungeon achievement count")
             equal(dfAchievementSources.raid, 72, "Dragonflight raid achievement count")
-            equal(dfAchievementSources.mounts, 20, "Dragonflight collection achievement count")
+            equal(dfAchievementSources.mounts, 21, "Dragonflight collection achievement count")
             equal(dfAchievementTasks, 2879, "Dragonflight attached achievement criteria count")
-            equal(twwAchievementSources.zone, 161, "TWW general achievement count")
+            equal(twwAchievementSources.zone, 163, "TWW general achievement count")
             equal(twwAchievementSources.delves, 113, "TWW delve achievement count")
             equal(twwAchievementSources.dungeons, 34, "TWW dungeon achievement count")
             equal(twwAchievementSources.raid, 73, "TWW raid achievement count")
@@ -1600,6 +1612,21 @@ do
         "Gleaming Roc Feather is a component, not a toy")
     truthy(findCatalogEntry("ToyData", "toys", "itemID", 131811),
         "Rocfeather Skyhorn Kite is the actual toy")
+
+    -- Current collection DB2 still exposes shells for these records, but
+    -- source adjudication proves they are obsolete/internal or never shipped.
+    for _, mountID in ipairs({ 7, 12, 43, 123, 145 }) do
+        equal(findCatalogEntry("MountData", "mounts", "mountID", mountID), nil,
+            "obsolete mount-spell record must stay excluded " .. mountID)
+    end
+    for _, speciesID in ipairs({ 1757, 1758 }) do
+        equal(findCatalogEntry("PetData", "pets", "speciesID", speciesID), nil,
+            "internal pet record must stay excluded " .. speciesID)
+    end
+    for _, itemID in ipairs({ 88587, 110586, 166851 }) do
+        equal(findCatalogEntry("ToyData", "toys", "itemID", itemID), nil,
+            "never-implemented toy record must stay excluded " .. itemID)
+    end
 end
 
 -- Communication queues survive encounters and report actual send success.
@@ -1819,8 +1846,12 @@ end
 do
     CanShowAchievementUI = function() return true end
     local criteriaCount = 1
-    GetAchievementNumCriteria = function() return criteriaCount end
-    GetAchievementCriteriaInfo = function(_, index)
+    GetAchievementNumCriteria = function(achievementID)
+        if not achievementID then error("navigation-only row queried as achievement") end
+        return criteriaCount
+    end
+    GetAchievementCriteriaInfo = function(achievementID, index)
+        if not achievementID then error("navigation-only row queried as achievement") end
         return "Criterion " .. index, 0, index == 1, 0, 1, nil, 0, 9000 + index
     end
 
@@ -1830,6 +1861,11 @@ do
     rareMC.RareData = {
         { achievementID = 10, criteriaCount = 2, source = "coiled_isle",
           zone = "Test", expansion = "midnight", criteriaNPCIDs = { 1, 2 } },
+        { navigationOnly = true, source = "navigation", zone = "Test",
+          expansion = "midnight", rares = {
+              { npcID = 333, name = "Untracked Rare",
+                waypoint = { 1, 0.3, 0.4 } },
+          } },
     }
     rareMC.RareNPCs = { [1] = { 1, 0.1, 0.1 }, [2] = { 1, 0.2, 0.2 } }
     loadAddon("addons/Collectionist/Modules/Rares/Scanner.lua", rareMC)
@@ -1840,6 +1876,15 @@ do
     criteriaCount = 2
     equal(rareScanner:Scan(), true, "complete rare criteria scan")
     equal(rareScanner.results.totalAll, 2, "rare criteria denominator")
+    equal(rareScanner.results.total, 2,
+        "navigation-only rare stays out of visible completion denominator")
+    equal(rareScanner.results.navigationCount, 1,
+        "navigation-only rare display count")
+    local rareNavigation = rareScanner.results.bySource.navigation[1]
+    equal(rareNavigation.npcID, 333, "navigation-only rare entity")
+    equal(rareNavigation.navigationOnly, true, "navigation-only rare marker")
+    equal(rareNavigation.collected, nil,
+        "navigation-only rare has no completion state")
     equal(rareScanner.results._partial, nil, "complete rare scan is not partial")
     rareMC.RareData[1].criteriaNPCIDs = { 1, false }
     rareMC.RareData[1].criteriaObjectIDs = { false, 777 }
@@ -1856,6 +1901,11 @@ do
     treasureMC.TreasureData = {
         { achievementID = 20, criteriaCount = 2, source = "coiled_isle",
           zone = "Test", expansion = "midnight", criteriaNames = { "One", "Two" } },
+        { navigationOnly = true, source = "navigation", zone = "Test",
+          expansion = "midnight", treasures = {
+              { objectID = 444, name = "Untracked Treasure",
+                waypoint = { 1, 0.4, 0.5 } },
+          } },
     }
     treasureMC.TreasureCoords = {
         One = { 1, 0.1, 0.1 }, Two = { 1, 0.2, 0.2 },
@@ -1869,6 +1919,16 @@ do
     criteriaCount = 2
     equal(treasureScanner:Scan(), true, "complete treasure criteria scan")
     equal(treasureScanner.results.totalAll, 2, "treasure criteria denominator")
+    equal(treasureScanner.results.total, 2,
+        "navigation-only treasure stays out of visible completion denominator")
+    equal(treasureScanner.results.navigationCount, 1,
+        "navigation-only treasure display count")
+    local treasureNavigation = treasureScanner.results.bySource.navigation[1]
+    equal(treasureNavigation.objectID, 444, "navigation-only treasure entity")
+    equal(treasureNavigation.navigationOnly, true,
+        "navigation-only treasure marker")
+    equal(treasureNavigation.collected, nil,
+        "navigation-only treasure has no completion state")
     equal(treasureScanner.results._partial, nil,
         "complete treasure scan is not partial")
 end
@@ -1888,14 +1948,30 @@ do
     end
     local MC = {
         MountData = {}, PetData = {}, ToyData = {}, DecorationData = {},
-        RareData = { { achievementID = 10, criteriaCount = 2 } },
-        TreasureData = { { achievementID = 20, criteriaCount = 1 } },
+        RareData = {
+            { achievementID = 10, criteriaCount = 2 },
+            { navigationOnly = true, rares = {
+                { npcID = 333, name = "Untracked Rare",
+                  waypoint = { 1, 0.3, 0.4 } },
+            } },
+        },
+        TreasureData = {
+            { achievementID = 20, criteriaCount = 1 },
+            { navigationOnly = true, treasures = {
+                { objectID = 444, name = "Untracked Treasure",
+                  waypoint = { 1, 0.4, 0.5 } },
+            } },
+        },
         modulesByKey = {},
     }
     loadAddon("addons/Collectionist/Modules/Roster/Bitmap.lua", MC)
     MC.Bitmap:Init()
     equal(MC.Bitmap.ids.rares[1], "10:1", "rare criterion key")
     equal(MC.Bitmap.ids.treasures[1], "20:1", "treasure criterion key")
+    equal(#MC.Bitmap.ids.rares, 2,
+        "navigation-only rares stay out of roster bitmap")
+    equal(#MC.Bitmap.ids.treasures, 1,
+        "navigation-only treasures stay out of roster bitmap")
 
     criteriaCounts[10] = 1
     MC.Bitmap._criteriaReady = false

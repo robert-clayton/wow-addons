@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 $decorAuditSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\shadowlands\sources\housing-wowdb-acquisition-audit.csv"
 $bastionRareNPCAuditSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\shadowlands\sources\bastion-rare-npc-audit.csv"
 
@@ -223,8 +224,11 @@ $petInventory = foreach ($pet in (Get-NewRows $bfaPets $slPets)) {
         if ($item) { $item.ExpansionID }
     })
     $creature = $creatures[[string]$pet.CreatureID]
+    $sharedCollectibleWild = (Test-CollectionistCollectibleWildPet $pet) -and [string]$pet.ID -notin $shadowlandsCollectibleWildPetIDs
     $status = if ([string]$pet.ID -in $shadowlandsCollectibleWildPetIDs) {
         "collectible_wild_pet"
+    } elseif ($sharedCollectibleWild) {
+        "collectible_wild_pet_shared_audit"
     } elseif ($pet.SummonSpellID -eq "0" -or [int]$pet.SourceTypeEnum -lt 0) {
         "noncollectible_pet_battle_npc"
     } elseif ($pet.SourceText_lang -match $externalCollectionPattern) {
@@ -238,7 +242,7 @@ $petInventory = foreach ($pet in (Get-NewRows $bfaPets $slPets)) {
     }
     [pscustomobject]@{
         status             = $status
-        release_decision   = if ($status -eq "noncollectible_pet_battle_npc") { "exclude_noncollectible" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } else { "include_shadowlands" }
+        release_decision   = if ($status -eq "collectible_wild_pet_shared_audit") { "exclude_shared_wild_audit" } elseif ($status -eq "noncollectible_pet_battle_npc") { "exclude_noncollectible" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } else { "include_shadowlands" }
         unavailable        = [string]$pet.ID -in $shadowlandsUnavailablePetIDs
         availability_note  = if ([string]$pet.ID -eq "3046") { "Death Rising pre-expansion event reward; event ended" } else { $null }
         current_exists     = $currentPetIDs.ContainsKey([string]$pet.ID)
@@ -608,7 +612,8 @@ Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "exclude
 Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 2 "Internal Shadowlands mount count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 176 "Selected Shadowlands pet count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 6 "External Shadowlands pet count"
-Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 118 "Noncollectible Shadowlands pet count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 57 "Noncollectible Shadowlands pet count"
+Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_shared_wild_audit" }).Count 61 "Shared-audit Shadowlands wild pet count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 115 "Selected Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 4 "External Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 2 "Internal Shadowlands toy count"

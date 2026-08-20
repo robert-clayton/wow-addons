@@ -8,6 +8,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\legion\sources\housing-wowdb-acquisition-audit.csv"
 $rareNPCAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\legion\sources\rare-npc-audit.csv"
 $attZonePath = Join-Path $AttRoot "db\Standard\Categories\Zones.lua"
@@ -127,13 +128,17 @@ $mopPetIDs = @("2017", "2018")
 $cataPetIDs = @("2078", "2079", "2082", "2083", "2085", "2086", "2087", "2089", "2090")
 $wrathPetIDs = @("1727", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969")
 $petUnavailableIDs = @("1889", "2022")
-$petInventory = foreach ($pet in $pets | Where-Object { [int]$_.ID -ge 1699 -and $_.SummonSpellID -ne "0" -and [int]$_.SourceTypeEnum -ge 0 }) {
+$petInventory = foreach ($pet in $pets | Where-Object {
+    [int]$_.ID -ge 1699 -and [int]$_.SourceTypeEnum -ge 0 -and
+    ($_.SummonSpellID -ne "0" -or (Test-CollectionistCollectibleWildPet $_))
+}) {
     $itemIDs = @($itemsBySpell[[string]$pet.SummonSpellID])
     $itemExpansionIDs = @($itemIDs | ForEach-Object { $item = $items[[string]$_]; if ($item) { $item.ExpansionID } })
     $creature = $creatures[[string]$pet.CreatureID]
+    $collectibleWild = Test-CollectionistCollectibleWildPet $pet
     [pscustomobject]@{
-        status = if ([string]$pet.ID -in $wrathPetIDs) { "wrath_acquisition_boundary" } elseif ([string]$pet.ID -in $cataPetIDs) { "cataclysm_acquisition_boundary" } elseif ([string]$pet.ID -in $mopPetIDs) { "mop_acquisition_boundary" } elseif ([string]$pet.ID -in $petExternalIDs) { "policy_external_candidate" } elseif ([string]$pet.ID -in $petInternalIDs) { "unobtainable_or_internal" } else { "legion_snapshot_candidate" }
-        release_decision = if ([string]$pet.ID -in $wrathPetIDs) { "exclude_wrath" } elseif ([string]$pet.ID -in $cataPetIDs) { "exclude_cataclysm" } elseif ([string]$pet.ID -in $mopPetIDs) { "exclude_mop" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } elseif ([string]$pet.ID -in $petInternalIDs) { "exclude_unobtainable_or_internal" } else { "include_legion" }
+        status = if ($collectibleWild) { "collectible_wild_pet_shared_audit" } elseif ([string]$pet.ID -in $wrathPetIDs) { "wrath_acquisition_boundary" } elseif ([string]$pet.ID -in $cataPetIDs) { "cataclysm_acquisition_boundary" } elseif ([string]$pet.ID -in $mopPetIDs) { "mop_acquisition_boundary" } elseif ([string]$pet.ID -in $petExternalIDs) { "policy_external_candidate" } elseif ([string]$pet.ID -in $petInternalIDs) { "unobtainable_or_internal" } else { "legion_snapshot_candidate" }
+        release_decision = if ($collectibleWild) { "exclude_shared_wild_audit" } elseif ([string]$pet.ID -in $wrathPetIDs) { "exclude_wrath" } elseif ([string]$pet.ID -in $cataPetIDs) { "exclude_cataclysm" } elseif ([string]$pet.ID -in $mopPetIDs) { "exclude_mop" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } elseif ([string]$pet.ID -in $petInternalIDs) { "exclude_unobtainable_or_internal" } else { "include_legion" }
         unavailable = [string]$pet.ID -in $petUnavailableIDs
         availability_note = if ([string]$pet.ID -eq "1889") { "Legion pre-launch invasion event reward; event ended" } elseif ([string]$pet.ID -eq "2022") { "Legion Brawler's Guild rank reward; Brawler's Guild is unavailable" } else { $null }
         current_exists = $currentPetIDs.ContainsKey([string]$pet.ID)
@@ -352,7 +357,7 @@ $currencyInventory = @($currencies | ForEach-Object { [pscustomobject]@{ current
 
 Assert-Equal @($mountInventory).Count 153 "Legion mount boundary row count"
 Assert-Equal @($mountInventory | Where-Object release_decision -eq "include_legion").Count 124 "Selected Legion mount count"
-Assert-Equal @($petInventory).Count 146 "Legion collectible pet boundary row count"
+Assert-Equal @($petInventory).Count 195 "Legion collectible pet boundary row count"
 Assert-Equal @($petInventory | Where-Object release_decision -eq "include_legion").Count 106 "Selected Legion pet count"
 Assert-Equal @($toyInventory).Count 229 "Legion toy boundary row count"
 Assert-Equal @($toyInventory | Where-Object release_decision -eq "include_legion").Count 154 "Selected Legion toy count"

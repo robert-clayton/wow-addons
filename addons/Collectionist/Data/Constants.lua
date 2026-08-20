@@ -124,6 +124,51 @@ function MC.BucketEntry(result, source, entry, category)
     bucket[#bucket + 1] = entry
 end
 
+-- Navigation-only rare/treasure groups let source catalogs contribute useful
+-- map locations without inventing a durable completion signal. These entries
+-- are deliberately bucketed only for display: they never pass through
+-- AccumulateScanEntry, never enter completion totals or score, and never join
+-- the collected list/roster bitmap.
+--
+-- Data shape:
+--   { navigationOnly = true, source = "zone_key", zone = "Zone", rares = {
+--       { npcID = 123, name = "Rare", waypoint = { mapID, x, y } },
+--   } }
+-- Use `treasures` plus objectID/itemID for treasure groups.
+function MC.BucketNavigationGroups(result, groups, moduleKey, listKey, noun)
+    for _, group in ipairs(groups or {}) do
+        if group.navigationOnly and MC.IsGroupVisible(group, moduleKey) then
+            for _, sourceEntry in ipairs(group[listKey] or {}) do
+                local entry = {}
+                for key, value in pairs(sourceEntry) do entry[key] = value end
+                entry.moduleKey = entry.moduleKey or moduleKey
+                entry.expansion = entry.expansion or group.expansion
+                entry.source = entry.source or group.source or "navigation"
+                entry.sourceInfo = entry.sourceInfo or group.sourceInfo
+                entry.zone = entry.zone or group.zone
+                entry.availableAfter = entry.availableAfter or group.availableAfter
+                entry.navigationOnly = true
+                entry.collected = nil
+                entry.learned = nil
+
+                local available = MC.IsContentAvailable(entry)
+                entry.future = not available
+                if not entry.sourceInfo and entry.zone then
+                    entry.sourceInfo = (noun or "Location") .. " location in " .. entry.zone
+                end
+
+                MC.BucketEntry(result, entry.source, entry)
+                if available then
+                    result.navigationCount = (result.navigationCount or 0) + 1
+                else
+                    result.navigationFutureCount =
+                        (result.navigationFutureCount or 0) + 1
+                end
+            end
+        end
+    end
+end
+
 -- Factory for the minimap-summary printer each module registers as
 -- opts.printSummary. Every module's summary differs only in its verb and
 -- source tables; the bracket label comes from the module itself.

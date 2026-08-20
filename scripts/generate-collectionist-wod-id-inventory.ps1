@@ -9,6 +9,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\warlords-of-draenor\sources\housing-wowdb-acquisition-audit.csv"
 $blizzardSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\warlords-of-draenor\sources\blizzard-wod-collectibles.csv"
 
@@ -190,12 +191,16 @@ $mountInventory = foreach ($id in $wodMountIDs) {
 
 $petExternalIDs = @("1386","1454","1466","1602","1603","1639","1691")
 $tbcPetIDs = @("1622", "1623", "1624", "1625", "1626", "1627", "1628", "1629", "1631", "1632", "1633", "1634", "1635")
-$petInventory = foreach ($pet in $pets | Where-Object { [int]$_.ID -ge 1386 -and [int]$_.ID -le 1693 -and $_.SummonSpellID -ne "0" -and [int]$_.SourceTypeEnum -ge 0 }) {
+$petInventory = foreach ($pet in $pets | Where-Object {
+    [int]$_.ID -ge 1386 -and [int]$_.ID -le 1693 -and [int]$_.SourceTypeEnum -ge 0 -and
+    ($_.SummonSpellID -ne "0" -or (Test-CollectionistCollectibleWildPet $_))
+}) {
     $itemIDs = @($itemsBySpell[[string]$pet.SummonSpellID])
     $creature = $creatures[[string]$pet.CreatureID]
+    $collectibleWild = Test-CollectionistCollectibleWildPet $pet
     [pscustomobject]@{
-        status = if ([string]$pet.ID -in $tbcPetIDs) { "tbc_acquisition_boundary" } elseif ([string]$pet.ID -eq "1691") { "legion_promotion_boundary" } elseif ([string]$pet.ID -in $petExternalIDs) { "policy_external_candidate" } else { "wod_boundary_confirmed" }
-        release_decision = if ([string]$pet.ID -in $tbcPetIDs) { "exclude_tbc" } elseif ([string]$pet.ID -eq "1691") { "exclude_legion" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } else { "include_wod" }
+        status = if ($collectibleWild) { "collectible_wild_pet_shared_audit" } elseif ([string]$pet.ID -in $tbcPetIDs) { "tbc_acquisition_boundary" } elseif ([string]$pet.ID -eq "1691") { "legion_promotion_boundary" } elseif ([string]$pet.ID -in $petExternalIDs) { "policy_external_candidate" } else { "wod_boundary_confirmed" }
+        release_decision = if ($collectibleWild) { "exclude_shared_wild_audit" } elseif ([string]$pet.ID -in $tbcPetIDs) { "exclude_tbc" } elseif ([string]$pet.ID -eq "1691") { "exclude_legion" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } else { "include_wod" }
         current_exists = $currentPetIDs.ContainsKey([string]$pet.ID)
         official_guide_match = $officialIDs.pets.ContainsKey([string]$pet.ID)
         species_id = $pet.ID
@@ -460,7 +465,7 @@ $treasureManifest = @($treasureInventory | Where-Object selection_decision -eq "
 
 Assert-Equal $mountInventory.Count 73 "Warlords mount candidate count"
 Assert-Equal $mountManifest.Count 68 "Selected Warlords mount count"
-Assert-Equal $petInventory.Count 104 "Warlords pet candidate count"
+Assert-Equal $petInventory.Count 136 "Warlords pet candidate count"
 Assert-Equal $petManifest.Count 84 "Selected Warlords pet count"
 Assert-Equal $toyInventory.Count 101 "Warlords toy candidate count"
 Assert-Equal $toyManifest.Count 91 "Selected Warlords toy count"

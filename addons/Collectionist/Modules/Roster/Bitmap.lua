@@ -278,8 +278,10 @@ function Bitmap:Build()
     if GetAchievementNumCriteria then
         for _, data in ipairs({ MC.RareData or {}, MC.TreasureData or {} }) do
             for _, ach in ipairs(data) do
-                local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
-                liveCriteriaCounts[ach.achievementID] = (ok and live) or 0
+                if ach.achievementID then
+                    local ok, live = pcall(GetAchievementNumCriteria, ach.achievementID)
+                    liveCriteriaCounts[ach.achievementID] = (ok and live) or 0
+                end
             end
         end
     end

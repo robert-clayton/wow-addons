@@ -39,6 +39,7 @@ Modules\Mounts\Data\BattleForAzeroth.lua
 Modules\Mounts\Data\Shadowlands.lua
 Modules\Mounts\Data\Dragonflight.lua
 Modules\Mounts\Data\TheWarWithin.lua
+Modules\Mounts\Data\DB2Gaps.lua
 Modules\Mounts\Data\Mounts.lua
 Modules\Mounts\Data\Patch120007.lua
 Modules\Mounts\Data\Patch120100.lua
@@ -58,6 +59,8 @@ Modules\Pets\Data\BattleForAzeroth.lua
 Modules\Pets\Data\Shadowlands.lua
 Modules\Pets\Data\Dragonflight.lua
 Modules\Pets\Data\TheWarWithin.lua
+Modules\Pets\Data\WildPets.lua
+Modules\Pets\Data\DB2Gaps.lua
 Modules\Pets\Data\Pets.lua
 Modules\Pets\Data\Patch120007.lua
 Modules\Pets\Data\Patch120100.lua
@@ -96,6 +99,7 @@ Modules\Toys\Data\BattleForAzeroth.lua
 Modules\Toys\Data\Shadowlands.lua
 Modules\Toys\Data\Dragonflight.lua
 Modules\Toys\Data\TheWarWithin.lua
+Modules\Toys\Data\DB2Gaps.lua
 Modules\Toys\Data\Toys.lua
 Modules\Toys\Data\Patch120007.lua
 Modules\Toys\Data\Patch120100.lua
@@ -152,6 +156,7 @@ Modules\Achievements\Data\BattleForAzeroth.lua
 Modules\Achievements\Data\Shadowlands.lua
 Modules\Achievements\Data\Dragonflight.lua
 Modules\Achievements\Data\TheWarWithin.lua
+Modules\Achievements\Data\HandyNotes.lua
 Modules\Achievements\Data\Achievements.lua
 Modules\Achievements\Data\Patch120007.lua
 Modules\Achievements\Data\Patch120100.lua

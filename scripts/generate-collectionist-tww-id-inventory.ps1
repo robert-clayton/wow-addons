@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 
 $dragonflightRoot = Join-Path $Db2Root "dragonflight"
 $twwRoot = Join-Path $Db2Root "tww"
@@ -263,6 +264,8 @@ $petInventory = foreach ($pet in $twwPetCandidates) {
     $guideNPCMatch = $petGuideNPCs.ContainsKey([string]$pet.CreatureID)
     $status = if ($guideItemID -or $guideNPCMatch) {
         "guide_confirmed"
+    } elseif (Test-CollectionistCollectibleWildPet $pet) {
+        "collectible_wild_pet_shared_audit"
     } elseif ($pet.SummonSpellID -eq "0") {
         "noncollectible_pet_battle_npc"
     } elseif (($itemExpansionIDs -contains "10") -or $pet.SourceText_lang -match $twwSignalPattern) {
@@ -276,6 +279,8 @@ $petInventory = foreach ($pet in $twwPetCandidates) {
     }
     $releaseDecision = if ($status -eq "post_tww_preload") {
         "exclude_cross_expansion"
+    } elseif ($status -eq "collectible_wild_pet_shared_audit") {
+        "exclude_shared_wild_audit"
     } elseif ($status -eq "noncollectible_pet_battle_npc") {
         "exclude_noncollectible"
     } elseif ($pet.SourceText_lang -match $externalCollectionPattern) {

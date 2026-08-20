@@ -8,6 +8,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\battle-for-azeroth\sources\housing-wowdb-acquisition-audit.csv"
 $rareNPCAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\battle-for-azeroth\sources\rare-npc-audit.csv"
 $legionRoot = Join-Path $Db2Root "legion"
@@ -153,10 +154,11 @@ $petInventory = foreach ($pet in (Get-NewRows $legionPets $bfaPets)) {
     $itemIDs = @($itemsBySpell[[string]$pet.SummonSpellID])
     $itemExpansionIDs = @($itemIDs | ForEach-Object { $item = $items[[string]$_]; if ($item) { $item.ExpansionID } })
     $creature = $historicalCreatureByID[[string]$pet.CreatureID]
-    $noncollectible = $pet.SummonSpellID -eq "0" -or [int]$pet.SourceTypeEnum -lt 0
+    $collectibleWild = Test-CollectionistCollectibleWildPet $pet
+    $noncollectible = [int]$pet.SourceTypeEnum -lt 0 -or ($pet.SummonSpellID -eq "0" -and -not $collectibleWild)
     [pscustomobject]@{
-        status = if ([string]$pet.ID -in $mopPetIDs) { "mop_acquisition_boundary" } elseif ($noncollectible) { "noncollectible_pet_battle_npc" } elseif ($pet.SourceText_lang -match $externalPattern) { "policy_external_candidate" } else { "snapshot_candidate" }
-        release_decision = if ([string]$pet.ID -in $mopPetIDs) { "exclude_mop" } elseif ($noncollectible) { "exclude_noncollectible" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } elseif ([string]$pet.ID -in $petInternalIDs) { "exclude_unobtainable_or_internal" } else { "include_bfa" }
+        status = if ([string]$pet.ID -in $mopPetIDs) { "mop_acquisition_boundary" } elseif ($collectibleWild) { "collectible_wild_pet_shared_audit" } elseif ($noncollectible) { "noncollectible_pet_battle_npc" } elseif ($pet.SourceText_lang -match $externalPattern) { "policy_external_candidate" } else { "snapshot_candidate" }
+        release_decision = if ([string]$pet.ID -in $mopPetIDs) { "exclude_mop" } elseif ($collectibleWild) { "exclude_shared_wild_audit" } elseif ($noncollectible) { "exclude_noncollectible" } elseif ([string]$pet.ID -in $petExternalIDs) { "exclude_policy_external" } elseif ([string]$pet.ID -in $petInternalIDs) { "exclude_unobtainable_or_internal" } else { "include_bfa" }
         unavailable = $false
         availability_note = $null
         current_exists = $currentPetIDs.ContainsKey([string]$pet.ID)
