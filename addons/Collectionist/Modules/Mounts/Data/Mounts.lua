@@ -98,7 +98,7 @@ MC.MountSourceOrder = {
     "delve", "prey", "ritual_sites", "void_assaults",
     "showdowns",
     "dungeon", "raid", "pvp",
-    "worldevent", "profession", "vendor", "prepatch",
+    "worldevent", "profession", "vendor", "tradingpost", "prepatch",
 }
 MC.MountSourceLabels = {
     renown = "Renown", reputation = "Reputation", drop = "Rare Drop",
@@ -107,7 +107,7 @@ MC.MountSourceLabels = {
     showdowns = "Void Showdowns",
     dungeon = "Dungeon", raid = "Raid", pvp = "PvP",
     worldevent = "World Event", profession = "Profession",
-    vendor = "Vendor", prepatch = "Pre-Patch",
+    vendor = "Vendor", tradingpost = "Trading Post", prepatch = "Pre-Patch",
 }
 
 local LOC = MC.LOC

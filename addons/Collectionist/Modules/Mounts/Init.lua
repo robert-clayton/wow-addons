@@ -9,6 +9,7 @@ local mod = MC.RegisterModule("mounts", {
     defaults       = {
         showCollected   = false,
         hideUnavailable = true,
+        hideTradingPost = false,
         collapsed       = {},
     },
     events = { "NEW_MOUNT_ADDED", "COMPANION_LEARNED", "PLAYER_ENTERING_WORLD" },

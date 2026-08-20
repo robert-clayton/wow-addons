@@ -7,6 +7,12 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.13.2", sections = {
+        { heading = "Added", lines = {
+            "|cffffd200Trading Post mounts and toys join the pets.|r 74 mounts and 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own \"Hide Trading Post\" toggle if you would rather not see them.",
+            "17 collectibles that only reached the Trading Post after starting life as Trading Card Game codes, in-game Shop purchases, Recruit-a-Friend rewards or promotions are deliberately left out. Those are still bought with real money or gone for good, depending on which.",
+        } },
+    } },
     { version = "1.13.1", sections = {
         { heading = "Added", lines = {
             "|cffffd200Recipes tell you where they come from.|r Around nine in ten recipes in the browser used to say \"unknown\" — nothing about who teaches them or where to look. 8,975 of them now name the trainer, vendor, boss, quest or container that gives them, and the zone it is in: \"Marith Lazuria <Jewelcrafting Supplies>, Dalaran\". Nine are still uncatalogued, all Inscription glyphs and Pandaria profession items.",
@@ -87,11 +93,6 @@ MC.CHANGELOG = {
             "If Blizzard adds rares or treasures to an existing achievement, they just show up without needing for the addon to be updated.",
             "If an achievement's criteria get reordered, waypoints and puzzle steps fall back to safe lookups rather than pointing at the wrong spot.",
             "Corrected bad collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.",
-        } },
-    } },
-    { version = "1.6.2", sections = {
-        { heading = "Changed", lines = {
-            "Mounts tab now has dedicated sections for the three Midnight feature systems: Prey, Ritual Sites, and Void Assaults.",
         } },
     } },
 }

@@ -9,6 +9,7 @@ local mod = MC.RegisterModule("toys", {
     defaults       = {
         showCollected   = false,
         hideUnavailable = true,
+        hideTradingPost = false,
         collapsed       = {},
     },
     -- NEW_TOY_ADDED fires on collect; TOYS_UPDATED catches filter / journal

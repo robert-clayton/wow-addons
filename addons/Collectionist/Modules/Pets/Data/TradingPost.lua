@@ -1,15 +1,15 @@
 local _, MC = ...
 
 -- GENERATED FILE - do not edit.
--- Regenerate: scripts/generate-collectionist-trading-post-pets.ps1
+-- Regenerate: scripts/generate-collectionist-trading-post.ps1
 --
 -- Trading Post pets. Bought with Trader's Tender in game and rotated back
--- into the shop over time, so they are tracked like any other earnable pet.
--- Expansion is the one whose Trading Post first offered the pet, not the
+-- into the shop over time, so they are tracked like anything else earnable.
+-- Expansion is the one whose Trading Post first offered the item, not the
 -- expansion its model or original promotion came from.
 --
--- 9 pets whose original source was a TCG code, the in-game Shop or a
--- promotion are deliberately NOT listed here, pending review.
+-- 9 whose original source was a TCG code, the in-game Shop, Recruit-a-Friend
+-- or a promotion are deliberately NOT listed here, pending review.
 
 MC.RegisterContent("dragonflight", "pets", {
     { source = "tradingpost", pets = {

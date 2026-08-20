@@ -35,8 +35,13 @@ function Scanner:Scan()
 
     local playerFaction = UnitFactionGroup("player")
     local hasJournal = C_MountJournal and C_MountJournal.GetMountInfoByID
+    local hideTradingPost = mod.db and mod.db.hideTradingPost
     for _, group in ipairs(MC.MountData) do
+        -- The trading-post toggle only affects what's shown; the account-wide
+        -- tallies below run for every group so broadcasts don't depend on
+        -- per-character display settings.
         local visible = MC.IsGroupVisible(group)
+                        and not (hideTradingPost and group.source == "tradingpost")
         for _, mount in ipairs(group.mounts) do
             -- PvP faction filtering: skip mounts not for this player's faction
             if not (mount.faction and mount.faction ~= playerFaction) then

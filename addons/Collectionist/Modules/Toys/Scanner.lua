@@ -26,8 +26,13 @@ function Scanner:Scan()
     local hasToyAPI  = PlayerHasToy ~= nil
     local hasInfoAPI = C_ToyBox and C_ToyBox.GetToyInfo
 
+    local hideTradingPost = mod.db and mod.db.hideTradingPost
     for _, group in ipairs(MC.ToyData) do
+        -- The trading-post toggle only affects what's shown; the account-wide
+        -- tallies below run for every group so broadcasts don't depend on
+        -- per-character display settings.
         local visible = MC.IsGroupVisible(group)
+                        and not (hideTradingPost and group.source == "tradingpost")
         for _, toy in ipairs(group.toys) do
             local isCollected = false
             if hasToyAPI and toy.itemID and toy.itemID > 0 then

@@ -1,3 +1,8 @@
+# 1.13.2
+### Added
+- **Trading Post mounts and toys join the pets.** 74 mounts and 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own "Hide Trading Post" toggle if you would rather not see them.
+- 17 collectibles that only reached the Trading Post after starting life as Trading Card Game codes, in-game Shop purchases, Recruit-a-Friend rewards or promotions are deliberately left out. Those are still bought with real money or gone for good, depending on which.
+
 # 1.13.1
 ### Added
 - **Recipes tell you where they come from.** Around nine in ten recipes in the browser used to say "unknown" — nothing about who teaches them or where to look. 8,975 of them now name the trainer, vendor, boss, quest or container that gives them, and the zone it is in: "Marith Lazuria \<Jewelcrafting Supplies\>, Dalaran". Nine are still uncatalogued, all Inscription glyphs and Pandaria profession items.

@@ -25,6 +25,13 @@ function UI:GetConfigDefs()
                 if mod.Scanner then MC.ScanNow(mod) end
                 MC.RefreshActive()
             end },
+        { type = "checkbox", label = "Hide Trading Post Toys",
+            get = function() return db.hideTradingPost end,
+            set = function(v)
+                db.hideTradingPost = v
+                if mod.Scanner then MC.ScanNow(mod) end
+                MC.RefreshActive()
+            end },
     }
 end
 

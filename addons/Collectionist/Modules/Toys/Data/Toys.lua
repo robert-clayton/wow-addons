@@ -4,6 +4,7 @@ local T = MC.SCORE_TIERS
 MC.ToySourceOrder = {
     "renown", "achievement", "quest", "treasure", "drop",
     "dungeon", "raid", "vendor", "profession", "worldevent",
+    "tradingpost",
 }
 MC.ToySourceLabels = {
     renown      = "Renown",
@@ -16,6 +17,7 @@ MC.ToySourceLabels = {
     vendor      = "Vendor",
     profession  = "Profession",
     worldevent  = "World Event",
+    tradingpost = "Trading Post",
 }
 
 local LOC = MC.LOC
