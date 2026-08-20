@@ -5,5 +5,5 @@ Thumbs.db
 *.swp
 *~
 addons/*/Libs/MidnightUI-1.0
-.claude/settings.local.json
+.claude/
 dist/

@@ -1,9 +1,31 @@
-# Unreleased
+# 1.13.0
 ### Added
-- Complete Classic, The Burning Crusade, Wrath of the Lich King, Cataclysm, Mists of Pandaria, Warlords of Draenor, Legion, Battle for Azeroth, Shadowlands, Dragonflight, and The War Within expansion catalogs for every tracker, with exact manifest validation for collectible, achievement, recipe, rare, and treasure IDs.
+- **The whole game, not just Midnight.** Complete Classic, The Burning Crusade, Wrath of the Lich King, Cataclysm, Mists of Pandaria, Warlords of Draenor, Legion, Battle for Azeroth, Shadowlands, Dragonflight, and The War Within catalogs for every tracker, with exact manifest validation for collectible, achievement, recipe, rare, and treasure IDs.
+- **A second interface: Premium.** An application-style window with sidebar navigation, a collection spine showing progress across every tracker, and a footer that keeps your score and peers in view. The original layout is still there as Simple — switch with `/mc style`.
+- A **compact mode** and a slim minimize strip, so Collectionist can sit on screen while you play without taking a quarter of it.
+- **Pinned targets.** Alt-click anything you're chasing to keep it in a small overlay, wherever you are in the addon.
+- The **Ellesmere** theme, for anyone running EllesmereUI.
+- The Collection Inspector is now a proper window you can move, resize, and close with Escape.
+- Every expansion appears in the pickers, greyed out until its content ships, so you can see what's coming.
 - Housing decorations are assigned to the expansion where they are obtained, including pre-Midnight rewards that only entered the housing catalog when housing launched.
 - Housing recipes taught by an older expansion's profession tiers are tracked with that expansion as well.
 - Release-cycle rewards from Remix, seasonal play, anniversaries, Plunderstorm, and other ended events remain under their original expansion and are marked unavailable where their acquisition window has closed.
+
+### Changed
+- **Achievements no longer inflate your Collection Score.** There are three times as many of them as the next-largest tracker and they carried the heaviest weights, so they were making up 59% of the total — the number described achievement progress more than it described a collection. The separate achievement-points tally is gone too; the game's own achievement UI is where that belongs.
+- **Recipes list every profession**, not just the ones this character knows, with a toggle to hide the ones you haven't learned. Recipe unlocks are account-wide, so the browser now matches.
+- **One control decides what a tab shows.** The per-tab expansion filter is gone; Options > Expansions governs every tracker at once.
+- Options moved out of a side dock and into the sidebar as its own tab. Scan lives there now.
+- Window controls sit where you expect them — minimize, maximize, and close at the top right of the header.
+- The launch expansion is called **Vanilla** rather than Classic, which is what people actually call it.
+- Fades and slides throughout both layouts, and tabs cross-fade when you switch.
+- Tracker headings dropped their subtitle blurbs.
+
+### Fixed
+- Scrollbars can be clicked and dragged.
+- The collection spine kept its full width when collapsing to compact.
+- The first time you hovered a sidebar entry it flashed near-white instead of lifting slightly.
+- Collectionist could not be expanded again after collapsing it all the way down to the strip.
 
 # 1.12.1
 ### Added
