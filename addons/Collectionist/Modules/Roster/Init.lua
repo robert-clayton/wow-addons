@@ -270,14 +270,14 @@ end
 -- there are three times as many of them as the next-largest tracker AND
 -- they carried the highest average weight, so they were 59% of the
 -- possible score — the number described achievement progress more than
--- it described a collection. Their own score is still computed and
--- returned separately (fourth value) so the Achievements tab can show
--- it as its own stat.
+-- it described a collection. Excluded modules are skipped outright; no
+-- achievement tally is computed, carried or displayed anywhere. The
+-- game's own achievement UI is where that number belongs.
 local SCORE_EXCLUDED = { achievements = true }
 
 function MC.GetLocalScore(excludePartial)
     local byModule = {}
-    local total, legacy, excluded = 0, 0, 0
+    local total, legacy = 0, 0
     for _, m in ipairs(MC.modules) do
         local r = m.Scanner and m.Scanner.results
         if WIRE_KEY[m.key] and r
@@ -293,16 +293,14 @@ function MC.GetLocalScore(excludePartial)
                 s = r.score or 0
                 l = r.legacyCount or 0
             end
-            if SCORE_EXCLUDED[m.key] then
-                excluded = excluded + s
-            else
+            if not SCORE_EXCLUDED[m.key] then
                 byModule[m.key] = { score = s, legacyCount = l }
                 total = total + s
                 legacy = legacy + l
             end
         end
     end
-    return total, legacy, byModule, excluded
+    return total, legacy, byModule
 end
 
 -- One per-expansion 'e' payload: "<expKey>:m:N/M,p:N/M,...". Returned

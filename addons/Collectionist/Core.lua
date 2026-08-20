@@ -238,6 +238,9 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
                     entry.expansion = entry.expansion or expansionKey
                     entry.moduleKey = entry.moduleKey or moduleKey
                     entry.availableAfter = entry.availableAfter or group.availableAfter
+                    if group.navigationOnly and entry.navigationOnly == nil then
+                        entry.navigationOnly = true
+                    end
                 end
             end
         end
@@ -674,6 +677,11 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 
     if item.sourceInfo then
         tt:AddLine(item.sourceInfo, 1, 1, 1, true)
+    end
+
+    if item.navigationOnly then
+        tt:AddLine("Location only — excluded from completion totals and saved ownership.",
+            0.72, 0.72, 0.72, true)
     end
 
     if item.availableAfter and MC.IsContentAvailable
@@ -1937,7 +1945,7 @@ function MC.CreatePanel()
             hoverColor = theme.colors.scoreAccentHover,
             tooltip = function(_, tt)
                 if not MC.GetLocalScore then return end
-                local total, legacy, byMod, achPoints = MC.GetLocalScore()
+                local total, legacy, byMod = MC.GetLocalScore()
                 tt:SetText("Collection Score")
                 tt:AddDoubleLine("Total", tostring(total),
                     1, 1, 1, theme.colors.scoreAccent[1], theme.colors.scoreAccent[2], theme.colors.scoreAccent[3])
@@ -1956,14 +1964,6 @@ function MC.CreatePanel()
                     tt:AddLine(" ")
                     tt:AddDoubleLine("Legacies", tostring(legacy),
                         0.7, 0.7, 0.85, 0.7, 0.7, 0.85)
-                end
-                -- Achievements keep their own tally outside the score.
-                if achPoints and achPoints > 0 then
-                    tt:AddLine(" ")
-                    tt:AddDoubleLine("Achievement points", tostring(achPoints),
-                        0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
-                    tt:AddLine("Tracked separately — not part of the score.",
-                        0.5, 0.5, 0.5, true)
                 end
             end,
         })
@@ -2524,7 +2524,7 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         if not MC.GetLocalScore then
             print(PREFIX .. " Score system not available.")
         else
-            local total, legacy, byMod, achPoints = MC.GetLocalScore()
+            local total, legacy, byMod = MC.GetLocalScore()
             print(format("%s Collection Score: |cffffcc66%d|r", PREFIX, total))
             for _, m in ipairs(MC.modules) do
                 local b = byMod[m.key]
@@ -2534,9 +2534,6 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
             end
             if legacy > 0 then
                 print(format("  Legacies: %d (collected items no longer obtainable)", legacy))
-            end
-            if achPoints and achPoints > 0 then
-                print(format("  Achievement points: %d (tracked separately)", achPoints))
             end
         end
     elseif cmd == "filter" then
