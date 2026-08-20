@@ -341,6 +341,26 @@ do
     equal(dfRecipes, 1004, "Dragonflight recipe count")
     equal(twwRecipes, 696, "TWW recipe count")
     truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
+
+    -- Acquisition-data burndown. DB2 carries no source column for recipes, so
+    -- most of the catalog ships as source="unknown" pending enrichment from
+    -- ATT ancestry. Pinning the count makes progress visible and stops a
+    -- generator change from silently re-introducing unsourced rows: enrichment
+    -- should only ever ratchet this DOWN. Update it deliberately, per pass.
+    local unsourcedRecipes, sourcelessRecipes = 0, 0
+    for _, dataKey in pairs(MC.RECIPE_DATA_KEYS) do
+        for _, category in ipairs(MC[dataKey]) do
+            for _, recipe in ipairs(category.recipes) do
+                if recipe.source == nil then
+                    sourcelessRecipes = sourcelessRecipes + 1
+                elseif recipe.source == "unknown" then
+                    unsourcedRecipes = unsourcedRecipes + 1
+                end
+            end
+        end
+    end
+    equal(sourcelessRecipes, 0, "every recipe carries a source string")
+    equal(unsourcedRecipes, 9, "recipe acquisition burndown (enrichment lowers this)")
     for _, recipeID in ipairs({
         402118, 402123, 402124, 402125, 402126, 402128, 402129, 402130,
         402131, 402133, 402134, 402135, 402136, 402137, 402138, 402139,

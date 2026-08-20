@@ -25,14 +25,32 @@ local function getBarKeys(skillLine)
     return k
 end
 
-local SOURCE_ORDER = { "trainer", "vendor", "discovery", "specialization", "drop", "quest" }
+-- "unknown" is last on purpose. Most shipped recipes still carry it: DB2
+-- has no acquisition column for recipes (unlike Mount/BattlePetSpecies/Toy,
+-- which ship a SourceText_lang), so the catalog was generated without one.
+-- Listing it here rather than letting it fall through the pairs() loop below
+-- gives it a stable position at the bottom instead of a random one, and a
+-- real label instead of the raw key.
+local SOURCE_ORDER = {
+    "trainer", "vendor", "discovery", "specialization",
+    "drop", "worlddrop", "quest", "treasure", "pvp",
+    "unavailable", "unknown",
+}
 local SOURCE_LABELS = {
     trainer        = "Trainer",
     vendor         = "Vendor",
     discovery      = "Discovery",
     specialization = "Specialization",
     drop           = "Drop",
+    worlddrop      = "World Drop",
     quest          = "Quest",
+    treasure       = "Treasure",
+    pvp            = "PvP",
+    -- ATT's never-implemented bucket: recipes that exist in the client but
+    -- were never released, plus content pulled since. Neither is farmable.
+    unavailable    = "Not obtainable",
+    -- Says the addon hasn't catalogued it, not that the recipe has no source.
+    unknown        = "Source not catalogued",
 }
 local SOURCE_SET = {}
 for _, s in ipairs(SOURCE_ORDER) do SOURCE_SET[s] = true end

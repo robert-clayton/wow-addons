@@ -294,11 +294,11 @@ $decorAudit = @($decorCandidates | Sort-Object { [int]$_.ID } | ForEach-Object {
         att_source_ancestry   = @($attOccurrences.ancestry | Sort-Object -Unique) -join ";"
     }
 })
-Assert-Equal @($decorAudit | Where-Object { [int]$_.att_occurrences -gt 0 }).Count 298 "Decorations represented in local ATT housing data"
+Assert-Equal @($decorAudit | Where-Object { [int]$_.att_occurrences -gt 0 }).Count 377 "Decorations represented in local ATT housing data"
 Write-CsvFile (Join-Path $AuditRoot "db2-decoration-gap-audit.csv") $decorAudit
 
 Write-Output "DB2 gap audit complete"
 Write-Output "Pets: 97 audited, 95 included, 2 confirmed internal"
 Write-Output "Mounts: 23 audited, 18 included, 5 confirmed internal"
 Write-Output "Toys: 94 audited, 75 included, 16 missing current item records, 3 confirmed never implemented"
-Write-Output "Decorations: 816 item-backed gaps deferred pending acquisition sources (298 have ATT catalog ancestry)"
+Write-Output "Decorations: 816 item-backed gaps deferred pending acquisition sources (377 have ATT catalog ancestry)"

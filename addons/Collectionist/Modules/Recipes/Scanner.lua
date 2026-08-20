@@ -6,6 +6,11 @@ local Scanner = mod.Scanner
 
 Scanner.results = {}
 
+-- Stands in for sourceInfo on recipes the catalog hasn't been enriched for
+-- yet. Points at the one action that always works for them — Wowhead —
+-- rather than leaving the tooltip's Source line empty.
+local UNSOURCED_HINT = "Acquisition not catalogued yet. Shift-click for Wowhead."
+
 -- skillLine -> per-profession recipe table name, shared with Core's
 -- RegisterContent recipes route (Core.lua loads first per the TOC).
 local dataSets = MC.RECIPE_DATA_KEYS
@@ -106,7 +111,15 @@ function Scanner:ScanProfession(skillLine, recipeData)
                     id         = recipe.id,
                     name       = recipe.name,
                     source     = recipe.source,
-                    sourceInfo = recipe.sourceInfo,
+                    -- Uncatalogued recipes have no sourceInfo, which would
+                    -- leave the info tooltip's Source line blank. Substituting
+                    -- here rather than in the data files keeps 8,900-odd rows
+                    -- out of the shipped catalog, and covers the pinned-target
+                    -- overlay and Collection Inspector too — they read this
+                    -- same scanned entry.
+                    sourceInfo = recipe.sourceInfo
+                        or ((recipe.source == nil or recipe.source == "unknown")
+                            and UNSOURCED_HINT or nil),
                     priority   = recipe.priority,
                     waypoint   = recipe.waypoint,
                     cost       = recipe.cost,

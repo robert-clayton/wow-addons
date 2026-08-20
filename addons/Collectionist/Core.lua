@@ -1677,6 +1677,11 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- accepted the current milestone.
         if MC.MaybeShowOnboarding then MC.MaybeShowOnboarding() end
 
+        -- First login after an update: show what changed. No-ops on a fresh
+        -- install (nothing to compare against, and Onboarding covers that
+        -- case) and when the stored version already matches.
+        if MC.WhatsNew then MC.WhatsNew:CheckOnLogin() end
+
     elseif event == "PLAYER_LOGOUT" then
         -- Snapshot the per-character DB into the account-wide DB so the next
         -- alt to log in for the first time inherits these settings as their
@@ -2282,6 +2287,13 @@ function MC.BuildConfig()
             MC.db.animations = v and true or false
             MUI.animEnabled = v and true or false
         end }
+    -- Stored account-wide next to lastSeenVersion, not in MC.db, so turning
+    -- it off on one character turns it off everywhere.
+    defs[#defs + 1] = { type = "checkbox", label = "Show What's New after updating",
+        get = function() return not (CollectionistDB and CollectionistDB.whatsNewDisabled) end,
+        set = function(v)
+            if CollectionistDB then CollectionistDB.whatsNewDisabled = not v end
+        end }
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "SHARING" }
     defs[#defs + 1] = { type = "checkbox",
@@ -2424,6 +2436,7 @@ local function PrintHelp()
     print("  /mc reset - reset panel position + size")
     print("  /mc sharing on|off|announce|sync|prune|clear|status - optional sharing")
     print("  /mc score - show your Collection Score breakdown")
+    print("  /mc whatsnew - what changed in this version")
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc version - show addon version")
@@ -2520,6 +2533,14 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         print(PREFIX .. " Panel reset.")
     elseif cmd == "version" then
         print(format("%s Collectionist v%s", PREFIX, MC.version))
+    elseif cmd == "whatsnew" or cmd == "changelog" then
+        if MC.WhatsNew then
+            -- Explicit request: show the notes for this version even when the
+            -- player has already dismissed them.
+            MC.WhatsNew:Show(MC.WhatsNew.PreviousVersionFloor())
+        else
+            print(PREFIX .. " What's New is unavailable — restart the client fully.")
+        end
     elseif cmd == "score" then
         if not MC.GetLocalScore then
             print(PREFIX .. " Score system not available.")

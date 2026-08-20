@@ -31,6 +31,7 @@ jobs:
         run: |
           luajit tests/toc_smoke.lua
           luajit tests/run.lua
+          luajit tests/whatsnew.lua
 
       - name: Build self-contained addon zip
         id: package

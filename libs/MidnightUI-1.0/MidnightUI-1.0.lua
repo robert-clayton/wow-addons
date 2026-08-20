@@ -119,6 +119,16 @@ lib.Themes.default = {
             tradingpost    = { 0.90, 0.55, 0.80 },
             event          = { 0.70, 0.70, 0.70 },
             crafted        = { 0.80, 0.50, 0.90 },
+            -- Random world drops: no fixed vendor, boss or zone to point at.
+            worlddrop      = { 0.72, 0.62, 0.45 },
+            -- Exists in the client but was never released, or has since been
+            -- pulled. Muted, because there is nothing to go and do.
+            unavailable    = { 0.52, 0.50, 0.55 },
+            -- Not a source type: the marker for "we haven't catalogued this
+            -- yet". Deliberately dimmer and less saturated than the 0.7 grey
+            -- SourceColor falls back to, so the group reads as pending rather
+            -- than as one more ordinary category.
+            unknown        = { 0.45, 0.47, 0.52 },
         },
         infoText        = { 0.48, 0.48, 0.48 },
         indicatorText      = { 0.62, 0.62, 0.62 },

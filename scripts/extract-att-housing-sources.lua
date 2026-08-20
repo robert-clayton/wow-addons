@@ -100,7 +100,12 @@ local function visit(node, ancestors)
     end
 
     if type(node.g) == "table" then
-        for _, child in ipairs(node.g) do visit(child, nextAncestors) end
+        for _, child in pairs(node.g) do visit(child, nextAncestors) end
+    end
+    -- ATT also uses array-style factory payloads whose children live directly
+    -- on the node rather than under `g`.
+    for key, child in pairs(node) do
+        if type(key) == "number" then visit(child, nextAncestors) end
     end
 end
 

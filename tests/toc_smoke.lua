@@ -195,6 +195,23 @@ for line in readAll(tocPath):gmatch("[^\r\n]+") do
     end
 end
 
+-- Data/Changelog.lua is generated from CHANGELOG.md and is the only copy the
+-- addon can read at runtime. If someone bumps the TOC and edits the markdown
+-- but forgets to regenerate, What's New would announce the wrong release --
+-- so fail the build instead.
+do
+    local tocVersion = readAll(tocPath):match("##%s*Version:%s*([%d%.]+)")
+    if not tocVersion then fail("no ## Version in the TOC") end
+    local newest = namespace.CHANGELOG and namespace.CHANGELOG[1]
+    if not newest then fail("MC.CHANGELOG is empty - run generate-collectionist-changelog-lua.ps1") end
+    if newest.version ~= tocVersion then
+        fail(string.format(
+            "Data/Changelog.lua is stale: newest entry is %s but the TOC says %s. "
+            .. "Run scripts/generate-collectionist-changelog-lua.ps1",
+            tostring(newest.version), tocVersion))
+    end
+end
+
 if not namespace.RegisterContent then fail("Core did not initialize RegisterContent") end
 if type(namespace.modules) ~= "table" or #namespace.modules ~= 8 then
     fail("expected 8 registered modules, got " .. tostring(namespace.modules and #namespace.modules))

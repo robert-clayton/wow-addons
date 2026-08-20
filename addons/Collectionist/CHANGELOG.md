@@ -1,3 +1,13 @@
+# 1.13.1
+### Added
+- **Recipes tell you where they come from.** Around nine in ten recipes in the browser used to say "unknown" — nothing about who teaches them or where to look. 8,975 of them now name the trainer, vendor, boss, quest or container that gives them, and the zone it is in: "Marith Lazuria \<Jewelcrafting Supplies\>, Dalaran". Nine are still uncatalogued, all Inscription glyphs and Pandaria profession items.
+- Recipes sort into headings that match how you actually get them, including World Drop, Treasure, PvP, and Not obtainable for recipes that exist in the client but were never released.
+- **Trading Post pets are tracked.** 30 of them, filed under the expansion whose Trading Post first offered them. They are bought with Trader's Tender you earn in game and they come back around, so leaving them out was making collections look more complete than they were. Hide them with "Hide Trading Post" in the Pets options.
+- **A quiet "what's new" note after updating.** The first time you open Collectionist on a new version, a small line appears at the edge of the window. Click it to read the changes, or ignore it and it leaves on its own. `/mc whatsnew` any time; turn it off in Options.
+
+### Changed
+- **Collection Score prices recipes by how hard they are to get.** While almost every recipe was filed as "unknown" they all scored the same flat amount regardless of source. Now that the addon knows the difference, a recipe that drops from a raid boss counts for more than one you buy from a vendor. Most collections will see their recipe score go up.
+
 # 1.13.0
 ### Added
 - **The whole game, not just Midnight.** Complete Classic, The Burning Crusade, Wrath of the Lich King, Cataclysm, Mists of Pandaria, Warlords of Draenor, Legion, Battle for Azeroth, Shadowlands, Dragonflight, and The War Within catalogs for every tracker, with exact manifest validation for collectible, achievement, recipe, rare, and treasure IDs.

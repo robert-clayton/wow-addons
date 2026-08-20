@@ -49,3 +49,20 @@ deduplication. No raw constructor call should be imported directly.
 The next ingestion audit must emit one decision per normalized node: augment an
 achievement criterion, include as navigation-only, exclude as duplicate, or
 defer for missing stable identity/source coordinates.
+
+## Second-publisher table providers
+
+The constructor count does not cover seven installed HandyNotes plugins from a
+second publisher. Those plugins use coordinate-keyed zone tables rather than
+`Rare({...})` and `Treasure({...})` nodes. The reproducible table-provider audit
+normalizes their stable identities separately:
+
+- 1,714 unique coordinate-backed rare NPC IDs, of which 993 are already in
+  Collectionist and 721 remain navigation candidates;
+- 1,400 unique quest-identified treasure nodes, of which 566 already map to a
+  Collectionist treasure criterion or quest and 834 remain candidates.
+
+These remain audit queues, not import lists. Rare aliases and phase duplicates
+still require review. Quest-only treasures also require an explicit extension
+of the navigation-only identity contract, which currently permits object or
+item IDs but not quest IDs.

@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.13.0
+## Version: 1.13.1
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -20,9 +20,11 @@ Core.lua
 Data\Constants.lua
 Data\Locations.lua
 Data\Expansions.lua
+Data\Changelog.lua
 TabBar.lua
 MinimapButton.lua
 Onboarding.lua
+WhatsNew.lua
 PremiumShell.lua
 PremiumNav.lua
 Targets.lua
@@ -60,6 +62,7 @@ Modules\Pets\Data\Shadowlands.lua
 Modules\Pets\Data\Dragonflight.lua
 Modules\Pets\Data\TheWarWithin.lua
 Modules\Pets\Data\WildPets.lua
+Modules\Pets\Data\TradingPost.lua
 Modules\Pets\Data\DB2Gaps.lua
 Modules\Pets\Data\Pets.lua
 Modules\Pets\Data\Patch120007.lua
