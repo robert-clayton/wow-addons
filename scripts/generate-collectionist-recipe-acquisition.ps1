@@ -223,7 +223,11 @@ try {
         $namedKind, $namedID = "", ""
         if ($best) {
             if ($preferAlias) {
-                foreach ($part in ($best.att_source_ancestry -split '>')) {
+                # `ancestry` is the extractor's column name (extract-att-sources.lua);
+                # `att_source_ancestry` is this script's OUTPUT name. Reading the
+                # output name here silently yielded $null, so this whole walk was
+                # dead code and only the immediate-parent fallback below ever ran.
+                foreach ($part in ($best.ancestry -split '>')) {
                     $bits = $part -split ':'
                     if ($bits.Count -eq 2 -and $bits[0] -eq $preferAlias -and $names.ContainsKey($part)) {
                         $namedKind, $namedID, $parentName = $bits[0], $bits[1], $names[$part]
@@ -249,6 +253,17 @@ try {
             map_id             = if ($best) { $best.map_id } else { "" }
             coord_x            = if ($best) { $best.coord_x } else { "" }
             coord_y            = if ($best) { $best.coord_y } else { "" }
+            # Additional spawns for the same map, packed "x,y;x,y". The waypoint
+            # generator turns these into a waypoint LIST, which Collectionist
+            # renders as "N possible locations".
+            extra_spawns       = if ($best) { $best.extra_spawns } else { "" }
+            # DIAGNOSTIC ONLY - never a placement signal. Expansion placement is
+            # by trade category, matching how all 9,918 shipped recipes were
+            # placed. awp disagrees with that on 86% of rows and puts nothing in
+            # vanilla, because it began with the 2.0 convention.
+            awp_own            = if ($best) { $best.awp_own } else { "" }
+            awp_ancestor       = if ($best) { $best.awp_ancestor } else { "" }
+            awp_ancestor_from  = if ($best) { $best.awp_ancestor_from } else { "" }
             att_file           = if ($best) { $best.att_file } else { "" }
             att_occurrences    = if ($occurrences) { $occurrences.Count } else { 0 }
             att_source_ancestry = if ($best) { $best.ancestry } else { "" }

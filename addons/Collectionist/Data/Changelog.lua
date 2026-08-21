@@ -7,6 +7,21 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.14.0", sections = {
+        { heading = "Added", lines = {
+            "|cffffd200Recipes drop map pins.|r Click a recipe you haven't learned and Collectionist points you at it, the same way rares and treasures already did. Around 5,900 recipes now have a location — the vendor who sells it, the boss who drops it, the quest that rewards it, or the trainer who teaches it.",
+            "|cffffd200Trainer pins know your faction.|r The data everyone builds these from files each recipe under one faction's trainer, which would have sent Alliance players to Orgrimmar. Every trainer pin is paired instead, so you get your own capital. Neutral hubs like Dalaran, Oribos and Valdrakken are shared, as they are in game.",
+            "A vendor who wanders now gets all of his stops pinned rather than one guess at where he might be.",
+            "|cffffd200401 recipes that were missing entirely|r, across every profession — Jewelcrafting 90, Inscription 87, Leatherworking 70, Enchanting 40, Blacksmithing 38, Cooking 34, Tailoring 24, and a handful each of Alchemy and Engineering.",
+            "|cffffd200180 housing decorations|r that were missing, each with the quest or vendor that awards it.",
+            "|cffffd200708 rares and 364 treasures as map locations.|r These are places to go, not things to collect — the game gives no reliable way to know whether you have already got them, so they show as \"Location only\", carry a waypoint, and never count towards your totals or your Collection Score. Pandaria through Midnight.",
+        } },
+        { heading = "Fixed", lines = {
+            "Twelve Draenor recipes said \"Not obtainable\" when they are craftable today — Hexweave Cloth, Truesteel Ingot, Alchemical Catalyst and the rest of the daily-cooldown reagents. They read as trainer-taught now, which is what they are.",
+            "Recipes show the \"Click to open profession\" hint again. The hint was checking for something recipe rows never carried, so it never appeared even though the click always worked.",
+            "Several hundred recipes named the wrong thing as their source — a quest reward would name the container it sat in rather than the quest. Quest-sourced recipes now name the quest.",
+        } },
+    } },
     { version = "1.13.2", sections = {
         { heading = "Added", lines = {
             "|cffffd200Trading Post mounts and toys join the pets.|r 74 mounts and 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own \"Hide Trading Post\" toggle if you would rather not see them.",
@@ -65,34 +80,6 @@ MC.CHANGELOG = {
             "Ten pets show their real battle family.",
             "The Ever Painting checklist and three relic tasks in the Arcantina and Zul'Aman tick the correct criteria.",
             "The Ritual Sites gate tracks the actual \"Ritual Site Disruptor\" achievement.",
-        } },
-    } },
-    { version = "1.12.0", sections = {
-        { heading = "Added", lines = {
-            "Expansion filter in the title bar: Current, All Expansions, or pin one expansion. Also /mc filter all|current|<expansion>. The Collection Inspector rescopes peer columns to match.",
-            "|cffffd200Collection Score|r, in the title bar and /mc score. Each collectible has a difficulty tier (1 / 5 / 10 / 25 / 50 / 100) and your score is the sum of what you own.",
-            "A |cffffd200Legacies|r count next to the score: collected items that can't be obtained anymore.",
-            "|cffffd200UI themes|r: Modern (slate and bronze, the new default) and Simple (the old warm-gold look). Applies account-wide.",
-            "Everything from |cffffd200Revelations (12.0.7)|r: Void Showdowns in Val and Naigtal, their rares and achievements, Showdown vendors, Rotmire, Dragonflight Timewalking, Midsummer, Lorewalking, Arcantina, and the opening Curse of Ula'tek story.",
-            "Everything from |cffffd200Curse of Ula'tek (12.1)|r: the Coiled Isle, Vaults of Atal'Utek, Curse Surges, Zul'jarra's Forces, Captain Tokka's Crew, Season 2 Prey, three new Delves, Altar of Fangs, and the Venomous Abyss.",
-            "Coiled Isle rare and treasure trackers, with waypoints and puzzle steps.",
-            "New 12.1 housing decor, Community Coupon rewards, pet beds, mounts, pets, toys, and achievements. Season 2 rewards show their regional unlock date.",
-        } },
-        { heading = "Changed", lines = {
-            "Achievements get their own row in the Collection Inspector.",
-            "Learned recipes count account-wide now. Your alts share recipe progress.",
-            "Item-priced collectibles show the item icon, how many you're carrying, and whether you can afford it.",
-            "Targets client 12.1.0.",
-            "The panel is wider to fit the new title-bar indicators.",
-            "Collection sharing asks for consent on first run.",
-            "Disabled tabs stay hidden but still feed your score and shared progress.",
-            "Future rewards stay visible for planning.",
-        } },
-        { heading = "Fixed", lines = {
-            "A Blizzard hotfix to an achievement can no longer blank a tab. Rows the game can't answer yet are skipped and retried for a couple of minutes.",
-            "If Blizzard adds rares or treasures to an existing achievement, they just show up without needing for the addon to be updated.",
-            "If an achievement's criteria get reordered, waypoints and puzzle steps fall back to safe lookups rather than pointing at the wrong spot.",
-            "Corrected bad collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.",
         } },
     } },
 }

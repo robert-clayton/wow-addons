@@ -260,6 +260,9 @@ do
     loadAddon("addons/Collectionist/Data/Locations.lua", MC)
     loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
 
+    -- Generated pin table, loaded first so the Scanner can attach from it.
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Waypoints.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/Trainers.lua", MC)
     local recipeBaseFiles = {
         "Alchemy.lua", "Blacksmithing.lua", "Cooking.lua",
         "Enchanting.lua", "Engineering.lua", "Inscription.lua",
@@ -280,6 +283,7 @@ do
     loadAddon("addons/Collectionist/Modules/Recipes/Data/Shadowlands.lua", MC)
     loadAddon("addons/Collectionist/Modules/Recipes/Data/Dragonflight.lua", MC)
     loadAddon("addons/Collectionist/Modules/Recipes/Data/TheWarWithin.lua", MC)
+    loadAddon("addons/Collectionist/Modules/Recipes/Data/AttGaps.lua", MC)
 
     equal(MC.GetLatestExpansion("recipes"), "midnight",
         "recipe Current expansion after TWW registration")
@@ -329,15 +333,15 @@ do
             end
         end
     end
-    equal(classicRecipes, 1223, "Classic recipe count")
-    equal(tbcRecipes, 755, "TBC recipe count")
-    equal(wrathRecipes, 860, "Wrath recipe count")
-    equal(cataRecipes, 690, "Cataclysm recipe count")
-    equal(mopRecipes, 978, "Pandaria recipe count")
-    equal(wodRecipes, 337, "Warlords recipe count")
-    equal(legionRecipes, 773, "Legion recipe count")
-    equal(bfaRecipes, 1253, "BFA recipe count")
-    equal(slRecipes, 634, "Shadowlands recipe count")
+    equal(classicRecipes, 1379, "Classic recipe count")
+    equal(tbcRecipes, 844, "TBC recipe count")
+    equal(wrathRecipes, 944, "Wrath recipe count")
+    equal(cataRecipes, 696, "Cataclysm recipe count")
+    equal(mopRecipes, 982, "Pandaria recipe count")
+    equal(wodRecipes, 372, "Warlords recipe count")
+    equal(legionRecipes, 779, "Legion recipe count")
+    equal(bfaRecipes, 1258, "BFA recipe count")
+    equal(slRecipes, 636, "Shadowlands recipe count")
     equal(dfRecipes, 1004, "Dragonflight recipe count")
     equal(twwRecipes, 696, "TWW recipe count")
     truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
@@ -361,6 +365,135 @@ do
     end
     equal(sourcelessRecipes, 0, "every recipe carries a source string")
     equal(unsourcedRecipes, 9, "recipe acquisition burndown (enrichment lowers this)")
+
+    -- Generated recipe waypoints. Guards the shape the runtime relies on:
+    -- MC.AddWaypoint rejects mapID <= 0, TomTom and C_Map both want 0-1
+    -- fractions, and DoItemAction uses element 4 as the marker label.
+    local wpCount, wpUnknown = 0, 0
+    local function checkTuple(t, id)
+        truthy(type(t) == "table" and #t >= 3, "waypoint tuple shape for " .. id)
+        truthy(type(t[1]) == "number" and t[1] > 0, "waypoint mapID > 0 for " .. id)
+        truthy(type(t[2]) == "number" and t[2] >= 0 and t[2] <= 1, "waypoint x in 0..1 for " .. id)
+        truthy(type(t[3]) == "number" and t[3] >= 0 and t[3] <= 1, "waypoint y in 0..1 for " .. id)
+        truthy(type(t[4]) == "string" and t[4] ~= "", "waypoint label for " .. id)
+    end
+    for id, wp in pairs(MC.RecipeWaypoints or {}) do
+        wpCount = wpCount + 1
+        -- A list of tuples means "N possible spawns" to MC.GetSmartWaypoint.
+        if type(wp[1]) == "table" then
+            for _, t in ipairs(wp) do checkTuple(t, id) end
+        else
+            checkTuple(wp, id)
+        end
+        -- A stale Waypoints.lua after a catalog regeneration would silently
+        -- pin IDs that no longer ship.
+        if not recipeSeen[tostring(id)] and not recipeSeen[id] then
+            wpUnknown = wpUnknown + 1
+        end
+    end
+    equal(wpUnknown, 0, "every recipe waypoint maps to a shipped recipe")
+    -- Ratchets UP as coverage grows; a drop means the generator lost data.
+    equal(wpCount, 3115, "recipe waypoint coverage")
+
+    -- Faction-paired trainer pins. The failure this guards against is a pin
+    -- that sends one faction into the other's capital, which is exactly what
+    -- naive extraction produces: ATT records each recipe under one faction's
+    -- trainer only.
+    local ALLIANCE_CAP = { [84]=true, [87]=true, [89]=true, [1161]=true }
+    local HORDE_CAP    = { [85]=true, [88]=true, [90]=true, [1165]=true }
+    local trCount, trPaired, trNeutral = 0, 0, 0
+    for id, e in pairs(MC.RecipeTrainers or {}) do
+        trCount = trCount + 1
+        truthy(e.n or e.a or e.h, "trainer entry has at least one faction " .. id)
+        if e.n then
+            trNeutral = trNeutral + 1
+            -- A neutral pin must not sit in either faction's capital.
+            truthy(not ALLIANCE_CAP[e.n[1]] and not HORDE_CAP[e.n[1]],
+                "neutral trainer pin is not in a faction capital " .. id)
+        end
+        if e.a then
+            checkTuple(e.a, id)
+            truthy(not HORDE_CAP[e.a[1]], "Alliance trainer pin is not in a Horde capital " .. id)
+        end
+        if e.h then
+            checkTuple(e.h, id)
+            truthy(not ALLIANCE_CAP[e.h[1]], "Horde trainer pin is not in an Alliance capital " .. id)
+        end
+        if e.a and e.h then trPaired = trPaired + 1 end
+    end
+    equal(trCount, 2785, "trainer-taught recipes with a pin")
+    equal(trPaired, 885, "trainer recipes pinned for BOTH factions")
+    equal(trNeutral, 1812, "trainer recipes at a neutral hub")
+
+    -- Navigation-only rares and treasures. These are map references, not
+    -- collectibles: the whole contract is that they render and pin but never
+    -- touch completion denominators, Collection Score, collected lists or the
+    -- roster bitmap. Assert the shape here rather than trusting the generator.
+    do
+        local navMC = { modules = {}, modulesByKey = {} }
+        for k, v in pairs(MC) do navMC[k] = v end
+        navMC.RareData, navMC.TreasureData = {}, {}
+        local realRare, realTreasure = MC.RareData, MC.TreasureData
+        MC.RareData, MC.TreasureData = {}, {}
+        loadAddon("addons/Collectionist/Modules/Rares/Data/Navigation.lua", MC)
+        loadAddon("addons/Collectionist/Modules/Treasures/Data/Navigation.lua", MC)
+
+        local checks = {
+            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare" },
+            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure" },
+        }
+        for _, c in ipairs(checks) do
+            local groups, entries = 0, 0
+            for _, group in ipairs(c.data or {}) do
+                if group.navigationOnly then
+                    groups = groups + 1
+                    truthy(group.source and group.source ~= "", c.label .. " nav group has a source key")
+                    truthy(group.zone and group.zone ~= "", c.label .. " nav group has a zone")
+                    for _, e in ipairs(group[c.list] or {}) do
+                        entries = entries + 1
+                        truthy(e[c.id], c.label .. " nav entry has a stable identity")
+                        truthy(e.name and e.name ~= "", c.label .. " nav entry is named")
+                        truthy(e.waypoint, c.label .. " nav entry has a waypoint")
+                        -- Never a collectible: no collected/learned state, and
+                        -- no score that could reach Collection Score.
+                        truthy(e.collected == nil, c.label .. " nav entry has no collected state")
+                        truthy(e.score == nil, c.label .. " nav entry carries no score")
+                        local wp = e.waypoint
+                        local tuples = (type(wp[1]) == "table") and wp or { wp }
+                        for _, t in ipairs(tuples) do
+                            truthy(type(t[1]) == "number" and t[1] > 0, c.label .. " nav mapID > 0")
+                            truthy(type(t[2]) == "number" and t[2] > 0 and t[2] <= 1, c.label .. " nav x in 0..1")
+                            truthy(type(t[3]) == "number" and t[3] > 0 and t[3] <= 1, c.label .. " nav y in 0..1")
+                        end
+                    end
+                end
+            end
+            truthy(groups > 0, c.label .. " navigation groups registered")
+            truthy(entries > 0, c.label .. " navigation entries registered")
+        end
+        equal(#MC.RareData > 0, true, "rare navigation data loaded")
+        MC.RareData, MC.TreasureData = realRare, realTreasure
+    end
+
+    -- The resolver must never hand a character the other faction's capital.
+    do
+        local realUnitFactionGroup = UnitFactionGroup
+        for _, faction in ipairs({ "Alliance", "Horde" }) do
+            UnitFactionGroup = function() return faction end
+            local wrong, checked = 0, 0
+            for id in pairs(MC.RecipeTrainers) do
+                local wp = MC.RecipeTrainerWaypoint(id)
+                if wp then
+                    checked = checked + 1
+                    local hostile = (faction == "Alliance") and HORDE_CAP or ALLIANCE_CAP
+                    if hostile[wp[1]] then wrong = wrong + 1 end
+                end
+            end
+            truthy(checked > 0, faction .. " resolves some trainer pins")
+            equal(wrong, 0, "no " .. faction .. " pin lands in a hostile capital")
+        end
+        UnitFactionGroup = realUnitFactionGroup
+    end
     for _, recipeID in ipairs({
         402118, 402123, 402124, 402125, 402126, 402128, 402129, 402130,
         402131, 402133, 402134, 402135, 402136, 402137, 402138, 402139,
@@ -410,9 +543,31 @@ do
     onlyExpansion("vanilla")
     scanner:Scan()
     local classicResult = scanner.results[171]
-    equal(classicResult.total, 114, "Classic-only Alchemy visible count")
+    equal(classicResult.total, 116, "Classic-only Alchemy visible count")
     equal(classicResult.learnedCount, 0, "Classic-only Alchemy learned count")
     equal(classicResult.learnedCountAll, 2, "account Alchemy learned count from Classic view")
+
+    -- End to end: the generated pin table has to survive the Scanner's
+    -- fixed-allowlist entry copy and reach the rendered row, or clicking does
+    -- nothing. 3449 is a Classic Alchemy recipe with a generated waypoint.
+    do
+        local withWaypoint, sample = 0, nil
+        for _, entries in pairs(classicResult.bySource) do
+            for _, e in ipairs(entries) do
+                if e.waypoint then
+                    withWaypoint = withWaypoint + 1
+                    if e.id == 3449 then sample = e end
+                end
+                truthy(e.skillLine == 171, "scanned recipe carries skillLine " .. tostring(e.id))
+            end
+        end
+        truthy(withWaypoint > 0, "scanned Classic Alchemy rows carry generated waypoints")
+        truthy(sample ~= nil, "recipe 3449 reached the scan with a waypoint")
+        if sample then
+            truthy(type(sample.waypoint[1]) == "number" or type(sample.waypoint[1]) == "table",
+                "recipe 3449 waypoint is a tuple or a list of tuples")
+        end
+    end
 
     onlyExpansion("tbc")
     scanner:Scan()
@@ -445,14 +600,14 @@ do
     onlyExpansion("wod")
     scanner:Scan()
     local wodResult = scanner.results[171]
-    equal(wodResult.total, 53, "Warlords-only Alchemy visible count")
+    equal(wodResult.total, 56, "Warlords-only Alchemy visible count")
     equal(wodResult.learnedCount, 0, "Warlords-only Alchemy learned count")
     equal(wodResult.learnedCountAll, 2, "account Alchemy learned count from Warlords view")
 
     onlyExpansion("legion")
     scanner:Scan()
     local legionResult = scanner.results[171]
-    equal(legionResult.total, 85, "Legion-only Alchemy visible count")
+    equal(legionResult.total, 86, "Legion-only Alchemy visible count")
     equal(legionResult.learnedCount, 0, "Legion-only Alchemy learned count")
     equal(legionResult.learnedCountAll, 2, "account Alchemy learned count from Legion view")
 
@@ -637,7 +792,7 @@ do
             },
         },
         decorations = {
-            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 136, slCount = 26, dfCount = 76, twwCount = 108,
+            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 136, slCount = 26, dfCount = 76, twwCount = 210,
             files = {
                 "Modules/Decorations/Data/Classic.lua",
                 "Modules/Decorations/Data/TheBurningCrusade.lua",
@@ -651,6 +806,7 @@ do
                 "Modules/Decorations/Data/Dragonflight.lua", "Modules/Decorations/Data/TheWarWithin.lua",
                 "Modules/Decorations/Data/Decorations.lua",
                 "Modules/Decorations/Data/Patch120007.lua", "Modules/Decorations/Data/Patch120100.lua",
+                "Modules/Decorations/Data/AttGaps.lua",
             },
         },
         achievements = {
@@ -1455,8 +1611,8 @@ do
             equal(dfDecorationSources.drop, 3, "Dragonflight drop decoration count")
             equal(dfCraftedDecorations, 25, "Dragonflight crafted decoration profession count")
             equal(twwDecorationSources.crafted, 24, "TWW crafted decoration count")
-            equal(twwDecorationSources.vendor, 41, "TWW vendor decoration count")
-            equal(twwDecorationSources.quest, 22, "TWW quest decoration count")
+            equal(twwDecorationSources.vendor, 42, "TWW vendor decoration count")
+            equal(twwDecorationSources.quest, 123, "TWW quest decoration count")
             equal(twwDecorationSources.achievement, 15, "TWW achievement decoration count")
             equal(twwDecorationSources.drop, 6, "TWW drop decoration count")
             equal(twwCookingDecorations, 4, "TWW Cooking decoration count")

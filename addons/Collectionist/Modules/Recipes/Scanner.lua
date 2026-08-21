@@ -121,9 +121,21 @@ function Scanner:ScanProfession(skillLine, recipeData)
                         or ((recipe.source == nil or recipe.source == "unknown")
                             and UNSOURCED_HINT or nil),
                     priority   = recipe.priority,
-                    waypoint   = recipe.waypoint,
+                    -- Hand-written waypoints on the curated profession files
+                    -- win; everything else falls back to the generated table,
+                    -- attached here rather than inlined on thousands of rows.
+                    -- Mirrors how Rares/Scanner.lua attaches MC.RareNPCs.
+                    waypoint   = recipe.waypoint
+                        or (recipe.id and MC.RecipeWaypoints and MC.RecipeWaypoints[recipe.id])
+                        or (MC.RecipeTrainerWaypoint and MC.RecipeTrainerWaypoint(recipe.id)),
                     cost       = recipe.cost,
                     dropInfo   = recipe.dropInfo,
+                    -- MC.ShowItemInfoTooltip gates its "Click to open
+                    -- profession" hint on item.skillLine, which recipe entries
+                    -- never carried -- so the hint was missing on every row
+                    -- while the click itself worked. Also hardens the
+                    -- item.skillLine fallback in Targets.ToggleTargetPin.
+                    skillLine  = skillLine,
                     learned    = known,
                 }
 

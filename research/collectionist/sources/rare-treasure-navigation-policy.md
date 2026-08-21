@@ -32,10 +32,23 @@ Navigation-only data uses a top-level registered group:
 }
 ```
 
-Treasure groups use `treasures` and a stable `objectID` or `itemID`. Every row
-must have a name, stable entity identifier, map/coordinates, expansion, and
-source provenance. A provider node already represented by an achievement
-criterion augments that criterion's metadata instead of becoming a second row.
+Treasure groups use `treasures` and a stable `objectID`, `itemID` or `questID`.
+Every row must have a name, stable entity identifier, map/coordinates,
+expansion, and source provenance. A provider node already represented by an
+achievement criterion augments that criterion's metadata instead of becoming a
+second row.
+
+**Contract extension (2026-08-20): `questID` is an accepted treasure identity.**
+The second-publisher table providers below key their nodes on a quest
+completion flag rather than an object or item. A completed quest is as stable
+an identity as an object ID and is what the game itself uses to remember the
+pickup, so the contract now names it. Nothing else changes: these rows are
+still navigation-only and still never acquire a collected state.
+
+The name requirement is load-bearing and was enforced on ingestion: 409 of the
+834 quest-identified treasure candidates carry neither a provider comment nor a
+criteria ID, and a nameless "Location only" pin is not worth shipping. They
+remain deferred until a name can be resolved.
 
 ## HandyNotes audit boundary
 

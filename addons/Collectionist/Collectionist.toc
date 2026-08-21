@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.13.2
+## Version: 1.14.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -87,6 +87,7 @@ Modules\Decorations\Data\TheWarWithin.lua
 Modules\Decorations\Data\Decorations.lua
 Modules\Decorations\Data\Patch120007.lua
 Modules\Decorations\Data\Patch120100.lua
+Modules\Decorations\Data\AttGaps.lua
 Modules\Decorations\Init.lua
 Modules\Decorations\Scanner.lua
 Modules\Decorations\UI.lua
@@ -127,6 +128,7 @@ Modules\Rares\Data\TheWarWithin.lua
 Modules\Rares\Data\Rares.lua
 Modules\Rares\Data\Patch120007.lua
 Modules\Rares\Data\Patch120100.lua
+Modules\Rares\Data\Navigation.lua
 Modules\Rares\Init.lua
 Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
@@ -145,6 +147,7 @@ Modules\Treasures\Data\Dragonflight.lua
 Modules\Treasures\Data\TheWarWithin.lua
 Modules\Treasures\Data\Treasures.lua
 Modules\Treasures\Data\Patch120100.lua
+Modules\Treasures\Data\Navigation.lua
 Modules\Treasures\Init.lua
 Modules\Treasures\Scanner.lua
 Modules\Treasures\UI.lua
@@ -170,6 +173,8 @@ Modules\Achievements\Scanner.lua
 Modules\Achievements\UI.lua
 
 # Recipes module
+Modules\Recipes\Data\Waypoints.lua
+Modules\Recipes\Data\Trainers.lua
 Modules\Recipes\Data\Alchemy.lua
 Modules\Recipes\Data\Blacksmithing.lua
 Modules\Recipes\Data\Cooking.lua
@@ -191,6 +196,7 @@ Modules\Recipes\Data\BattleForAzeroth.lua
 Modules\Recipes\Data\Shadowlands.lua
 Modules\Recipes\Data\Dragonflight.lua
 Modules\Recipes\Data\TheWarWithin.lua
+Modules\Recipes\Data\AttGaps.lua
 Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua
 Modules\Recipes\UI.lua

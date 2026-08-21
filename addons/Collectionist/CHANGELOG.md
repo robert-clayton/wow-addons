@@ -1,3 +1,17 @@
+# 1.14.0
+### Added
+- **Recipes drop map pins.** Click a recipe you haven't learned and Collectionist points you at it, the same way rares and treasures already did. Around 5,900 recipes now have a location — the vendor who sells it, the boss who drops it, the quest that rewards it, or the trainer who teaches it.
+- **Trainer pins know your faction.** The data everyone builds these from files each recipe under one faction's trainer, which would have sent Alliance players to Orgrimmar. Every trainer pin is paired instead, so you get your own capital. Neutral hubs like Dalaran, Oribos and Valdrakken are shared, as they are in game.
+- A vendor who wanders now gets all of his stops pinned rather than one guess at where he might be.
+- **401 recipes that were missing entirely**, across every profession — Jewelcrafting 90, Inscription 87, Leatherworking 70, Enchanting 40, Blacksmithing 38, Cooking 34, Tailoring 24, and a handful each of Alchemy and Engineering.
+- **180 housing decorations** that were missing, each with the quest or vendor that awards it.
+- **708 rares and 364 treasures as map locations.** These are places to go, not things to collect — the game gives no reliable way to know whether you have already got them, so they show as "Location only", carry a waypoint, and never count towards your totals or your Collection Score. Pandaria through Midnight.
+
+### Fixed
+- Twelve Draenor recipes said "Not obtainable" when they are craftable today — Hexweave Cloth, Truesteel Ingot, Alchemical Catalyst and the rest of the daily-cooldown reagents. They read as trainer-taught now, which is what they are.
+- Recipes show the "Click to open profession" hint again. The hint was checking for something recipe rows never carried, so it never appeared even though the click always worked.
+- Several hundred recipes named the wrong thing as their source — a quest reward would name the container it sat in rather than the quest. Quest-sourced recipes now name the quest.
+
 # 1.13.2
 ### Added
 - **Trading Post mounts and toys join the pets.** 74 mounts and 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own "Hide Trading Post" toggle if you would rather not see them.

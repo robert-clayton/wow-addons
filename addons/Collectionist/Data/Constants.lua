@@ -471,7 +471,11 @@ MC.MAP = {
     Netherstorm               = 109,
     SilvermoonCity            = 110,
     ShattrathCity             = 111,
-    IsleOfQuelDanas           = 122,
+    -- The TBC-era Sunwell island. Midnight re-uses the name for a different
+    -- uiMap (2424, further down), so this one is suffixed: an unsuffixed
+    -- IsleOfQuelDanas here was silently shadowed by the Midnight entry and
+    -- unreachable. Every current consumer wants the Midnight map.
+    IsleOfQuelDanasTBC        = 122,
 
     -- Wrath of the Lich King.
     Northrend                 = 113,

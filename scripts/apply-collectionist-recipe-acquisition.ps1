@@ -97,9 +97,25 @@ function Get-SourceInfo($row) {
 $dataDir = Join-Path $RepoRoot "addons/Collectionist/Modules/Recipes/Data"
 $files = Get-ChildItem -LiteralPath $dataDir -Filter *.lua | Sort-Object Name
 
+# Recipes DB2 grants automatically. AcquireMethod 1 is the common case; WoD and
+# TWW also use 3 for a handful. ATT classifies several of those as
+# never-implemented, which is demonstrably wrong - Hexweave Cloth, Truesteel
+# Ingot and the other Draenor daily-cooldown reagents are craftable today - so
+# a non-zero DB2 acquire method overrides an ATT "unavailable". DB2 is
+# authoritative for whether a thing exists; ATT is a community catalog.
+$db2Granted = @{}
+foreach ($csv in (Get-ChildItem -Path (Join-Path $RepoRoot "research/collectionist") -Filter recipes.csv -Recurse -ErrorAction SilentlyContinue)) {
+    if ($csv.FullName -notmatch '[\\/]ids[\\/]') { continue }
+    foreach ($row in (Import-Csv -LiteralPath $csv.FullName)) {
+        if ($row.acquire_method -and $row.acquire_method -ne "0") { $db2Granted[$row.recipe_spell_id] = $true }
+    }
+}
+Write-Host ("DB2-granted recipe IDs: {0}" -f $db2Granted.Count)
+
 $grand = [ordered]@{}
 $totalRewritten = 0
 $totalLeft = 0
+$totalCorrected = 0
 
 foreach ($file in $files) {
     $lines = [System.IO.File]::ReadAllLines($file.FullName)
@@ -108,6 +124,18 @@ foreach ($file in $files) {
 
     for ($i = 0; $i -lt $lines.Length; $i++) {
         $line = $lines[$i]
+
+        # Correction pass: a DB2-granted recipe must never read "Not
+        # obtainable". Idempotent - the rewritten line no longer matches.
+        if ($line -match 'source = "unavailable"' -and $line -match '\{\s*id\s*=\s*(\d+)\s*,') {
+            if ($db2Granted.ContainsKey($Matches[1])) {
+                $lines[$i] = $line -replace 'source = "unavailable", sourceInfo = "[^"]*"',
+                    'source = "trainer", sourceInfo = "Learned automatically"'
+                if ($lines[$i] -ne $line) { $totalCorrected++ }
+                continue
+            }
+        }
+
         if ($line -notmatch 'source = "unknown"') { continue }
         if ($line -notmatch '\{\s*id\s*=\s*(\d+)\s*,') { $left++; continue }
         $id = $Matches[1]
@@ -136,7 +164,7 @@ foreach ($file in $files) {
         $grand[$row.source_kind]++
     }
 
-    if ($changed -gt 0 -and -not $WhatIf) {
+    if (($changed -gt 0 -or $totalCorrected -gt 0) -and -not $WhatIf) {
         # UTF-8 without BOM, LF - matches what the generators emit.
         $utf8 = New-Object System.Text.UTF8Encoding($false)
         [System.IO.File]::WriteAllText($file.FullName, ($lines -join "`n") + "`n", $utf8)
@@ -149,7 +177,7 @@ foreach ($file in $files) {
 }
 
 Write-Host ""
-Write-Host ("Rewritten: {0}    still unsourced: {1}" -f $totalRewritten, $totalLeft)
+Write-Host ("Rewritten: {0}    corrected: {1}    still unsourced: {2}" -f $totalRewritten, $totalCorrected, $totalLeft)
 if ($WhatIf) { Write-Host "(-WhatIf: no files written)" }
 Write-Host ""
 $grand.GetEnumerator() | Sort-Object Value -Descending |
