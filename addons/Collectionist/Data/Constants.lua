@@ -91,10 +91,20 @@ function MC.GetAvailabilityBadge(entry)
     return "Soon"
 end
 
+-- How many of these entries a player could still go and complete. Feeds the
+-- minimap summary's per-source "remaining" lines and the premium shell's
+-- collection spine.
+--
+-- navigationOnly entries are excluded. They share the same bySource buckets as
+-- real collectibles so they render in the tab list, but they have no completion
+-- state at all, so counting them told players they had dozens more treasures
+-- left in a zone than actually exist -- "The Coiled Isle: 56 remaining" when 22
+-- were trackable. The scanners already keep them out of totalAll and score;
+-- this is the one counter they reached.
 function MC.CountObtainableEntries(entries)
     local count = 0
     for _, entry in ipairs(entries or {}) do
-        if not entry.future then count = count + 1 end
+        if not entry.future and not entry.navigationOnly then count = count + 1 end
     end
     return count
 end

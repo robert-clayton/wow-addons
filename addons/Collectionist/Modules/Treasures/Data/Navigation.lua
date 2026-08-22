@@ -12,14 +12,9 @@ local _, MC = ...
 -- resolvable name, zone or coordinate are deliberately absent.
 
 MC.RegisterContent("bfa", "treasures", {
-    { navigationOnly = true, source = "darkshore", zone = "Darkshore", treasures = {
-        { questID = 54910, name = "54879", waypoint = { 62, 0.408, 0.4337, "54879" } },
-        { questID = 54911, name = "54880", waypoint = { 62, 0.4132, 0.482, "54880" } },
-    } },
     { navigationOnly = true, source = "drustvar", zone = "Drustvar", treasures = {
         { questID = 49137, name = "Ancient Sarcophagus", waypoint = { 896, 0.4346, 0.3611, "Ancient Sarcophagus" } },
         { questID = 49341, name = "Seething Cache", waypoint = { 896, 0.6793, 0.6683, "Seething Cache" } },
-        { questID = 51907, name = "[23181263] = {quest=5191,},", waypoint = { 896, 0.2622, 0.2993, "[23181263] = {quest=5191,}," } },
         { questID = 51914, name = "Rares", waypoint = { 896, 0.3932, 0.6173, "Rares" } },
     } },
     { navigationOnly = true, source = "mechagon", zone = "Mechagon", treasures = {
@@ -31,15 +26,7 @@ MC.RegisterContent("bfa", "treasures", {
         { questID = 55309, name = "Spitting Clownfish", waypoint = { 1462, 0.837, 0.73, "Spitting Clownfish" } },
         { questID = 55310, name = "Sludge-fouled Carp", waypoint = { 1462, 0.655, 0.522, "Sludge-fouled Carp" } },
         { questID = 55313, name = "Tasty Steelfin", waypoint = { 1462, 0.474, 0.36, "Tasty Steelfin" } },
-        { questID = 55547, name = "325660", waypoint = { { 1462, 0.433, 0.4977, "325660" }, { 1462, 0.4922, 0.3021, "325660" }, { 1462, 0.5211, 0.5326, "325660" }, { 1462, 0.5325, 0.419, "325660" }, { 1462, 0.5697, 0.3861, "325660" } } },
-        { questID = 55548, name = "325661", waypoint = { { 1462, 0.2061, 0.7141, "325661" }, { 1462, 0.3078, 0.5183, "325661" }, { 1462, 0.3568, 0.3833, "325661" }, { 1462, 0.4015, 0.5409, "325661" } } },
-        { questID = 55549, name = "325662", waypoint = { { 1462, 0.5994, 0.6357, "325662" }, { 1462, 0.6586, 0.646, "325662" }, { 1462, 0.6707, 0.5645, "325662" }, { 1462, 0.7351, 0.5334, "325662" }, { 1462, 0.8037, 0.4838, "325662" } } },
-        { questID = 55550, name = "325664", waypoint = { { 1462, 0.6555, 0.5284, "325664" }, { 1462, 0.7259, 0.4733, "325664" }, { 1462, 0.7301, 0.495, "325664" }, { 1462, 0.7621, 0.5286, "325664" }, { 1462, 0.8119, 0.6149, "325664" } } },
         { questID = 55551, name = "Rares", waypoint = { { 1462, 0.5666, 0.5739, "Rares" }, { 1462, 0.5863, 0.416, "Rares" }, { 1462, 0.6158, 0.323, "Rares" }, { 1462, 0.6436, 0.5961, "Rares" }, { 1462, 0.7065, 0.4796, "Rares" } } },
-        { questID = 55552, name = "325665", waypoint = { { 1462, 0.5066, 0.2858, "325665" }, { 1462, 0.5561, 0.2404, "325665" }, { 1462, 0.5678, 0.2918, "325665" }, { 1462, 0.5714, 0.2283, "325665" }, { 1462, 0.6409, 0.2627, "325665" }, { 1462, 0.6643, 0.2227, "325665" } } },
-        { questID = 55553, name = "325666", waypoint = { { 1462, 0.6732, 0.2289, "325666" }, { 1462, 0.8069, 0.1868, "325666" }, { 1462, 0.8575, 0.2824, "325666" }, { 1462, 0.8623, 0.2042, "325666" }, { 1462, 0.8873, 0.2015, "325666" } } },
-        { questID = 55554, name = "325667", waypoint = { { 1462, 0.4836, 0.7595, "325667" }, { 1462, 0.5725, 0.8202, "325667" }, { 1462, 0.6229, 0.739, "325667" }, { 1462, 0.6676, 0.7759, "325667" } } },
-        { questID = 55555, name = "325668", waypoint = { { 1462, 0.6362, 0.6715, "325668" }, { 1462, 0.7212, 0.6545, "325668" }, { 1462, 0.7651, 0.6601, "325668" }, { 1462, 0.8116, 0.7231, "325668" }, { 1462, 0.8516, 0.6335, "325668" } } },
         { questID = 55556, name = "Mechagon", waypoint = { { 1462, 0.1208, 0.8568, "Mechagon" }, { 1462, 0.2053, 0.7696, "Mechagon" }, { 1462, 0.2178, 0.8303, "Mechagon" }, { 1462, 0.2479, 0.6526, "Mechagon" } } },
     } },
     { navigationOnly = true, source = "nazjatar", zone = "Nazjatar", treasures = {
@@ -53,13 +40,7 @@ MC.RegisterContent("bfa", "treasures", {
     } },
     { navigationOnly = true, source = "nazmir", zone = "Nazmir", treasures = {
         { questID = 50895, name = "Rares", waypoint = { 863, 0.2804, 0.8187, "Rares" } },
-        { questID = 53417, name = "verify", waypoint = { 863, 0.691, 0.579, "verify" } },
-        { questID = 53418, name = "verify", waypoint = { 863, 0.656, 0.509, "verify" } },
-        { questID = 53420, name = "verify", waypoint = { 863, 0.528, 0.429, "verify" } },
-        { questID = 53422, name = "verify", waypoint = { 863, 0.456, 0.91, "verify" } },
-        { questID = 53423, name = "verify", waypoint = { 863, 0.284, 0.823, "verify" } },
-        { questID = 53424, name = "verify", waypoint = { 863, 0.242, 0.916, "verify" } },
-        { questID = 53425, name = "[52804290] = {quest=53426, achievement=13828, minimap=true,}, -- maybe?", waypoint = { 863, 0.217, 0.693, "[52804290] = {quest=53426, achievement=13828, minimap=true,}, -- maybe?" } },
+        { questID = 53425, name = "maybe?", waypoint = { 863, 0.217, 0.693, "maybe?" } },
         { questID = 53426, name = "Carved in Stone, Written in Blood", waypoint = { 863, 0.2569, 0.4058, "Carved in Stone, Written in Blood" } },
     } },
     { navigationOnly = true, source = "stormsong_valley", zone = "Stormsong Valley", treasures = {
@@ -150,7 +131,7 @@ MC.RegisterContent("df", "treasures", {
         { questID = 74978, name = "Broken Waygate", waypoint = { 2022, 0.3575, 0.4758, "Broken Waygate" } },
     } },
     { navigationOnly = true, source = "zaralek_cavern", zone = "Zaralek Cavern", treasures = {
-        { questID = 73410, name = "[] = {criteria=59221, quest=73410}, -- Seething Cache", waypoint = { 2133, 0.4372, 0.8386, "[] = {criteria=59221, quest=73410}, -- Seething Cache" } },
+        { questID = 73410, name = "Seething Cache", waypoint = { 2133, 0.4372, 0.8386, "Seething Cache" } },
         { questID = 73548, name = "verify quest", waypoint = { { 2133, 0.3818, 0.4991, "verify quest" }, { 2133, 0.4193, 0.4711, "verify quest" } } },
         { questID = 73552, name = "verify quest", waypoint = { { 2133, 0.3005, 0.5141, "verify quest" }, { 2133, 0.3201, 0.5277, "verify quest" }, { 2133, 0.3239, 0.5034, "verify quest" } } },
         { questID = 73553, name = "verify quest", waypoint = { { 2133, 0.2734, 0.4217, "verify quest" }, { 2133, 0.2817, 0.5154, "verify quest" }, { 2133, 0.2826, 0.4627, "verify quest" } } },
@@ -218,11 +199,10 @@ MC.RegisterContent("legion", "treasures", {
     { navigationOnly = true, source = "valsharah", zone = "Valsharah", treasures = {
         { questID = 38466, name = "Unguarded Thistleleaf Treasure npc:92104", waypoint = { 641, 0.5556, 0.7762, "Unguarded Thistleleaf Treasure npc:92104" } },
         { questID = 38783, name = "Darkpens, Val'sharah", waypoint = { 641, 0.7022, 0.5704, "Darkpens, Val'sharah" } },
-        { questID = 38864, name = "[54958054] = {quest=38861, label=ns.CHEST_SM, note=\"In underwater cave\"}, -- removed? swapped for 38864?", waypoint = { 641, 0.549, 0.8056, "[54958054] = {quest=38861, label=ns.CHEST_SM, note=\"In underwater cave\"}, -- removed? swapped for 38864?" } },
+        { questID = 38864, name = "removed? swapped for 38864?", waypoint = { 641, 0.549, 0.8056, "removed? swapped for 38864?" } },
         { questID = 38900, name = "Antydas Nightcaller npc:93758, quest 38903 for talking to him", waypoint = { 641, 0.6435, 0.8463, "Antydas Nightcaller npc:93758, quest 38903 for talking to him" } },
-        { questID = 39081, name = "[37005734] = {quest=39083, label=ns.CHEST_SM},", waypoint = { 641, 0.3381, 0.5826, "[37005734] = {quest=39083, label=ns.CHEST_SM}," } },
         { questID = 39086, name = "Rares", waypoint = { 641, 0.509, 0.5168, "Rares" } },
-        { questID = 39108, name = "[67105770] = {quest=, loot={139023}, label=\"Elven Chest\"}, -- no tracking quest triggers here...", waypoint = { 641, 0.666, 0.409, "[67105770] = {quest=, loot={139023}, label=\"Elven Chest\"}, -- no tracking quest triggers here..." } },
+        { questID = 39108, name = "Elven Chest", waypoint = { 641, 0.666, 0.409, "Elven Chest" } },
     } },
 })
 
@@ -285,7 +265,6 @@ MC.RegisterContent("midnight", "treasures", {
         { questID = 93508, name = "Impenatrably Sealed Gourd", waypoint = { 2413, 0.2673, 0.6759, "Impenatrably Sealed Gourd" } },
         { questID = 93587, name = "Peculiar Cauldron, Ruddy Sporeglider", waypoint = { 2413, 0.4064, 0.2802, "Peculiar Cauldron, Ruddy Sporeglider" } },
         { questID = 93650, name = "Sporespawned Cache, Untainted Grove Crawler", waypoint = { 2413, 0.4665, 0.6778, "Sporespawned Cache, Untainted Grove Crawler" } },
-        { questID = 94046, name = "quest=94046,", waypoint = { 2413, 0.5022, 0.5197, "quest=94046," } },
     } },
     { navigationOnly = true, source = "isle_of_queldanas", zone = "Isle Of Queldanas", treasures = {
         { questID = 92620, name = "voidlight x5, potent healing potion x3", waypoint = { 2424, 0.3836, 0.3304, "voidlight x5, potent healing potion x3" } },
@@ -312,7 +291,7 @@ MC.RegisterContent("midnight", "treasures", {
         { questID = 93996, name = "Stellar Stash", waypoint = { 2405, 0.532, 0.3222, "Stellar Stash" } },
         { questID = 94387, name = "Scout's Pack, Unused Initiate's Bulwark", waypoint = { 2405, 0.4905, 0.2013, "Scout's Pack, Unused Initiate's Bulwark" } },
         { questID = 94454, name = "Forgotten Researcher's Cache, Researcher's Shadowgraft", waypoint = { { 2405, 0.2308, 0.8392, "Forgotten Researcher's Cache, Researcher's Shadowgraft" }, { 2405, 0.4692, 0.7989, "Forgotten Researcher's Cache, Researcher's Shadowgraft" } } },
-        { questID = 94742, name = "or \"Void-hoarder's Corpse\"", waypoint = { 2405, 0.2483, 0.7001, "or \"Void-hoarder's Corpse\"" } },
+        { questID = 94742, name = "or \"Void-hoarder's Corpse", waypoint = { 2405, 0.2483, 0.7001, "or \"Void-hoarder's Corpse" } },
         { questID = 97091, name = "Highland Redcap", waypoint = { 2405, 0.289, 0.6176, "Highland Redcap" } },
         { questID = 97092, name = "Dusty Redcap", waypoint = { { 2405, 0.2262, 0.6135, "Dusty Redcap" }, { 2405, 0.2791, 0.4996, "Dusty Redcap" } } },
         { questID = 97093, name = "Marshy Redcap", waypoint = { 2405, 0.7142, 0.3705, "Marshy Redcap" } },
@@ -395,7 +374,7 @@ MC.RegisterContent("tww", "treasures", {
         { questID = 84438, name = "Tome of Polymorph: Mosswool", waypoint = { 2339, 0.6123, 0.0552, "Tome of Polymorph: Mosswool" } },
     } },
     { navigationOnly = true, source = "hallowfall", zone = "Hallowfall", treasures = {
-        { questID = 79081, name = "quest=79081, -- daily", waypoint = { 2215, 0.4321, 0.5177, "quest=79081, -- daily" } },
+        { questID = 79081, name = "daily", waypoint = { 2215, 0.4321, 0.5177, "daily" } },
         { questID = 80590, name = "directly saw", waypoint = { { 2215, 0.6163, 0.3265, "directly saw" }, { 2215, 0.6307, 0.3074, "directly saw" } } },
         { questID = 81518, name = "Radiant Remnant", waypoint = { 2215, 0.5609, 0.1455, "Radiant Remnant" } },
         { questID = 81988, name = "Darkened Arathi Shoulderguards (cosmetic)", waypoint = { 2215, 0.6614, 0.2802, "Darkened Arathi Shoulderguards (cosmetic)" } },
@@ -410,8 +389,8 @@ MC.RegisterContent("tww", "treasures", {
         { questID = 84497, name = "Lightspark Grade Book", waypoint = { 2215, 0.5264, 0.5999, "Lightspark Grade Book" } },
     } },
     { navigationOnly = true, source = "isle_of_dorn", zone = "Isle Of Dorn", treasures = {
-        { questID = 82756, name = "label=\"{npc:222941:Pearlescent Shellcrab}\",", waypoint = { 2248, 0.3836, 0.4194, "label=\"{npc:222941:Pearlescent Shellcrab}\"," } },
-        { questID = 83094, name = "- Dog!", waypoint = { 2248, 0.3144, 0.5131, "- Dog!" } },
+        { questID = 82756, name = "{npc:222941:Pearlescent Shellcrab}", waypoint = { 2248, 0.3836, 0.4194, "{npc:222941:Pearlescent Shellcrab}" } },
+        { questID = 83094, name = "Dog!", waypoint = { 2248, 0.3144, 0.5131, "Dog!" } },
     } },
     { navigationOnly = true, source = "karesh", zone = "Karesh", treasures = {
         { questID = 86067, name = "Flickering Lantern, then 6681 Gift of the Brothers", waypoint = { 2371, 0.698, 0.605, "Flickering Lantern, then 6681 Gift of the Brothers" } },
@@ -436,7 +415,6 @@ MC.RegisterContent("tww", "treasures", {
         { questID = 83623, name = "Ethereal Vision", waypoint = { 2214, 0.5579, 0.41, "Ethereal Vision" } },
     } },
     { navigationOnly = true, source = "siren_isle", zone = "Siren Isle", treasures = {
-        { questID = 84529, name = "84873", waypoint = { 2369, 0.6244, 0.9081, "84873" } },
         { questID = 86171, name = "amethyst", waypoint = { 2369, 0.6756, 0.7351, "amethyst" } },
         { questID = 86437, name = "Turbulent Fragment", waypoint = { 2369, 0.6723, 0.7882, "Turbulent Fragment" } },
         { questID = 86732, name = "Stone Carver's Scramseax", waypoint = { 2369, 0.2646, 0.2297, "Stone Carver's Scramseax" } },
@@ -476,7 +454,6 @@ MC.RegisterContent("wod", "treasures", {
     { navigationOnly = true, source = "nagrand_draenor", zone = "Nagrand Draenor", treasures = {
         { questID = 34466, name = "Archmage Vargoth", waypoint = { 550, 0.464, 0.16, "Archmage Vargoth" } },
         { questID = 35596, name = "Goldmane", waypoint = { 550, 0.403, 0.761, "Goldmane" } },
-        { questID = 36711, name = "35711", waypoint = { { 550, 0.384, 0.494, "35711" }, { 550, 0.659, 0.612, "35711" }, { 550, 0.854, 0.387, "35711" } } },
         { questID = 37435, name = "abu'gar", waypoint = { 550, 0.404, 0.686, "abu'gar" } },
     } },
     { navigationOnly = true, source = "shadowmoon_valley_draenor", zone = "Shadowmoon Valley Draenor", treasures = {

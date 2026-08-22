@@ -43,6 +43,17 @@ function ConvertTo-LuaString([string]$value) {
     return '"' + ($value -replace '\\', '\\\\' -replace '"', '\"') + '"'
 }
 
+# The audit writes descriptive expansion names; the addon's registry
+# (Data/Expansions.lua) uses short keys. An untranslated key matches nothing in
+# MC.EXPANSION_BY_KEY, so Options > Expansions silently fails to filter those
+# rows and MC.GetLatestExpansion never sees them.
+$EXPANSION_KEY = @{
+    "classic" = "vanilla"; "tbc" = "tbc"; "wrath" = "wrath"; "cataclysm" = "cata"
+    "mists_of_pandaria" = "mop"; "wod" = "wod"; "legion" = "legion"
+    "battle_for_azeroth" = "bfa"; "shadowlands" = "shadowlands"
+    "dragonflight" = "df"; "tww" = "tww"; "midnight" = "midnight"
+}
+
 # Origins that are NOT the Trading Post itself. Held back by default.
 $OUT_OF_GAME = 'Trading Card Game|In-Game Shop|Promotion|Recruit|Collector'
 function Test-OutOfGameOrigin([string]$sourceText) {
@@ -117,7 +128,9 @@ foreach ($spec in $KINDS) {
     [void]$sb.AppendLine()
 
     foreach ($group in ($kept | Group-Object acquisition_expansion | Sort-Object Name)) {
-        [void]$sb.AppendLine(('MC.RegisterContent({0}, "{1}", {{' -f (ConvertTo-LuaString $group.Name), $spec.listKey))
+        $expKey = $EXPANSION_KEY[$group.Name]
+        if (-not $expKey) { throw "Unmapped expansion '$($group.Name)' - add it to `$EXPANSION_KEY" }
+        [void]$sb.AppendLine(('MC.RegisterContent({0}, "{1}", {{' -f (ConvertTo-LuaString $expKey), $spec.listKey))
         [void]$sb.AppendLine(('    {{ source = "tradingpost", {0} = {{' -f $spec.listKey))
         foreach ($row in ($group.Group | Sort-Object { [int]$_.collectible_id })) {
             $info = "|cFFFFD200Trading Post|r"
@@ -129,7 +142,14 @@ foreach ($spec in $KINDS) {
                     $parts += "speciesID = $($row.collectible_id)"
                     $parts += "npcID = $($sp.CreatureID)"
                     $parts += "name = $(ConvertTo-LuaString $row.name)"
-                    $parts += "petType = $($sp.PetTypeEnum)"
+                    # Battle pet families are 1-10. A 0 in DB2 means the export
+                    # has no family for this species, and writing it shipped a
+                    # value the Scanner treats as "absent" anyway -- so omit the
+                    # field and let the live C_PetJournal lookup supply it,
+                    # rather than baking in a sentinel that looks like data.
+                    if ($sp.PetTypeEnum -and [int]$sp.PetTypeEnum -ge 1) {
+                        $parts += "petType = $($sp.PetTypeEnum)"
+                    }
                 }
                 'mount' {
                     $parts += "mountID = $($row.collectible_id)"

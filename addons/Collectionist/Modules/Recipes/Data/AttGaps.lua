@@ -11,10 +11,10 @@ local _, MC = ...
 -- every other recipe in the catalog. Never-implemented rows are excluded.
 
 MC.RegisterContent("bfa", "recipes", {
-    { skillLine = 755, name = "Battle for Azeroth (ATT)", recipes = { -- Jewelcrafting: 1
+    { skillLine = 755, name = "Battle for Azeroth", recipes = { -- Jewelcrafting: 1
         { id = 382973, name = "Kul Tiras and Zandalar Prospecting", source = "trainer", sourceInfo = "Samuel D. Colton III <Jewelcrafting Trainer>" },
     } },
-    { skillLine = 773, name = "Battle for Azeroth (ATT)", recipes = { -- Inscription: 4
+    { skillLine = 773, name = "Battle for Azeroth", recipes = { -- Inscription: 4
         { id = 344335, name = "Glyph of the Swift Chameleon", source = "vendor", sourceInfo = "Roko <Wandering Merchant>" },
         { id = 344340, name = "Glyph of the Aquatic Chameleon", source = "vendor", sourceInfo = "Roko <Wandering Merchant>" },
         { id = 344341, name = "Glyph of the Aerial Chameleon", source = "vendor", sourceInfo = "Roko <Wandering Merchant>" },
@@ -23,96 +23,96 @@ MC.RegisterContent("bfa", "recipes", {
 })
 
 MC.RegisterContent("cata", "recipes", {
-    { skillLine = 165, name = "Cataclysm (ATT)", recipes = { -- Leatherworking: 2
+    { skillLine = 165, name = "Cataclysm", recipes = { -- Leatherworking: 2
         { id = 163216, name = "Blackened Dragonscale", source = "trainer", sourceInfo = "Karolek <Leatherworking Trainer>" },
         { id = 163218, name = "Deepsea Scale", source = "trainer", sourceInfo = "Karolek <Leatherworking Trainer>" },
     } },
-    { skillLine = 333, name = "Cataclysm (ATT)", recipes = { -- Enchanting: 2
+    { skillLine = 333, name = "Cataclysm", recipes = { -- Enchanting: 2
         { id = 217645, name = "Tome of Illusions: Cataclysm", source = "trainer", sourceInfo = "Godan <Enchanting Trainer>" },
         { id = 217649, name = "Tome of Illusions: Elemental Lords", source = "trainer", sourceInfo = "Controlling the Elements" },
     } },
-    { skillLine = 755, name = "Cataclysm (ATT)", recipes = { -- Jewelcrafting: 2
+    { skillLine = 755, name = "Cataclysm", recipes = { -- Jewelcrafting: 2
         { id = 382978, name = "Cataclysm Prospecting", source = "trainer", sourceInfo = "Lugrah <Jewelcrafting Trainer>" },
         { id = 404740, name = "Cataclysm Crushing", source = "trainer", sourceInfo = "Lugrah <Jewelcrafting Trainer>" },
     } },
 })
 
 MC.RegisterContent("legion", "recipes", {
-    { skillLine = 171, name = "Legion (ATT)", recipes = { -- Alchemy: 1
+    { skillLine = 171, name = "Legion", recipes = { -- Alchemy: 1
         { id = 221690, name = "Silvery Salve", source = "trainer", sourceInfo = "Olisarra the Kind <Bandage Trainer>" },
     } },
-    { skillLine = 197, name = "Legion (ATT)", recipes = { -- Tailoring: 3
+    { skillLine = 197, name = "Legion", recipes = { -- Tailoring: 3
         { id = 202853, name = "Silkweave Bandage", source = "vendor", sourceInfo = "Olisarra the Kind <Bandage Trainer>" },
         { id = 202854, name = "Silkweave Splint", source = "vendor", sourceInfo = "Olisarra the Kind <Bandage Trainer>" },
         { id = 230047, name = "Feathered Luffa", source = "vendor", sourceInfo = "Marin Bladewing <Wardens Emissary>" },
     } },
-    { skillLine = 755, name = "Legion (ATT)", recipes = { -- Jewelcrafting: 1
+    { skillLine = 755, name = "Legion", recipes = { -- Jewelcrafting: 1
         { id = 382975, name = "Legion Prospecting", source = "trainer", sourceInfo = "Timethy Jones <Jewelcrafting Trainer>" },
     } },
-    { skillLine = 773, name = "Legion (ATT)", recipes = { -- Inscription: 1
+    { skillLine = 773, name = "Legion", recipes = { -- Inscription: 1
         { id = 360882, name = "Mark of the Duskwing Raven", source = "vendor", sourceInfo = "Sylvia Hartshorn <Dreamweaver Emissary>" },
     } },
 })
 
 MC.RegisterContent("midnight", "recipes", {
-    { skillLine = 164, name = "Midnight (ATT)", recipes = { -- Blacksmithing: 1
+    { skillLine = 164, name = "Midnight", recipes = { -- Blacksmithing: 1
         { id = 471041, name = "Recraft Equipment", source = "trainer", sourceInfo = "Bemarrin <Blacksmithing Trainer>" },
     } },
-    { skillLine = 165, name = "Midnight (ATT)", recipes = { -- Leatherworking: 1
+    { skillLine = 165, name = "Midnight", recipes = { -- Leatherworking: 1
         { id = 471046, name = "Recraft Equipment", source = "trainer", sourceInfo = "Talmar <Leatherworking Trainer>" },
     } },
-    { skillLine = 171, name = "Midnight (ATT)", recipes = { -- Alchemy: 3
+    { skillLine = 171, name = "Midnight", recipes = { -- Alchemy: 3
         { id = 471040, name = "Recraft Equipment", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
         { id = 1233129, name = "Recycle Potions", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
         { id = 1233130, name = "Recycle Flasks", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
     } },
-    { skillLine = 185, name = "Midnight (ATT)", recipes = { -- Cooking: 1
+    { skillLine = 185, name = "Midnight", recipes = { -- Cooking: 1
         { id = 1259655, name = "Thalassian Fillet", source = "trainer", sourceInfo = "Sylann <Cooking Trainer>" },
     } },
-    { skillLine = 197, name = "Midnight (ATT)", recipes = { -- Tailoring: 1
+    { skillLine = 197, name = "Midnight", recipes = { -- Tailoring: 1
         { id = 471047, name = "Recraft Equipment", source = "trainer", sourceInfo = "Galana <Tailoring Trainer>" },
     } },
-    { skillLine = 202, name = "Midnight (ATT)", recipes = { -- Engineering: 1
+    { skillLine = 202, name = "Midnight", recipes = { -- Engineering: 1
         { id = 471043, name = "Recraft Equipment", source = "trainer", sourceInfo = "Danwe <Engineering Trainer>" },
     } },
-    { skillLine = 333, name = "Midnight (ATT)", recipes = { -- Enchanting: 1
+    { skillLine = 333, name = "Midnight", recipes = { -- Enchanting: 1
         { id = 471042, name = "Recraft Equipment", source = "trainer", sourceInfo = "Dolothos <Enchanting Trainer>" },
     } },
-    { skillLine = 755, name = "Midnight (ATT)", recipes = { -- Jewelcrafting: 3
+    { skillLine = 755, name = "Midnight", recipes = { -- Jewelcrafting: 3
         { id = 471045, name = "Recraft Equipment", source = "trainer", sourceInfo = "Amin <Jewelcrafting Trainer>" },
         { id = 1231127, name = "Midnight Prospecting", source = "trainer", sourceInfo = "Amin <Jewelcrafting Trainer>" },
         { id = 1231132, name = "Midnight Crushing", source = "discovery", sourceInfo = "Discovered while crafting" },
     } },
-    { skillLine = 773, name = "Midnight (ATT)", recipes = { -- Inscription: 2
+    { skillLine = 773, name = "Midnight", recipes = { -- Inscription: 2
         { id = 471044, name = "Recraft Equipment", source = "trainer", sourceInfo = "Zantasia <Inscription Trainer>" },
         { id = 1269575, name = "Midnight Milling", source = "trainer", sourceInfo = "Zantasia <Inscription Trainer>" },
     } },
 })
 
 MC.RegisterContent("mop", "recipes", {
-    { skillLine = 165, name = "Pandaria (ATT)", recipes = { -- Leatherworking: 1
+    { skillLine = 165, name = "Pandaria", recipes = { -- Leatherworking: 1
         { id = 163220, name = "Prismatic Scale", source = "trainer", sourceInfo = "Clean Pelt <Leatherworking Trainer>" },
     } },
-    { skillLine = 333, name = "Pandaria (ATT)", recipes = { -- Enchanting: 2
+    { skillLine = 333, name = "Pandaria", recipes = { -- Enchanting: 2
         { id = 217650, name = "Tome of Illusions: Pandaria", source = "trainer", sourceInfo = "Lai the Spellpaw <Enchanting Trainer>" },
         { id = 217651, name = "Tome of Illusions: Secrets of the Shado-Pan", source = "vendor", sourceInfo = "Rushi the Fox <Shado-Pan Quartermaster>" },
     } },
-    { skillLine = 755, name = "Pandaria (ATT)", recipes = { -- Jewelcrafting: 1
+    { skillLine = 755, name = "Pandaria", recipes = { -- Jewelcrafting: 1
         { id = 382977, name = "Pandaria Prospecting", source = "trainer", sourceInfo = "Mai the Jade Shaper <Jewelcrafting Trainer>" },
     } },
 })
 
 MC.RegisterContent("shadowlands", "recipes", {
-    { skillLine = 755, name = "Shadowlands (ATT)", recipes = { -- Jewelcrafting: 1
+    { skillLine = 755, name = "Shadowlands", recipes = { -- Jewelcrafting: 1
         { id = 325248, name = "Shadowlands Prospecting", source = "trainer", sourceInfo = "Appraiser Au'vesk <Jewelcrafting Trainer>" },
     } },
-    { skillLine = 773, name = "Shadowlands (ATT)", recipes = { -- Inscription: 1
+    { skillLine = 773, name = "Shadowlands", recipes = { -- Inscription: 1
         { id = 382982, name = "Shadowlands Milling", source = "vendor", sourceInfo = "Scribe Au'tehshi <Inscription Trainer>" },
     } },
 })
 
 MC.RegisterContent("tbc", "recipes", {
-    { skillLine = 165, name = "The Burning Crusade (ATT)", recipes = { -- Leatherworking: 8
+    { skillLine = 165, name = "The Burning Crusade", recipes = { -- Leatherworking: 8
         { id = 52733, name = "Bracers of Shackled Souls", source = "vendor", sourceInfo = "Okuno <Ashtongue Deathsworn Quartermaster>" },
         { id = 163225, name = "Thick Clefthoof Leather", source = "trainer", sourceInfo = "Barim Spilthoof <Leatherworking Trainer> (Horde)" },
         { id = 163226, name = "Crystal Infused Leather", source = "trainer", sourceInfo = "Barim Spilthoof <Leatherworking Trainer> (Horde)" },
@@ -122,10 +122,10 @@ MC.RegisterContent("tbc", "recipes", {
         { id = 163231, name = "Cobra Scales", source = "trainer", sourceInfo = "Barim Spilthoof <Leatherworking Trainer> (Horde)" },
         { id = 163232, name = "Wind Scales", source = "trainer", sourceInfo = "Barim Spilthoof <Leatherworking Trainer> (Horde)" },
     } },
-    { skillLine = 333, name = "The Burning Crusade (ATT)", recipes = { -- Enchanting: 1
+    { skillLine = 333, name = "The Burning Crusade", recipes = { -- Enchanting: 1
         { id = 217641, name = "Tome of Illusions: Outland", source = "trainer", sourceInfo = "Felannia <Enchanting Trainer> (Horde)" },
     } },
-    { skillLine = 755, name = "The Burning Crusade (ATT)", recipes = { -- Jewelcrafting: 80
+    { skillLine = 755, name = "The Burning Crusade", recipes = { -- Jewelcrafting: 80
         { id = 25255, name = "Delicate Copper Wire", source = "trainer", sourceInfo = "Lugrah <Jewelcrafting Trainer>" },
         { id = 25278, name = "Bronze Setting", source = "trainer", sourceInfo = "Lugrah <Jewelcrafting Trainer>" },
         { id = 25280, name = "Elegant Silver Ring", source = "trainer", sourceInfo = "Lugrah <Jewelcrafting Trainer>" },
@@ -210,7 +210,7 @@ MC.RegisterContent("tbc", "recipes", {
 })
 
 MC.RegisterContent("vanilla", "recipes", {
-    { skillLine = 164, name = "Classic (ATT)", recipes = { -- Blacksmithing: 37
+    { skillLine = 164, name = "Classic", recipes = { -- Blacksmithing: 37
         { id = 36125, name = "Light Earthforged Blade", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 43549, name = "Heavy Copper Longsword", source = "quest", sourceInfo = "Quest: Supplying the Front" },
         { id = 413506, name = "Icebane Coif", source = "vendor", sourceInfo = "Master Craftsman Omarion <Brotherhood of the Light>" },
@@ -249,7 +249,7 @@ MC.RegisterContent("vanilla", "recipes", {
         { id = 416687, name = "Sacred Guardian", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
         { id = 416688, name = "Ichor Slicer", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
     } },
-    { skillLine = 165, name = "Classic (ATT)", recipes = { -- Leatherworking: 55
+    { skillLine = 165, name = "Classic", recipes = { -- Leatherworking: 55
         { id = 36074, name = "Blackstorm Leggings", source = "specialization", sourceInfo = "Karolek <Leatherworking Trainer>" },
         { id = 36075, name = "Wildfeather Leggings", source = "specialization", sourceInfo = "Caryssia Moonhunter <Tribal Leatherworking Trainer>" },
         { id = 36076, name = "Dragonstrike Leggings", source = "specialization", sourceInfo = "Peter Galen <Master Dragonscale Leatherworker>" },
@@ -306,11 +306,11 @@ MC.RegisterContent("vanilla", "recipes", {
         { id = 414566, name = "Scourged Scales", source = "drop", sourceInfo = "Zackett Skullsmash" },
         { id = 416692, name = "Sanctified Leather Hat", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
     } },
-    { skillLine = 171, name = "Classic (ATT)", recipes = { -- Alchemy: 2
+    { skillLine = 171, name = "Classic", recipes = { -- Alchemy: 2
         { id = 63732, name = "Elixir of Minor Accuracy", source = "trainer", sourceInfo = "Yelmak <Alchemy Trainer>" },
         { id = 114786, name = "Alchemist's Flask", source = "trainer", sourceInfo = "Yelmak <Alchemy Trainer>" },
     } },
-    { skillLine = 185, name = "Classic (ATT)", recipes = { -- Cooking: 33
+    { skillLine = 185, name = "Classic", recipes = { -- Cooking: 33
         { id = 28267, name = "Crunchy Spider Surprise", source = "vendor", sourceInfo = "Fazu <Tradesman>" },
         { id = 33276, name = "Lynx Steak", source = "vendor", sourceInfo = "Landraelanis <Tradesman>" },
         { id = 33277, name = "Roasted Moongraze Tenderloin", source = "quest", sourceInfo = "Quest: The Great Moongraze Hunt (1" },
@@ -345,7 +345,7 @@ MC.RegisterContent("vanilla", "recipes", {
         { id = 399038, name = "Grilled Southfury Salmon", source = "quest", sourceInfo = "Quest: Orcish Groceries" },
         { id = 399040, name = "Feast for the Ancestors", source = "quest", sourceInfo = "Quest: Orcish Groceries" },
     } },
-    { skillLine = 197, name = "Classic (ATT)", recipes = { -- Tailoring: 19
+    { skillLine = 197, name = "Classic", recipes = { -- Tailoring: 19
         { id = 44950, name = "Green Winter Clothes", source = "vendor", sourceInfo = "Penney Copperpinch <Smokywood Pastures>" },
         { id = 44958, name = "Red Winter Clothes", source = "vendor", sourceInfo = "Wulmort Jinglepocket <Smokywood Pastures>" },
         { id = 49677, name = "Dress Shoes", source = "vendor", sourceInfo = "Haughty Modiste <Fashion Designer>" },
@@ -366,14 +366,14 @@ MC.RegisterContent("vanilla", "recipes", {
         { id = 413903, name = "Peculiar Glacial Mantle", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 414564, name = "Cursed Cloth", source = "drop", sourceInfo = "Zackett Skullsmash" },
     } },
-    { skillLine = 202, name = "Classic (ATT)", recipes = { -- Engineering: 5
+    { skillLine = 202, name = "Classic", recipes = { -- Engineering: 5
         { id = 39895, name = "Fused Wiring", source = "vendor", sourceInfo = "Viggz Shinesparked <Engineering Supplies>" },
         { id = 63750, name = "High-powered Flashlight", source = "trainer", sourceInfo = "Roxxik <Engineering Trainer>" },
         { id = 413759, name = "Replaced Servo Arm", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 416689, name = "Skullstone Bludgeon", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
         { id = 416691, name = "Refurbished Purifier", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
     } },
-    { skillLine = 333, name = "Classic (ATT)", recipes = { -- Enchanting: 5
+    { skillLine = 333, name = "Classic", recipes = { -- Enchanting: 5
         { id = 63746, name = "Lesser Accuracy", source = "trainer", sourceInfo = "Godan <Enchanting Trainer>" },
         { id = 217637, name = "Tome of Illusions: Azeroth", source = "trainer", sourceInfo = "Godan <Enchanting Trainer>" },
         { id = 416684, name = "Magebane Nexus", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
@@ -383,20 +383,20 @@ MC.RegisterContent("vanilla", "recipes", {
 })
 
 MC.RegisterContent("wod", "recipes", {
-    { skillLine = 171, name = "Warlords of Draenor (ATT)", recipes = { -- Alchemy: 3
+    { skillLine = 171, name = "Warlords of Draenor", recipes = { -- Alchemy: 3
         { id = 172540, name = "Healing Tonic", source = "trainer", sourceInfo = "Katherine Joplin <Alchemy Recipes>" },
         { id = 172541, name = "Blackwater Anti-Venom", source = "trainer", sourceInfo = "Katherine Joplin <Alchemy Recipes>" },
         { id = 172542, name = "Fire Ammonite Oil", source = "trainer", sourceInfo = "Katherine Joplin <Alchemy Recipes>" },
     } },
-    { skillLine = 197, name = "Warlords of Draenor (ATT)", recipes = { -- Tailoring: 1
+    { skillLine = 197, name = "Warlords of Draenor", recipes = { -- Tailoring: 1
         { id = 172539, name = "Antiseptic Bandage", source = "drop", sourceInfo = "Drops from creatures" },
     } },
-    { skillLine = 202, name = "Warlords of Draenor (ATT)", recipes = { -- Engineering: 3
+    { skillLine = 202, name = "Warlords of Draenor", recipes = { -- Engineering: 3
         { id = 171072, name = "Alliance Firework", source = "vendor", sourceInfo = "Fariel Starsong <Coin of Ancestry Collector>" },
         { id = 171073, name = "Horde Firework", source = "vendor", sourceInfo = "Fariel Starsong <Coin of Ancestry Collector>" },
         { id = 171074, name = "Snake Firework", source = "vendor", sourceInfo = "Fariel Starsong <Coin of Ancestry Collector>" },
     } },
-    { skillLine = 333, name = "Warlords of Draenor (ATT)", recipes = { -- Enchanting: 28
+    { skillLine = 333, name = "Warlords of Draenor", recipes = { -- Enchanting: 28
         { id = 173716, name = "Illusion: Agility", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 173717, name = "Illusion: Battlemaster", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 173718, name = "Illusion: Berserking", source = "drop", sourceInfo = "Drops from creatures" },
@@ -429,18 +429,18 @@ MC.RegisterContent("wod", "recipes", {
 })
 
 MC.RegisterContent("wrath", "recipes", {
-    { skillLine = 165, name = "Wrath of the Lich King (ATT)", recipes = { -- Leatherworking: 3
+    { skillLine = 165, name = "Wrath of the Lich King", recipes = { -- Leatherworking: 3
         { id = 163222, name = "Icy Dragonscale", source = "trainer", sourceInfo = "Diane Cannings <Leatherworking Trainer>" },
         { id = 163223, name = "Nerubian Chitin", source = "trainer", sourceInfo = "Diane Cannings <Leatherworking Trainer>" },
         { id = 163224, name = "Jormungar Scale", source = "trainer", sourceInfo = "Diane Cannings <Leatherworking Trainer>" },
     } },
-    { skillLine = 333, name = "Wrath of the Lich King (ATT)", recipes = { -- Enchanting: 1
+    { skillLine = 333, name = "Wrath of the Lich King", recipes = { -- Enchanting: 1
         { id = 217644, name = "Tome of Illusions: Northrend", source = "trainer", sourceInfo = "Enchanter Nalthanis <Enchanting Trainer>" },
     } },
-    { skillLine = 755, name = "Wrath of the Lich King (ATT)", recipes = { -- Jewelcrafting: 1
+    { skillLine = 755, name = "Wrath of the Lich King", recipes = { -- Jewelcrafting: 1
         { id = 382979, name = "Northrend Prospecting", source = "trainer", sourceInfo = "Timothy Jones <Jewelcrafting Trainer>" },
     } },
-    { skillLine = 773, name = "Wrath of the Lich King (ATT)", recipes = { -- Inscription: 79
+    { skillLine = 773, name = "Wrath of the Lich King", recipes = { -- Inscription: 79
         { id = 45382, name = "Scroll of Stamina", source = "vendor", sourceInfo = "Jo'mah <Inscription Trainer>" },
         { id = 48114, name = "Scroll of Intellect", source = "vendor", sourceInfo = "Jo'mah <Inscription Trainer>" },
         { id = 48116, name = "Scroll of Versatility", source = "vendor", sourceInfo = "Jo'mah <Inscription Trainer>" },

@@ -393,7 +393,7 @@ do
     end
     equal(wpUnknown, 0, "every recipe waypoint maps to a shipped recipe")
     -- Ratchets UP as coverage grows; a drop means the generator lost data.
-    equal(wpCount, 3115, "recipe waypoint coverage")
+    equal(wpCount, 3248, "recipe waypoint coverage")
 
     -- Faction-paired trainer pins. The failure this guards against is a pin
     -- that sends one faction into the other's capital, which is exactly what
@@ -421,9 +421,9 @@ do
         end
         if e.a and e.h then trPaired = trPaired + 1 end
     end
-    equal(trCount, 2785, "trainer-taught recipes with a pin")
-    equal(trPaired, 885, "trainer recipes pinned for BOTH factions")
-    equal(trNeutral, 1812, "trainer recipes at a neutral hub")
+    equal(trCount, 2921, "trainer-taught recipes with a pin")
+    equal(trPaired, 948, "trainer recipes pinned for BOTH factions")
+    equal(trNeutral, 1714, "trainer recipes at a neutral hub")
 
     -- Navigation-only rares and treasures. These are map references, not
     -- collectibles: the whole contract is that they render and pin but never
@@ -439,8 +439,8 @@ do
         loadAddon("addons/Collectionist/Modules/Treasures/Data/Navigation.lua", MC)
 
         local checks = {
-            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare" },
-            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure" },
+            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare",     expected = 706 },
+            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure", expected = 343 },
         }
         for _, c in ipairs(checks) do
             local groups, entries = 0, 0
@@ -469,7 +469,11 @@ do
                 end
             end
             truthy(groups > 0, c.label .. " navigation groups registered")
-            truthy(entries > 0, c.label .. " navigation entries registered")
+            -- Pinned, not just non-zero. These counts move whenever the name
+            -- or zone quality gates in generate-collectionist-navigation-gaps.ps1
+            -- change, and "> 0" would let a gate that silently dropped half the
+            -- dataset pass. Update deliberately, per regeneration.
+            equal(entries, c.expected, c.label .. " navigation entry count")
         end
         equal(#MC.RareData > 0, true, "rare navigation data loaded")
         MC.RareData, MC.TreasureData = realRare, realTreasure
@@ -737,7 +741,7 @@ do
 
     local dataFixtures = {
         mounts = {
-            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 94, cataCount = 48, mopCount = 93, wodCount = 69, legionCount = 125, bfaCount = 140, slCount = 181, dfCount = 161, twwCount = 186,
+            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 94, cataCount = 48, mopCount = 93, wodCount = 69, legionCount = 125, bfaCount = 140, slCount = 181, dfCount = 187, twwCount = 222,
             files = {
                 "Modules/Mounts/Data/Classic.lua",
                 "Modules/Mounts/Data/TheBurningCrusade.lua",
@@ -749,13 +753,13 @@ do
                 "Modules/Mounts/Data/BattleForAzeroth.lua",
                 "Modules/Mounts/Data/Shadowlands.lua",
                 "Modules/Mounts/Data/Dragonflight.lua", "Modules/Mounts/Data/TheWarWithin.lua",
-                "Modules/Mounts/Data/DB2Gaps.lua",
+                "Modules/Mounts/Data/DB2Gaps.lua", "Modules/Mounts/Data/TradingPost.lua",
                 "Modules/Mounts/Data/Mounts.lua",
                 "Modules/Mounts/Data/Patch120007.lua", "Modules/Mounts/Data/Patch120100.lua",
             },
         },
         pets = {
-            field = "PetData", list = "pets", id = "speciesID", classicCount = 204, tbcCount = 70, wrathCount = 81, cataCount = 82, mopCount = 173, wodCount = 117, legionCount = 158, bfaCount = 300, slCount = 237, dfCount = 217, twwCount = 208,
+            field = "PetData", list = "pets", id = "speciesID", classicCount = 204, tbcCount = 70, wrathCount = 81, cataCount = 82, mopCount = 173, wodCount = 117, legionCount = 158, bfaCount = 300, slCount = 237, dfCount = 234, twwCount = 220,
             files = {
                 "Modules/Pets/Data/Classic.lua",
                 "Modules/Pets/Data/TheBurningCrusade.lua",
@@ -768,13 +772,13 @@ do
                 "Modules/Pets/Data/Shadowlands.lua",
                 "Modules/Pets/Data/Dragonflight.lua", "Modules/Pets/Data/TheWarWithin.lua",
                 "Modules/Pets/Data/WildPets.lua",
-                "Modules/Pets/Data/DB2Gaps.lua",
+                "Modules/Pets/Data/DB2Gaps.lua", "Modules/Pets/Data/TradingPost.lua",
                 "Modules/Pets/Data/Pets.lua",
                 "Modules/Pets/Data/Patch120007.lua", "Modules/Pets/Data/Patch120100.lua",
             },
         },
         toys = {
-            field = "ToyData", list = "toys", id = "itemID", classicCount = 14, tbcCount = 22, wrathCount = 36, cataCount = 43, mopCount = 79, wodCount = 128, legionCount = 158, bfaCount = 136, slCount = 115, dfCount = 173, twwCount = 99,
+            field = "ToyData", list = "toys", id = "itemID", classicCount = 14, tbcCount = 22, wrathCount = 36, cataCount = 43, mopCount = 79, wodCount = 128, legionCount = 158, bfaCount = 136, slCount = 115, dfCount = 180, twwCount = 101,
             files = {
                 "Modules/Toys/Data/Classic.lua",
                 "Modules/Toys/Data/TheBurningCrusade.lua",
@@ -786,7 +790,7 @@ do
                 "Modules/Toys/Data/BattleForAzeroth.lua",
                 "Modules/Toys/Data/Shadowlands.lua",
                 "Modules/Toys/Data/Dragonflight.lua", "Modules/Toys/Data/TheWarWithin.lua",
-                "Modules/Toys/Data/DB2Gaps.lua",
+                "Modules/Toys/Data/DB2Gaps.lua", "Modules/Toys/Data/TradingPost.lua",
                 "Modules/Toys/Data/Toys.lua",
                 "Modules/Toys/Data/Patch120007.lua", "Modules/Toys/Data/Patch120100.lua",
             },

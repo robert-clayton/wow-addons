@@ -11,7 +11,7 @@ local _, MC = ...
 -- 9 whose original source was a TCG code, the in-game Shop, Recruit-a-Friend
 -- or a promotion are deliberately NOT listed here, pending review.
 
-MC.RegisterContent("dragonflight", "pets", {
+MC.RegisterContent("df", "pets", {
     { source = "tradingpost", pets = {
         { speciesID = 3243, npcID = 183686, name = "Pippin", petType = 9, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.0", itemID = 190175 },
         { speciesID = 3244, npcID = 185324, name = "Drazka'zet the Wrathful", petType = 3, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.0", itemID = 190176 },

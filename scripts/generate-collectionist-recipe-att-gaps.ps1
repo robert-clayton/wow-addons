@@ -163,7 +163,11 @@ foreach ($expGroup in ($rows | Group-Object expansion | Sort-Object Name)) {
     $expKey = $expGroup.Name
     [void]$sb.AppendLine(('MC.RegisterContent({0}, "recipes", {{' -f (ConvertTo-LuaString $expKey)))
     foreach ($sl in ($expGroup.Group | Group-Object skillLine | Sort-Object { [int]$_.Name })) {
-        $label = "{0} (ATT)" -f $EXPANSION_LABEL[$expKey]
+        # Plain expansion label. The category name is not rendered today
+        # (Modules/Recipes/UI.lua groups by source, not category), but tagging
+        # it with the tool that produced it would leak an implementation
+        # detail into data for no benefit if that ever changes.
+        $label = $EXPANSION_LABEL[$expKey]
         [void]$sb.AppendLine(('    {{ skillLine = {0}, name = {1}, recipes = {{ -- {2}: {3}' -f
             $sl.Name, (ConvertTo-LuaString $label), $PROFESSION_LABEL[[int]$sl.Name], $sl.Count))
         foreach ($r in ($sl.Group | Sort-Object id)) {

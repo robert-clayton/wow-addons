@@ -11,7 +11,7 @@ local _, MC = ...
 -- 8 whose original source was a TCG code, the in-game Shop, Recruit-a-Friend
 -- or a promotion are deliberately NOT listed here, pending review.
 
-MC.RegisterContent("dragonflight", "mounts", {
+MC.RegisterContent("df", "mounts", {
     { source = "tradingpost", mounts = {
         { mountID = 125, name = "Riding Turtle", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7", itemID = 23720 },
         { mountID = 371, name = "Blazing Hippogryph", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6", itemID = 54069 },

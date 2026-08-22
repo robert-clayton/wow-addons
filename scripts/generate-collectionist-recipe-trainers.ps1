@@ -117,7 +117,7 @@ try {
     }
 
     $entries = [System.Collections.Generic.List[object]]::new()
-    $stats = [ordered]@{ paired = 0; neutral = 0; unpairable = 0; noTrainerNode = 0 }
+    $stats = [ordered]@{ paired = 0; neutral = 0; factionLocked = 0; unpairable = 0; noTrainerNode = 0 }
 
     foreach ($row in (Import-Csv -LiteralPath $acqPath)) {
         if ($row.source_kind -ne 'trainer') { continue }
@@ -134,8 +134,26 @@ try {
         if ($null -eq $x -or $null -eq $y) { $stats.noTrainerNode++; continue }
         $own = @{ map = $row.map_id; x = $x; y = $y; name = $nm }
 
+        # A name tagged "(Horde)" or "(Alliance)" is faction-locked wherever it
+        # stands. Thrallmar and Honor Hold are the common case: both sit in
+        # Hellfire Peninsula, which is not a mirrored capital, so the pair
+        # lookup below misses and they would fall into the neutral branch --
+        # pinning a Horde-only base for Alliance players.
+        $tagged = $null
+        if ($nm -match '\((Horde|Alliance)\)') { $tagged = $Matches[1].ToLowerInvariant() }
+
         $pair = $FACTION_PAIR[$row.map_id]
         if (-not $pair) {
+            if ($tagged) {
+                # Scope it to its own faction. The other faction resolves to nil
+                # and keeps the normal open-the-profession click, which is
+                # honest -- better than a pin into hostile territory.
+                $e = [pscustomobject]@{ id = [int]$row.recipe_spell_id; alliance = $null; horde = $null }
+                $e.$tagged = $own
+                $entries.Add($e)
+                $stats.factionLocked++
+                continue
+            }
             # Neutral hub, or a zone with no faction mirror: one pin for everyone.
             $entries.Add([pscustomobject]@{ id = [int]$row.recipe_spell_id; neutral = $own })
             $stats.neutral++

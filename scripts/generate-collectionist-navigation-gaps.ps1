@@ -109,6 +109,48 @@ function ConvertTo-Coords([string]$packed) {
     return ,$out
 }
 
+# The providers' comment field is free text and often holds a raw fragment of
+# their own Lua rather than a label -- "[37005734] = {quest=39083, label=ns.CHEST_SM},"
+# or a bare node ID. Shipping those puts source code in the panel and on the
+# map pin.
+#
+# Two passes. First RECOVER: these fragments usually carry the real name in a
+# trailing "-- Name" comment, so prefer that over the fragment. Then REJECT
+# anything still shaped like code, numeric-only, or a maintainer's note.
+$NAME_FILLER = '^(verify|verified|todo|tbd|check|unknown|test|temp|\?+)$'
+
+function Get-CleanName([string]$raw) {
+    if (-not $raw) { return $null }
+    $n = $raw.Trim()
+
+    # An explicit label= is the provider's own display string and beats
+    # everything else. A trailing comment on the same row is as often a
+    # maintainer's note ("bugged for years") as a name.
+    $lab = [regex]::Match($n, 'label\s*=\s*"([^"]+)"')
+    if ($lab.Success -and $lab.Groups[1].Value.Trim()) { return $lab.Groups[1].Value.Trim() }
+
+    # "[[npc=214726--]]}, -- Lava Slug" -> "Lava Slug".
+    #
+    # The leading `^.*` is greedy on purpose: it forces the match onto the LAST
+    # `--` in the string. An anchored pattern without it matches the FIRST `--`
+    # -- which in these fragments is usually inside the payload (`npc=214726--`)
+    # -- and captures the rest of the line as if it were the label.
+    $m = [regex]::Match($n, '^.*--\s*(.+?)\s*$')
+    if ($m.Success -and $m.Groups[1].Value.Trim()) { $n = $m.Groups[1].Value.Trim() }
+
+    $n = ($n -split '[;|]')[0].Trim()
+    $n = $n.Trim('"', "'", ',', ' ', '-')
+    if (-not $n) { return $null }
+
+    # Still code-shaped, a bare number, or a note to self.
+    if ($n -match '[\{\}\[\]=]') { return $null }
+    if ($n -match '\bns\.' -or $n -match '^\s*--') { return $null }
+    if ($n -match '^\d+$') { return $null }
+    if ($n -match $NAME_FILLER) { return $null }
+    if ($n.Length -lt 3) { return $null }
+    return $n
+}
+
 # Zone key for the source bucket: lowercase, matching the existing rare data
 # ("azsuna", "highmountain").
 function Get-ZoneKey([string]$zone) { return ($zone -creplace '(?<!^)([A-Z])', '_$1').ToLowerInvariant() }
@@ -184,9 +226,10 @@ $rareStats = @{ emitted = 0; noExpansion = 0; noMap = 0; noCoords = 0; noName = 
 $rareRows = @(Import-Csv -LiteralPath $rarePath | Where-Object { $_.decision -eq 'navigation_candidate_needs_dedup' })
 $rareGroups = Build-Groups $rareRows "rares" {
     param($row, $map, $coords)
-    if (-not $row.name) { return $null }
-    $wp = Format-Waypoint $map.id $coords $row.name
-    return '{ npcID = ' + $row.npc_id + ', name = ' + (ConvertTo-LuaString $row.name) + ', waypoint = ' + $wp + ' },'
+    $name = Get-CleanName $row.name
+    if (-not $name) { return $null }
+    $wp = Format-Waypoint $map.id $coords $name
+    return '{ npcID = ' + $row.npc_id + ', name = ' + (ConvertTo-LuaString $name) + ', waypoint = ' + $wp + ' },'
 } ([ref]$rareStats)
 Write-NavFile $rareGroups "rares" "rares" "rares" (Join-Path $RepoRoot "addons/Collectionist/Modules/Rares/Data/Navigation.lua")
 
@@ -195,10 +238,8 @@ $treasureStats = @{ emitted = 0; noExpansion = 0; noMap = 0; noCoords = 0; noNam
 $treasureRows = @(Import-Csv -LiteralPath $treasurePath | Where-Object { $_.decision -eq 'quest_identity_navigation_candidate' })
 $treasureGroups = Build-Groups $treasureRows "treasures" {
     param($row, $map, $coords)
-    # comments is the provider's own label. No name, no row.
-    $name = $row.comments
-    if (-not $name) { return $null }
-    $name = ($name -split '[;|]')[0].Trim()
+    # comments is the provider's own label, but often a raw Lua fragment.
+    $name = Get-CleanName $row.comments
     if (-not $name) { return $null }
     $wp = Format-Waypoint $map.id $coords $name
     return '{ questID = ' + $row.quest_id + ', name = ' + (ConvertTo-LuaString $name) + ', waypoint = ' + $wp + ' },'

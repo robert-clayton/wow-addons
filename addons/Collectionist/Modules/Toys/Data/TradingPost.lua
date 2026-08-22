@@ -8,7 +8,7 @@ local _, MC = ...
 -- Expansion is the one whose Trading Post first offered the item, not the
 -- expansion its model or original promotion came from.
 
-MC.RegisterContent("dragonflight", "toys", {
+MC.RegisterContent("df", "toys", {
     { source = "tradingpost", toys = {
         { itemID = 206268, name = "Ethereal Transmogrifier", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5" },
         { itemID = 206347, name = "Mannequin Charm", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5" },
