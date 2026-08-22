@@ -1,7 +1,18 @@
 local _, MC = ...
 
--- GENERATED FILE - do not edit.
--- Regenerate: scripts/generate-collectionist-decor-att-gaps.ps1
+-- HAND-MAINTAINED. Edit this file directly.
+--
+-- One-time extraction from AllTheThings (see CREDITS.txt), reconciled
+-- against the DB2 decoration inventory.
+--
+-- Frozen from its generator, which has been deleted. The upstream it read is a
+-- one-time research artifact, not a live feed -- re-running it could only
+-- reproduce the same rows or clobber corrections made since. One such
+-- correction is already in history: a generator re-run would have restored
+-- petType = 0 on eight Trading Post pets.
+--
+-- Validated by scripts/db/run.sh, which loads this into the content database
+-- and fails on any constraint violation.
 --
 -- Housing decorations present in current DB2 and in All The Things but
 -- absent from the per-expansion catalogs. Only rows with direct ATT quest

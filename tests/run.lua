@@ -489,7 +489,7 @@ do
             end
             truthy(groups > 0, c.label .. " navigation groups registered")
             -- Pinned, not just non-zero. These counts move whenever the name
-            -- or zone quality gates in generate-collectionist-navigation-gaps.ps1
+            -- or the zone quality gates that produced Navigation.lua before it was frozen
             -- change, and "> 0" would let a gate that silently dropped half the
             -- dataset pass. Update deliberately, per regeneration.
             equal(entries, c.expected, c.label .. " navigation entry count")

@@ -1,7 +1,19 @@
 local _, MC = ...
 
--- GENERATED FILE - do not edit.
--- Regenerate: scripts/generate-collectionist-recipe-waypoints.ps1
+-- HAND-MAINTAINED. Edit this file directly.
+--
+-- One-time extraction from AllTheThings (see CREDITS.txt). Keyed by
+-- coordinates AND source name: 48 locations host more than one source,
+-- and collapsing them labelled recipes with somebody else's vendor.
+--
+-- Frozen from its generator, which has been deleted. The upstream it read is a
+-- one-time research artifact, not a live feed -- re-running it could only
+-- reproduce the same rows or clobber corrections made since. One such
+-- correction is already in history: a generator re-run would have restored
+-- petType = 0 on eight Trading Post pets.
+--
+-- Validated by scripts/db/run.sh, which loads this into the content database
+-- and fails on any constraint violation.
 --
 -- recipe spell ID -> { mapID, x, y, "Label" }, matching the shape used by
 -- MC.LOC / MC.RareNPCs / MC.TreasureCoords. Attached at scan time by

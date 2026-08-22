@@ -1,14 +1,47 @@
 # Collectionist content database
 
-The addon's data files are no longer hand-assembled from a pile of other
-datasets. `data/collectionist.db` is the authority; the Lua under
-`addons/Collectionist/Modules/*/Data/` is emitted from it.
+**The curated Lua under `addons/` is the source of truth.** The database is a
+validator built from it, not a source it is built from.
 
 ```bash
-bash scripts/db/run.sh        # rebuild, re-emit, and prove the two agree
+bash scripts/db/run.sh        # load, validate, and prove the round trip
 ```
 
-Exits non-zero on any difference, so it works as a gate.
+Exits non-zero on any constraint violation or round-trip difference, so it
+works as a gate.
+
+`data/collectionist.db` is a build artifact and is not committed. Committing a
+binary that nothing can diff, review, blame or merge would make it look
+authoritative when it is derived.
+
+### Why the Lua stays the source
+
+Three options were weighed. The deciding question for a CSV-sourced pipeline is
+*what writes the CSV* — a script reading ATT or DB2 keeps the external
+dependency and merely moves it one hop, while a human writing it means
+migrating 50,000 lines into a format that is worse at groups, waypoint lists
+and criteria arrays. Either way the emitted Lua still has to be committed
+because it is what ships, so every change produces two diffs instead of one.
+
+A database-as-source fails harder: no diff, no review, no blame, no merge, no
+hand-edit in an emergency.
+
+Lua keeps hierarchy, 1,065 lines of hand-written reasoning, and line-wise
+diffs. The database supplies what Lua alone cannot: constraints that make a bug
+class unrepresentable, and reconciliation against upstream.
+
+### No script writes shipped data any more
+
+Six generators owning nine data files were frozen and deleted, along with the
+line-rewriting `apply-collectionist-recipe-acquisition.ps1`. Their upstreams
+were one-time research artifacts, not live feeds, so a re-run could only
+reproduce the same rows or clobber corrections made since — a re-run of
+`generate-collectionist-trading-post.ps1` would have restored `petType = 0` on
+eight pets that were fixed by hand.
+
+`generate-collectionist-changelog-lua.ps1` is kept: it derives
+`Data/Changelog.lua` from `CHANGELOG.md` in the same repo, with no external
+dependency.
 
 ## Why
 
@@ -35,7 +68,7 @@ stored. They are unrepresentable, not merely untested.
 |---|---|---|
 | 1 | `dump-shipped-data.lua` | Loads the addon's data files with `MC.RegisterContent` stubbed and dumps every row as JSONL |
 | 2 | `build-db.py` | Loads that dump into `data/collectionist.db` under the schema's constraints |
-| 3 | `emit-lua.py` | Writes Lua back out to `build/emitted/` |
+| 3 | `emit-lua.py` | Writes Lua back out to `build/emitted/` (for the proof, not for shipping) |
 | 4 | `dump-emitted-data.lua` | Loads the emitted Lua through the same harness |
 | 5 | `compare-roundtrip.py` | Diffs steps 1 and 4 |
 | 6 | `dump-handynotes.lua` | Loads 20 HandyNotes addons from the WoW install and dumps every map node |
@@ -201,17 +234,17 @@ roster bitmaps.
 
 ## Known gaps
 
-- **The emitter writes to `build/emitted/` only.** It does not yet replace the
-  files under `addons/`, which have a hand-tuned layout, comments, and a TOC
-  order that the round trip does not model. The proof establishes that it
-  *could*; switching over is a separate, reviewable change.
+- **The emitter writes to `build/emitted/` only, deliberately.** It exists to
+  prove the schema models every shipped field: if someone adds a Lua field the
+  database cannot represent, the round trip fails and says so. It is not meant
+  to replace the files under `addons/`, which carry the hand-written reasoning
+  that is the point of keeping them.
 - **132 source keys** are used by data but declared in no label table, so they
   render as raw lowercase. `build-db.py` lists them on every run.
-- **Only the committed catalog is versioned.** `data/collectionist.db` holds
-  the catalog alone, at 6.7 MB. Upstream ingest lands in
-  `build/collectionist-full.db` (31 MB) because the CSVs behind it are already
-  committed under `research/` and the ingest is deterministic — committing the
-  loaded copy would store the same 20 MB twice in a format git cannot delta.
+- **Neither database is committed.** `data/collectionist.db` (catalog) and
+  `build/collectionist-full.db` (catalog + upstream) are both rebuilt by
+  `run.sh` from files that are committed: the Lua under `addons/` and the CSVs
+  under `research/`.
 
 ## Concurrency
 

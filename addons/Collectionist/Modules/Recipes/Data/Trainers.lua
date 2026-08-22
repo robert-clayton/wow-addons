@@ -1,7 +1,19 @@
 local _, MC = ...
 
--- GENERATED FILE - do not edit.
--- Regenerate: scripts/generate-collectionist-recipe-trainers.ps1
+-- HAND-MAINTAINED. Edit this file directly.
+--
+-- One-time extraction from AllTheThings (see CREDITS.txt). Trainer pins
+-- are faction-paired: an NPC-level extraction, not recipe-anchored, so
+-- Alliance players are not routed into Orgrimmar.
+--
+-- Frozen from its generator, which has been deleted. The upstream it read is a
+-- one-time research artifact, not a live feed -- re-running it could only
+-- reproduce the same rows or clobber corrections made since. One such
+-- correction is already in history: a generator re-run would have restored
+-- petType = 0 on eight Trading Post pets.
+--
+-- Validated by scripts/db/run.sh, which loads this into the content database
+-- and fails on any constraint violation.
 --
 -- Trainer-taught recipes, resolved per faction at scan time.
 --
