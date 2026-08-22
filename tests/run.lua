@@ -190,19 +190,27 @@ do
     equal(names(MC.SortEntries(sample(), "mounts")), "Cobalt,Amber,Basalt,Dune",
         "default mode leaves the shipped order alone")
 
-    MC.db.sortMode.mounts = "name"
+    MC.db.sortMode.mounts = "name_asc"
     equal(names(MC.SortEntries(sample(), "mounts")), "Amber,Basalt,Cobalt,Dune",
         "A-Z sorts by name")
 
-    MC.db.sortMode.mounts = "expansion"
-    -- Newest first, and the two Wrath rows fall back to name rather than to
-    -- whatever order table.sort happened to leave them in.
+    MC.db.sortMode.mounts = "name_desc"
+    equal(names(MC.SortEntries(sample(), "mounts")), "Dune,Cobalt,Basalt,Amber",
+        "Z-A reverses the name order")
+
+    MC.db.sortMode.mounts = "exp_desc"
+    -- Newest expansion first, and the two Wrath rows read A-Z inside it --
+    -- names are not reversed just because the expansion order is.
     equal(names(MC.SortEntries(sample(), "mounts")), "Amber,Basalt,Cobalt,Dune",
-        "newest-first orders by expansion then name")
+        "expansion descending puts the newest first")
+
+    MC.db.sortMode.mounts = "exp_asc"
+    equal(names(MC.SortEntries(sample(), "mounts")), "Dune,Basalt,Cobalt,Amber",
+        "expansion ascending puts the oldest first, names A-Z within it")
 
     -- Ties must be resolved deterministically. A windowed list repaints on
     -- scroll, so an unstable comparator would show rows visibly swapping.
-    MC.db.sortMode.mounts = "name"
+    MC.db.sortMode.mounts = "name_asc"
     local dupes = {
         { name = "Same", expansion = "wrath" },
         { name = "Same", expansion = "midnight" },
@@ -216,12 +224,14 @@ do
 
     -- Cycling wraps and is remembered per module.
     MC.db.sortMode.mounts = "default"
-    equal(MC.CycleSortMode("mounts"), "name", "cycle: default -> name")
-    equal(MC.CycleSortMode("mounts"), "expansion", "cycle: name -> expansion")
+    equal(MC.CycleSortMode("mounts"), "name_asc", "cycle: default -> A-Z")
+    equal(MC.CycleSortMode("mounts"), "name_desc", "cycle: A-Z -> Z-A")
+    equal(MC.CycleSortMode("mounts"), "exp_asc", "cycle: Z-A -> expansion up")
+    equal(MC.CycleSortMode("mounts"), "exp_desc", "cycle: expansion up -> expansion down")
     equal(MC.CycleSortMode("mounts"), "default", "cycle wraps back to default")
-    MC.db.sortMode.pets = "name"
+    MC.db.sortMode.pets = "name_asc"
     equal(MC.GetSortMode("mounts"), "default", "sort mode is per module")
-    equal(MC.GetSortMode("pets"), "name", "each module keeps its own mode")
+    equal(MC.GetSortMode("pets"), "name_asc", "each module keeps its own mode")
 
     -- A junk value must not leak into the label lookup.
     MC.db.sortMode.mounts = "bogus"

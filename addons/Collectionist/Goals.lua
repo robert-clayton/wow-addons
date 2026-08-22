@@ -130,6 +130,18 @@ end
 
 local HEADER_H, ROW_H = 22, 18
 
+-- Collapsed state lives in its own sub-table, exactly like a module's.
+-- MC.db itself has no `collapsed` field -- only MC.db[moduleKey] does -- and
+-- passing MC.db straight to RenderCollapsibleHeader indexed a nil, which
+-- killed the render and left the page blank with no message.
+function Goals:DB()
+    if not MC.db then return { collapsed = {} } end
+    MC.db[MC.GOALS_KEY] = MC.db[MC.GOALS_KEY] or {}
+    local db = MC.db[MC.GOALS_KEY]
+    db.collapsed = db.collapsed or {}
+    return db
+end
+
 function Goals:Render()
     local panel = MC.panel
     if not (panel and panel.scrollChild) then return end
@@ -168,7 +180,7 @@ function Goals:Render()
                 countColor = { cr, cg, cb },
                 fontSize   = theme.fontSize,
                 countFontSize = theme.fontSize - 1,
-            }, MC.db, function() Goals:Render() end)
+            }, self:DB(), function() Goals:Render() end)
         yOff = newY
 
         if not collapsed then

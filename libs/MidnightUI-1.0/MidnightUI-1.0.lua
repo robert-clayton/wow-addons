@@ -1387,9 +1387,12 @@ function lib.MakeIndicatorBtn(parent, opts)
     applyTheme()
     lib.RegisterThemeHook(applyTheme)
 
+    -- opts.fixedWidth pins the button so its label can change without the
+    -- neighbours shifting. A control that cycles through labels of different
+    -- lengths otherwise nudges everything anchored to it on every click.
     function btn:SetLabel(text)
         fs:SetText(text or "")
-        btn:SetWidth(fs:GetStringWidth() + pad)
+        btn:SetWidth(opts.fixedWidth or (fs:GetStringWidth() + pad))
     end
     btn:SetLabel(opts.label or "")
 

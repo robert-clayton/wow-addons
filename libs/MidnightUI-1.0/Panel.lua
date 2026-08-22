@@ -370,6 +370,7 @@ function PanelProto:CreateScrollFrame()
         if contentH <= viewH or viewH <= 0 then
             thumb:Hide()
             if syncScrollHit then syncScrollHit() end
+            if self._MaybeRepaintWindow then self:_MaybeRepaintWindow() end
             return
         end
         thumb:Show()
@@ -380,6 +381,7 @@ function PanelProto:CreateScrollFrame()
         thumb:ClearAllPoints()
         thumb:SetPoint("TOPLEFT", track, "TOPLEFT", 0, -((trackH - thumbH) * pct))
         if syncScrollHit then syncScrollHit() end
+        if self._MaybeRepaintWindow then self:_MaybeRepaintWindow() end
     end
 
     -- Textures cannot take mouse input; overlay frames that can.

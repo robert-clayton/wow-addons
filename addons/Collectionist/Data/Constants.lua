@@ -124,9 +124,13 @@ end
 --
 -- Order here is the cycle order of the title-bar control.
 MC.SORT_MODES = {
-    { key = "default",   label = "Default", tip = "The order the data ships in" },
-    { key = "name",      label = "A-Z",     tip = "Alphabetical by name" },
-    { key = "expansion", label = "Newest",  tip = "Newest expansion first" },
+    { key = "default",  label = "Default",      tip = "The order the data ships in" },
+    { key = "name_asc", label = "A-Z",          tip = "Name, A to Z" },
+    { key = "name_desc", label = "Z-A",         tip = "Name, Z to A" },
+    -- Arrows rather than words: "Expansion Ascending" is too long for a
+    -- control that has to hold a fixed width next to four other labels.
+    { key = "exp_asc",   label = "Expansion ▲", tip = "Expansion, oldest first" },
+    { key = "exp_desc", label = "Expansion ▼", tip = "Expansion, newest first" },
 }
 
 MC.SORT_MODE_BY_KEY = {}
@@ -173,19 +177,35 @@ function MC.SortEntries(entries, moduleKey)
     local pos = {}
     for i = 1, #entries do pos[entries[i]] = i end
 
-    local function byName(a, b)
+    -- The original index is the final tie-break in every mode. table.sort is
+    -- not stable in Lua, and with the row list windowed and repainting on
+    -- scroll, two rows that compare equal could otherwise swap places
+    -- mid-scroll and read as flicker.
+    local function byName(a, b, desc)
         local an, bn = a.name or "", b.name or ""
-        if an ~= bn then return an < bn end
+        if an ~= bn then
+            if desc then return an > bn end
+            return an < bn
+        end
         return pos[a] < pos[b]
     end
 
-    if mode == "name" then
-        table.sort(entries, byName)
-    elseif mode == "expansion" then
+    if mode == "name_asc" then
+        table.sort(entries, function(a, b) return byName(a, b, false) end)
+    elseif mode == "name_desc" then
+        table.sort(entries, function(a, b) return byName(a, b, true) end)
+    elseif mode == "exp_asc" or mode == "exp_desc" then
+        local desc = mode == "exp_desc"
         table.sort(entries, function(a, b)
             local ao, bo = expansionOrder(a), expansionOrder(b)
-            if ao ~= bo then return ao > bo end
-            return byName(a, b)
+            if ao ~= bo then
+                if desc then return ao > bo end
+                return ao < bo
+            end
+            -- Names inside an expansion always read A-Z, in both directions.
+            -- Reversing them under a descending expansion sort is surprising:
+            -- the player asked for expansion order, not for reversed names.
+            return byName(a, b, false)
         end)
     end
     return entries

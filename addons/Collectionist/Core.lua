@@ -2033,6 +2033,10 @@ function MC.CreatePanel()
         -- mode has to be readable at a glance, or cycling through three
         -- states with no visible label is a guessing game.
         local sortBtn = MUI.MakeIndicatorBtn(bar, {
+            -- Pinned width. The label cycles between "Default" and
+            -- "Expansion h88", and an auto-sized button would shove
+            -- the peers/score chain sideways on every click.
+            fixedWidth = 86,
             tooltip = function(_, tt)
                 tt:SetText("Sort rows")
                 for _, m in ipairs(MC.SORT_MODES) do
@@ -2097,7 +2101,7 @@ function MC.CreatePanel()
             theme.colors.btnTealFg,
             theme.colors.btnTealHoverBg,
             theme.colors.btnTealHoverBd,
-            "Closest to done  (/mc goals)")
+            "Closest to done")
         goalsBtn:SetPoint("RIGHT", searchBtn, "LEFT", -10, 0)
         goalsBtn:SetScript("OnClick", function() MC.SelectGoals() end)
         MC.goalsIndicator = goalsBtn
@@ -2345,7 +2349,14 @@ function MC.SelectSearch(query)
 end
 
 function MC.SelectGoals()
-    if not MC.panel or MC.IsGoalsSelected() then return end
+    if not MC.panel then return end
+    -- Clicking the icon again backs out to the tracker underneath. Goals is a
+    -- detour, not a destination, and there was otherwise no way out of it
+    -- except picking a tab from the sidebar.
+    if MC.IsGoalsSelected() then
+        if MC.activeModule then MC.SwitchTab(MC.activeModule) end
+        return
+    end
     local wasOptions = MC.IsOptionsSelected()
     MC.activeSelection = MC.GOALS_KEY
 

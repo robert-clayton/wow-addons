@@ -148,6 +148,9 @@ function Nav:SetActive(key)
         elseif key == MC.SEARCH_KEY then
             self.panel:SetPageHeader("Search",
                 "Every collectible, by name, zone, or source")
+        elseif key == MC.GOALS_KEY then
+            self.panel:SetPageHeader("Closest to Done",
+                "The collections you are nearest to finishing")
         else
             local mod = MC.modulesByKey and MC.modulesByKey[key]
             self.panel:SetPageHeader((mod and mod.label) or key, nil)
