@@ -39,7 +39,6 @@
 "item_expansion_signal","include_shadowlands","False",,"True","1099","184447","Kevin's Party Supplies","8","0","0","|cFFFFD200Treasure: |rSlime-Coated Crate|n|cFFFFD200Zone: |rMaldraxxus"
 "item_expansion_signal","include_shadowlands","False",,"True","1100","184476","Regenerating Slime Vial","8","0","0","|cFFFFD200Drop: |rBubbleblood|n|cFFFFD200Zone: |rMaldraxxus"
 "source_text_signal","include_shadowlands","False",,"True","1101","184508","Mawsworn Pet Leash","0","5","0","|cFFFFD200Achievement: |rBattle in the Shadowlands|n|cFFFFD200Category: |rBattle"
-"source_text_signal","include_shadowlands","False",,"True","1102","183810","Shadowlands Mini: Grandmaster Vole","7","0","2","|cFFFFD200Treasure: |rPrize Bag|n|cFFFFD200Zone: |rMaldraxxus"
 "item_expansion_signal","include_shadowlands","False",,"True","1103","184495","Infested Arachnid Casing","8","0","0","|cFFFFD200Drop:|r Supplies of the Undying Army"
 "item_expansion_signal","include_shadowlands","False",,"True","1104","184396","Malfunctioning Goliath Gauntlet","8","-1","0","|cFFFFD200Drop:|r Ascended Supplies"
 "item_expansion_signal","include_shadowlands","False",,"True","1105","184487","Gormling in a Bag","8","-1","0","|cFFFFD200World Quest:|r Ardenweald world quests"

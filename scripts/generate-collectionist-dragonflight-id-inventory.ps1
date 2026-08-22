@@ -7,6 +7,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 
 $shadowlandsRoot = Join-Path $Db2Root "shadowlands"
 $dragonflightRoot = Join-Path $Db2Root "dragonflight"
@@ -464,7 +465,6 @@ $achievementCriteriaInventory = foreach ($achievement in $dfAchievements | Where
         }
     }
 }
-
 $achievementByID = New-Index $dfAchievements
 $rareNpcOverrides = @{
     "Possessive Hornswog" = "192362;200002"
@@ -505,6 +505,9 @@ $treasureInventory = foreach ($achievementID in $treasureAchievementIDs) {
         }
     }
 }
+$currentEncounterCriteria = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root -AllAchievements)
+$rareInventory = @(Sync-CollectionistEncounterRows $rareInventory $currentEncounterCriteria)
+$treasureInventory = @(Sync-CollectionistEncounterRows $treasureInventory $currentEncounterCriteria)
 
 $tradeCategoryChildren = @{}
 foreach ($category in $tradeSkillCategories) {
@@ -816,10 +819,10 @@ Write-CsvFile (Join-Path $ManifestRoot "pets.csv") $petManifest
 Write-CsvFile (Join-Path $ManifestRoot "toys.csv") $toyManifest
 $achievementManifest = @($achievementInventory | Where-Object { $_.status -eq "dragonflight_category_confirmed" } | Sort-Object { [int]$_.achievement_id })
 $achievementManifestIDs = @($achievementManifest | ForEach-Object { [string]$_.achievement_id })
-$achievementCriteriaManifest = @($achievementCriteriaInventory |
-    Where-Object { [string]$_.achievement_id -in $achievementManifestIDs } |
-    Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
-Assert-Equal @($achievementCriteriaManifest).Count 3203 "Dragonflight visible achievement criteria manifest row count"
+$achievementCriteriaManifest = @(Sync-CollectionistAchievementCriteria @(
+    $achievementCriteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementManifestIDs }
+) $CurrentTradeDb2Root | Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
+Assert-Equal @($achievementCriteriaManifest).Count 3202 "Dragonflight visible achievement criteria manifest row count"
 Assert-UniqueField $achievementCriteriaManifest "tree_id" "Dragonflight visible achievement criteria manifest"
 $recipeManifest = @($recipeInventory | Where-Object { $_.status -in @("named_recipe", "current_house_decor_recipe", "acquisition_dragonflight_ancient_zulgurub") } | Sort-Object profession, { [int]$_.recipe_spell_id })
 $rareManifest = @($rareInventory | Sort-Object { [int]$_.achievement_id }, { Get-OrderPathSortKey $_.order_path })
@@ -883,7 +886,7 @@ $manifestSummary = @(
     [pscustomobject]@{ manifest = "decorations"; rows = 76; identifier = "decor_id" }
     [pscustomobject]@{ manifest = "recipes"; rows = 1004; identifier = "recipe_spell_id" }
     [pscustomobject]@{ manifest = "achievements"; rows = 569; identifier = "achievement_id" }
-    [pscustomobject]@{ manifest = "achievement-criteria"; rows = 3203; identifier = "tree_id" }
+    [pscustomobject]@{ manifest = "achievement-criteria"; rows = 3202; identifier = "tree_id" }
     [pscustomobject]@{ manifest = "rares"; rows = 197; identifier = "tree_id" }
     [pscustomobject]@{ manifest = "treasures"; rows = 57; identifier = "tree_id" }
     [pscustomobject]@{ manifest = "supporting-currencies"; rows = 8; identifier = "currency_id" }

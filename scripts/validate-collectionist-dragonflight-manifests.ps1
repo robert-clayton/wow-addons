@@ -84,8 +84,12 @@ Assert-ExactSet $treasureManifest $treasureInventory "tree_id" "Dragonflight tre
 Assert-ExactSet $mapManifest $mapInventory "map_id" "Dragonflight supporting maps" 9
 
 $achievementIDs = Get-IDs $achievementManifest "achievement_id"
-$expectedCriteria = @($criteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementIDs })
-Assert-ExactSet $criteriaManifest $expectedCriteria "tree_id" "Dragonflight achievement criteria" 3203
+$retiredCurrentTreeIDs = @("144959")
+$expectedCriteria = @($criteriaInventory | Where-Object {
+    [string]$_.achievement_id -in $achievementIDs -and [string]$_.tree_id -notin $retiredCurrentTreeIDs
+})
+Assert-IDValues @($criteriaInventory | Where-Object { [string]$_.tree_id -in $retiredCurrentTreeIDs } | ForEach-Object tree_id) $retiredCurrentTreeIDs "Dragonflight retired current criteria trees"
+Assert-ExactSet $criteriaManifest $expectedCriteria "tree_id" "Dragonflight achievement criteria" 3202
 
 if (@($currencyManifest).Count -ne 8 -or (Get-IDs $currencyManifest "currency_id").Count -ne 8) {
     throw "Dragonflight supporting currency manifest count or uniqueness mismatch"

@@ -9,6 +9,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\battle-for-azeroth\sources\housing-wowdb-acquisition-audit.csv"
 $rareNPCAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\battle-for-azeroth\sources\rare-npc-audit.csv"
 $legionRoot = Join-Path $Db2Root "legion"
@@ -243,6 +244,7 @@ $achievementCriteriaInventory = foreach ($achievement in $selectedAchievements |
         [pscustomobject]@{ achievement_id = $achievement.ID; title = $achievement.Title_lang; category_id = $achievement.Category; order_path = $leaf.order_path; tree_id = $leaf.tree_id; description = $leaf.description; criteria_id = $leaf.criteria_id; criteria_type = $leaf.criteria_type; asset_id = $leaf.asset_id; amount = $leaf.amount; operator = $leaf.operator }
     }
 }
+$achievementCriteriaInventory = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root)
 
 $achievementByID = New-Index $bfaAchievements
 $attEntityByCriteriaID = @{}
@@ -282,6 +284,9 @@ $rareAchievementIDs = @("12939", "12940", "12941", "12942", "12943", "12944", "1
 $treasureAchievementIDs = @("12771", "12849", "12851", "12852", "12853", "12995", "13549", "13836")
 $rareInventory = @(Get-EncounterRows $rareAchievementIDs "rare")
 $treasureInventory = @(Get-EncounterRows $treasureAchievementIDs "treasure")
+$currentEncounterCriteria = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root -AllAchievements)
+$rareInventory = @(Sync-CollectionistEncounterRows $rareInventory $currentEncounterCriteria)
+$treasureInventory = @(Sync-CollectionistEncounterRows $treasureInventory $currentEncounterCriteria)
 
 $rareNPCAudit = @($rareInventory | Where-Object criteria_type -eq "27" | ForEach-Object {
     [pscustomobject]@{ achievement_id = $_.achievement_id; achievement = $_.achievement; tree_id = $_.tree_id; criterion = $_.criterion; completion_quest_id = $_.criteria_asset; npc_id = $_.npc_ids; object_id = $_.object_ids; mapping = $_.entity_mapping }

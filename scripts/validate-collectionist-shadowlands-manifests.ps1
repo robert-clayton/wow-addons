@@ -79,7 +79,7 @@ Assert-ExactSet $mountManifest @($mountInventory | Where-Object release_decision
 Assert-ExactSet $petManifest @($petInventory | Where-Object release_decision -eq "include_shadowlands") "species_id" "Shadowlands pets" 176
 Assert-IDValues @($mountManifest | Where-Object status -eq "snapshot_candidate" | Where-Object mount_id -eq "293" | ForEach-Object mount_id) @("293") "Shadowlands reused Illidari Doomhawk mount ID"
 Assert-IDValues @($petManifest | Where-Object status -eq "collectible_wild_pet" | ForEach-Object species_id) @("3215") "Shadowlands collectible wild-pet overrides"
-Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_shadowlands") "toy_id" "Shadowlands toys" 115
+Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_shadowlands") "toy_id" "Shadowlands toys" 114
 Assert-ExactSet $decorationManifest @($decorationInventory | Where-Object status -eq "acquisition_shadowlands_confirmed") "decor_id" "Shadowlands decorations" 26
 Assert-ExactSet $achievementManifest @($achievementInventory | Where-Object status -eq "shadowlands_category_confirmed") "achievement_id" "Shadowlands achievements" 419
 Assert-ExactSet $recipeManifest @($recipeInventory | Where-Object status -in @("named_recipe", "current_house_decor_recipe")) "recipe_spell_id" "Shadowlands recipes" 634

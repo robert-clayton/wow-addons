@@ -1388,8 +1388,8 @@ MC.RegisterContent("tww", "achievements", {
             { achievementID = 40446, name = "I TAKE Candle!", description = "Successfully complete a Kobold delve without exhausting an Enchanted Candle or Air Totem on Tier 8 or higher.", zone = "Delves" },
             { achievementID = 40447, name = "Delver of the Depths II", description = "Complete the War Within delves listed below on Tier 4 or higher with lives remaining.", zone = "Delves",
               taskList = { intro = "Progress from live achievement criteria.", tasks = {
-                  { achievementID = 40447, criteriaID = 68308, label = "Earthcrawl Mines" },
-                  { achievementID = 40447, criteriaID = 68308, label = "Fungal Folly" },
+                  { achievementID = 40447, criteriaID = 68308, criteriaIndex = 1, label = "Earthcrawl Mines" },
+                  { achievementID = 40447, criteriaID = 68308, criteriaIndex = 2, label = "Fungal Folly" },
                   { achievementID = 40447, criteriaID = 68317, label = "The Underkeep" },
                   { achievementID = 40447, criteriaID = 68318, label = "The Waterworks" },
                   { achievementID = 40447, criteriaID = 102958, label = "Sidestreet Sluice" },
@@ -1966,12 +1966,10 @@ MC.RegisterContent("tww", "achievements", {
             { achievementID = 42801, name = "Journey's End (Season 3)", description = "Complete the Delver's Journey before Season 3 ends.", zone = "Delves" },
             { achievementID = 60933, name = "With Flying Colors", description = "Complete Brann's Delver's Race as the Horde.", zone = "Delves",
               taskList = { intro = "Progress from live achievement criteria.", tasks = {
-                  { achievementID = 60933, criteriaID = 107547 },
                   { achievementID = 60933, criteriaID = 107549 },
               } } },
             { achievementID = 60934, name = "With Flying Colors", description = "Complete Brann's Delver's Race as the Alliance.", zone = "Delves",
               taskList = { intro = "Progress from live achievement criteria.", tasks = {
-                  { achievementID = 60934, criteriaID = 107554 },
                   { achievementID = 60934, criteriaID = 107555 },
               } } },
         },

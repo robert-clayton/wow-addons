@@ -28,6 +28,17 @@ function First-ID($value) {
     return @(([string]$value -split ";") | Where-Object { $_ })[0]
 }
 
+$preferredCurrentItemIDs = @{ "192770" = "204382" }
+function First-PreferredItemID($value) {
+    $ids = @(([string]$value -split ";") | Where-Object { $_ })
+    foreach ($id in $ids) {
+        if ($preferredCurrentItemIDs.ContainsKey([string]$id)) {
+            return $preferredCurrentItemIDs[[string]$id]
+        }
+    }
+    return $ids[0]
+}
+
 function Get-OrderPathSortKey([string]$path) {
     return ((@($path -split "/") | ForEach-Object { "{0:D8}" -f [int]$_ }) -join "/")
 }
@@ -93,7 +104,7 @@ Add-GroupedEntries $mountLines $mounts "mounts" "mounts" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
     $parts.Add("mountID = $($row.mount_id)")
-    $itemID = First-ID $row.item_ids
+    $itemID = First-PreferredItemID $row.item_ids
     if ($itemID) { $parts.Add("itemID = $itemID") }
     $parts.Add("name = $(ConvertTo-LuaString $row.name)")
     $parts.Add("source = $(ConvertTo-LuaString $source)")
@@ -119,7 +130,7 @@ Add-GroupedEntries $petLines $pets "pets" "pets" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
     $parts.Add("speciesID = $($row.species_id)")
-    $itemID = First-ID $row.item_ids
+    $itemID = First-PreferredItemID $row.item_ids
     if ($itemID) { $parts.Add("itemID = $itemID") }
     if ($row.creature_id) { $parts.Add("npcID = $($row.creature_id)") }
     $parts.Add("name = $(ConvertTo-LuaString $row.name)")
@@ -223,9 +234,13 @@ foreach ($categoryID in @("15455", "15462", "15465", "15466", "15467", "15468", 
         if ($tasks.Count -ge 2 -and $tasks.Count -le 30) {
             $achievementLines.Add($prefix + ",")
             $achievementLines.Add('          taskList = { intro = "Progress from live achievement criteria.", tasks = {')
+            $duplicateCriteriaIDs = @($tasks | Group-Object criteria_id | Where-Object Count -gt 1 | ForEach-Object Name)
+            $taskIndex = 0
             foreach ($task in $tasks) {
+                $taskIndex++
+                $criteriaIndex = if ([string]$task.criteria_id -in $duplicateCriteriaIDs) { ", criteriaIndex = $taskIndex" } else { "" }
                 $label = if ($task.description) { ", label = $(ConvertTo-LuaString $task.description)" } else { "" }
-                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$label },")
+                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$criteriaIndex$label },")
             }
             $achievementLines.Add("          } } },")
         } else {

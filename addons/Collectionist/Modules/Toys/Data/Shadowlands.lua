@@ -1,6 +1,6 @@
 local _, MC = ...
 
--- Shadowlands toys. Generated from the exact 115-row release manifest.
+-- Shadowlands toys. Generated from the exact 114-row release manifest.
 MC.RegisterContent("shadowlands", "toys", {
     { source = "renown", toys = {
         { itemID = 182773, name = "Necrolord Hearthstone", source = "renown", sourceInfo = "|cFFFFD200Covenant: |rNecrolord|n|cFFFFD200Vendor: |rSu Zettai|n|cFFFFD200Zone: |rMaldraxxus|n|cFFFFD200Cost: |r750|Hcurrency:1813|h|TInterface\\ICONS\\Spell_AnimaBastion_Orb.BLP:0|t|h" },
@@ -80,7 +80,6 @@ MC.RegisterContent("shadowlands", "toys", {
         { itemID = 184318, name = "Battlecry of Krexus", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rBlackhound Cache|n|cFFFFD200Zone: |rMaldraxxus" },
         { itemID = 183988, name = "Bondable Val'kyr Diadem", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rGift of Chyrus|n|cFFFFD200Zone: |rBastion" },
         { itemID = 184447, name = "Kevin's Party Supplies", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rSlime-Coated Crate|n|cFFFFD200Zone: |rMaldraxxus" },
-        { itemID = 183810, name = "Shadowlands Mini: Grandmaster Vole", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rPrize Bag|n|cFFFFD200Zone: |rMaldraxxus" },
         { itemID = 184489, name = "Fae Harp", source = "treasure", sourceInfo = "|cFFFFD200Treasure:|r Elusive Faerie Cache|n|cFFFFD200Zone:|r Ardenweald" },
         { itemID = 184490, name = "Fae Pipes", source = "treasure", sourceInfo = "|cFFFFD200Treasure:|r Harmonic Chest|n|cFFFFD200Zone:|r Ardenweald" },
         { itemID = 184415, name = "Soothing Vesper", source = "treasure", sourceInfo = "|cFFFFD200Treasure:|r Broken Bell or Skyward Bell|n|cFFFFD200Zone:|r Bastion" },

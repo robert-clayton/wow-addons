@@ -67,7 +67,7 @@ Assert-IDValues @($petInventory | Where-Object release_decision -eq "exclude_tbc
 Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_wod") "toy_id" "Warlords toys" 91
 Assert-ExactSet $decorManifest @($decorInventory | Where-Object status -eq "acquisition_wod_confirmed") "decor_id" "Warlords decorations" 80
 Assert-ExactSet $achievementManifest @($achievementInventory | Where-Object status -eq "wod_category_confirmed") "achievement_id" "Warlords achievements" 402
-Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "Warlords achievement criteria" 3036
+Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "Warlords achievement criteria" 3035
 Assert-ExactSet $recipeManifest @($recipeInventory | Where-Object status -in @("current_named_recipe", "current_house_decor_recipe")) "recipe_spell_id" "Warlords recipes" 337
 Assert-IDValues @($recipeManifest | Where-Object status -eq "current_house_decor_recipe" | ForEach-Object recipe_spell_id) @(
     "1260985","1260987","1260988","1260990","1261008","1261025","1261027","1261032","1261045","1261066","1261071",

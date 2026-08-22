@@ -10,6 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\warlords-of-draenor\sources\housing-wowdb-acquisition-audit.csv"
 $blizzardSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\warlords-of-draenor\sources\blizzard-wod-collectibles.csv"
 
@@ -306,6 +307,7 @@ $achievementCriteriaInventory = foreach ($achievement in $selectedAchievements |
         [pscustomobject]@{ achievement_id=$achievement.ID; title=$achievement.Title_lang; category_id=$achievement.Category; order_path=$leaf.order_path; tree_id=$leaf.tree_id; description=$leaf.description; criteria_id=$leaf.criteria_id; criteria_type=$leaf.criteria_type; asset_id=$leaf.asset_id; amount=$leaf.amount; operator=$leaf.operator }
     }
 }
+$achievementCriteriaInventory = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root)
 
 $achievementByID = New-Index $achievements
 function Get-EncounterRows($Specs, [string]$Kind) {
@@ -346,6 +348,9 @@ $treasureSpecs = @(
 )
 $rareInventory = @(Get-EncounterRows $rareSpecs "rare")
 $treasureInventory = @(Get-EncounterRows $treasureSpecs "treasure")
+$currentEncounterCriteria = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root -AllAchievements)
+$rareInventory = @(Sync-CollectionistEncounterRows $rareInventory $currentEncounterCriteria)
+$treasureInventory = @(Sync-CollectionistEncounterRows $treasureInventory $currentEncounterCriteria)
 
 $tradeCategoryChildren = @{}
 foreach ($category in $tradeSkillCategories) {
@@ -471,7 +476,7 @@ Assert-Equal $toyInventory.Count 101 "Warlords toy candidate count"
 Assert-Equal $toyManifest.Count 91 "Selected Warlords toy count"
 Assert-Equal $achievementInventory.Count 415 "Warlords achievement audit count"
 Assert-Equal $achievementManifest.Count 402 "Visible Warlords achievement count"
-Assert-Equal $achievementCriteriaInventory.Count 3036 "Warlords achievement criteria count"
+Assert-Equal $achievementCriteriaInventory.Count 3035 "Warlords achievement criteria count"
 Assert-Equal $historicalRecipeInventory.Count 353 "Historical Warlords recipe count"
 Assert-Equal $houseDecorRecipeInventory.Count 21 "Current Draenor house decor recipe count"
 Assert-Equal $recipeInventory.Count 374 "Warlords recipe audit count"

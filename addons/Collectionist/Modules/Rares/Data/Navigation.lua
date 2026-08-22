@@ -11,6 +11,85 @@ local _, MC = ...
 -- Sourced from installed HandyNotes table providers. Rows without a
 -- resolvable name, zone or coordinate are deliberately absent.
 
+local SOURCE_KEYS = {
+    { "arathi_highlands", "Arathi Highlands" },
+    { "azj_kahet", "Azj-Kahet" },
+    { "azsuna", "Azsuna" },
+    { "azure_span", "The Azure Span" },
+    { "bastion", "Bastion" },
+    { "broken_shore", "Broken Shore" },
+    { "darkshore", "Darkshore" },
+    { "dread_wastes", "Dread Wastes" },
+    { "drustvar", "Drustvar" },
+    { "emerald_dream", "Emerald Dream" },
+    { "eredath", "Eredath" },
+    { "eversong_woods", "Eversong Woods" },
+    { "forbidden_reach", "The Forbidden Reach" },
+    { "frostfire_ridge", "Frostfire Ridge" },
+    { "gorgrond", "Gorgrond" },
+    { "hallowfall", "Hallowfall" },
+    { "highmountain", "Highmountain" },
+    { "isle_of_dorn", "Isle of Dorn" },
+    { "isle_of_giants", "Isle of Giants" },
+    { "isle_of_queldanas", "Isle of Quel'Danas" },
+    { "isle_of_thunder", "Isle of Thunder" },
+    { "jade_forest", "The Jade Forest" },
+    { "karesh", "K'aresh" },
+    { "korthia", "Korthia" },
+    { "krasarang_wilds", "Krasarang Wilds" },
+    { "kun_lai_summit", "Kun-Lai Summit" },
+    { "maldraxxus", "Maldraxxus" },
+    { "maw", "The Maw" },
+    { "mechagon", "Mechagon Island" },
+    { "nagrand_draenor", "Nagrand" },
+    { "nazjatar", "Nazjatar" },
+    { "nazmir", "Nazmir" },
+    { "ohnahran_plains", "Ohn'ahran Plains" },
+    { "revendreth", "Revendreth" },
+    { "ringing_deeps", "The Ringing Deeps" },
+    { "shadowmoon_valley_draenor", "Shadowmoon Valley" },
+    { "siren_isle", "Siren Isle" },
+    { "spires_of_arak", "Spires of Arak" },
+    { "stormheim", "Stormheim" },
+    { "stormsong_valley", "Stormsong Valley" },
+    { "suramar", "Suramar" },
+    { "talador", "Talador" },
+    { "tanaan_jungle", "Tanaan Jungle" },
+    { "thaldraszus", "Thaldraszus" },
+    { "timeless_isle", "Timeless Isle" },
+    { "tiragarde_sound", "Tiragarde Sound" },
+    { "townlong_steppes", "Townlong Steppes" },
+    { "uldum", "Uldum" },
+    { "undermine", "Undermine" },
+    { "vale_of_eternal_blossoms", "Vale of Eternal Blossoms" },
+    { "valley_of_the_four_winds", "Valley of the Four Winds" },
+    { "valsharah", "Val'sharah" },
+    { "veiled_stair", "The Veiled Stair" },
+    { "voidstorm", "Voidstorm" },
+    { "voldun", "Vol'dun" },
+    { "waking_shores", "The Waking Shores" },
+    { "zaralek_cavern", "Zaralek Cavern" },
+    { "zereth_mortis", "Zereth Mortis" },
+    { "zuldazar", "Zuldazar" },
+}
+local function mergeSourceKeys()
+    MC.RareSourceOrder = MC.RareSourceOrder or {}
+    MC.RareSourceLabels = MC.RareSourceLabels or {}
+    for _, pair in ipairs(SOURCE_KEYS) do
+        if not MC.RareSourceLabels[pair[1]] then
+            MC.RareSourceOrder[#MC.RareSourceOrder + 1] = pair[1]
+        end
+        MC.RareSourceLabels[pair[1]] = MC.RareSourceLabels[pair[1]] or pair[2]
+    end
+end
+if MC.RareSourceOrder then mergeSourceKeys() else
+    local f = CreateFrame("Frame"); f:RegisterEvent("ADDON_LOADED")
+    f:SetScript("OnEvent", function(self, _, name)
+        if name ~= "Collectionist" then return end
+        self:UnregisterEvent("ADDON_LOADED"); self:SetScript("OnEvent", nil); mergeSourceKeys()
+    end)
+end
+
 MC.RegisterContent("bfa", "rares", {
     { navigationOnly = true, source = "arathi_highlands", zone = "Arathi Highlands", rares = {
         { npcID = 137374, name = "The Lion's Roar", waypoint = { 14, 0.3909, 0.392, "The Lion's Roar" } },
@@ -83,7 +162,7 @@ MC.RegisterContent("bfa", "rares", {
     { navigationOnly = true, source = "drustvar", zone = "Drustvar", rares = {
         { npcID = 138866, name = "Fungi Trio (quest 51887 also?)", waypoint = { 896, 0.2424, 0.2193, "Fungi Trio (quest 51887 also?)" } },
     } },
-    { navigationOnly = true, source = "mechagon", zone = "Mechagon", rares = {
+    { navigationOnly = true, source = "mechagon", zone = "Mechagon Island", rares = {
         { npcID = 150394, name = "Armored Vaultbot", waypoint = { 1462, 0.606, 0.446, "Armored Vaultbot" } },
         { npcID = 151623, name = "The Scrap King", waypoint = { 1462, 0.712, 0.484, "The Scrap King" } },
         { npcID = 152570, name = "Crazed Trogg", waypoint = { 1462, 0.822, 0.21, "Crazed Trogg" } },
@@ -164,7 +243,7 @@ MC.RegisterContent("bfa", "rares", {
         { npcID = 162370, name = "Armagedillo", waypoint = { 249, 0.438, 0.414, "Armagedillo" } },
         { npcID = 162372, name = "Spirit of Cyrus the Black", waypoint = { { 249, 0.58, 0.616, "Spirit of Cyrus the Black" }, { 249, 0.58, 0.824, "Spirit of Cyrus the Black" }, { 249, 0.664, 0.68, "Spirit of Cyrus the Black" }, { 249, 0.708, 0.746, "Spirit of Cyrus the Black" } } },
     } },
-    { navigationOnly = true, source = "vale_of_eternal_blossoms", zone = "Vale Of Eternal Blossoms", rares = {
+    { navigationOnly = true, source = "vale_of_eternal_blossoms", zone = "Vale of Eternal Blossoms", rares = {
         { npcID = 154087, name = "Zror'um the Infinite", waypoint = { 390, 0.694, 0.414, "Zror'um the Infinite" } },
         { npcID = 154106, name = "Quid", waypoint = { 390, 0.89, 0.476, "Quid" } },
         { npcID = 154332, name = "Voidtender Malketh", waypoint = { { 390, 0.37, 0.478, "Voidtender Malketh" }, { 390, 0.676, 0.29, "Voidtender Malketh" } } },
@@ -208,7 +287,7 @@ MC.RegisterContent("bfa", "rares", {
         { npcID = 160968, name = "Jade Colossus", waypoint = { 390, 0.176, 0.112, "Jade Colossus" } },
         { npcID = 163042, name = "Ivory Cloud Serpent", waypoint = { 390, 0.268, 0.551, "Ivory Cloud Serpent" } },
     } },
-    { navigationOnly = true, source = "voldun", zone = "Voldun", rares = {
+    { navigationOnly = true, source = "voldun", zone = "Vol'dun", rares = {
         { npcID = 162681, name = "Scavenger of the Sands", waypoint = { 864, 0.55, 0.73, "Scavenger of the Sands" } },
     } },
     { navigationOnly = true, source = "zuldazar", zone = "Zuldazar", rares = {
@@ -225,7 +304,7 @@ MC.RegisterContent("bfa", "rares", {
 })
 
 MC.RegisterContent("df", "rares", {
-    { navigationOnly = true, source = "azure_span", zone = "Azure Span", rares = {
+    { navigationOnly = true, source = "azure_span", zone = "The Azure Span", rares = {
         { npcID = 186962, name = "Cascade", waypoint = { 2024, 0.2344, 0.3327, "Cascade" } },
         { npcID = 190892, name = "Temperamental Skyclaw", waypoint = { 2024, 0.188, 0.254, "Temperamental Skyclaw" } },
         { npcID = 192749, name = "Sharpfang", waypoint = { 2024, 0.3679, 0.3249, "Sharpfang" } },
@@ -244,11 +323,11 @@ MC.RegisterContent("df", "rares", {
         { npcID = 212090, name = "Elusive Blooming Brierhide", waypoint = { 2200, 0.408, 0.428, "Elusive Blooming Brierhide" } },
         { npcID = 212133, name = "Elusive Verdant Gladewarden", waypoint = { 2200, 0.578, 0.378, "Elusive Verdant Gladewarden" } },
     } },
-    { navigationOnly = true, source = "forbidden_reach", zone = "Forbidden Reach", rares = {
+    { navigationOnly = true, source = "forbidden_reach", zone = "The Forbidden Reach", rares = {
         { npcID = 202436, name = "Elusive Frenzied Amberfur", waypoint = { 2151, 0.426, 0.52, "Elusive Frenzied Amberfur" } },
         { npcID = 203280, name = "To'no and Little Ko (203286)", waypoint = { 2151, 0.74, 0.374, "To'no and Little Ko (203286)" } },
     } },
-    { navigationOnly = true, source = "ohnahran_plains", zone = "Ohnahran Plains", rares = {
+    { navigationOnly = true, source = "ohnahran_plains", zone = "Ohn'ahran Plains", rares = {
         { npcID = 186189, name = "Gentara", waypoint = { 2023, 0.839, 0.2592, "Gentara" } },
         { npcID = 187667, name = "Ellam", waypoint = { 2023, 0.7668, 0.3055, "Ellam" } },
         { npcID = 187840, name = "Elaichi", waypoint = { 2023, 0.8513, 0.224, "Elaichi" } },
@@ -311,7 +390,7 @@ MC.RegisterContent("df", "rares", {
         { npcID = 201552, name = "Overseer Stonetongue", waypoint = { 2025, 0.5956, 0.6227, "Overseer Stonetongue" } },
         { npcID = 201562, name = "Shardwing", waypoint = { 2025, 0.486, 0.174, "Shardwing" } },
     } },
-    { navigationOnly = true, source = "waking_shores", zone = "Waking Shores", rares = {
+    { navigationOnly = true, source = "waking_shores", zone = "The Waking Shores", rares = {
         { npcID = 184853, name = "Primal Scythid Queen", waypoint = { 2022, 0.8121, 0.3783, "Primal Scythid Queen" } },
         { npcID = 187111, name = "Ancient Hornswog", waypoint = { 2022, 0.776, 0.222, "Ancient Hornswog" } },
         { npcID = 187209, name = "Klozicc the Ascended", waypoint = { 2022, 0.548, 0.822, "Klozicc the Ascended" } },
@@ -402,7 +481,7 @@ MC.RegisterContent("legion", "rares", {
         { npcID = 106532, name = "Inquisitor Volitix", waypoint = { 680, 0.3798, 0.7039, "Inquisitor Volitix" } },
         { npcID = 113368, name = "Llorian", waypoint = { 680, 0.2945, 0.5333, "Llorian" } },
     } },
-    { navigationOnly = true, source = "valsharah", zone = "Valsharah", rares = {
+    { navigationOnly = true, source = "valsharah", zone = "Val'sharah", rares = {
         { npcID = 93654, name = "Skul'vrax", waypoint = { 641, 0.6042, 0.9072, "Skul'vrax" } },
         { npcID = 93686, name = "Jinikki the Puncturer", waypoint = { 641, 0.5274, 0.875, "Jinikki the Puncturer" } },
     } },
@@ -416,7 +495,7 @@ MC.RegisterContent("midnight", "rares", {
         { npcID = 245611, name = "Sunstrider Isle Runestone, Claw of the Void", waypoint = { 94, 0.4048, 0.1361, "Sunstrider Isle Runestone, Claw of the Void" } },
         { npcID = 246145, name = "Sanctum of the Moon Runestone, Commander Gravok", waypoint = { 94, 0.4113, 0.7383, "Sanctum of the Moon Runestone, Commander Gravok" } },
     } },
-    { navigationOnly = true, source = "isle_of_queldanas", zone = "Isle Of Queldanas", rares = {
+    { navigationOnly = true, source = "isle_of_queldanas", zone = "Isle of Quel'Danas", rares = {
         { npcID = 239864, name = "Dripping Shadow", waypoint = { 2424, 0.3709, 0.383, "Dripping Shadow" } },
         { npcID = 252465, name = "Tarhu the Ransacker", waypoint = { 2424, 0.5571, 0.2913, "Tarhu the Ransacker" } },
     } },
@@ -437,11 +516,11 @@ MC.RegisterContent("mop", "rares", {
         { npcID = 69768, name = "Zandalari Warscout +4", waypoint = { { 422, 0.2, 0.406, "Zandalari Warscout +4" }, { 422, 0.37, 0.482, "Zandalari Warscout +4" }, { 422, 0.488, 0.846, "Zandalari Warscout +4" }, { 422, 0.508, 0.368, "Zandalari Warscout +4" }, { 422, 0.646, 0.64, "Zandalari Warscout +4" } } },
         { npcID = 69841, name = "Zandalari Warbringer", waypoint = { { 422, 0.364, 0.854, "Zandalari Warbringer" }, { 422, 0.3986, 0.6578, "Zandalari Warbringer" }, { 422, 0.472, 0.614, "Zandalari Warbringer" }, { 422, 0.524, 0.188, "Zandalari Warbringer" }, { 422, 0.75, 0.674, "Zandalari Warbringer" } } },
     } },
-    { navigationOnly = true, source = "isle_of_giants", zone = "Isle Of Giants", rares = {
+    { navigationOnly = true, source = "isle_of_giants", zone = "Isle of Giants", rares = {
         { npcID = 69161, name = "Oondasta", waypoint = { 507, 0.5, 0.57, "Oondasta" } },
         { npcID = 70096, name = "War-God Dokah", waypoint = { 507, 0.776, 0.822, "War-God Dokah" } },
     } },
-    { navigationOnly = true, source = "isle_of_thunder", zone = "Isle Of Thunder", rares = {
+    { navigationOnly = true, source = "isle_of_thunder", zone = "Isle of Thunder", rares = {
         { npcID = 69099, name = "Nalak", waypoint = { 504, 0.605, 0.373, "Nalak" } },
         { npcID = 69218, name = "Kroshik Adult (around this area)", waypoint = { 504, 0.52, 0.824, "Kroshik Adult (around this area)" } },
         { npcID = 69339, name = "Electromancer Ju'le", waypoint = { 504, 0.445, 0.61, "Electromancer Ju'le" } },
@@ -461,7 +540,7 @@ MC.RegisterContent("mop", "rares", {
         { npcID = 70226, name = "Sacrificed Kroshik", waypoint = { 504, 0.55, 0.878, "Sacrificed Kroshik" } },
         { npcID = 70530, name = "Ra'sha", waypoint = { 504, 0.3943, 0.8159, "Ra'sha" } },
     } },
-    { navigationOnly = true, source = "jade_forest", zone = "Jade Forest", rares = {
+    { navigationOnly = true, source = "jade_forest", zone = "The Jade Forest", rares = {
         { npcID = 64272, name = "Jade Infused Blade", waypoint = { 371, 0.3926, 0.4665, "Jade Infused Blade" } },
         { npcID = 70323, name = "Krakkanon +2", waypoint = { { 371, 0.324, 0.342, "Krakkanon +2" }, { 371, 0.352, 0.512, "Krakkanon +2" }, { 371, 0.51, 0.208, "Krakkanon +2" }, { 371, 0.73, 0.854, "Krakkanon +2" } } },
         { npcID = 253602, name = "Frederick the Fabulous", waypoint = { 371, 0.576, 0.156, "Frederick the Fabulous" } },
@@ -475,7 +554,7 @@ MC.RegisterContent("mop", "rares", {
         { npcID = 66937, name = "Akkalar", waypoint = { 418, 0.598, 0.958, "Akkalar" } },
         { npcID = 66938, name = "Odd'nirok", waypoint = { 418, 0.426, 0.926, "Odd'nirok" } },
     } },
-    { navigationOnly = true, source = "kun_lai_summit", zone = "Kun Lai Summit", rares = {
+    { navigationOnly = true, source = "kun_lai_summit", zone = "Kun-Lai Summit", rares = {
         { npcID = 60491, name = "Sha of Anger", waypoint = { 379, 0.536, 0.646, "Sha of Anger" } },
         { npcID = 64227, name = "Kafa Press (Frozen Trail Packer)", waypoint = { 379, 0.352, 0.764, "Kafa Press (Frozen Trail Packer)" } },
     } },
@@ -486,7 +565,7 @@ MC.RegisterContent("mop", "rares", {
     { navigationOnly = true, source = "townlong_steppes", zone = "Townlong Steppes", rares = {
         { npcID = 66900, name = "Huggalon the Heart Watcher", waypoint = { 388, 0.372, 0.576, "Huggalon the Heart Watcher" } },
     } },
-    { navigationOnly = true, source = "vale_of_eternal_blossoms", zone = "Vale Of Eternal Blossoms", rares = {
+    { navigationOnly = true, source = "vale_of_eternal_blossoms", zone = "Vale of Eternal Blossoms", rares = {
         { npcID = 58474, name = "Bloodtip", waypoint = { 390, 0.758, 0.4758, "Bloodtip" } },
         { npcID = 58768, name = "Cracklefang", waypoint = { 390, 0.4645, 0.5934, "Cracklefang" } },
         { npcID = 58769, name = "Vicejaw", waypoint = { 390, 0.3738, 0.509, "Vicejaw" } },
@@ -503,18 +582,72 @@ MC.RegisterContent("mop", "rares", {
         { npcID = 63695, name = "Baolai the Immolator", waypoint = { 390, 0.284, 0.43, "Baolai the Immolator" } },
         { npcID = 64403, name = "Alani +38", waypoint = { 390, 0.166, 0.34, "Alani +38" } },
     } },
-    { navigationOnly = true, source = "valley_of_the_four_winds", zone = "Valley Of The Four Winds", rares = {
+    { navigationOnly = true, source = "valley_of_the_four_winds", zone = "Valley of the Four Winds", rares = {
         { npcID = 62346, name = "Galleon (actually 71606440 but)", waypoint = { 376, 0.697, 0.619, "Galleon (actually 71606440 but)" } },
         { npcID = 64004, name = "Ancient Pandaren Fishing Charm", waypoint = { 376, 0.468, 0.246, "Ancient Pandaren Fishing Charm" } },
         { npcID = 64191, name = "Ancient Pandaren Craftsman", waypoint = { 376, 0.454, 0.382, "Ancient Pandaren Craftsman" } },
     } },
-    { navigationOnly = true, source = "veiled_stair", zone = "Veiled Stair", rares = {
+    { navigationOnly = true, source = "veiled_stair", zone = "The Veiled Stair", rares = {
         { npcID = 70126, name = "Willy Wilder +3", waypoint = { 433, 0.624, 0.746, "Willy Wilder +3" } },
     } },
 })
 
+MC.RegisterContent("shadowlands", "rares", {
+    { navigationOnly = true, source = "bastion", zone = "Bastion", rares = {
+        { npcID = 156339, name = "Orstus and Sotiros", waypoint = { 1533, 0.2245, 0.2285, "Orstus and Sotiros" } },
+    } },
+    { navigationOnly = true, source = "korthia", zone = "Korthia", rares = {
+        { npcID = 179768, name = "Consumption", waypoint = { 1961, 0.5115, 0.4177, "Consumption" } },
+        { npcID = 179871, name = "Razorwing Nest", waypoint = { 1961, 0.2572, 0.5108, "Razorwing Nest" } },
+        { npcID = 180063, name = "Darkmaul", waypoint = { 1961, 0.4285, 0.327, "Darkmaul" } },
+    } },
+    { navigationOnly = true, source = "maldraxxus", zone = "Maldraxxus", rares = {
+        { npcID = 162741, name = "Gieger", waypoint = { 1536, 0.316, 0.354, "Gieger" } },
+        { npcID = 162853, name = "Azmogal", waypoint = { 1536, 0.5035, 0.473, "Azmogal" } },
+    } },
+    { navigationOnly = true, source = "maw", zone = "The Maw", rares = {
+        { npcID = 174827, name = "Gorged Shadehound", waypoint = { 1543, 0.535, 0.795, "Gorged Shadehound" } },
+    } },
+    { navigationOnly = true, source = "revendreth", zone = "Revendreth", rares = {
+        { npcID = 156916, name = "Inquisitor Sorin", waypoint = { 1525, 0.6975, 0.472, "Inquisitor Sorin" } },
+        { npcID = 156918, name = "Inquisitor Otilia", waypoint = { 1525, 0.647, 0.464, "Inquisitor Otilia" } },
+        { npcID = 156919, name = "Inquisitor Petre", waypoint = { 1525, 0.6725, 0.434, "Inquisitor Petre" } },
+        { npcID = 159151, name = "Inquisitor Traian", waypoint = { 1525, 0.762, 0.521, "Inquisitor Traian" } },
+        { npcID = 159152, name = "High Inquisitor Gabi", waypoint = { 1525, 0.753, 0.4415, "High Inquisitor Gabi" } },
+        { npcID = 159153, name = "High Inquisitor Radu", waypoint = { 1525, 0.7125, 0.4235, "High Inquisitor Radu" } },
+        { npcID = 159154, name = "High Inquisitor Magda", waypoint = { 1525, 0.6975, 0.5225, "High Inquisitor Magda" } },
+        { npcID = 159155, name = "High Inquisitor Dacian", waypoint = { 1525, 0.721, 0.5315, "High Inquisitor Dacian" } },
+        { npcID = 159156, name = "Grand Inquisitor Nicu", waypoint = { 1525, 0.645, 0.5275, "Grand Inquisitor Nicu" } },
+        { npcID = 159157, name = "Grand Inquisitor Aurica", waypoint = { 1525, 0.6965, 0.454, "Grand Inquisitor Aurica" } },
+        { npcID = 159496, name = "Forgemaster Madalav", waypoint = { 1525, 0.3265, 0.1545, "Forgemaster Madalav" } },
+        { npcID = 165290, name = "Harika the Horrid", waypoint = { 1525, 0.4585, 0.792, "Harika the Horrid" } },
+    } },
+    { navigationOnly = true, source = "zereth_mortis", zone = "Zereth Mortis", rares = {
+        { npcID = 178835, name = "Sharpeye Collector", waypoint = { 1970, 0.5355, 0.752, "Sharpeye Collector" } },
+        { npcID = 179007, name = "Overgrown Geomental", waypoint = { 1970, 0.628, 0.683, "Overgrown Geomental" } },
+        { npcID = 181208, name = "Enchained Servitor", waypoint = { 1970, 0.622, 0.25, "Enchained Servitor" } },
+        { npcID = 181221, name = "Bygone Geomental", waypoint = { 1970, 0.6125, 0.744, "Bygone Geomental" } },
+        { npcID = 181222, name = "Over-charged Vespoid", waypoint = { 1970, 0.632, 0.58, "Over-charged Vespoid" } },
+        { npcID = 181223, name = "Gaiagantic", waypoint = { 1970, 0.6075, 0.6475, "Gaiagantic" } },
+        { npcID = 181287, name = "Gorged Runefeaster", waypoint = { 1970, 0.3615, 0.385, "Gorged Runefeaster" } },
+        { npcID = 181290, name = "Corrupted Runehoarder", waypoint = { 1970, 0.503, 0.639, "Corrupted Runehoarder" } },
+        { npcID = 181292, name = "Misaligned Enforcer", waypoint = { 1970, 0.5615, 0.4805, "Misaligned Enforcer" } },
+        { npcID = 181293, name = "Suspicious Nesmin", waypoint = { 1970, 0.3505, 0.6375, "Suspicious Nesmin" } },
+        { npcID = 181294, name = "Runegorged Bufonid", waypoint = { 1970, 0.5025, 0.6015, "Runegorged Bufonid" } },
+        { npcID = 181295, name = "Runethief Xy'lora", waypoint = { 1970, 0.6185, 0.518, "Runethief Xy'lora" } },
+        { npcID = 181344, name = "Runefur", waypoint = { 1970, 0.398, 0.5205, "Runefur" } },
+        { npcID = 181349, name = "Cipherclad", waypoint = { 1970, 0.3885, 0.586, "Cipherclad" } },
+        { npcID = 181352, name = "Bitterbeak", waypoint = { 1970, 0.4145, 0.6245, "Bitterbeak" } },
+        { npcID = 182466, name = "Antros", waypoint = { 1970, 0.488, 0.056, "Antros" } },
+        { npcID = 182798, name = "Twisted Warpcrafter", waypoint = { 1970, 0.452, 0.219, "Twisted Warpcrafter" } },
+        { npcID = 184819, name = "Dominated Irregular", waypoint = { 1970, 0.4865, 0.137, "Dominated Irregular" } },
+        { npcID = 185261, name = "it just vanishes)", waypoint = { 1970, 0.4293, 0.4006, "it just vanishes)" } },
+        { npcID = 185798, name = "65724 is the daily", waypoint = { 1970, 0.345, 0.655, "65724 is the daily" } },
+    } },
+})
+
 MC.RegisterContent("tww", "rares", {
-    { navigationOnly = true, source = "azj_kahet", zone = "Azj Kahet", rares = {
+    { navigationOnly = true, source = "azj_kahet", zone = "Azj-Kahet", rares = {
         { npcID = 216046, name = "Tka'ktath", waypoint = { 2255, 0.6279, 0.6618, "Tka'ktath" } },
         { npcID = 216047, name = "The One Left", waypoint = { 2255, 0.634, 0.95, "The One Left" } },
         { npcID = 221032, name = "Rhak'ik", waypoint = { 2255, 0.4376, 0.3953, "Rhak'ik" } },
@@ -525,11 +658,11 @@ MC.RegisterContent("tww", "rares", {
         { npcID = 220720, name = "Magpie", waypoint = { 2215, 0.6042, 0.6022, "Magpie" } },
         { npcID = 241232, name = "Dissenter Troosilver", waypoint = { 2215, 0.7205, 0.4154, "Dissenter Troosilver" } },
     } },
-    { navigationOnly = true, source = "isle_of_dorn", zone = "Isle Of Dorn", rares = {
+    { navigationOnly = true, source = "isle_of_dorn", zone = "Isle of Dorn", rares = {
         { npcID = 220068, name = "Malfunctioning Spire", waypoint = { 2248, 0.3149, 0.5529, "Malfunctioning Spire" } },
         { npcID = 224515, name = "Elusive Ironhide Maelstrom Wolf", waypoint = { 2248, 0.692, 0.496, "Elusive Ironhide Maelstrom Wolf" } },
     } },
-    { navigationOnly = true, source = "karesh", zone = "Karesh", rares = {
+    { navigationOnly = true, source = "karesh", zone = "K'aresh", rares = {
         { npcID = 231229, name = "Korgoth the Hungerer", waypoint = { 2371, 0.7179, 0.2823, "Korgoth the Hungerer" } },
         { npcID = 234970, name = "Miasmawrath", waypoint = { 2371, 0.5055, 0.5406, "Miasmawrath" } },
         { npcID = 235087, name = "The Harvester", waypoint = { 2371, 0.4938, 0.6418, "The Harvester" } },
@@ -543,7 +676,7 @@ MC.RegisterContent("tww", "rares", {
         { npcID = 248062, name = "Empurror", waypoint = { 2371, 0.7317, 0.2374, "Empurror" } },
         { npcID = 248067, name = "K'aresh'ire", waypoint = { 2371, 0.7025, 0.5423, "K'aresh'ire" } },
     } },
-    { navigationOnly = true, source = "ringing_deeps", zone = "Ringing Deeps", rares = {
+    { navigationOnly = true, source = "ringing_deeps", zone = "The Ringing Deeps", rares = {
         { npcID = 214726, name = "Lava Slug", waypoint = { 2214, 0.4464, 0.156, "Lava Slug" } },
         { npcID = 216058, name = "Rock Snail", waypoint = { { 2214, 0.4764, 0.112, "Rock Snail" }, { 2214, 0.5904, 0.512, "Rock Snail" } } },
         { npcID = 217316, name = "Moss Sludglet", waypoint = { 2214, 0.5184, 0.694, "Moss Sludglet" } },
@@ -662,7 +795,7 @@ MC.RegisterContent("wod", "rares", {
         { npcID = 88586, name = "Mogamago", waypoint = { 543, 0.618, 0.393, "Mogamago" } },
         { npcID = 88672, name = "Hunter Bal'ra", waypoint = { 543, 0.55, 0.466, "Hunter Bal'ra" } },
     } },
-    { navigationOnly = true, source = "nagrand_draenor", zone = "Nagrand Draenor", rares = {
+    { navigationOnly = true, source = "nagrand_draenor", zone = "Nagrand", rares = {
         { npcID = 78161, name = "Hyperious", waypoint = { 550, 0.87, 0.55, "Hyperious" } },
         { npcID = 79024, name = "Warmaster Blugthol", waypoint = { 550, 0.826, 0.762, "Warmaster Blugthol" } },
         { npcID = 79725, name = "Captain Ironbeard", waypoint = { 550, 0.346, 0.77, "Captain Ironbeard" } },
@@ -715,7 +848,7 @@ MC.RegisterContent("wod", "rares", {
         { npcID = 98199, name = "Pugg", waypoint = { 550, 0.2818, 0.2969, "Pugg" } },
         { npcID = 98200, name = "Guk", waypoint = { 550, 0.2378, 0.3851, "Guk" } },
     } },
-    { navigationOnly = true, source = "shadowmoon_valley_draenor", zone = "Shadowmoon Valley Draenor", rares = {
+    { navigationOnly = true, source = "shadowmoon_valley_draenor", zone = "Shadowmoon Valley", rares = {
         { npcID = 72362, name = "Ku'targ the Voidseer", waypoint = { 539, 0.322, 0.35, "Ku'targ the Voidseer" } },
         { npcID = 72537, name = "Leaf-Reader Kurri", waypoint = { 539, 0.376, 0.146, "Leaf-Reader Kurri" } },
         { npcID = 72606, name = "Rockhoof", waypoint = { 539, 0.53, 0.506, "Rockhoof" } },
@@ -756,7 +889,7 @@ MC.RegisterContent("wod", "rares", {
         { npcID = 86213, name = "Aqualir", waypoint = { 539, 0.508, 0.788, "Aqualir" } },
         { npcID = 86689, name = "Sneevel", waypoint = { 539, 0.276, 0.436, "Sneevel" } },
     } },
-    { navigationOnly = true, source = "spires_of_arak", zone = "Spires Of Arak", rares = {
+    { navigationOnly = true, source = "spires_of_arak", zone = "Spires of Arak", rares = {
         { npcID = 79938, name = "Shadowbark", waypoint = { 542, 0.52, 0.354, "Shadowbark" } },
         { npcID = 80372, name = "Echidna", waypoint = { 542, 0.69, 0.54, "Echidna" } },
         { npcID = 80614, name = "Blade-Dancer Aeryx", waypoint = { 542, 0.468, 0.23, "Blade-Dancer Aeryx" } },

@@ -154,7 +154,27 @@ function Get-CleanName([string]$raw) {
 # Zone key for the source bucket: lowercase, matching the existing rare data
 # ("azsuna", "highmountain").
 function Get-ZoneKey([string]$zone) { return ($zone -creplace '(?<!^)([A-Z])', '_$1').ToLowerInvariant() }
-function Get-ZoneLabel([string]$zone) { return ($zone -creplace '(?<!^)([A-Z])', ' $1') }
+
+# Display name. Splitting the provider's CamelCase filename gives "Vale Of
+# Eternal Blossoms" -- visibly not a WoW zone name -- so prefer the client's own
+# UiMap name for the mapID we already resolved, and only fall back to the split
+# when the export predates that map. Newest export wins for the same reason the
+# trading-post generator picks the largest BattlePetSpecies.
+$script:UIMAP = @{}
+$uiMapCsv = Get-ChildItem -Path (Join-Path $env:TEMP "collectionist-*-db2") -Filter UiMap.csv -Recurse -ErrorAction SilentlyContinue |
+    Sort-Object { (Get-Content -LiteralPath $_.FullName | Measure-Object -Line).Lines } -Descending |
+    Select-Object -First 1
+if ($uiMapCsv) {
+    foreach ($row in (Import-Csv -LiteralPath $uiMapCsv.FullName)) {
+        if ($row.ID -and $row.Name_lang) { $script:UIMAP[$row.ID] = $row.Name_lang }
+    }
+    Write-Host ("UiMap names: {0} (from {1})" -f $script:UIMAP.Count, (Split-Path -Leaf (Split-Path -Parent $uiMapCsv.FullName)))
+}
+
+function Get-ZoneLabel([string]$zone, $mapID) {
+    if ($mapID -and $script:UIMAP.ContainsKey([string]$mapID)) { return $script:UIMAP[[string]$mapID] }
+    return ($zone -creplace '(?<!^)([A-Z])', ' $1')
+}
 
 function Build-Groups($rows, [string]$listKey, [scriptblock]$entryBuilder, [ref]$stats) {
     $groups = [ordered]@{}
@@ -171,7 +191,7 @@ function Build-Groups($rows, [string]$listKey, [scriptblock]$entryBuilder, [ref]
 
         $key = "$expKey|$($map.zone)"
         if (-not $groups.Contains($key)) {
-            $groups[$key] = @{ expansion = $expKey; zone = $map.zone; entries = [System.Collections.Generic.List[string]]::new() }
+            $groups[$key] = @{ expansion = $expKey; zone = $map.zone; mapID = $map.id; entries = [System.Collections.Generic.List[string]]::new() }
         }
         $groups[$key].entries.Add($entry)
         $stats.Value.emitted++
@@ -204,11 +224,44 @@ function Write-NavFile($groups, [string]$module, [string]$listKey, [string]$noun
     [void]$sb.AppendLine('-- Sourced from installed HandyNotes table providers. Rows without a')
     [void]$sb.AppendLine('-- resolvable name, zone or coordinate are deliberately absent.')
     [void]$sb.AppendLine()
+    # Register every zone key with the module's source order and labels, or the
+    # tab renders the raw key ("vale_of_eternal_blossoms") as a section header
+    # and draws those sections in a non-deterministic order, because an
+    # unregistered key falls out of a pairs() walk. Same shape and the same
+    # ADDON_LOADED guard the per-expansion files already use, e.g.
+    # Modules/Rares/Data/BattleForAzeroth.lua:47.
+    $orderVar  = if ($module -eq 'rares') { 'RareSourceOrder' }  else { 'TreasureSourceOrder' }
+    $labelsVar = if ($module -eq 'rares') { 'RareSourceLabels' } else { 'TreasureSourceLabels' }
+    [void]$sb.AppendLine('local SOURCE_KEYS = {')
+    foreach ($g in ($groups.Values | Sort-Object zone -Unique)) {
+        [void]$sb.AppendLine(('    {{ {0}, {1} }},' -f
+            (ConvertTo-LuaString (Get-ZoneKey $g.zone)), (ConvertTo-LuaString (Get-ZoneLabel $g.zone $g.mapID))))
+    }
+    [void]$sb.AppendLine('}')
+    [void]$sb.AppendLine('local function mergeSourceKeys()')
+    [void]$sb.AppendLine(('    MC.{0} = MC.{0} or {{}}' -f $orderVar))
+    [void]$sb.AppendLine(('    MC.{0} = MC.{0} or {{}}' -f $labelsVar))
+    [void]$sb.AppendLine('    for _, pair in ipairs(SOURCE_KEYS) do')
+    [void]$sb.AppendLine(('        if not MC.{0}[pair[1]] then' -f $labelsVar))
+    [void]$sb.AppendLine(('            MC.{0}[#MC.{0} + 1] = pair[1]' -f $orderVar))
+    [void]$sb.AppendLine('        end')
+    [void]$sb.AppendLine(('        MC.{0}[pair[1]] = MC.{0}[pair[1]] or pair[2]' -f $labelsVar))
+    [void]$sb.AppendLine('    end')
+    [void]$sb.AppendLine('end')
+    [void]$sb.AppendLine(('if MC.{0} then mergeSourceKeys() else' -f $orderVar))
+    [void]$sb.AppendLine('    local f = CreateFrame("Frame"); f:RegisterEvent("ADDON_LOADED")')
+    [void]$sb.AppendLine('    f:SetScript("OnEvent", function(self, _, name)')
+    [void]$sb.AppendLine('        if name ~= "Collectionist" then return end')
+    [void]$sb.AppendLine('        self:UnregisterEvent("ADDON_LOADED"); self:SetScript("OnEvent", nil); mergeSourceKeys()')
+    [void]$sb.AppendLine('    end)')
+    [void]$sb.AppendLine('end')
+    [void]$sb.AppendLine()
+
     foreach ($expGroup in ($groups.Values | Group-Object expansion | Sort-Object Name)) {
         [void]$sb.AppendLine(('MC.RegisterContent({0}, "{1}", {{' -f (ConvertTo-LuaString $expGroup.Name), $module))
         foreach ($g in ($expGroup.Group | Sort-Object zone)) {
             [void]$sb.AppendLine(('    {{ navigationOnly = true, source = {0}, zone = {1}, {2} = {{' -f
-                (ConvertTo-LuaString (Get-ZoneKey $g.zone)), (ConvertTo-LuaString (Get-ZoneLabel $g.zone)), $listKey))
+                (ConvertTo-LuaString (Get-ZoneKey $g.zone)), (ConvertTo-LuaString (Get-ZoneLabel $g.zone $g.mapID)), $listKey))
             foreach ($e in $g.entries) { [void]$sb.AppendLine('        ' + $e) }
             [void]$sb.AppendLine('    } },')
         }

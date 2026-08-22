@@ -9,7 +9,6 @@ MC.EngineeringRecipes = {
         recipes = {
             { id = 1229755, name = "Song Gear",      source = "trainer",   sourceInfo = "Trainer (Skill 1)",  priority = 1 },
             { id = 1229853, name = "Soul Sprocket",   source = "trainer",   sourceInfo = "Trainer (Skill 25)", priority = 1 },
-            { id = 1229855, name = "Lumiflux",        source = "discovery", sourceInfo = "Recycling",          priority = 2 },
         },
     },
     {

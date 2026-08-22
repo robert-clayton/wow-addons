@@ -22,6 +22,19 @@ function Write-LuaFile([string]$relativePath, $lines) {
     [System.IO.File]::WriteAllText($path, $text, [System.Text.UTF8Encoding]::new($false))
 }
 function First-ID($value) { return @(([string]$value -split ";") | Where-Object { $_ })[0] }
+$preferredCurrentItemIDs = @{
+    "113564" = "118598"
+    "113566" = "118595"
+    "113568" = "118600"
+    "113569" = "118599"
+}
+function First-PreferredItemID($value) {
+    $ids = @(([string]$value -split ";") | Where-Object { $_ })
+    foreach ($id in $ids) {
+        if ($preferredCurrentItemIDs.ContainsKey([string]$id)) { return $preferredCurrentItemIDs[[string]$id] }
+    }
+    return $ids[0]
+}
 function Get-OrderPathSortKey([string]$path) {
     return ((@($path -split "/") | ForEach-Object { "{0:D8}" -f [int]$_ }) -join "/")
 }
@@ -71,7 +84,7 @@ Add-GroupedEntries $mountLines $mounts "mounts" "mounts" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
     $parts.Add("mountID = $($row.mount_id)")
-    $itemID = First-ID $row.item_ids; if ($itemID) { $parts.Add("itemID = $itemID") }
+    $itemID = First-PreferredItemID $row.item_ids; if ($itemID) { $parts.Add("itemID = $itemID") }
     $parts.Add("name = $(ConvertTo-LuaString $row.name)")
     $parts.Add("source = $(ConvertTo-LuaString $source)")
     $parts.Add("sourceInfo = $(ConvertTo-LuaString $row.source_text)")
@@ -91,7 +104,7 @@ Add-GroupedEntries $petLines $pets "pets" "pets" {
     param($row, $source)
     $parts = [System.Collections.Generic.List[string]]::new()
     $parts.Add("speciesID = $($row.species_id)")
-    $itemID = First-ID $row.item_ids; if ($itemID) { $parts.Add("itemID = $itemID") }
+    $itemID = First-PreferredItemID $row.item_ids; if ($itemID) { $parts.Add("itemID = $itemID") }
     if ($row.creature_id) { $parts.Add("npcID = $($row.creature_id)") }
     $parts.Add("name = $(ConvertTo-LuaString $row.name)")
     $parts.Add("petType = $([int]$row.pet_type_enum + 1)")
@@ -196,9 +209,13 @@ foreach ($categoryID in $categoryOrder) {
         if ($tasks.Count -ge 2 -and $tasks.Count -le 30) {
             $achievementLines.Add($prefix + ",")
             $achievementLines.Add('          taskList = { intro = "Progress from live achievement criteria.", tasks = {')
+            $duplicateCriteriaIDs = @($tasks | Group-Object criteria_id | Where-Object Count -gt 1 | ForEach-Object Name)
+            $taskIndex = 0
             foreach ($task in $tasks) {
+                $taskIndex++
+                $criteriaIndex = if ([string]$task.criteria_id -in $duplicateCriteriaIDs) { ", criteriaIndex = $taskIndex" } else { "" }
                 $label = if ($task.description) { ", label = $(ConvertTo-LuaString $task.description)" } else { "" }
-                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$label },")
+                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$criteriaIndex$label },")
             }
             $achievementLines.Add("          } } },")
         } else { $achievementLines.Add($prefix + " },") }

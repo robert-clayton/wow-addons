@@ -74,7 +74,7 @@ Every primary collectible inventory includes current-retail validation. Recipes 
 
 The script also writes release inclusion manifests under `research/collectionist/tww/manifests/`. These are the exact ID sets intended for addon registration, separated from the broader audit inventories. The decoration manifest is filtered by acquisition evidence and excludes theme-only, cross-expansion, internal, and hidden catalog rows. Mount, pet, and toy rows carry an explicit `release_decision`; their manifests preserve the addon's documented store/promotion/internal exclusions and include confirmed TWW-era event additions.
 
-Current manifest totals are 186 mounts, 200 pets, 99 toys, 108 decorations, 696 recipes, 381 player-facing achievements with 1,987 achievement-tree leaves, 140 rare criteria, and 86 treasure criteria. `manifests/summary.csv` records the identifier field for each set. The addon data now matches the mount, pet, toy, decoration, recipe, and achievement manifests exactly; `scripts/validate-collectionist-tww-manifests.ps1` enforces those primary-ID sets.
+Current manifest totals are 186 mounts, 200 pets, 99 toys, 108 decorations, 696 recipes, 381 player-facing achievements with 1,985 current-trackable achievement-tree leaves, 140 rare criteria, and 86 treasure criteria. `manifests/summary.csv` records the identifier field for each set. The addon data now matches the mount, pet, toy, decoration, recipe, and achievement manifests exactly; `scripts/validate-collectionist-tww-manifests.ps1` enforces those primary-ID sets.
 
 ## Validated snapshot totals
 

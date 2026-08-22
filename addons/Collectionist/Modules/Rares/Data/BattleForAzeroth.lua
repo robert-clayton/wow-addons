@@ -1,6 +1,6 @@
 local addonName, MC = ...
 
--- Battle for Azeroth zone rares and special encounters. Exact 256 ordered criteria/entity rows.
+-- Battle for Azeroth zone rares and special encounters. Exact 254 ordered criteria/entity rows.
 MC.RegisterContent("bfa", "rares", {
     { source = "tiragarde", achievementID = 12939, criteriaCount = 32,
       criteriaTreeIDs = { 69152, 69153, 69154, 69155, 69156, 69157, 69158, 69159, 69160, 69161, 69162, 69163, 69164, 69165, 69166, 69167, 69168, 69169, 69170, 69171, 69172, 69173, 69174, 69175, 69176, 69177, 69178, 69179, 69180, 69181, 69182, 69183 },
@@ -37,10 +37,10 @@ MC.RegisterContent("bfa", "rares", {
       criteriaNPCIDs = { 151124, 151625, 151672, 151684, 151702, 150575, 151934, 152007, 151884, 151202, 151569, 151296, 152001, 151308, 151940, 150937, 153000, 152182, 151933, 152569, 150342, 153206, 153205, 152764, 153200, 152113, 153226, 153228, 151627, false, 154153, 154225, 154701, 154739, 155060, 155583 },
       criteriaObjectIDs = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 322020, false, false, false, false, false, false }, name = "Rest In Pistons",
       zoneMapID = MC.MAP.Mechagon, zone = "Mechagon" },
-    { source = "nazjatar", achievementID = 13691, criteriaCount = 37,
-      criteriaTreeIDs = { 80613, 80614, 80615, 80616, 80618, 80619, 80621, 80622, 80623, 80624, 80625, 80626, 80627, 80628, 80629, 80630, 80631, 80632, 80633, 80634, 80635, 80636, 80637, 80638, 80639, 80640, 80641, 80642, 80643, 80644, 80645, 80647, 80648, 80649, 80650, 80651, 80652 },
-      criteriaNPCIDs = { 152415, 152416, 152794, 152566, 152361, 152712, 152464, 152556, 152756, 152291, 152414, 152555, 152553, 152448, 152567, 152323, 144644, 152465, 152397, 152681, 152682, 150583, 151870, 152795, 152548, 152545, 152542, 152552, 153658, 152359, 152290, 153898, 153928, 154148, 152360, 152568, 151719 },
-      criteriaObjectIDs = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false }, name = "I Thought You Said They'd Be Rare?",
+    { source = "nazjatar", achievementID = 13691, criteriaCount = 35,
+      criteriaTreeIDs = { 80613, 80614, 80615, 80618, 80619, 80621, 80622, 80623, 80624, 80625, 80626, 80627, 80628, 80629, 80630, 80631, 80632, 80633, 80634, 80635, 80637, 80638, 80639, 80640, 80641, 80642, 80643, 80644, 80645, 80647, 80648, 80649, 80650, 80651, 80652 },
+      criteriaNPCIDs = { 152415, 152416, 152794, 152361, 152712, 152464, 152556, 152756, 152291, 152414, 152555, 152553, 152448, 152567, 152323, 144644, 152465, 152397, 152681, 152682, 151870, 152795, 152548, 152545, 152542, 152552, 153658, 152359, 152290, 153898, 153928, 154148, 152360, 152568, 151719 },
+      criteriaObjectIDs = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false }, name = "I Thought You Said They'd Be Rare?",
       zoneMapID = MC.MAP.Nazjatar, zone = "Nazjatar" },
 })
 

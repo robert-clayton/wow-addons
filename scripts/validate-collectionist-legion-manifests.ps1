@@ -74,7 +74,7 @@ Assert-IDValues @($petInventory | Where-Object release_decision -eq "exclude_mop
 Assert-IDValues @($toyInventory | Where-Object release_decision -eq "exclude_mop" | ForEach-Object toy_id) @("442", "451", "452", "453", "454", "456", "457", "462", "463", "464", "467", "468", "470", "486", "497", "498", "619", "633") "Legion Pandaria-owned toy exclusions"
 Assert-ExactSet $decorManifest @($decorInventory | Where-Object status -eq "acquisition_legion_confirmed") "decor_id" "Legion decorations" 211
 Assert-ExactSet $achievementManifest @($achievementInventory | Where-Object status -eq "legion_category_confirmed") "achievement_id" "Legion achievements" 305
-Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "Legion achievement criteria" 2411
+Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "Legion achievement criteria" 2407
 Assert-ExactSet $recipeManifest @($recipeInventory | Where-Object status -in @("named_recipe", "current_house_decor_recipe")) "recipe_spell_id" "Legion recipes" 773
 Assert-IDValues @($recipeManifest | Where-Object status -eq "current_house_decor_recipe" | ForEach-Object recipe_spell_id) @(
     "1260693","1260695","1260698","1260700","1260704","1260711","1260719","1260730","1260737","1260757","1260762","1260765",

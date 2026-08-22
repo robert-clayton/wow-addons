@@ -116,7 +116,7 @@ foreach ($pair in @{
     Outland = 101; Zangarmarsh = 102; Exodar = 103; ShadowmoonValleyOutland = 104
     BladesEdgeMountains = 105; BloodmystIsle = 106; NagrandOutland = 107
     TerokkarForest = 108; Netherstorm = 109; SilvermoonCity = 110
-    ShattrathCity = 111; IsleOfQuelDanas = 122
+    ShattrathCity = 111; IsleOfQuelDanasTBC = 122
 }.GetEnumerator()) {
     if ($constants -notmatch "(?m)^\s*$([regex]::Escape($pair.Key))\s*=\s*$($pair.Value),") {
         throw "Missing The Burning Crusade map constant $($pair.Key)=$($pair.Value)"
@@ -139,7 +139,6 @@ foreach ($module in @("Mounts", "Pets", "Decorations", "Toys", "Rares", "Treasur
 
 $results | Format-Table -AutoSize
 Write-Host "Collectionist The Burning Crusade runtime validation passed"
-
 
 
 

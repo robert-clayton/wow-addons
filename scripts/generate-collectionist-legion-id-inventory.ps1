@@ -9,6 +9,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\legion\sources\housing-wowdb-acquisition-audit.csv"
 $rareNPCAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\legion\sources\rare-npc-audit.csv"
 $attZonePath = Join-Path $AttRoot "db\Standard\Categories\Zones.lua"
@@ -244,6 +245,7 @@ $achievementCriteriaInventory = foreach ($achievement in $selectedAchievements |
         [pscustomobject]@{ achievement_id = $achievement.ID; title = $achievement.Title_lang; category_id = $achievement.Category; order_path = $leaf.order_path; tree_id = $leaf.tree_id; description = $leaf.description; criteria_id = $leaf.criteria_id; criteria_type = $leaf.criteria_type; asset_id = $leaf.asset_id; amount = $leaf.amount; operator = $leaf.operator }
     }
 }
+$achievementCriteriaInventory = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root)
 
 $achievementByID = New-Index $achievements
 $attEntityByCriteriaID = @{}
@@ -281,6 +283,9 @@ $rareAchievementIDs = @("11261", "11262", "11263", "11264", "11265", "12078")
 $treasureAchievementIDs = @("11256", "11257", "11258", "11259", "11260", "12074")
 $rareInventory = @(Get-EncounterRows $rareAchievementIDs "rare")
 $treasureInventory = @(Get-EncounterRows $treasureAchievementIDs "treasure")
+$currentEncounterCriteria = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentTradeDb2Root -AllAchievements)
+$rareInventory = @(Sync-CollectionistEncounterRows $rareInventory $currentEncounterCriteria)
+$treasureInventory = @(Sync-CollectionistEncounterRows $treasureInventory $currentEncounterCriteria)
 $rareNPCAudit = @($rareInventory | Where-Object criteria_type -eq "27" | ForEach-Object {
     [pscustomobject]@{ achievement_id = $_.achievement_id; achievement = $_.achievement; tree_id = $_.tree_id; criterion = $_.criterion; completion_quest_id = $_.criteria_asset; npc_id = $_.npc_ids; object_id = $_.object_ids; mapping = $_.entity_mapping }
 })
@@ -364,7 +369,7 @@ Assert-Equal @($toyInventory | Where-Object release_decision -eq "include_legion
 Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "include_legion" -and $_.unavailable }).Count 9 "Unavailable Legion mount count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_legion" -and $_.unavailable }).Count 2 "Unavailable Legion pet count"
 Assert-Equal @($selectedAchievements).Count 305 "Visible Legion achievement count"
-Assert-Equal @($achievementCriteriaInventory).Count 2411 "Legion achievement criteria count"
+Assert-Equal @($achievementCriteriaInventory).Count 2407 "Legion achievement criteria count"
 Assert-Equal @($historicalRecipeInventory | Where-Object status -eq "named_recipe").Count 750 "Historical named Legion recipe count"
 Assert-Equal @($houseDecorRecipeInventory).Count 23 "Current Legion house decor recipe count"
 Assert-Equal @($recipeInventory | Where-Object status -in @("named_recipe", "current_house_decor_recipe")).Count 773 "Named Legion recipe count"

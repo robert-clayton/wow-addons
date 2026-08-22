@@ -127,6 +127,23 @@ do
     local refreshed = tooltip.doubleLines[#tooltip.doubleLines][2]
     truthy(refreshed:find("Refreshed Token", 1, true),
         "item metadata should retry after cache notification")
+
+    local indexCalls, idCalls = 0, 0
+    C_AchievementInfo = {
+        GetAchievementCriteriaInfo = function(achievementID, criteriaIndex)
+            indexCalls = indexCalls + 1
+            return "Indexed criterion", 0, achievementID == 77 and criteriaIndex == 2
+        end,
+        GetAchievementCriteriaInfoByID = function()
+            idCalls = idCalls + 1
+            return "Reused criterion", 0, false
+        end,
+    }
+    equal(MC.IsTaskCompleted({ achievementID = 77, criteriaID = 88, criteriaIndex = 2 }),
+        true, "criteria index disambiguates reused criteria IDs")
+    equal(indexCalls, 1, "criteria index lookup used")
+    equal(idCalls, 0, "ambiguous criteria ID lookup skipped")
+    C_AchievementInfo = nil
 end
 
 -- Stable legacy denominator and score separation.
@@ -345,6 +362,8 @@ do
     equal(dfRecipes, 1004, "Dragonflight recipe count")
     equal(twwRecipes, 696, "TWW recipe count")
     truthy(midnightRecipes > 500, "Midnight recipe catalog retained")
+    equal(recipeSeen[1229855], nil,
+        "Lumiflux is not a current SkillLineAbility recipe")
 
     -- Acquisition-data burndown. DB2 carries no source column for recipes, so
     -- most of the catalog ships as source="unknown" pending enrichment from
@@ -439,8 +458,8 @@ do
         loadAddon("addons/Collectionist/Modules/Treasures/Data/Navigation.lua", MC)
 
         local checks = {
-            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare",     expected = 706 },
-            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure", expected = 343 },
+            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare",     expected = 745 },
+            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure", expected = 429 },
         }
         for _, c in ipairs(checks) do
             local groups, entries = 0, 0
@@ -778,7 +797,7 @@ do
             },
         },
         toys = {
-            field = "ToyData", list = "toys", id = "itemID", classicCount = 14, tbcCount = 22, wrathCount = 36, cataCount = 43, mopCount = 79, wodCount = 128, legionCount = 158, bfaCount = 136, slCount = 115, dfCount = 180, twwCount = 101,
+            field = "ToyData", list = "toys", id = "itemID", classicCount = 14, tbcCount = 22, wrathCount = 36, cataCount = 43, mopCount = 79, wodCount = 128, legionCount = 158, bfaCount = 136, slCount = 114, dfCount = 180, twwCount = 101,
             files = {
                 "Modules/Toys/Data/Classic.lua",
                 "Modules/Toys/Data/TheBurningCrusade.lua",
@@ -1635,7 +1654,7 @@ do
             equal(tbcAchievementSources.dungeons, 40, "TBC dungeon and raid achievement count")
             equal(tbcAchievementSources.metas, 16, "TBC quest/meta achievement count")
             equal(tbcAchievementSources.reputation, 16, "TBC reputation achievement count")
-            equal(tbcAchievementTasks, 651, "TBC attached achievement criteria count")
+            equal(tbcAchievementTasks, 648, "TBC attached achievement criteria count")
             equal(wrathAchievementSources.zone, 16, "Wrath exploration achievement count")
             equal(wrathAchievementSources.dungeons, 80, "Wrath dungeon achievement count")
             equal(wrathAchievementSources.metas, 21, "Wrath quest/meta achievement count")
@@ -1678,7 +1697,7 @@ do
             equal(wodAchievementSources.monuments, 7, "Warlords monument achievement count")
             equal(wodAchievementSources.invasions, 18, "Warlords invasion achievement count")
             equal(wodAchievementSources.shipyard, 27, "Warlords shipyard achievement count")
-            equal(wodAchievementTasks, 981, "Warlords attached achievement criteria count")
+            equal(wodAchievementTasks, 980, "Warlords attached achievement criteria count")
             equal(legionAchievementSources.metas, 44, "Legion quest/meta achievement count")
             equal(legionAchievementSources.dungeons, 76, "Legion dungeon achievement count")
             equal(legionAchievementSources.raid, 100, "Legion raid achievement count")
@@ -1687,7 +1706,7 @@ do
             equal(legionAchievementSources.reputation, 11, "Legion reputation achievement count")
             equal(legionAchievementSources.class_hall, 5, "Legion class-hall achievement count")
             equal(legionAchievementSources.missions, 12, "Legion mission achievement count")
-            equal(legionAchievementTasks, 642, "Legion attached achievement criteria count")
+            equal(legionAchievementTasks, 638, "Legion attached achievement criteria count")
             equal(bfaAchievementSources.metas, 77, "BFA quest/meta achievement count")
             equal(bfaAchievementSources.dungeons, 59, "BFA dungeon achievement count")
             equal(bfaAchievementSources.raid, 97, "BFA raid achievement count")
@@ -1696,7 +1715,7 @@ do
             equal(bfaAchievementSources.islands, 64, "BFA island achievement count")
             equal(bfaAchievementSources.war_effort, 37, "BFA war-effort achievement count")
             equal(bfaAchievementSources.heart_of_azeroth, 10, "BFA Heart of Azeroth achievement count")
-            equal(bfaAchievementTasks, 1310, "BFA attached achievement criteria count")
+            equal(bfaAchievementTasks, 1307, "BFA attached achievement criteria count")
             equal(slAchievementSources.metas, 48, "Shadowlands quest/meta achievement count")
             equal(slAchievementSources.dungeons, 57, "Shadowlands dungeon achievement count")
             equal(slAchievementSources.zone, 74, "Shadowlands exploration achievement count")
@@ -1712,12 +1731,12 @@ do
             equal(dfAchievementSources.dungeons, 59, "Dragonflight dungeon achievement count")
             equal(dfAchievementSources.raid, 72, "Dragonflight raid achievement count")
             equal(dfAchievementSources.mounts, 21, "Dragonflight collection achievement count")
-            equal(dfAchievementTasks, 2879, "Dragonflight attached achievement criteria count")
+            equal(dfAchievementTasks, 2878, "Dragonflight attached achievement criteria count")
             equal(twwAchievementSources.zone, 163, "TWW general achievement count")
             equal(twwAchievementSources.delves, 113, "TWW delve achievement count")
             equal(twwAchievementSources.dungeons, 34, "TWW dungeon achievement count")
             equal(twwAchievementSources.raid, 73, "TWW raid achievement count")
-            equal(twwAchievementTasks, 1485, "TWW attached achievement criteria count")
+            equal(twwAchievementTasks, 1483, "TWW attached achievement criteria count")
         end
         if moduleKey == "rares" then
             equal(classicCriteriaCount, 0, "Classic rare criteria count")
@@ -1728,7 +1747,7 @@ do
             equal(wodCriteriaCount, 72, "Warlords rare criteria count")
             equal(legionCriteriaCount, 185, "Legion rare criteria count")
             equal(legionRareObjects, 7, "Legion rare object-provider count")
-            equal(bfaCriteriaCount, 256, "BFA rare criteria count")
+            equal(bfaCriteriaCount, 254, "BFA rare criteria count")
             equal(bfaRareObjects, 5, "BFA rare object-provider count")
             equal(slCriteriaCount, 211, "Shadowlands rare criteria count")
             equal(dfCriteriaCount, 197, "Dragonflight rare criteria count")
@@ -1774,6 +1793,52 @@ do
         truthy(entry, "missing acquisition-era collectible " .. check[4])
         equal(entry.expansion, check[5], "acquisition expansion " .. check[4])
     end
+
+    local currentMountItems = {
+        [656] = 137573,
+        [1467] = 204382,
+        [2158] = 221967,
+    }
+    for mountID, itemID in pairs(currentMountItems) do
+        local mount = findCatalogEntry("MountData", "mounts", "mountID", mountID)
+        truthy(mount, "missing mount item mapping " .. mountID)
+        equal(mount.itemID, itemID, "current mount item mapping " .. mountID)
+    end
+    local currentPetItems = {
+        [1432] = 118595,
+        [1434] = 118598,
+        [1429] = 118599,
+        [1430] = 118600,
+    }
+    for speciesID, itemID in pairs(currentPetItems) do
+        local pet = findCatalogEntry("PetData", "pets", "speciesID", speciesID)
+        truthy(pet, "missing pet item mapping " .. speciesID)
+        equal(pet.itemID, itemID, "current pet item mapping " .. speciesID)
+    end
+    equal(findCatalogEntry("ToyData", "toys", "itemID", 183810), nil,
+        "retired Shadowlands toy item must stay excluded")
+
+    local reusedCriterionRows = 0
+    for _, group in ipairs(MC.AchievementData or {}) do
+        for _, achievement in ipairs(group.achievements or {}) do
+            local tasks = achievement.taskList and achievement.taskList.tasks or {}
+            local counts = {}
+            for _, task in ipairs(tasks) do
+                if task.criteriaID then
+                    counts[task.criteriaID] = (counts[task.criteriaID] or 0) + 1
+                end
+            end
+            for taskIndex, task in ipairs(tasks) do
+                if task.criteriaID and counts[task.criteriaID] > 1 then
+                    reusedCriterionRows = reusedCriterionRows + 1
+                    equal(task.criteriaIndex, taskIndex,
+                        "reused criterion positional index " .. achievement.achievementID)
+                end
+            end
+        end
+    end
+    equal(reusedCriterionRows, 65,
+        "all reused achievement criterion rows are position-disambiguated")
 
     -- HandyNotes_WarWithin mislabeled these six pet items as toys. The
     -- species/item pairs are collectible pets and must never enter ToyData.

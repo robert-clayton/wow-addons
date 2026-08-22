@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\the-burning-crusade\sources\housing-wowdb-acquisition-audit.csv"
 $blizzardSourcePath = Join-Path $PSScriptRoot "..\research\collectionist\the-burning-crusade\sources\blizzard-tbc-collectibles.csv"
 $attDataRoot = Join-Path $AttRoot ".contrib\Parser\DATAS"
@@ -354,6 +355,7 @@ function Get-CriteriaLeaves([string]$RootID){
 $achievementCriteriaInventory=foreach($achievement in $selectedTbcAchievements|Where-Object{$_.Criteria_tree-ne"0"}){
     foreach($leaf in(Get-CriteriaLeaves([string]$achievement.Criteria_tree))){[pscustomobject]@{achievement_id=$achievement.ID;title=$achievement.Title_lang;category_id=$achievement.Category;order_path=$leaf.order_path;tree_id=$leaf.tree_id;description=$leaf.description;criteria_id=$leaf.criteria_id;criteria_type=$leaf.criteria_type;asset_id=$leaf.asset_id;amount=$leaf.amount;operator=$leaf.operator}}
 }
+$achievementCriteriaInventory=@(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentDb2Root)
 $rareInventory=foreach($row in $achievementCriteriaInventory|Where-Object achievement_id -eq "1312"){
     [pscustomobject]@{achievement_id=$row.achievement_id;achievement=$row.title;order_path=$row.order_path;tree_id=$row.tree_id;criterion=$row.description;criteria_id=$row.criteria_id;criteria_type=$row.criteria_type;criteria_asset=$row.asset_id;npc_id=$row.asset_id;completion_quest_id="";object_id="";selection_decision="include_tbc"}
 }
@@ -393,7 +395,7 @@ Assert-Equal $toyInventory.Count 32 "TBC toy inventory count"
 Assert-Equal @($toyInventory|Where-Object release_decision -eq "include_tbc").Count 22 "TBC toy manifest count"
 Assert-Equal $decorInventory.Count 29 "TBC decoration inventory count"
 Assert-Equal $achievementInventory.Count 99 "TBC achievement inventory count"
-Assert-Equal $achievementCriteriaInventory.Count 845 "TBC achievement criteria inventory count"
+Assert-Equal $achievementCriteriaInventory.Count 842 "TBC achievement criteria inventory count"
 Assert-Equal $rareInventory.Count 20 "TBC rare count"
 Assert-Equal $recipeInventory.Count 755 "TBC recipe inventory count"
 Assert-Equal @($recipeInventory|Where-Object house_decor_recipe).Count 26 "TBC house decor recipe count"
@@ -408,7 +410,7 @@ Assert-IDValues @($officialIDs.toys.Keys) @($toyInventory|Where-Object official_
 
 $taskAchievementIDs=@($achievementCriteriaInventory|Group-Object achievement_id|Where-Object{$_.Count-ge2-and$_.Count-le30}|ForEach-Object Name)
 Assert-Equal $taskAchievementIDs.Count 65 "TBC eligible task achievement count"
-Assert-Equal @($achievementCriteriaInventory|Where-Object{[string]$_.achievement_id-in$taskAchievementIDs}).Count 651 "TBC eligible task criteria count"
+Assert-Equal @($achievementCriteriaInventory|Where-Object{[string]$_.achievement_id-in$taskAchievementIDs}).Count 648 "TBC eligible task criteria count"
 
 $summary=@()
 $summary+=Export-Inventory "mounts" $mountInventory
@@ -431,7 +433,7 @@ $manifests=[ordered]@{
     toys=@{rows=@($toyInventory|Where-Object release_decision -eq "include_tbc"|Sort-Object{[int]$_.toy_id});expected=22;id="toy_id"}
     decorations=@{rows=@($decorInventory|Sort-Object{[int]$_.decor_id});expected=29;id="decor_id"}
     achievements=@{rows=@($achievementInventory|Sort-Object{[int]$_.achievement_id});expected=99;id="achievement_id"}
-    "achievement-criteria"=@{rows=@($achievementCriteriaInventory|Sort-Object{[int]$_.achievement_id},{Get-OrderPathSortKey $_.order_path});expected=845;id="tree_id"}
+    "achievement-criteria"=@{rows=@($achievementCriteriaInventory|Sort-Object{[int]$_.achievement_id},{Get-OrderPathSortKey $_.order_path});expected=842;id="tree_id"}
     recipes=@{rows=@($recipeInventory|Sort-Object profession,{[int]$_.recipe_spell_id});expected=755;id="recipe_spell_id"}
     rares=@{rows=@($rareInventory|Sort-Object{Get-OrderPathSortKey $_.order_path});expected=20;id="tree_id"}
     treasures=@{rows=$treasureInventory;expected=0;id="tree_id"}

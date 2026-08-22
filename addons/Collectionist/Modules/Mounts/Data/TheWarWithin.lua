@@ -458,7 +458,7 @@ MC.RegisterContent("tww", "mounts", {
     {
         source = "profession",
         mounts = {
-            { mountID = 2158, itemID = 223268, name = "Crowd Pummeler 2-30", source = "profession",
+            { mountID = 2158, itemID = 221967, name = "Crowd Pummeler 2-30", source = "profession",
               sourceInfo = "Crafted: Khaz Algar Engineering", score = T.medium },
             { mountID = 2502, itemID = 235712, name = "Void-Crystal Panther", source = "profession",
               sourceInfo = "Crafted: Jewelcrafting (11.1.5)", score = T.medium },

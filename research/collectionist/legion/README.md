@@ -17,7 +17,7 @@ A final Warlords of Draenor DB2 export was not available from that endpoint. Mou
 - 106 battle pets; 19 Wrath-acquisition rows, 9 Cataclysm-acquisition rows, 2 Pandaria-acquisition rows, 6 external-policy rows, and 4 internal, placeholder, or never-released pets are excluded.
 - 154 toys; 3 Classic-acquisition rows, 13 TBC-acquisition rows, 7 Wrath-acquisition rows, 8 Cataclysm-acquisition rows, 18 Pandaria-acquisition rows, 18 Warlords-acquisition rows, 2 promotional rows, and 6 internal or never-implemented rows are excluded.
 - 211 housing decorations assigned by current Legion acquisition paths.
-- 305 visible player-facing achievements across eight Legion category roots, with 2,411 stable criteria-tree leaves.
+- 305 visible player-facing achievements across eight Legion category roots, with 2,407 current-trackable criteria-tree leaves.
 - 773 named recipes in the nine professions supported by Collectionist: 750 historical Legion recipes plus 23 housing recipes taught by Legion profession tiers.
 - 185 ordered rare/special-encounter criteria across six achievements.
 - 314 ordered treasure/hidden-object criteria across six achievements.

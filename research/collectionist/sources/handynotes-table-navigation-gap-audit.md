@@ -4,12 +4,12 @@ The prior 1,707 Rare and 771 Treasure constructor counts cover one HandyNotes pu
 
 ## Result
 
-- Unique table-provider rare NPCs: 1714
-- Already represented by Collectionist rare data: 993
-- Additional rare navigation candidates: 721
-- Unique quest-identified treasure nodes: 1400
-- Already represented by Collectionist treasure criteria/quests: 566
-- Additional quest-identity treasure candidates: 834
+- Unique table-provider rare NPCs: 1939
+- Already represented by Collectionist rare data: 1178
+- Additional rare navigation candidates: 761
+- Unique quest-identified treasure nodes: 1623
+- Already represented by Collectionist treasure criteria/quests: 661
+- Additional quest-identity treasure candidates: 962
 
 ## Additional candidates by expansion
 
@@ -19,6 +19,7 @@ The prior 1,707 Rare and 771 Treasure constructor counts cover one HandyNotes pu
 | wod | 252 | 29 |
 | legion | 65 | 334 |
 | battle_for_azeroth | 186 | 169 |
+| shadowlands | 40 | 128 |
 | dragonflight | 98 | 72 |
 | tww | 49 | 77 |
 | midnight | 14 | 109 |

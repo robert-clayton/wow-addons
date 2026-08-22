@@ -25,8 +25,18 @@ if (-not (Test-Path -LiteralPath $HandyNotesRoot)) {
     throw "Missing installed HandyNotes root: $HandyNotesRoot"
 }
 
+# Navigation.lua is this pipeline's OWN OUTPUT. Counting it as pre-existing
+# coverage makes the audit eat its own tail: everything emitted last run reads
+# as "already represented" on the next, and the candidate set collapses toward
+# zero. Measured: re-running without this exclusion took the rare candidates
+# from 721 to 55. The question this audit answers is "what does the
+# achievement-backed catalog not cover", so its own navigation rows are not
+# part of the answer.
+$SELF_OUTPUT = "Navigation.lua"
+
 $trackedNPCs = [System.Collections.Generic.HashSet[string]]::new()
-foreach ($path in @(Get-ChildItem -LiteralPath (Join-Path $AddonRoot "Modules\Rares\Data") -File -Filter "*.lua")) {
+foreach ($path in @(Get-ChildItem -LiteralPath (Join-Path $AddonRoot "Modules\Rares\Data") -File -Filter "*.lua" |
+                    Where-Object { $_.Name -ne $SELF_OUTPUT })) {
     $content = Get-Content -Raw -LiteralPath $path.FullName
     foreach ($match in [regex]::Matches($content, '\b(?:criteriaNPCIDs|npcIDs)\s*=\s*\{([^}]*)\}')) {
         foreach ($idMatch in [regex]::Matches($match.Groups[1].Value, '\d+')) {
@@ -39,7 +49,8 @@ foreach ($path in @(Get-ChildItem -LiteralPath (Join-Path $AddonRoot "Modules\Ra
 }
 
 $trackedTreasureQuests = [System.Collections.Generic.HashSet[string]]::new()
-foreach ($path in @(Get-ChildItem -LiteralPath (Join-Path $AddonRoot "Modules\Treasures\Data") -File -Filter "*.lua")) {
+foreach ($path in @(Get-ChildItem -LiteralPath (Join-Path $AddonRoot "Modules\Treasures\Data") -File -Filter "*.lua" |
+                    Where-Object { $_.Name -ne $SELF_OUTPUT })) {
     foreach ($match in [regex]::Matches((Get-Content -Raw -LiteralPath $path.FullName), '\bquestID\s*=\s*(\d+)')) {
         [void]$trackedTreasureQuests.Add($match.Groups[1].Value)
     }
@@ -67,8 +78,21 @@ $tableAddons = [ordered]@{
     HandyNotes_LegionTreasures = "legion"
     HandyNotes_MidnightTreasures = "midnight"
     HandyNotes_MistsOfPandariaTreasures = "mists_of_pandaria"
+    HandyNotes_ShadowlandsTreasures = "shadowlands"
     HandyNotes_TreasureHunter = "wod"
     HandyNotes_WarWithin = "tww"
+}
+
+# An installed provider missing from the list above does not fail - it is
+# silently absent from the audit, and the per-expansion table then reads as
+# "that expansion has nothing" rather than "we did not look". Shadowlands was
+# omitted exactly that way. Warn loudly instead.
+$knownProviders = @($tableAddons.Keys)
+foreach ($candidate in @(Get-ChildItem -LiteralPath $HandyNotesRoot -Directory -ErrorAction SilentlyContinue |
+                         Where-Object { $_.Name -match '^HandyNotes_.*Treasure' })) {
+    if ($knownProviders -notcontains $candidate.Name) {
+        Write-Warning ("Installed provider not in `$tableAddons, its nodes are being skipped: {0}" -f $candidate.Name)
+    }
 }
 
 $nodes = [System.Collections.Generic.List[object]]::new()

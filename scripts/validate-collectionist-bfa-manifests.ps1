@@ -73,10 +73,10 @@ Assert-IDValues @($recipeManifest | Where-Object status -eq "current_house_decor
     "1260337","1260349","1260352","1260425","1260458","1260475","1260485","1260492","1260501","1260508","1260564",
     "1260577","1260583","1260593","1260596","1260691","1260692","1262005","1262151","1263859","1263870","1263877"
 ) "BFA house decor recipe IDs"
-Assert-ExactSet $rareManifest @($rareInventory | Where-Object selection_decision -eq "include_bfa") "tree_id" "BFA rare criteria" 256
+Assert-ExactSet $rareManifest @($rareInventory | Where-Object selection_decision -eq "include_bfa") "tree_id" "BFA rare criteria" 254
 Assert-ExactSet $treasureManifest @($treasureInventory | Where-Object selection_decision -eq "include_bfa") "tree_id" "BFA treasure criteria" 98
 $achievementIDs = Get-IDs $achievementManifest "achievement_id"
-Assert-ExactSet $criteriaManifest @($criteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementIDs }) "tree_id" "BFA achievement criteria" 2854
+Assert-ExactSet $criteriaManifest @($criteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementIDs }) "tree_id" "BFA achievement criteria" 2851
 Assert-ExactSet $currencyManifest $currencyManifest "currency_id" "BFA supporting currencies" 14
 Assert-ExactSet $factionManifest $factionManifest "faction_id" "BFA supporting factions" 19
 Assert-ExactSet $mapManifest $mapManifest "map_id" "BFA supporting maps" 10

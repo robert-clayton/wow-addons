@@ -28,7 +28,7 @@ MC.RegisterContent("df", "rares", {
       zoneMapID = MC.MAP.ZaralekCavern, zone = "Zaralek Cavern" },
     { source = "emerald_dream", achievementID = 19316, criteriaCount = 24,
       criteriaTreeIDs = { 151262, 151263, 151264, 151265, 151266, 151267, 151268, 151269, 151270, 151271, 151272, 151273, 151274, 151275, 151276, 151277, 151278, 151279, 151280, 151281, 151282, 151283, 151284, 153296 },
-      criteriaNPCIDs = { 209113, 209893, 209898, 209936, 209929, 209902, 209365, 209620, 209909, 209913, 209911, 209919, 210111, 210045, 210046, 210047, 210050, 210047, 208658, 210064, 210070, 210075, 210161, 210508 }, name = "Adventurer of the Emerald Dream",
+      criteriaNPCIDs = { 209113, 209893, 209898, 209936, 209929, 209902, 209365, 209620, 209909, 209913, 209911, 209919, 210111, 210045, 210046, 210047, 210050, 210051, 208658, 210064, 210070, 210075, 210161, 210508 }, name = "Adventurer of the Emerald Dream",
       zoneMapID = MC.MAP.EmeraldDream, zone = "Emerald Dream" },
 })
 

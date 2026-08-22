@@ -10,7 +10,18 @@ Scanner.results = {}
 -- per render. Mirrors the existing taskList shape used by Treasures.
 local function ensureTaskLabel(task)
     if task.label and task.label ~= "" then return end
-    if task.achievementID and task.criteriaID then
+    if task.achievementID and task.criteriaIndex then
+        local getByIndex = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfo)
+                             or GetAchievementCriteriaInfo
+        if getByIndex then
+            local ok, name = pcall(getByIndex, task.achievementID, task.criteriaIndex)
+            if ok and name and name ~= "" then
+                task.label = name
+                return
+            end
+        end
+        task.label = "Criterion " .. task.criteriaIndex
+    elseif task.achievementID and task.criteriaID then
         local getById = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfoByID)
                           or GetAchievementCriteriaInfoByID
         if getById then
@@ -117,6 +128,12 @@ function Scanner:Scan()
                         sourceInfo    = ach.description,
                         zone          = ach.zone,
                         icon          = liveIcon,
+                        -- Achievement-level waypoint. This copy is an
+                        -- allowlist, so omitting the field silently dropped it
+                        -- before render and MC.DoItemAction had nothing to pin
+                        -- for the 38 achievements that carry one. Task-level
+                        -- waypoints ride inside taskList and were unaffected.
+                        waypoint      = ach.waypoint,
                         taskList      = ach.taskList,
                         progress      = { done = done, total = total },
                         collected     = liveCompleted,

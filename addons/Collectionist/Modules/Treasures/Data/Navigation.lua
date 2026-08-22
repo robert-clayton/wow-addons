@@ -11,13 +11,88 @@ local _, MC = ...
 -- Sourced from installed HandyNotes table providers. Rows without a
 -- resolvable name, zone or coordinate are deliberately absent.
 
+local SOURCE_KEYS = {
+    { "antoran_wastes", "Antoran Wastes" },
+    { "ardenweald", "Ardenweald" },
+    { "azj_kahet", "Azj-Kahet" },
+    { "azsuna", "Azsuna" },
+    { "azure_span", "The Azure Span" },
+    { "bastion", "Bastion" },
+    { "coiled_isle", "The Coiled Isle" },
+    { "dornogal", "Dornogal" },
+    { "drustvar", "Drustvar" },
+    { "emerald_dream", "Emerald Dream" },
+    { "eredath", "Eredath" },
+    { "eversong_woods", "Eversong Woods" },
+    { "forbidden_reach", "The Forbidden Reach" },
+    { "frostfire_ridge", "Frostfire Ridge" },
+    { "gorgrond", "Gorgrond" },
+    { "hallowfall", "Hallowfall" },
+    { "harandar", "Harandar" },
+    { "highmountain", "Highmountain" },
+    { "isle_of_dorn", "Isle of Dorn" },
+    { "isle_of_queldanas", "Isle of Quel'Danas" },
+    { "jade_forest", "The Jade Forest" },
+    { "karesh", "K'aresh" },
+    { "korthia", "Korthia" },
+    { "krokuun", "Krokuun" },
+    { "kun_lai_summit", "Kun-Lai Summit" },
+    { "maldraxxus", "Maldraxxus" },
+    { "maw", "The Maw" },
+    { "mechagon", "Mechagon Island" },
+    { "nagrand_draenor", "Nagrand" },
+    { "nazjatar", "Nazjatar" },
+    { "nazmir", "Nazmir" },
+    { "ohnahran_plains", "Ohn'ahran Plains" },
+    { "revendreth", "Revendreth" },
+    { "ringing_deeps", "The Ringing Deeps" },
+    { "shadowmoon_valley_draenor", "Shadowmoon Valley" },
+    { "siren_isle", "Siren Isle" },
+    { "spires_of_arak", "Spires of Arak" },
+    { "stormheim", "Stormheim" },
+    { "stormsong_valley", "Stormsong Valley" },
+    { "suramar", "Suramar" },
+    { "talador", "Talador" },
+    { "thaldraszus", "Thaldraszus" },
+    { "timeless_isle", "Timeless Isle" },
+    { "tiragarde_sound", "Tiragarde Sound" },
+    { "uldum", "Uldum" },
+    { "undermine", "Undermine" },
+    { "valley_of_the_four_winds", "Valley of the Four Winds" },
+    { "valsharah", "Val'sharah" },
+    { "voidstorm", "Voidstorm" },
+    { "voldun", "Vol'dun" },
+    { "waking_shores", "The Waking Shores" },
+    { "zaralek_cavern", "Zaralek Cavern" },
+    { "zereth_mortis", "Zereth Mortis" },
+    { "zulaman", "Zul'Aman" },
+    { "zuldazar", "Zuldazar" },
+}
+local function mergeSourceKeys()
+    MC.TreasureSourceOrder = MC.TreasureSourceOrder or {}
+    MC.TreasureSourceLabels = MC.TreasureSourceLabels or {}
+    for _, pair in ipairs(SOURCE_KEYS) do
+        if not MC.TreasureSourceLabels[pair[1]] then
+            MC.TreasureSourceOrder[#MC.TreasureSourceOrder + 1] = pair[1]
+        end
+        MC.TreasureSourceLabels[pair[1]] = MC.TreasureSourceLabels[pair[1]] or pair[2]
+    end
+end
+if MC.TreasureSourceOrder then mergeSourceKeys() else
+    local f = CreateFrame("Frame"); f:RegisterEvent("ADDON_LOADED")
+    f:SetScript("OnEvent", function(self, _, name)
+        if name ~= "Collectionist" then return end
+        self:UnregisterEvent("ADDON_LOADED"); self:SetScript("OnEvent", nil); mergeSourceKeys()
+    end)
+end
+
 MC.RegisterContent("bfa", "treasures", {
     { navigationOnly = true, source = "drustvar", zone = "Drustvar", treasures = {
         { questID = 49137, name = "Ancient Sarcophagus", waypoint = { 896, 0.4346, 0.3611, "Ancient Sarcophagus" } },
         { questID = 49341, name = "Seething Cache", waypoint = { 896, 0.6793, 0.6683, "Seething Cache" } },
         { questID = 51914, name = "Rares", waypoint = { 896, 0.3932, 0.6173, "Rares" } },
     } },
-    { navigationOnly = true, source = "mechagon", zone = "Mechagon", treasures = {
+    { navigationOnly = true, source = "mechagon", zone = "Mechagon Island", treasures = {
         { questID = 55299, name = "Bottom Feeding Stinkfish", waypoint = { 1462, 0.767, 0.492, "Bottom Feeding Stinkfish" } },
         { questID = 55305, name = "Bolted Steelhead, Energized Lighting Cod, Solarsprocket Barbel", waypoint = { 1462, 0.35, 0.465, "Bolted Steelhead, Energized Lighting Cod, Solarsprocket Barbel" } },
         { questID = 55306, name = "Pond Hopping Springfish", waypoint = { 1462, 0.558, 0.319, "Pond Hopping Springfish" } },
@@ -59,7 +134,7 @@ MC.RegisterContent("bfa", "treasures", {
     { navigationOnly = true, source = "uldum", zone = "Uldum", treasures = {
         { questID = 58879, name = "Friendly Alpaca", waypoint = { 249, 0.76, 0.68, "Friendly Alpaca" } },
     } },
-    { navigationOnly = true, source = "voldun", zone = "Voldun", treasures = {
+    { navigationOnly = true, source = "voldun", zone = "Vol'dun", treasures = {
         { questID = 51673, name = "Rares", waypoint = { { 864, 0.519, 0.8251, "Rares" }, { 864, 0.5232, 0.8519, "Rares" } } },
         { questID = 53132, name = "Jason's Rusty Blade", waypoint = { 864, 0.5629, 0.7011, "Jason's Rusty Blade" } },
         { questID = 53133, name = "Ian's Empty Bottle", waypoint = { 864, 0.3621, 0.7838, "Ian's Empty Bottle" } },
@@ -84,7 +159,7 @@ MC.RegisterContent("bfa", "treasures", {
 })
 
 MC.RegisterContent("df", "treasures", {
-    { navigationOnly = true, source = "azure_span", zone = "Azure Span", treasures = {
+    { navigationOnly = true, source = "azure_span", zone = "The Azure Span", treasures = {
         { questID = 71002, name = "Best Spell Ever", waypoint = { 2024, 0.664, 0.333, "Best Spell Ever" } },
         { questID = 72121, name = "for The Great Shellkhan in Thaldraszus", waypoint = { 2024, 0.4563, 0.5482, "for The Great Shellkhan in Thaldraszus" } },
         { questID = 72136, name = "Rustpine Den", waypoint = { 2024, 0.6607, 0.5111, "Rustpine Den" } },
@@ -98,10 +173,10 @@ MC.RegisterContent("df", "treasures", {
         { questID = 78550, name = "Grovekeeper's Barrier", waypoint = { 2200, 0.6958, 0.5285, "Grovekeeper's Barrier" } },
         { questID = 78551, name = "Verdant Gleaner's Scythe", waypoint = { 2200, 0.5532, 0.4538, "Verdant Gleaner's Scythe" } },
     } },
-    { navigationOnly = true, source = "forbidden_reach", zone = "Forbidden Reach", treasures = {
+    { navigationOnly = true, source = "forbidden_reach", zone = "The Forbidden Reach", treasures = {
         { questID = 69200, name = "Words of the Wyrmslayer", waypoint = { 2151, 0.6155, 0.3378, "Words of the Wyrmslayer" } },
     } },
-    { navigationOnly = true, source = "ohnahran_plains", zone = "Ohnahran Plains", treasures = {
+    { navigationOnly = true, source = "ohnahran_plains", zone = "Ohn'ahran Plains", treasures = {
         { questID = 67718, name = "Ludo", waypoint = { 2023, 0.6101, 0.4337, "Ludo" } },
         { questID = 71033, name = "Primal Revenant's Frostblade", waypoint = { 2023, 0.5601, 0.7879, "Primal Revenant's Frostblade" } },
         { questID = 72512, name = "Godoloto", waypoint = { 2023, 0.5646, 0.7328, "Godoloto" } },
@@ -111,7 +186,7 @@ MC.RegisterContent("df", "treasures", {
         { questID = 70538, name = "Yennu's Map", waypoint = { 2025, 0.5493, 0.7543, "Yennu's Map" } },
         { questID = 72060, name = "Living Mud Mask", waypoint = { 2025, 0.386, 0.4642, "Living Mud Mask" } },
     } },
-    { navigationOnly = true, source = "waking_shores", zone = "Waking Shores", treasures = {
+    { navigationOnly = true, source = "waking_shores", zone = "The Waking Shores", treasures = {
         { questID = 65875, name = "A Dragon's Day Off", waypoint = { 2022, 0.2016, 0.3958, "A Dragon's Day Off" } },
         { questID = 65965, name = "FullSails Supply Chest", waypoint = { 2022, 0.4315, 0.6738, "FullSails Supply Chest" } },
         { questID = 70268, name = "Continuing Veritistrasz's story", waypoint = { 2022, 0.2324, 0.6049, "Continuing Veritistrasz's story" } },
@@ -196,7 +271,7 @@ MC.RegisterContent("legion", "treasures", {
         { questID = 43988, name = "Rares", waypoint = { 680, 0.3552, 0.528, "Rares" } },
         { questID = 43989, name = "Infinite Stone", waypoint = { 680, 0.3556, 0.1209, "Infinite Stone" } },
     } },
-    { navigationOnly = true, source = "valsharah", zone = "Valsharah", treasures = {
+    { navigationOnly = true, source = "valsharah", zone = "Val'sharah", treasures = {
         { questID = 38466, name = "Unguarded Thistleleaf Treasure npc:92104", waypoint = { 641, 0.5556, 0.7762, "Unguarded Thistleleaf Treasure npc:92104" } },
         { questID = 38783, name = "Darkpens, Val'sharah", waypoint = { 641, 0.7022, 0.5704, "Darkpens, Val'sharah" } },
         { questID = 38864, name = "removed? swapped for 38864?", waypoint = { 641, 0.549, 0.8056, "removed? swapped for 38864?" } },
@@ -207,7 +282,7 @@ MC.RegisterContent("legion", "treasures", {
 })
 
 MC.RegisterContent("midnight", "treasures", {
-    { navigationOnly = true, source = "coiled_isle", zone = "Coiled Isle", treasures = {
+    { navigationOnly = true, source = "coiled_isle", zone = "The Coiled Isle", treasures = {
         { questID = 94569, name = "Amani Privateer's Cache", waypoint = { 2512, 0.7188, 0.6666, "Amani Privateer's Cache" } },
         { questID = 95164, name = "Malfunctioning Staff", waypoint = { 2512, 0.7537, 0.6833, "Malfunctioning Staff" } },
         { questID = 95558, name = "Crumbling Urn", waypoint = { 2512, 0.7348, 0.5654, "Crumbling Urn" } },
@@ -266,7 +341,7 @@ MC.RegisterContent("midnight", "treasures", {
         { questID = 93587, name = "Peculiar Cauldron, Ruddy Sporeglider", waypoint = { 2413, 0.4064, 0.2802, "Peculiar Cauldron, Ruddy Sporeglider" } },
         { questID = 93650, name = "Sporespawned Cache, Untainted Grove Crawler", waypoint = { 2413, 0.4665, 0.6778, "Sporespawned Cache, Untainted Grove Crawler" } },
     } },
-    { navigationOnly = true, source = "isle_of_queldanas", zone = "Isle Of Queldanas", treasures = {
+    { navigationOnly = true, source = "isle_of_queldanas", zone = "Isle of Quel'Danas", treasures = {
         { questID = 92620, name = "voidlight x5, potent healing potion x3", waypoint = { 2424, 0.3836, 0.3304, "voidlight x5, potent healing potion x3" } },
         { questID = 92621, name = "potent healing potion x3", waypoint = { 2424, 0.5415, 0.2363, "potent healing potion x3" } },
         { questID = 92622, name = "potent healing potion x3, frayed handwraps", waypoint = { 2424, 0.3546, 0.2932, "potent healing potion x3, frayed handwraps" } },
@@ -297,7 +372,7 @@ MC.RegisterContent("midnight", "treasures", {
         { questID = 97093, name = "Marshy Redcap", waypoint = { 2405, 0.7142, 0.3705, "Marshy Redcap" } },
         { questID = 97095, name = "Airy Redcap", waypoint = { 2405, 0.9509, 0.2667, "Airy Redcap" } },
     } },
-    { navigationOnly = true, source = "zulaman", zone = "Zulaman", treasures = {
+    { navigationOnly = true, source = "zulaman", zone = "Zul'Aman", treasures = {
         { questID = 90793, name = "Honored Warrior's Cache", waypoint = { 2437, 0.4683, 0.8186, "Honored Warrior's Cache" } },
         { questID = 90794, name = "Abandoned Ritual Skull, Hexed Vilefeather Eagle", waypoint = { 2437, 0.4472, 0.441, "Abandoned Ritual Skull, Hexed Vilefeather Eagle" } },
         { questID = 90795, name = "Bait and Tackle", waypoint = { 2437, 0.2084, 0.6654, "Bait and Tackle" } },
@@ -311,10 +386,10 @@ MC.RegisterContent("midnight", "treasures", {
 })
 
 MC.RegisterContent("mop", "treasures", {
-    { navigationOnly = true, source = "jade_forest", zone = "Jade Forest", treasures = {
+    { navigationOnly = true, source = "jade_forest", zone = "The Jade Forest", treasures = {
         { questID = 31866, name = "Rares", waypoint = { 371, 0.6245, 0.2752, "Rares" } },
     } },
-    { navigationOnly = true, source = "kun_lai_summit", zone = "Kun Lai Summit", treasures = {
+    { navigationOnly = true, source = "kun_lai_summit", zone = "Kun-Lai Summit", treasures = {
         { questID = 31868, name = "Rares", waypoint = { 379, 0.4788, 0.735, "Rares" } },
     } },
     { navigationOnly = true, source = "timeless_isle", zone = "Timeless Isle", treasures = {
@@ -357,14 +432,117 @@ MC.RegisterContent("mop", "treasures", {
         { questID = 33210, name = "Sturdy", waypoint = { 554, 0.476, 0.276, "Sturdy" } },
         { questID = 33227, name = "in the shipwreck of Cpt. Zvezdan", waypoint = { 554, 0.617, 0.885, "in the shipwreck of Cpt. Zvezdan" } },
     } },
-    { navigationOnly = true, source = "valley_of_the_four_winds", zone = "Valley Of The Four Winds", treasures = {
+    { navigationOnly = true, source = "valley_of_the_four_winds", zone = "Valley of the Four Winds", treasures = {
         { questID = 31869, name = "Boat-Building Instructions", waypoint = { 376, 0.92, 0.39, "Boat-Building Instructions" } },
         { questID = 37246, name = "Mysterious Fruit Pile (Mesmerizing Fruit Hat)", waypoint = { 376, 0.5205, 0.6382, "Mysterious Fruit Pile (Mesmerizing Fruit Hat)" } },
     } },
 })
 
+MC.RegisterContent("shadowlands", "treasures", {
+    { navigationOnly = true, source = "ardenweald", zone = "Ardenweald", treasures = {
+        { questID = 60306, name = "Dream Catcher", waypoint = { 1565, 0.478, 0.537, "Dream Catcher" } },
+        { questID = 61192, name = "failed:61208, passed: 61198", waypoint = { { 1565, 0.2628, 0.5897, "failed:61208, passed: 61198" }, { 1565, 0.3251, 0.5302, "failed:61208, passed: 61198" } } },
+        { questID = 61633, name = "this is the overall questid for the event, but each rare has its own quest as well", waypoint = { 1565, 0.4125, 0.4445, "this is the overall questid for the event, but each rare has its own quest as well" } },
+        { questID = 64961, name = "Cat Soul", waypoint = { 1565, 0.6985, 0.2732, "Cat Soul" } },
+    } },
+    { navigationOnly = true, source = "bastion", zone = "Bastion", treasures = {
+        { questID = 61183, name = "Silverwind Larion", waypoint = { 1533, 0.3601, 0.2652, "Silverwind Larion" } },
+        { questID = 61229, name = "Crystal Mallet of Heralds", waypoint = { 1533, 0.5934, 0.3144, "Crystal Mallet of Heralds" } },
+        { questID = 61698, name = "this one seems to be daily?", waypoint = { 1533, 0.6104, 0.1511, "this one seems to be daily?" } },
+        { questID = 64959, name = "Otter Soul", waypoint = { 1533, 0.4985, 0.4685, "Otter Soul" } },
+    } },
+    { navigationOnly = true, source = "korthia", zone = "Korthia", treasures = {
+        { questID = 64247, name = "Spectral Bound Chest", waypoint = { 1961, 0.6205, 0.5551, "Spectral Bound Chest" } },
+        { questID = 64250, name = "Mawsworn cache", waypoint = { { 1961, 0.592, 0.567, "Mawsworn cache" }, { 1961, 0.603, 0.565, "Mawsworn cache" }, { 1961, 0.61, 0.587, "Mawsworn cache" }, { 1961, 0.621, 0.577, "Mawsworn cache" } } },
+        { questID = 64292, name = "Tinybell", waypoint = { 1961, 0.6055, 0.2105, "Tinybell" } },
+        { questID = 64362, name = "Feather Stuffed Helm", waypoint = { 1961, 0.524, 0.727, "Feather Stuffed Helm" } },
+        { questID = 64522, name = "Riftbound Caches", waypoint = { 1961, 0.618, 0.446, "Riftbound Caches" } },
+    } },
+    { navigationOnly = true, source = "maldraxxus", zone = "Maldraxxus", treasures = {
+        { questID = 59428, name = "later 59429", waypoint = { 1536, 0.5589, 0.3897, "later 59429" } },
+        { questID = 60109, name = "vignette's \"Web Covered Chest\" though", waypoint = { 1536, 0.5495, 0.261, "vignette's \"Web Covered Chest\" though" } },
+        { questID = 60368, name = "Everlasting Boneforged Greataxe", waypoint = { 1536, 0.441, 0.399, "Everlasting Boneforged Greataxe" } },
+        { questID = 61560, name = "Dapper Top Hat", waypoint = { 1536, 0.51, 0.788, "Dapper Top Hat" } },
+        { questID = 61562, name = "Trustworthy Doll", waypoint = { 1536, 0.532, 0.412, "Trustworthy Doll" } },
+        { questID = 62479, name = "Happiness Bird", waypoint = { 1536, 0.334, 0.364, "Happiness Bird" } },
+        { questID = 62571, name = "Safe Fall Pack", waypoint = { 1536, 0.6, 0.447, "Safe Fall Pack" } },
+        { questID = 62577, name = "Magician's Hat", waypoint = { 1536, 0.425, 0.503, "Magician's Hat" } },
+        { questID = 62602, name = "todo: this adds a pet directly to your collection, so before this can be uncommented I need to make loot cope with that", waypoint = { 1536, 0.4151, 0.1953, "todo: this adds a pet directly to your collection, so before this can be uncommented I need to make loot cope with that" } },
+        { questID = 62758, name = "Dundae's Hat", waypoint = { { 1536, 0.471, 0.49, "Dundae's Hat" }, { 1536, 0.542, 0.306, "Dundae's Hat" } } },
+        { questID = 62804, name = "Gelloh", waypoint = { 1536, 0.582, 0.742, "Gelloh" } },
+        { questID = 64995, name = "Saurid Soul", waypoint = { 1536, 0.4462, 0.6554, "Saurid Soul" } },
+    } },
+    { navigationOnly = true, source = "maw", zone = "The Maw", treasures = {
+        { questID = 61519, name = "Eurydea's Necklace", waypoint = { 1543, 0.2675, 0.293, "Eurydea's Necklace" } },
+        { questID = 62680, name = "Seal Breaker Key", waypoint = { 1543, 0.669, 0.562, "Seal Breaker Key" } },
+        { questID = 63157, name = "Box of Torments", waypoint = { 1543, 0.731, 0.166, "Box of Torments" } },
+        { questID = 63159, name = "Words of the Warden", waypoint = { 1543, 0.1935, 0.334, "Words of the Warden" } },
+        { questID = 63163, name = "Tormentor's Notes", waypoint = { 1543, 0.3575, 0.4555, "Tormentor's Notes" } },
+        { questID = 63999, name = "Jailer's Personal Stash", waypoint = { 1543, 0.2975, 0.428, "Jailer's Personal Stash" } },
+        { questID = 64000, name = "Etherwyrm Cage Key", waypoint = { { 1543, 0.231, 0.4225, "Etherwyrm Cage Key" }, { 1543, 0.238, 0.405, "Etherwyrm Cage Key" } } },
+        { questID = 64008, name = "Lil'Abom Right Hand", waypoint = { 1543, 0.385, 0.585, "Lil'Abom Right Hand" } },
+        { questID = 64009, name = "Lil'Abom Spare Arm", waypoint = { 1543, 0.393, 0.665, "Lil'Abom Spare Arm" } },
+        { questID = 64010, name = "Lil'Abom Head", waypoint = { 1543, 0.3221, 0.5608, "Lil'Abom Head" } },
+        { questID = 64011, name = "Lil'Abom Torso", waypoint = { 1543, 0.399, 0.626, "Lil'Abom Torso" } },
+        { questID = 64013, name = "Lil'Abom Legs", waypoint = { 1543, 0.2935, 0.673, "Lil'Abom Legs" } },
+        { questID = 64045, name = "inside the Altar", waypoint = { { 1543, 0.201, 0.525, "inside the Altar" }, { 1543, 0.23, 0.684, "inside the Altar" } } },
+        { questID = 64056, name = "Extractor's Sanatorium", waypoint = { { 1543, 0.262, 0.196, "Extractor's Sanatorium" }, { 1543, 0.285, 0.21, "Extractor's Sanatorium" }, { 1543, 0.296, 0.116, "Extractor's Sanatorium" }, { 1543, 0.327, 0.148, "Extractor's Sanatorium" }, { 1543, 0.737, 0.506, "Extractor's Sanatorium" } } },
+        { questID = 64199, name = "Nilganihmaht's Gold Band", waypoint = { 1543, 0.192, 0.3225, "Nilganihmaht's Gold Band" } },
+        { questID = 64202, name = "signet:64201, silver:64200, gold:64199, runed:64198, stone: 64197", waypoint = { 1543, 0.255, 0.368, "signet:64201, silver:64200, gold:64199, runed:64198, stone: 64197" } },
+        { questID = 64207, name = "Nilganimahts Silver Ring", waypoint = { 1543, 0.6605, 0.574, "Nilganimahts Silver Ring" } },
+        { questID = 64209, name = "Quartered Ancient Ring", waypoint = { { 1543, 0.289, 0.571, "Quartered Ancient Ring" }, { 1543, 0.3506, 0.6973, "Quartered Ancient Ring" } } },
+        { questID = 64270, name = "Fallen Charger", waypoint = { 1543, 0.2745, 0.495, "Fallen Charger" } },
+        { questID = 64283, name = "Zovaal's Vault Chain", waypoint = { { 1543, 0.448, 0.514, "Zovaal's Vault Chain" }, { 1543, 0.664, 0.582, "Zovaal's Vault Chain" } } },
+    } },
+    { navigationOnly = true, source = "revendreth", zone = "Revendreth", treasures = {
+        { questID = 59612, name = "Dredhollow Bolt", waypoint = { 1525, 0.4275, 0.734, "Dredhollow Bolt" } },
+        { questID = 60297, name = "59236, 60297", waypoint = { 1525, 0.2075, 0.5426, "59236, 60297" } },
+        { questID = 60896, name = "daily, final", waypoint = { 1525, 0.593, 0.57, "daily, final" } },
+        { questID = 61828, name = "61820, 61828", waypoint = { 1525, 0.5512, 0.3567, "61820, 61828" } },
+        { questID = 61829, name = "61824, 61829", waypoint = { 1525, 0.296, 0.2589, "61824, 61829" } },
+        { questID = 61830, name = "61817, 61830", waypoint = { 1525, 0.726, 0.4365, "61817, 61830" } },
+        { questID = 61831, name = "61821, 61831", waypoint = { 1525, 0.403, 0.7716, "61821, 61831" } },
+        { questID = 61832, name = "61825, 61832", waypoint = { 1525, 0.7717, 0.6543, "61825, 61832" } },
+        { questID = 61833, name = "61818, 61833", waypoint = { 1525, 0.2949, 0.3726, "61818, 61833" } },
+        { questID = 61834, name = "61822, 61834", waypoint = { 1525, 0.4041, 0.7334, "61822, 61834" } },
+        { questID = 61835, name = "61826, 61835", waypoint = { 1525, 0.2715, 0.2163, "61826, 61835" } },
+        { questID = 61836, name = "61819, 61836", waypoint = { 1525, 0.3909, 0.5218, "61819, 61836" } },
+        { questID = 61837, name = "61823, 61837", waypoint = { 1525, 0.588, 0.678, "61823, 61837" } },
+        { questID = 61838, name = "61827, 61838", waypoint = { 1525, 0.7097, 0.4363, "61827, 61838" } },
+        { questID = 62038, name = "Carriages", waypoint = { 1525, 0.5652, 0.3657, "Carriages" } },
+        { questID = 62042, name = "Day 2: brush from Snickersnee", waypoint = { 1525, 0.634, 0.618, "Day 2: brush from Snickersnee" } },
+        { questID = 62047, name = "Day 4: fresh water", waypoint = { 1525, 0.633, 0.616, "Day 4: fresh water" } },
+        { questID = 62048, name = "Day 5: blanket", waypoint = { 1525, 0.51, 0.7881, "Day 5: blanket" } },
+        { questID = 62050, name = "Day 6: apples", waypoint = { 1525, 0.408, 0.466, "Day 6: apples" } },
+        { questID = 62196, name = "Bat Visage Bobber", waypoint = { 1525, 0.7359, 0.7539, "Bat Visage Bobber" } },
+        { questID = 64941, name = "Chicken Soul", waypoint = { { 1525, 0.6326, 0.4285, "Chicken Soul" }, { 1525, 0.6375, 0.6169, "Chicken Soul" } } },
+    } },
+    { navigationOnly = true, source = "zereth_mortis", zone = "Zereth Mortis", treasures = {
+        { questID = 65183, name = "Pocopoc's Ruby and Platinum Body", waypoint = { 1970, 0.42, 0.5185, "Pocopoc's Ruby and Platinum Body" } },
+        { questID = 65184, name = "Fashion of the First Ones", waypoint = { 1970, 0.5175, 0.779, "Fashion of the First Ones" } },
+        { questID = 65282, name = "Olea Manu", waypoint = { 1970, 0.371, 0.447, "Olea Manu" } },
+        { questID = 65319, name = "Lore concordances", waypoint = { { 1970, 0.643, 0.633, "Lore concordances" }, { 1970, 0.656, 0.476, "Lore concordances" }, { 1970, 0.678, 0.2745, "Lore concordances" } } },
+        { questID = 65320, name = "Zereth Mortis", waypoint = { { 1970, 0.385, 0.355, "Zereth Mortis" }, { 1970, 0.436, 0.4035, "Zereth Mortis" }, { 1970, 0.4995, 0.3045, "Zereth Mortis" } } },
+        { questID = 65322, name = "Zereth Mortis", waypoint = { { 1970, 0.3645, 0.5645, "Zereth Mortis" }, { 1970, 0.392, 0.4665, "Zereth Mortis" }, { 1970, 0.422, 0.688, "Zereth Mortis" } } },
+        { questID = 65323, name = "Zereth Mortis", waypoint = { { 1970, 0.442, 0.901, "Zereth Mortis" }, { 1970, 0.4475, 0.761, "Zereth Mortis" }, { 1970, 0.475, 0.462, "Zereth Mortis" } } },
+        { questID = 65347, name = "Arbiter in the Making", waypoint = { 1970, 0.4786, 0.3046, "Arbiter in the Making" } },
+        { questID = 65351, name = "Schematic: Resonant Echo", waypoint = { 1970, 0.783, 0.531, "Schematic: Resonant Echo" } },
+        { questID = 65412, name = "Zereth Mortis", waypoint = { 1970, 0.513, 0.2575, "Zereth Mortis" } },
+        { questID = 65499, name = "Sand Sand Everywhere", waypoint = { 1970, 0.444, 0.368, "Sand Sand Everywhere" } },
+        { questID = 65501, name = "Schematic: Buzz", waypoint = { 1970, 0.6435, 0.6345, "Schematic: Buzz" } },
+        { questID = 65513, name = "Gromit Soul", waypoint = { 1970, 0.5107, 0.8289, "Gromit Soul" } },
+        { questID = 65517, name = "flying", waypoint = { 1970, 0.344, 0.713, "flying" } },
+        { questID = 65518, name = "flying", waypoint = { 1970, 0.633, 0.605, "flying" } },
+        { questID = 65519, name = "Mawforged Bridle", waypoint = { 1970, 0.2392, 0.3771, "Mawforged Bridle" } },
+        { questID = 65559, name = "Wayward Essence", waypoint = { 1970, 0.517, 0.9, "Wayward Essence" } },
+        { questID = 65611, name = "Sandworn Chest Key", waypoint = { 1970, 0.6595, 0.2695, "Sandworn Chest Key" } },
+        { questID = 65643, name = "Antecedent Drape (same caveat as the Valise)", waypoint = { 1970, 0.469, 0.395, "Antecedent Drape (same caveat as the Valise)" } },
+        { questID = 65730, name = "Mai Toa", waypoint = { 1970, 0.5855, 0.498, "Mai Toa" } },
+    } },
+})
+
 MC.RegisterContent("tww", "treasures", {
-    { navigationOnly = true, source = "azj_kahet", zone = "Azj Kahet", treasures = {
+    { navigationOnly = true, source = "azj_kahet", zone = "Azj-Kahet", treasures = {
         { questID = 83744, name = "Wildcamp Or'lay", waypoint = { 2255, 0.2421, 0.5274, "Wildcamp Or'lay" } },
         { questID = 83745, name = "Faerin's Advance", waypoint = { 2255, 0.6023, 0.1814, "Faerin's Advance" } },
         { questID = 83746, name = "Mmarl", waypoint = { 2255, 0.7804, 0.6325, "Mmarl" } },
@@ -388,11 +566,11 @@ MC.RegisterContent("tww", "treasures", {
         { questID = 84342, name = "Darkened Arathi Cape (cosmetic)", waypoint = { 2215, 0.6255, 0.1633, "Darkened Arathi Cape (cosmetic)" } },
         { questID = 84497, name = "Lightspark Grade Book", waypoint = { 2215, 0.5264, 0.5999, "Lightspark Grade Book" } },
     } },
-    { navigationOnly = true, source = "isle_of_dorn", zone = "Isle Of Dorn", treasures = {
+    { navigationOnly = true, source = "isle_of_dorn", zone = "Isle of Dorn", treasures = {
         { questID = 82756, name = "{npc:222941:Pearlescent Shellcrab}", waypoint = { 2248, 0.3836, 0.4194, "{npc:222941:Pearlescent Shellcrab}" } },
         { questID = 83094, name = "Dog!", waypoint = { 2248, 0.3144, 0.5131, "Dog!" } },
     } },
-    { navigationOnly = true, source = "karesh", zone = "Karesh", treasures = {
+    { navigationOnly = true, source = "karesh", zone = "K'aresh", treasures = {
         { questID = 86067, name = "Flickering Lantern, then 6681 Gift of the Brothers", waypoint = { 2371, 0.698, 0.605, "Flickering Lantern, then 6681 Gift of the Brothers" } },
         { questID = 91640, name = "A Dog-eared Book (no vignette)", waypoint = { 2371, 0.373, 0.257, "A Dog-eared Book (no vignette)" } },
         { questID = 91642, name = "Mysterious Notebook", waypoint = { 2371, 0.5845, 0.915, "Mysterious Notebook" } },
@@ -405,7 +583,7 @@ MC.RegisterContent("tww", "treasures", {
         { questID = 91686, name = "Geologist Field Journal", waypoint = { 2371, 0.4892, 0.5715, "Geologist Field Journal" } },
         { questID = 91687, name = "Checklist of Minor Pleasures", waypoint = { 2371, 0.3823, 0.4562, "Checklist of Minor Pleasures" } },
     } },
-    { navigationOnly = true, source = "ringing_deeps", zone = "Ringing Deeps", treasures = {
+    { navigationOnly = true, source = "ringing_deeps", zone = "The Ringing Deeps", treasures = {
         { questID = 83475, name = "Water Console", waypoint = { 2214, 0.4114, 0.4644, "Water Console" } },
         { questID = 83479, name = "Abyssal Console", waypoint = { 2214, 0.5484, 0.933, "Abyssal Console" } },
         { questID = 83480, name = "Taelloch Console", waypoint = { 2214, 0.5954, 0.611, "Taelloch Console" } },
@@ -451,15 +629,15 @@ MC.RegisterContent("wod", "treasures", {
         { questID = 34463, name = "Archmage Vargoth", waypoint = { 543, 0.397, 0.399, "Archmage Vargoth" } },
         { questID = 37249, name = "followers", waypoint = { 543, 0.57, 0.653, "followers" } },
     } },
-    { navigationOnly = true, source = "nagrand_draenor", zone = "Nagrand Draenor", treasures = {
+    { navigationOnly = true, source = "nagrand_draenor", zone = "Nagrand", treasures = {
         { questID = 34466, name = "Archmage Vargoth", waypoint = { 550, 0.464, 0.16, "Archmage Vargoth" } },
         { questID = 35596, name = "Goldmane", waypoint = { 550, 0.403, 0.761, "Goldmane" } },
         { questID = 37435, name = "abu'gar", waypoint = { 550, 0.404, 0.686, "abu'gar" } },
     } },
-    { navigationOnly = true, source = "shadowmoon_valley_draenor", zone = "Shadowmoon Valley Draenor", treasures = {
+    { navigationOnly = true, source = "shadowmoon_valley_draenor", zone = "Shadowmoon Valley", treasures = {
         { questID = 33037, name = "followers", waypoint = { 539, 0.518, 0.355, "followers" } },
     } },
-    { navigationOnly = true, source = "spires_of_arak", zone = "Spires Of Arak", treasures = {
+    { navigationOnly = true, source = "spires_of_arak", zone = "Spires of Arak", treasures = {
         { questID = 37168, name = "Leorajh", waypoint = { 542, 0.553, 0.685, "Leorajh" } },
     } },
     { navigationOnly = true, source = "talador", zone = "Talador", treasures = {

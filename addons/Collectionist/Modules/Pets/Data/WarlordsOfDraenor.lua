@@ -39,7 +39,7 @@ MC.RegisterContent("wod", "pets", {
     } },
     { source = "quest", pets = {
         { speciesID = 1387, itemID = 111660, npcID = 77221, name = "Iron Starlette", petType = 10, source = "quest", sourceInfo = "|cFFFFD200Quest:|r Report to the King (Alliance), Warning the Warchief (Horde)|n|cFFFFD200Zone:|r Blasted Lands (90+)|n" },
-        { speciesID = 1434, itemID = 113564, npcID = 83588, name = "Sun Sproutling", petType = 7, source = "quest", sourceInfo = "|cFFFFD200Quest:|r Mastering the Menagerie" },
+        { speciesID = 1434, itemID = 118598, npcID = 83588, name = "Sun Sproutling", petType = 7, source = "quest", sourceInfo = "|cFFFFD200Quest:|r Mastering the Menagerie" },
         { speciesID = 1446, itemID = 114834, npcID = 84330, name = "Meadowstomper Calf", petType = 8, source = "quest", sourceInfo = "|cFFFFD200Quest:|r New Babies|n|cFFFFD200Zone:|r Nagrand (Draenor)" },
         { speciesID = 1532, itemID = 119466, npcID = 86447, name = "Ikky", petType = 3, source = "quest", sourceInfo = "|cFFFFD200Quest:|r Ikky's Egg|n|cFFFFD200Zone:|r Spires of Arak" },
         { speciesID = 1545, itemID = 118578, npcID = 87704, name = "Firewing", petType = 3, source = "quest", sourceInfo = "|cFFFFD200Quest:|r Mastering the Menagerie" },
@@ -59,7 +59,7 @@ MC.RegisterContent("wod", "pets", {
         { speciesID = 1403, itemID = 111402, npcID = 79410, name = "Mechanical Axebeak", petType = 3, source = "profession", sourceInfo = "|cFFFFD200Profession: |rEngineering" },
         { speciesID = 1412, itemID = 112057, npcID = 80329, name = "Lifelike Mechanical Frostboar", petType = 10, source = "profession", sourceInfo = "|cFFFFD200Profession: |rEngineering" },
         { speciesID = 1426, itemID = 113216, npcID = 82464, name = "Elekk Plushie", petType = 6, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Tailoring|n" },
-        { speciesID = 1432, itemID = 113566, npcID = 83594, name = "Nightshade Sproutling", petType = 7, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Herbalism" },
+        { speciesID = 1432, itemID = 118595, npcID = 83594, name = "Nightshade Sproutling", petType = 7, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Herbalism" },
         { speciesID = 1448, itemID = 114919, npcID = 84441, name = "Sea Calf", petType = 9, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Fishing|n|cFFFFD200Vendor:|r Nat Pagle|n|cFFFFD200Zone:|r Garrison, Fishing Shack|n|cFFFFD200Cost:|r 50|Tinterface\\icons\\inv_misc_coin_19.blp:0|t" },
         { speciesID = 1495, itemID = 118919, npcID = 85667, name = "Ore Eater", petType = 1, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Mining" },
         { speciesID = 1530, itemID = 117380, npcID = 86422, name = "Frostwolf Ghostpup", petType = 4, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Archaeology" },
@@ -69,8 +69,8 @@ MC.RegisterContent("wod", "pets", {
     } },
     { source = "vendor", pets = {
         { speciesID = 1396, itemID = 110721, npcID = 79039, name = "Crazy Carrot", petType = 7, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rNaron Bloomthistle|n|cFFFFD200Zone: |rLunarfall|n|cFFFFD200Cost: |r1000|TINTERFACE\\ICONS\\INV_FARM_PUMPKINSEED_YELLOW.BLP:0|t|n|n|cFFFFD200Vendor: |rTarnon|n|cFFFFD200Zone: |rFrostwall|n|cFFFFD200Cost: |r1000|TINTERFACE\\ICONS\\INV_FARM_PUMPKINSEED_YELLOW.BLP:0|t" },
-        { speciesID = 1429, itemID = 113569, npcID = 83584, name = "Autumnal Sproutling", petType = 7, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDraemus|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\ACHIEVEMENT_GUILDPERK_HONORABLEMENTION.BLP:0|t" },
-        { speciesID = 1430, itemID = 113568, npcID = 83583, name = "Forest Sproutling", petType = 7, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |r Kwilax Fuseshiv|n|cFFFFD200Faction: |rSteamwheedle Preservation Society - Revered|n|cFFFFD200Cost: |r1000|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { speciesID = 1429, itemID = 118599, npcID = 83584, name = "Autumnal Sproutling", petType = 7, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDraemus|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\ACHIEVEMENT_GUILDPERK_HONORABLEMENTION.BLP:0|t" },
+        { speciesID = 1430, itemID = 118600, npcID = 83583, name = "Forest Sproutling", petType = 7, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |r Kwilax Fuseshiv|n|cFFFFD200Faction: |rSteamwheedle Preservation Society - Revered|n|cFFFFD200Cost: |r1000|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
         { speciesID = 1449, itemID = 114968, npcID = 84521, name = "Deathwatch Hatchling", petType = 8, source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Guild Vendor|n|cFFFFD200Zone:|r Stormwind, Orgrimmar|n|cFFFFD200Cost: |r300|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
         { speciesID = 1450, itemID = 115282, npcID = 84885, name = "Draenei Micro Defender", petType = 10, source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Vinidcator Nuurem|n|cFFFFD200Reputation:|r Council of Exarchs|n" },
         { speciesID = 1453, itemID = 140274, npcID = 79730, name = "River Calf", petType = 8, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDraemus|n|cFFFFD200Zone: |rDalaran|n|cFFFFD200Cost: |r50|TINTERFACE\\ICONS\\ACHIEVEMENT_GUILDPERK_HONORABLEMENTION.BLP:0|t" },

@@ -31,6 +31,18 @@ MC.AchievementSubcategoryOrder = {
         "islands", "war_effort", "heart_of_azeroth",
         "showdowns", "prey", "void_assaults", "ritual_sites",
         "delves", "dungeons", "raid", "housing", "professions", "season",
+        -- Cross-expansion features. Listed newest-first within each
+        -- expansion's block so a section keeps a stable position instead of
+        -- being drawn from an unordered pairs() walk.
+        "artifacts", "class_hall",
+        "garrison", "buildings", "followers", "missions", "shipyard",
+        "invasions", "monuments", "ashran",
+        "scenarios", "proving", "timeless",
+        "tournament",
+        -- Battlegrounds and world PvP.
+        "alterac", "arathi", "warsong", "eye_of_storm", "twinpeaks",
+        "gilneas", "silvershard", "kotmogu", "deepwind",
+        "tolbarad", "wintergrasp",
     },
 }
 
@@ -63,6 +75,41 @@ MC.AchievementSourceLabels = {
     housing       = "Housing",
     professions   = "Professions",
     season        = "Season 2",
+
+    -- Keys the cross-expansion catalogs use. Without a label these render as
+    -- the raw key ("eye_of_storm", "class_hall") because the UI falls back to
+    -- the source string, and they land in a non-deterministic position because
+    -- an unordered key is drawn from a pairs() walk.
+    -- Warlords garrison and its outbuildings.
+    garrison      = "Garrison",
+    buildings     = "Garrison Buildings",
+    followers     = "Followers",
+    missions      = "Missions",
+    shipyard      = "Shipyard",
+    invasions     = "Garrison Invasions",
+    monuments     = "Garrison Monuments",
+    ashran        = "Ashran",
+    -- Legion.
+    artifacts     = "Artifacts",
+    class_hall    = "Class Hall",
+    -- Pandaria.
+    scenarios     = "Scenarios",
+    proving       = "Proving Grounds",
+    timeless      = "Timeless Isle",
+    -- Battlegrounds and world PvP. Named as the game names them.
+    alterac       = "Alterac Valley",
+    arathi        = "Arathi Basin",
+    warsong       = "Warsong Gulch",
+    eye_of_storm  = "Eye of the Storm",
+    twinpeaks     = "Twin Peaks",
+    gilneas       = "Battle for Gilneas",
+    silvershard   = "Silvershard Mines",
+    kotmogu       = "Temple of Kotmogu",
+    deepwind      = "Deepwind Gorge",
+    tolbarad      = "Tol Barad",
+    wintergrasp   = "Wintergrasp",
+    -- Wrath.
+    tournament    = "Argent Tournament",
 }
 
 -- Back-compat: keep flat source order so older callers don't break.

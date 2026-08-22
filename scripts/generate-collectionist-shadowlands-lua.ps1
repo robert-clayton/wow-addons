@@ -127,7 +127,7 @@ $toys = Read-Manifest "toys"
 $toyLines = [System.Collections.Generic.List[string]]::new()
 $toyLines.Add("local _, MC = ...")
 $toyLines.Add("")
-$toyLines.Add("-- Shadowlands toys. Generated from the exact 115-row release manifest.")
+$toyLines.Add("-- Shadowlands toys. Generated from the exact 114-row release manifest.")
 $toyLines.Add('MC.RegisterContent("shadowlands", "toys", {')
 Add-GroupedEntries $toyLines $toys "toys" "toys" {
     param($row, $source)
@@ -210,9 +210,13 @@ foreach ($categoryID in @("15422", "15428", "15436", "15438", "15439", "15440", 
         if ($tasks.Count -ge 2 -and $tasks.Count -le 30) {
             $achievementLines.Add($prefix + ",")
             $achievementLines.Add('          taskList = { intro = "Progress from live achievement criteria.", tasks = {')
+            $duplicateCriteriaIDs = @($tasks | Group-Object criteria_id | Where-Object Count -gt 1 | ForEach-Object Name)
+            $taskIndex = 0
             foreach ($task in $tasks) {
+                $taskIndex++
+                $criteriaIndex = if ([string]$task.criteria_id -in $duplicateCriteriaIDs) { ", criteriaIndex = $taskIndex" } else { "" }
                 $label = if ($task.description) { ", label = $(ConvertTo-LuaString $task.description)" } else { "" }
-                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$label },")
+                $achievementLines.Add("              { achievementID = $($row.achievement_id), criteriaID = $($task.criteria_id)$criteriaIndex$label },")
             }
             $achievementLines.Add("          } } },")
         } else {

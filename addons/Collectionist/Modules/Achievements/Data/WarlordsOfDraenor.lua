@@ -1386,7 +1386,6 @@ MC.RegisterContent("wod", "achievements", {
               { achievementID = 9224, criteriaID = 26293, label = "Defeat Chani Malflame" },
               { achievementID = 9224, criteriaID = 26294, label = "Defeat Hildie Hackerguard" },
               { achievementID = 9224, criteriaID = 26295, label = "Defeat Jackson Bajheera" },
-              { achievementID = 9224, criteriaID = 26296, label = "Defeat John Swifty" },
               { achievementID = 9224, criteriaID = 26297, label = "Defeat Malda Brewbelly" },
               { achievementID = 9224, criteriaID = 26298, label = "Defeat Mathias Zunn" },
               { achievementID = 9224, criteriaID = 26299, label = "Defeat Shani Freezewind" },

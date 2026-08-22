@@ -8,7 +8,7 @@ This expansion has exact ID inventories, release manifests, generated runtime da
 - 84 battle pets from a 104-row collectible boundary; 13 TBC-acquisition pets, six external promotional/shop pets, and the Legion collector-edition pet are excluded.
 - 91 toys from a 101-row acquisition audit. Eight older toys merely exposed by Warlords vendors, Noble's Eternal Elementium Signet, and Soft Foam Sword are excluded.
 - 80 housing decorations assigned by current Warlords acquisition paths.
-- 402 visible player-facing achievements across 13 Warlords category roots, with 3,036 stable criteria-tree leaves.
+- 402 visible player-facing achievements across 13 Warlords category roots, with 3,035 current-trackable criteria-tree leaves.
 - 337 current named recipes: 316 surviving historical recipes plus 21 housing recipes taught by Draenor profession tiers. The inventory retains 37 historical recipe rows whose ability or spell name no longer exists in current retail.
 - 72 ordered rare criteria across three canonical achievements; the duplicate partial Tanaan achievement is excluded.
 - 368 ordered treasure criteria across three canonical achievements; threshold and partial duplicates are excluded.

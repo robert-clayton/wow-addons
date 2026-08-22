@@ -81,7 +81,7 @@ Assert-ExactSet $petManifest @($petInventory | Where-Object release_decision -eq
 Assert-ExactSet $toyManifest @($toyInventory | Where-Object release_decision -eq "include_tbc") "toy_id" "TBC toys" 22
 Assert-ExactSet $decorManifest $decorInventory "decor_id" "TBC decorations" 29
 Assert-ExactSet $achievementManifest $achievementInventory "achievement_id" "TBC achievements" 99
-Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "TBC achievement criteria" 845
+Assert-ExactSet $criteriaManifest $criteriaInventory "tree_id" "TBC achievement criteria" 842
 Assert-ExactSet $recipeManifest $recipeInventory "recipe_spell_id" "TBC recipes" 755
 Assert-ExactSet $rareManifest $rareInventory "tree_id" "TBC rares" 20
 Assert-ExactSet $treasureManifest $treasureInventory "tree_id" "TBC treasures" 0
@@ -116,7 +116,7 @@ Assert-GroupCounts $recipeManifest "profession" @{Alchemy=75;Blacksmithing=129;C
 Assert-GroupCounts $achievementManifest "category_id" @{"14777"=3;"14778"=2;"14779"=9;"14803"=13;"14805"=40;"14861"=1;"14862"=14;"14865"=16;"15081"=1} "TBC achievement categories"
 Assert-GroupCounts $decorManifest "source_kind" @{achievement=2;crafted=26;drop=1} "TBC decoration sources"
 $taskGroups = @($criteriaManifest | Group-Object achievement_id | Where-Object { $_.Count -ge 2 -and $_.Count -le 30 })
-if ($taskGroups.Count -ne 65 -or @($taskGroups.Group).Count -ne 651) { throw "TBC achievement task boundary mismatch" }
+if ($taskGroups.Count -ne 65 -or @($taskGroups.Group).Count -ne 648) { throw "TBC achievement task boundary mismatch" }
 Assert-IDValues @($achievementManifest | Where-Object achievement_id -in @("858","859","860","861","868","4908","4926") | ForEach-Object achievement_id) @("858","859","860","861","868","4908","4926") "TBC starter-zone achievements"
 
 $blizzardRows = Read-Rows (Join-Path $sourceRoot "blizzard-tbc-collectibles.csv")

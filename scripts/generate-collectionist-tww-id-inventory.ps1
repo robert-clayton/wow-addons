@@ -6,6 +6,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "collectionist-wild-pet-rules.ps1")
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 
 $dragonflightRoot = Join-Path $Db2Root "dragonflight"
 $twwRoot = Join-Path $Db2Root "tww"
@@ -441,7 +442,6 @@ $achievementCriteriaInventory = foreach ($achievement in $twwAchievements | Wher
         }
     }
 }
-
 $rareGuideText = @("azj.html", "hallowfall.html", "karesh.html") | ForEach-Object {
     Get-Content -Raw -LiteralPath (Join-Path $guideRoot $_)
 }
@@ -497,6 +497,9 @@ $treasureInventory = foreach ($achievementID in $treasureAchievementIDs) {
         }
     }
 }
+$currentEncounterCriteria = @(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $currentRoot -AllAchievements)
+$rareInventory = @(Sync-CollectionistEncounterRows $rareInventory $currentEncounterCriteria)
+$treasureInventory = @(Sync-CollectionistEncounterRows $treasureInventory $currentEncounterCriteria)
 
 $tradeCategoryChildren = @{}
 foreach ($category in $tradeSkillCategories) {
@@ -730,8 +733,9 @@ $rareManifest = @($rareInventory | Sort-Object { [int]$_.achievement_id }, order
 $treasureManifest = @($treasureInventory | Sort-Object { [int]$_.achievement_id }, order_path)
 $achievementManifest = @($achievementInventory | Where-Object { $_.status -eq "tww_category_confirmed" } | Sort-Object { [int]$_.achievement_id })
 $achievementManifestIDs = @($achievementManifest | ForEach-Object { [string]$_.achievement_id })
-$achievementCriteriaManifest = @($achievementCriteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementManifestIDs } |
-    Sort-Object { [int]$_.achievement_id }, order_path |
+$achievementCriteriaManifest = @(Sync-CollectionistAchievementCriteria @(
+    $achievementCriteriaInventory | Where-Object { [string]$_.achievement_id -in $achievementManifestIDs }
+) $currentRoot | Sort-Object { [int]$_.achievement_id }, order_path |
     Select-Object *, @{ Name = "achievement_tree_key"; Expression = { "$($_.achievement_id):$($_.tree_id)" } })
 
 $releaseManifests = [ordered]@{
@@ -741,7 +745,7 @@ $releaseManifests = [ordered]@{
     decorations = @{ rows = $twwDecorationManifest; expected = 108; id = "decor_id" }
     recipes     = @{ rows = $recipeManifest; expected = 696; id = "recipe_spell_id" }
     achievements = @{ rows = $achievementManifest; expected = 381; id = "achievement_id" }
-    "achievement-criteria" = @{ rows = $achievementCriteriaManifest; expected = 1987; id = "achievement_tree_key" }
+    "achievement-criteria" = @{ rows = $achievementCriteriaManifest; expected = 1985; id = "achievement_tree_key" }
     rares       = @{ rows = $rareManifest; expected = 140; id = "criteria_id" }
     treasures   = @{ rows = $treasureManifest; expected = 86; id = "criteria_id" }
 }

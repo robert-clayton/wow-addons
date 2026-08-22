@@ -37,7 +37,7 @@ A full-catalog acquisition scan also found Stormwind Wooden Table outside the Sh
 
 - Mount snapshot candidates: 193; 179 selected, 12 external-policy exclusions, and 2 internal/test exclusions.
 - Battle-pet snapshot candidates: 300; 175 selected, 6 external-policy exclusions, and 119 noncollectible or unavailable species rows.
-- Toy snapshot candidates: 121; 115 selected, 4 external-policy exclusions, and 2 unavailable/internal exclusions. Toy 1164/item 187959 is a removed placeholder and is absent from current retail.
+- Toy snapshot candidates: 121; 114 selected, 4 external-policy exclusions, 2 unavailable/internal exclusions, and 1 retired item exclusion. Toy 1102/item 183810 was replaced by a different current Toy row; toy 1164/item 187959 is a removed placeholder.
 - Decorations: 33 themed candidates plus 1 full-catalog acquisition match; 26 acquisition-confirmed for Shadowlands.
 - Achievement snapshot candidates: 963.
 - Player-visible Shadowlands achievements: 419 across the seven player-facing categories.

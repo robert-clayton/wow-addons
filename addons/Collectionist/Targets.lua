@@ -44,7 +44,11 @@ Targets._live = Targets._live or {}
 --------------------------------------------------------------------------
 local GENERIC_ID_FIELDS = {
     "mountID", "speciesID", "decorID", "itemID",
-    "id", "objectID", "npcID", "achievementID",
+    -- questID is the stable identity for navigation-only treasures: those
+    -- providers key their nodes on a quest completion flag rather than an
+    -- object. Without it here, keyFor returns nil for all of them and
+    -- alt-click pinning silently no-ops while the tooltip still offers it.
+    "id", "objectID", "questID", "npcID", "achievementID",
 }
 
 local function keyFor(item, moduleOverride)

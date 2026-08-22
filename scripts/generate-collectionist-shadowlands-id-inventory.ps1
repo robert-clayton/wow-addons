@@ -99,7 +99,7 @@ $slCurrencies = Read-Table $shadowlandsRoot "CurrencyTypes"
 
 $currentMountIDs = New-IDSet (Read-Table $CurrentDb2Root "Mount")
 $currentPetIDs = New-IDSet (Read-Table $CurrentDb2Root "BattlePetSpecies")
-$currentToyIDs = New-IDSet (Read-Table $CurrentDb2Root "Toy")
+$currentToyItemIDs = New-IDSet (Read-Table $CurrentTradeDb2Root "Toy") "ItemID"
 $currentAchievementIDs = New-IDSet (Read-Table $CurrentDb2Root "Achievement")
 $currentRecipeSpellIDs = New-IDSet (Read-Table $CurrentDb2Root "SkillLineAbility") "Spell"
 $currentSpellNameIDs = New-IDSet (Read-Table $CurrentDb2Root "SpellName")
@@ -261,6 +261,7 @@ $petInventory = foreach ($pet in (Get-NewRows $bfaPets $slPets)) {
 
 $toyInventory = foreach ($toy in (Get-NewRows $bfaToys $slToys)) {
     $item = $items[[string]$toy.ItemID]
+    $currentItemExists = $currentToyItemIDs.ContainsKey([string]$toy.ItemID)
     $toySourceText = if ($toySourceOverrides.ContainsKey([string]$toy.ID)) { $toySourceOverrides[[string]$toy.ID] } else { $toy.SourceText_lang }
     $status = if ($toySourceText -match $externalCollectionPattern) {
         "policy_external_candidate"
@@ -273,10 +274,10 @@ $toyInventory = foreach ($toy in (Get-NewRows $bfaToys $slToys)) {
     }
     [pscustomobject]@{
         status            = $status
-        release_decision  = if ([string]$toy.ID -in $toyInternalIDs) { "exclude_unobtainable_or_internal" } elseif ([string]$toy.ID -in $toyExternalIDs) { "exclude_policy_external" } else { "include_shadowlands" }
+        release_decision  = if ([string]$toy.ID -in $toyInternalIDs) { "exclude_unobtainable_or_internal" } elseif ([string]$toy.ID -in $toyExternalIDs) { "exclude_policy_external" } elseif (-not $currentItemExists) { "exclude_removed_current_item" } else { "include_shadowlands" }
         unavailable       = $false
         availability_note = $null
-        current_exists    = $currentToyIDs.ContainsKey([string]$toy.ID)
+        current_exists    = $currentItemExists
         toy_id            = $toy.ID
         item_id           = $toy.ItemID
         name              = if ($item) { $item.Display_lang } else { $null }
@@ -614,7 +615,7 @@ Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "include_s
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 6 "External Shadowlands pet count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_noncollectible" }).Count 57 "Noncollectible Shadowlands pet count"
 Assert-Equal @($petInventory | Where-Object { $_.release_decision -eq "exclude_shared_wild_audit" }).Count 61 "Shared-audit Shadowlands wild pet count"
-Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 115 "Selected Shadowlands toy count"
+Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "include_shadowlands" }).Count 114 "Selected Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_policy_external" }).Count 4 "External Shadowlands toy count"
 Assert-Equal @($toyInventory | Where-Object { $_.release_decision -eq "exclude_unobtainable_or_internal" }).Count 2 "Internal Shadowlands toy count"
 Assert-Equal @($mountInventory | Where-Object { $_.release_decision -eq "include_shadowlands" -and -not $_.source_text }).Count 0 "Selected Shadowlands mounts with blank sources"
@@ -742,7 +743,7 @@ Write-CsvFile (Join-Path $ManifestRoot "supporting-maps.csv") $supportingMapMani
 $manifestSummary = @(
     [pscustomobject]@{ manifest = "mounts"; rows = 180; identifier = "mount_id" }
     [pscustomobject]@{ manifest = "pets"; rows = 176; identifier = "species_id" }
-    [pscustomobject]@{ manifest = "toys"; rows = 115; identifier = "toy_id" }
+    [pscustomobject]@{ manifest = "toys"; rows = 114; identifier = "toy_id" }
     [pscustomobject]@{ manifest = "decorations"; rows = 26; identifier = "decor_id" }
     [pscustomobject]@{ manifest = "achievements"; rows = 419; identifier = "achievement_id" }
     [pscustomobject]@{ manifest = "achievement-criteria"; rows = 2489; identifier = "tree_id" }

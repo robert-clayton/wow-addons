@@ -76,7 +76,7 @@ MC.RegisterContent("legion", "mounts", {
         { mountID = 1009, itemID = 156486, name = "Starcursed Voidstrider", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rAllied Races: Void Elf" },
     } },
     { source = "quest", mounts = {
-        { mountID = 656, itemID = 116793, name = "Llothien Prowler", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Volpin the Elusive|n|cFFFFD200Zone:|r Suramar|n" },
+        { mountID = 656, itemID = 137573, name = "Llothien Prowler", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Volpin the Elusive|n|cFFFFD200Zone:|r Suramar|n" },
         { mountID = 793, itemID = 137577, name = "Predatory Bloodgazer", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Bloodgazer Reunion|n" },
         { mountID = 794, itemID = 137579, name = "Brilliant Direbeak", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Direbeak Reunion|n" },
         { mountID = 795, itemID = 137578, name = "Snowfeather Hunter", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Snowfeather Reunion|n" },

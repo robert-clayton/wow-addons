@@ -16,9 +16,9 @@ Historical DB2 CSVs come from `https://wago.tools/db2/<Table>/csv?build=<build>&
 - 236 battle pets; 11 Pandaria-acquisition rows, 232 non-collectible battle NPCs, 9 external-policy rows, and 1 internal test pet are excluded.
 - 135 toys; 6 external-policy rows and 2 internal or never-implemented rows are excluded.
 - 136 housing decorations assigned by current BFA acquisition paths.
-- 452 visible player-facing achievements across the eight BFA category roots, with 2,854 stable criteria-tree leaves.
+- 452 visible player-facing achievements across the eight BFA category roots, with 2,851 current-trackable criteria-tree leaves.
 - 1,253 named recipes in the nine professions supported by Collectionist: 1,231 historical BFA recipes plus 22 housing recipes taught by Kul Tiran and Zandalari profession tiers.
-- 256 ordered rare/special-encounter criteria across eight achievements.
+- 254 current ordered rare/special-encounter criteria across eight achievements.
 - 98 ordered treasure/hidden-object criteria across eight achievements.
 - 14 supporting currencies, 19 factions, and 10 primary maps.
 

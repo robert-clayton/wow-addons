@@ -22,7 +22,7 @@ The exact ID sets under `manifests/` contain:
 - 65 battle pets from 85 audited current candidates.
 - 22 toys from 32 audited current candidates.
 - 29 housing decorations assigned by current TBC acquisition requirements.
-- 99 player-facing achievements with 845 achievement-tree leaves.
+- 99 player-facing achievements with 842 current-trackable achievement-tree leaves.
 - 755 recipes, including 26 current TBC housing recipes.
 - 20 ordered rare NPCs from the canonical **Bloody Rare** achievement.
 - 0 treasure criteria because TBC has no comparable expansion-wide treasure checklist achievement.

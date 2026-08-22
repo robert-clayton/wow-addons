@@ -9,6 +9,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "collectionist-current-criteria.ps1")
 $decorAuditPath = Join-Path $PSScriptRoot "..\research\collectionist\classic\sources\housing-wowdb-acquisition-audit.csv"
 $attDataRoot = Join-Path $AttRoot ".contrib\Parser\DATAS"
 $attMountDbPath = Join-Path $attDataRoot "00 - DB\MountDB.lua"
@@ -145,6 +146,7 @@ $criteriaByID=New-Index $historicalCriteria;$criteriaChildren=@{}
 foreach($node in $historicalCriteriaTrees){if(-not$criteriaChildren.ContainsKey([string]$node.Parent)){$criteriaChildren[[string]$node.Parent]=[Collections.Generic.List[object]]::new()};$criteriaChildren[[string]$node.Parent].Add($node)}
 function Get-CriteriaLeaves([string]$RootID){if(-not $RootID -or $RootID -eq "0"){return};$queue=[Collections.Generic.Queue[object]]::new();$queue.Enqueue(@($RootID,""));while($queue.Count){$pair=$queue.Dequeue();foreach($node in @($criteriaChildren[[string]$pair[0]]|Sort-Object{[int]$_.OrderIndex})){$path=if($pair[1]){"$($pair[1])/$($node.OrderIndex)"}else{[string]$node.OrderIndex};if($node.CriteriaID -ne "0"){$criterion=$criteriaByID[[string]$node.CriteriaID];[pscustomobject]@{order_path=$path;tree_id=$node.ID;description=$node.Description_lang;criteria_id=$node.CriteriaID;criteria_type=if($criterion){$criterion.Type}else{$null};asset_id=if($criterion){$criterion.Asset}else{$null};amount=$node.Amount;operator=$node.Operator}}else{$queue.Enqueue(@([string]$node.ID,$path))}}}}
 $achievementCriteriaInventory=foreach($achievement in $selectedAchievements|Where-Object Criteria_tree -ne "0"){foreach($leaf in Get-CriteriaLeaves([string]$achievement.Criteria_tree)){[pscustomobject]@{achievement_id=$achievement.ID;title=$achievement.Title_lang;category_id=$achievement.Category;order_path=$leaf.order_path;tree_id=$leaf.tree_id;description=$leaf.description;criteria_id=$leaf.criteria_id;criteria_type=$leaf.criteria_type;asset_id=$leaf.asset_id;amount=$leaf.amount;operator=$leaf.operator}}}
+$achievementCriteriaInventory=@(Sync-CollectionistAchievementCriteria $achievementCriteriaInventory $CurrentDb2Root)
 $rareInventory=@();$treasureInventory=@()
 
 $tradeCategoryChildren=@{};$tradeCategoryByID=New-Index $currentTradeCategories
