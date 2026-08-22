@@ -108,6 +108,7 @@ MC.MountSourceLabels = {
     dungeon = "Dungeon", raid = "Raid", pvp = "PvP",
     worldevent = "World Event", profession = "Profession",
     vendor = "Vendor", tradingpost = "Trading Post", prepatch = "Pre-Patch",
+    treasure = "Treasure",
 }
 
 local LOC = MC.LOC

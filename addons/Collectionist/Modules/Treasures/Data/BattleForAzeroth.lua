@@ -2,11 +2,11 @@ local addonName, MC = ...
 
 -- Battle for Azeroth treasures and hidden-object collections. Exact 98 ordered criteria rows.
 MC.RegisterContent("bfa", "treasures", {
-    { source = "tiragarde", achievementID = 12852, criteriaCount = 10,
+    { source = "tiragarde_sound", achievementID = 12852, criteriaCount = 10,
       criteriaTreeIDs = { 67943, 67944, 67945, 67946, 67947, 67948, 67949, 67950, 67951, 67952 },
       criteriaNames = { "Hay Covered Chest", "Cutwater Treasure Chest", "Precarious Noble Cache", "Forgotten Smuggler's Stash", "Scrimshaw Cache", "Secret of the Depths", "Soggy Treasure Map", "Faded Treasure Map", "Yellowed Treasure Map", "Singed Treasure Map" }, name = "Treasures of Tiragarde Sound",
       zoneMapID = MC.MAP.TiragardeSound, zone = "Tiragarde Sound" },
-    { source = "stormsong", achievementID = 12853, criteriaCount = 10,
+    { source = "stormsong_valley", achievementID = 12853, criteriaCount = 10,
       criteriaTreeIDs = { 68003, 68004, 68005, 68006, 68007, 68008, 68009, 68010, 68011, 68012 },
       criteriaNames = { "Weathered Treasure Chest", "Old Ironbound Chest", "Frosty Treasure Chest", "Sunken Strongbox", "Hidden Scholar's Chest", "Smuggler's Stash", "Discarded Lunchbox", "Carved Wooden Chest", "Venture Co. Supply Chest", "Forgotten Chest" }, name = "Treasures of Stormsong Valley",
       zoneMapID = MC.MAP.StormsongValley, zone = "Stormsong Valley" },

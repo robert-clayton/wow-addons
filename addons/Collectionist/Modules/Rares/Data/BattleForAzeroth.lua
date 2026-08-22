@@ -2,12 +2,12 @@ local addonName, MC = ...
 
 -- Battle for Azeroth zone rares and special encounters. Exact 254 ordered criteria/entity rows.
 MC.RegisterContent("bfa", "rares", {
-    { source = "tiragarde", achievementID = 12939, criteriaCount = 32,
+    { source = "tiragarde_sound", achievementID = 12939, criteriaCount = 32,
       criteriaTreeIDs = { 69152, 69153, 69154, 69155, 69156, 69157, 69158, 69159, 69160, 69161, 69162, 69163, 69164, 69165, 69166, 69167, 69168, 69169, 69170, 69171, 69172, 69173, 69174, 69175, 69176, 69177, 69178, 69179, 69180, 69181, 69182, 69183 },
       criteriaNPCIDs = { 132182, 129181, 132068, 132086, 139145, 130508, 132088, 139152, 132211, 132127, 139233, 131520, 134106, 139290, 137183, 131252, 139205, 131262, 132179, 139278, 127290, 139287, 139285, 132280, 139135, 139280, 133356, 139289, 131389, 139235, 132076, 131984 },
       criteriaObjectIDs = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false }, name = "Adventurer of Tiragarde Sound",
       zoneMapID = MC.MAP.TiragardeSound, zone = "Tiragarde Sound" },
-    { source = "stormsong", achievementID = 12940, criteriaCount = 35,
+    { source = "stormsong_valley", achievementID = 12940, criteriaCount = 35,
       criteriaTreeIDs = { 69076, 69078, 69079, 69080, 69081, 69082, 69083, 69084, 69085, 69086, 69087, 69088, 69098, 69099, 69100, 69101, 69102, 69103, 69104, 69105, 69106, 69107, 69135, 69148, 69149, 69150, 69184, 69185, 69186, 69187, 69188, 69189, 69190, 69192, 69191 },
       criteriaNPCIDs = { 141175, 140997, 138938, 139328, 136189, 134884, 139319, 137025, 132007, 142088, 141029, 131404, 141286, 139298, 141059, 139385, 140938, 139968, 136183, 134897, 135939, false, 141226, 141088, 141039, 130897, 129803, 141143, 130079, 138963, 141239, 139988, 139980, 140925, 141043 },
       criteriaObjectIDs = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 286952, false, false, false, false, false, false, false, false, false, false, false, false, false }, name = "Adventurer of Stormsong Valley",

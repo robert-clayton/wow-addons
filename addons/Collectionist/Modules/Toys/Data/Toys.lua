@@ -18,6 +18,7 @@ MC.ToySourceLabels = {
     profession  = "Profession",
     worldevent  = "World Event",
     tradingpost = "Trading Post",
+    reputation = "Reputation",
 }
 
 local LOC = MC.LOC
@@ -213,9 +214,11 @@ MC.RegisterContent("midnight", "toys", {
               waypoint = LOC.NaleideaRivergleam, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.Undercoin, 5000 } } },
             -- Twilight Ascension (pre-patch event)
+            -- No waypoint: the pre-patch event is over and Materialist Ophinell
+            -- has nothing to sell. sourceInfo keeps the historical record, but
+            -- a pin would send players to an empty vendor.
             { itemID = 249468, name = "Twilight's Blade Top Secret Strategy Training Guide", source = "vendor",
               sourceInfo = "Materialist Ophinell - 30 Twilight's Blade Insignia (pre-patch event; Twilight Highlands)",
-              waypoint = LOC.MaterialistOphinell,
               cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 30 } }, score = T.legendary, unavailable = true },
         },
     },
