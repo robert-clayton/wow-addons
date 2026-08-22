@@ -79,6 +79,20 @@ function UI:GetConfigDefs()
                 MC.RefreshActive()
             end,
         },
+        {
+            type  = "checkbox",
+            label = "Hide unobtainable recipes",
+            tooltip = "Recipes that were removed from the game or never released. "
+                   .. "They stay counted as Legacies either way.",
+            get   = function() return mod.db.hideUnavailable end,
+            set   = function(v)
+                mod.db.hideUnavailable = v
+                -- A rescan, not just a redraw: the filter runs in the scanner
+                -- so the per-profession counts move with it.
+                if mod.Scanner then mod.Scanner:Scan() end
+                MC.RefreshActive()
+            end,
+        },
     }
 end
 

@@ -93,6 +93,7 @@ function Scanner:ScanProfession(skillLine, recipeData)
 
     for _, category in ipairs(recipeData) do
         local visible = MC.IsGroupVisible(category, "recipes")
+        local visibleHere
         for _, recipe in ipairs(category.recipes) do
             result.totalAll = result.totalAll + 1
             local known = recipe.id and self:IsRecipeKnown(recipe.id) or false
@@ -118,7 +119,19 @@ function Scanner:ScanProfession(skillLine, recipeData)
                 end
             end
 
-            if visible then
+            -- "Hide unobtainable" drops the row from the list AND from the
+            -- denominator, so a profession reads 40/40 rather than 40/47 with
+            -- seven rows nobody can ever get. The account-wide ledger and the
+            -- Legacy tally above are untouched: ownership is still recorded
+            -- and still counted, it just is not shown or chased.
+            local unobtainable = (recipe.source == "unavailable") or recipe.unavailable
+            if unobtainable and mod.db and mod.db.hideUnavailable then
+                visibleHere = false
+            else
+                visibleHere = visible
+            end
+
+            if visibleHere then
                 result.total = result.total + 1
                 local entry = {
                     id         = recipe.id,

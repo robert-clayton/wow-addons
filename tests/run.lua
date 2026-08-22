@@ -233,6 +233,21 @@ do
     equal(MC.GetSortMode("mounts"), "default", "sort mode is per module")
     equal(MC.GetSortMode("pets"), "name_asc", "each module keeps its own mode")
 
+    -- Round-tripping back to Default must restore the shipped order. Sorting
+    -- is in place, so without a kept copy the list stayed alphabetical.
+    do
+        local list = sample()
+        MC.db.sortMode.mounts = "name_asc"
+        MC.SortEntries(list, "mounts")
+        equal(names(list), "Amber,Basalt,Cobalt,Dune", "sorted away from shipped order")
+        MC.db.sortMode.mounts = "default"
+        MC.SortEntries(list, "mounts")
+        equal(names(list), "Cobalt,Amber,Basalt,Dune", "Default restores the shipped order")
+        MC.db.sortMode.mounts = "exp_asc"
+        MC.SortEntries(list, "mounts")
+        equal(names(list), "Dune,Basalt,Cobalt,Amber", "and can sort again afterwards")
+    end
+
     -- A junk value must not leak into the label lookup.
     MC.db.sortMode.mounts = "bogus"
     equal(MC.GetSortMode("mounts"), "default", "unknown mode falls back to default")
@@ -731,6 +746,30 @@ do
         equal(withLegacy.legacyCount, baseLegacy + 1, "an unavailable recipe counts as a legacy")
         CollectionistDB.recipesLearned[17579] = nil
         scanner:Scan()
+    end
+
+    -- "Hide unobtainable recipes" takes those rows out of the DENOMINATOR as
+    -- well as the list. Hiding them from the display alone would leave a
+    -- profession stuck at 40/47 with seven rows nobody can ever obtain.
+    do
+        local mod = MC.modulesByKey["recipes"]
+        local before = scanner.results[171].total
+        local beforeAll = scanner.results[171].totalAll
+        mod.db.hideUnavailable = true
+        scanner:Scan()
+        local hidden = scanner.results[171]
+        truthy(hidden.total < before, "hiding unobtainable recipes lowers the total")
+        equal(hidden.totalAll, beforeAll,
+            "the account-wide tally is unaffected -- ownership is still recorded")
+        for _, bucket in pairs(hidden.bySource or {}) do
+            for _, entry in ipairs(bucket) do
+                truthy(entry.source ~= "unavailable",
+                    "no unobtainable row survives in the buckets")
+            end
+        end
+        mod.db.hideUnavailable = false
+        scanner:Scan()
+        equal(scanner.results[171].total, before, "turning it back off restores the total")
     end
 
     -- End to end: the generated pin table has to survive the Scanner's

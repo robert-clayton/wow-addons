@@ -172,15 +172,41 @@ end
 function MC.SortEntries(entries, moduleKey)
     if type(entries) ~= "table" or #entries < 2 then return entries end
     local mode = MC.GetSortMode(moduleKey)
-    if mode == "default" then return entries end
+
+    -- Sorting happens IN PLACE because every caller ignores the return value
+    -- and re-reads the bucket. That destroys the order the scanner produced,
+    -- so "Default" could never get it back -- switching away from A-Z and
+    -- back left the list alphabetical. Keep one copy of the shipped order,
+    -- taken before the first sort, and restore from it.
+    if not entries._shipped then
+        local o = {}
+        for i = 1, #entries do o[i] = entries[i] end
+        entries._shipped = o
+    end
+
+    -- A windowed list re-renders on every scroll. Without this the addon
+    -- rebuilt a position table the length of the bucket and re-ran table.sort
+    -- on every one of those passes; buckets only change when the scanner
+    -- rebuilds them, which produces a new table with no stamp on it.
+    if entries._sortedAs == mode and entries._sortedLen == #entries then
+        return entries
+    end
+
+    if mode == "default" then
+        for i = 1, #entries._shipped do entries[i] = entries._shipped[i] end
+        entries._sortedAs, entries._sortedLen = mode, #entries
+        return entries
+    end
 
     local pos = {}
-    for i = 1, #entries do pos[entries[i]] = i end
+    for i = 1, #entries._shipped do pos[entries._shipped[i]] = i end
 
-    -- The original index is the final tie-break in every mode. table.sort is
-    -- not stable in Lua, and with the row list windowed and repainting on
-    -- scroll, two rows that compare equal could otherwise swap places
-    -- mid-scroll and read as flicker.
+    -- The SHIPPED index is the final tie-break in every mode. table.sort is
+    -- not stable in Lua, so without a total order two rows that compare equal
+    -- could swap places between renders -- and with a windowed list that
+    -- repaints on scroll, that reads as flicker. Keying off the shipped order
+    -- rather than the current one also makes the result independent of
+    -- whatever mode ran last.
     local function byName(a, b, desc)
         local an, bn = a.name or "", b.name or ""
         if an ~= bn then
@@ -208,6 +234,7 @@ function MC.SortEntries(entries, moduleKey)
             return byName(a, b, false)
         end)
     end
+    entries._sortedAs, entries._sortedLen = mode, #entries
     return entries
 end
 

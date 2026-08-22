@@ -69,6 +69,10 @@ local mod = MC.RegisterModule("recipes", {
         -- Off by default: recipes are account-wide, so the whole
         -- catalog is what a player can work toward.
         hideUnlearnedProfs = false,
+        -- Off by default: a recipe you already own that can no longer be
+        -- obtained is a Legacy and worth seeing. Players chasing completion
+        -- of what is still gettable want it gone.
+        hideUnavailable    = false,
         collapsed          = {},
     },
     -- SPELLS_CHANGED dropped: it fires on every spell cast / talent swap, far
