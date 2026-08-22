@@ -570,6 +570,22 @@ do
     equal(classicResult.learnedCount, 0, "Classic-only Alchemy learned count")
     equal(classicResult.learnedCountAll, 2, "account Alchemy learned count from Classic view")
 
+    -- A learned recipe that can no longer be obtained is a Legacy: counted,
+    -- never scored. Every other module splits it that way via
+    -- MC.AccumulateScanEntry; recipes have their own loop and used to score
+    -- them at full value. 17579 is Classic Alchemy, source="unavailable".
+    do
+        local baseScore, baseLegacy = classicResult.score, classicResult.legacyCount
+        truthy(type(baseLegacy) == "number", "recipe results carry legacyCount")
+        CollectionistDB.recipesLearned[17579] = true
+        scanner:Scan()
+        local withLegacy = scanner.results[171]
+        equal(withLegacy.score, baseScore, "an unavailable recipe adds no score")
+        equal(withLegacy.legacyCount, baseLegacy + 1, "an unavailable recipe counts as a legacy")
+        CollectionistDB.recipesLearned[17579] = nil
+        scanner:Scan()
+    end
+
     -- End to end: the generated pin table has to survive the Scanner's
     -- fixed-allowlist entry copy and reach the rendered row, or clicking does
     -- nothing. 3449 is a Classic Alchemy recipe with a generated waypoint.

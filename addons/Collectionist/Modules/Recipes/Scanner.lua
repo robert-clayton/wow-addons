@@ -61,7 +61,8 @@ function Scanner:Scan()
                         -- Off-profession recipes never render here, so there
                         -- is no display work to gate on IsGroupVisible.
                         for _, recipe in ipairs(category.recipes) do
-                            if recipe.id and ledger[recipe.id] == true then
+                            if recipe.id and ledger[recipe.id] == true
+                               and recipe.source ~= "unavailable" and not recipe.unavailable then
                                 offScore = offScore + MC.ScoreFor(recipe)
                             end
                         end
@@ -82,6 +83,10 @@ function Scanner:ScanProfession(skillLine, recipeData)
         totalAll       = 0,
         learnedCountAll = 0,
         score          = 0,
+        -- Learned recipes that can no longer be obtained. Counted, never
+        -- scored -- the same split MC.AccumulateScanEntry applies for every
+        -- other module, so "Legacies" means the same thing everywhere.
+        legacyCount    = 0,
         bySource       = {},
         learned        = {},
     }
@@ -102,7 +107,15 @@ function Scanner:ScanProfession(skillLine, recipeData)
                 or (ledger and recipe.id and ledger[recipe.id] == true)
             if accountKnown then
                 result.learnedCountAll = result.learnedCountAll + 1
-                result.score = result.score + MC.ScoreFor(recipe)
+                -- source="unavailable" is ATT's never-implemented bucket:
+                -- present in the client, never released, or pulled since.
+                -- Owning one is a legacy, not an achievement to score, and
+                -- every other module already splits it that way.
+                if recipe.source == "unavailable" or recipe.unavailable then
+                    result.legacyCount = result.legacyCount + 1
+                else
+                    result.score = result.score + MC.ScoreFor(recipe)
+                end
             end
 
             if visible then

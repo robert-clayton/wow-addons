@@ -284,9 +284,15 @@ function MC.GetLocalScore(excludePartial)
            and not (excludePartial and (r._partial or next(r) == nil)) then
             local s, l = 0, 0
             if m.key == "recipes" then
+                -- Recipes keep one sub-table per skill line rather than a
+                -- single flat result, so both tallies are summed across them.
+                -- legacyCount was previously ignored here, which meant a
+                -- no-longer-obtainable recipe counted toward nothing at all
+                -- once the scanner stopped scoring it.
                 for _, sub in pairs(r) do
                     if type(sub) == "table" and sub.score then
                         s = s + sub.score
+                        l = l + (sub.legacyCount or 0)
                     end
                 end
             else
