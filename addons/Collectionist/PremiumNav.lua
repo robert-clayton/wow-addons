@@ -145,6 +145,9 @@ function Nav:SetActive(key)
             -- No expansion scope here: Options is not a filtered list.
             self.panel:SetPageHeader("Options",
                 "How Collectionist tracks, and how it looks")
+        elseif key == MC.SEARCH_KEY then
+            self.panel:SetPageHeader("Search",
+                "Every collectible, by name, zone, or source")
         else
             local mod = MC.modulesByKey and MC.modulesByKey[key]
             self.panel:SetPageHeader((mod and mod.label) or key, nil)

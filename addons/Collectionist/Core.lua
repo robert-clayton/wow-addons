@@ -362,6 +362,10 @@ end
 -- stale data at that character's next logout.
 local ACCOUNT_ONLY_KEYS = {
     recipesLearned = true,
+    -- Search recents are written straight to CollectionistDB; without
+    -- this flag the logout snapshot's clear loop would erase them every
+    -- session and the copy loop could never restore them.
+    searchRecents = true,
 }
 
 -- Strictly per-character state that must never ride the PLAYER_LOGOUT
@@ -384,6 +388,9 @@ local charDefaults = {
     panelHeight      = 560,
     disabledModules  = {},
     animations       = true,
+    -- Game-wide item-tooltip status (Tooltips.lua). Off means the line
+    -- never appends; the tri-state in Tooltips.lua caches until toggled.
+    tooltipStatusDisabled = false,
     -- Expansions hidden from the browse lists. Purely a display filter:
     -- totals, Collection Score, Legacies, and sharing keep counting a
     -- disabled expansion's content.
@@ -981,6 +988,11 @@ function MC.OpenItemWowhead(item)
         url = "https://www.wowhead.com/spell=" .. tonumber(item.id)
     elseif item.objectID and item.objectID > 0 then
         url = "https://www.wowhead.com/object=" .. tonumber(item.objectID)
+    elseif item.questID and item.questID > 0 then
+        -- Navigation-only treasures identify by quest completion flag rather
+        -- than an object, so this is the only link they can offer. Ordered
+        -- after objectID so a row carrying both still prefers the object.
+        url = "https://www.wowhead.com/quest=" .. tonumber(item.questID)
     elseif item.npcID then
         url = "https://www.wowhead.com/npc=" .. tonumber(item.npcID)
     elseif item.achievementID then
@@ -1104,7 +1116,9 @@ MC._isWaypointList = isWaypointList
 --   achievementID + criteriaID    — GetAchievementCriteriaInfoByID (preferred;
 --                                    survives criterion reorderings between
 --                                    patches that would shift criteriaIndex)
---   achievementID + criteriaIndex — GetAchievementCriteriaInfo (3rd = completed)
+--   achievementID + criteriaIndex — GetAchievementCriteriaInfo (3rd = completed;
+--                                    takes precedence when Blizzard reuses one
+--                                    criteriaID for multiple visible rows)
 --   speciesID                     — C_PetJournal.GetNumCollectedInfo > 0
 --   itemID [+ itemCount]          — PlayerHasToy / GetItemCount >= itemCount
 --                                    (default itemCount = 1; PlayerHasToy is
@@ -1119,6 +1133,15 @@ function MC.IsTaskCompleted(task)
         end
         return false
     end
+    if task.achievementID and task.criteriaIndex then
+        local getCrit = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfo)
+                          or GetAchievementCriteriaInfo
+        if getCrit then
+            local ok, _, _, completed = pcall(getCrit, task.achievementID, task.criteriaIndex)
+            return ok and (completed and true or false) or false
+        end
+        return false
+    end
     if task.achievementID and task.criteriaID then
         -- Look up by stable criteria ID (preferred — surviving criterion
         -- reorderings between patches). Only available via the C_API.
@@ -1126,15 +1149,6 @@ function MC.IsTaskCompleted(task)
                           or GetAchievementCriteriaInfoByID
         if getById then
             local ok, _, _, completed = pcall(getById, task.achievementID, task.criteriaID)
-            return ok and (completed and true or false) or false
-        end
-        return false
-    end
-    if task.achievementID and task.criteriaIndex then
-        local getCrit = (C_AchievementInfo and C_AchievementInfo.GetAchievementCriteriaInfo)
-                          or GetAchievementCriteriaInfo
-        if getCrit then
-            local ok, _, _, completed = pcall(getCrit, task.achievementID, task.criteriaIndex)
             return ok and (completed and true or false) or false
         end
         return false
@@ -1372,6 +1386,9 @@ function MC.OnScanComplete(mod)
     if MC.Targets and MC.Targets.OnScanComplete then MC.Targets:OnScanComplete(mod) end
     if MC.RosterDebouncedBroadcast then MC.RosterDebouncedBroadcast() end
     if MC.RefreshPeerPanel then MC.RefreshPeerPanel() end
+    -- Search marks its index dirty here and pays for the rebuild on the
+    -- next open/query; a login wave fires one of these per module.
+    if MC.Search and MC.Search.Invalidate then MC.Search:Invalidate() end
     -- Not while Options owns the content area: the module's rows would
     -- render straight over the settings page.
     if MC.activeModule == mod.key and mod.UI and MC.panel
@@ -1762,6 +1779,9 @@ function MC._ApplyIndicatorVisibility()
     setIndicatorShown(MC.expansionFilterBtn, viewHidden or MC.IsOptionsSelected())
     setIndicatorShown(MC.scoreIndicator, viewHidden)
     setIndicatorShown(MC.peerIndicator, viewHidden)
+    -- Search rides the chain's compact/strip hiding but, being an action
+    -- rather than a readout, stays available on the Options page.
+    setIndicatorShown(MC.searchIndicator, viewHidden)
     -- The counter hides for Options, since it counts a tracker list.
     -- Exception: the strip is built around it (icon, wordmark, counter,
     -- restore) and would collapse to a gap without it. Its value is the
@@ -1777,6 +1797,11 @@ function MC._ApplyIndicatorVisibility()
     -- Peer visibility also depends on rosterEnabled; re-derive it on
     -- return to full rather than blanket-showing.
     if not viewHidden and MC.RefreshPeerIndicator then MC.RefreshPeerIndicator() end
+
+    -- Search's floating chrome anchors off the title bar, which compact/
+    -- strip hide outright — take the chrome down with it, and bring it
+    -- back when a full view returns while search is still the selection.
+    if MC.Search and MC.Search.OnViewChanged then MC.Search:OnViewChanged() end
 end
 
 function MC.CreatePanel()
@@ -2003,6 +2028,21 @@ function MC.CreatePanel()
         scoreBtn:SetPoint("RIGHT", rightAnchor, rightPoint, rightOfsX, 0)
         peerBtn:SetPoint("RIGHT", scoreBtn, "LEFT", -10, 0)
 
+        -- Search. A view action rather than an indicator, so it stays up
+        -- on the Options page (unlike score/peer) and only follows the
+        -- chain down into compact/strip.
+        local searchBtn = MUI.MakeHeaderIconBtn(bar,
+            "Interface\\Common\\UI-Searchbox-Icon", 13,
+            theme.colors.btnTealFg,
+            theme.colors.btnTealHoverBg,
+            theme.colors.btnTealHoverBd,
+            "Search  (/mc find)")
+        searchBtn:SetPoint("RIGHT", peerBtn, "LEFT", -10, 0)
+        -- SelectSearch already handles the already-open case by refocusing
+        -- the input; no duplicate guard here.
+        searchBtn:SetScript("OnClick", function() MC.SelectSearch() end)
+        MC.searchIndicator = searchBtn
+
         MC.RefreshPeerIndicator()
 
         -- The premium shell may already be in the compact/strip state
@@ -2112,9 +2152,14 @@ function MC.SwitchTab(key)
     if not mod or not MC.IsModuleEnabled(key) then return end
 
     local wasOptions = MC.IsOptionsSelected()
+    local wasSearch = MC.IsSearchSelected()
     MC.activeSelection = key
     MC.activeModule = key
     if MC.cdb then MC.cdb.activeTab = key end
+
+    -- Leaving search takes its floating chrome (input + scope chips) down;
+    -- it is parented to the window frame, so nothing else hides it.
+    if wasSearch and MC.Search and MC.Search.HideView then MC.Search:HideView() end
 
     if MC.TabBar then MC.TabBar:SetActive(key) end
     if MC.RefreshExpansionFilterButton then MC.RefreshExpansionFilterButton() end
@@ -2153,6 +2198,10 @@ function MC.SelectOptions()
 
     MC.activeSelection = MC.OPTIONS_KEY
 
+    -- Search → Options: same chrome teardown SwitchTab does on its way to
+    -- a tracker.
+    if MC.Search and MC.Search.HideView then MC.Search:HideView() end
+
     if MC.TabBar and MC.TabBar.SetActive then
         MC.TabBar:SetActive(MC.OPTIONS_KEY)
     end
@@ -2184,6 +2233,56 @@ function MC.ToggleOptions()
     -- Everything disabled: there is nothing to go back to, so Options
     -- stays up rather than leaving an empty content area behind.
     if back then MC.SwitchTab(back) end
+end
+
+--------------------------------------------------------------------------
+-- Search view. State/index/render live in Search.lua; this is the tab
+-- plumbing, kept beside its siblings (SwitchTab / SelectOptions) because
+-- it needs TransitionContent, which is file-local to Core.
+--
+-- activeSelection carries SEARCH_KEY while activeModule stays put, so
+-- backing out of search reopens the last tracker — the same contract
+-- Options uses.
+--------------------------------------------------------------------------
+
+function MC.IsSearchSelected()
+    return MC.activeSelection == MC.SEARCH_KEY
+end
+
+function MC.SelectSearch(query)
+    if not MC.panel then return end
+    -- Re-clicking the header magnifier while search is up just refocuses
+    -- the input rather than flickering the page through another fade.
+    if MC.IsSearchSelected() then
+        if MC.Search and MC.Search.inputFrame then MC.Search.inputFrame:Focus() end
+        return
+    end
+
+    local wasOptions = MC.IsOptionsSelected()
+    MC.activeSelection = MC.SEARCH_KEY
+
+    -- Deactivate the sidebar rows and re-seat the page header, mirroring
+    -- SwitchTab: PremiumNav's SetActive hides the travelling indicator for
+    -- an unknown key and titles the page "Search". Classic TabBar merely
+    -- deactivates its tabs.
+    if MC.TabBar and MC.TabBar.SetActive then
+        MC.TabBar:SetActive(MC.SEARCH_KEY)
+    end
+
+    if wasOptions then MC._ApplyIndicatorVisibility() end
+
+    TransitionContent(function()
+        -- Leaving Options: its pooled widgets share the scroll child with
+        -- the results about to render (same teardown SwitchTab does).
+        if wasOptions and MC.panel.ClearConfigContent then
+            MC.panel:ClearConfigContent()
+        elseif not wasOptions then
+            if MC.panel.pool then MC.panel.pool:ReleaseAll() end
+        end
+        if MC.Search and MC.Search.ShowView then
+            MC.Search:ShowView(query, true)
+        end
+    end)
 end
 
 -- Re-render the options page on the next frame, once, however many
@@ -2220,6 +2319,14 @@ function MC.RefreshActive()
     -- module render would paint a tracker list over it.
     if MC.IsOptionsSelected() then
         MC.QueueConfigRebuild()
+        if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        return
+    end
+    -- While search owns the content area, a stale-path refresh re-runs the
+    -- current query (fresh collected badges after a rescan) instead of
+    -- painting a tracker list over the results.
+    if MC.IsSearchSelected() then
+        if MC.Search and MC.Search.RefreshResults then MC.Search:RefreshResults() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
         return
     end
@@ -2293,6 +2400,12 @@ function MC.BuildConfig()
         get = function() return not (CollectionistDB and CollectionistDB.whatsNewDisabled) end,
         set = function(v)
             if CollectionistDB then CollectionistDB.whatsNewDisabled = not v end
+        end }
+    defs[#defs + 1] = { type = "checkbox", label = "Collection status on item tooltips",
+        get = function() return not (MC.db.tooltipStatusDisabled) end,
+        set = function(v)
+            MC.db.tooltipStatusDisabled = not v
+            if MC.TooltipsSetEnabled then MC.TooltipsSetEnabled(v) end
         end }
     defs[#defs + 1] = { type = "divider" }
     defs[#defs + 1] = { type = "section", label = "SHARING" }
@@ -2439,12 +2552,16 @@ local function PrintHelp()
     print("  /mc whatsnew - what changed in this version")
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
+    print("  /mc find <text> - global search (also: just /mc <anything>)")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
 
 SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
-    msg = strlower(strtrim(msg or "", " \t\r\n"))
+    -- Queries keep their original case (recents display it verbatim);
+    -- command matching below runs on the lowercased copy.
+    local rawQuery = strtrim(msg or "", " \t\r\n")
+    msg = strlower(rawQuery)
 
     if msg == "" then
         if MC.panel then MC.panel:Toggle() end
@@ -2585,9 +2702,28 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         else
             print(PREFIX .. " Targets not loaded.")
         end
+    elseif cmd == "find" or cmd == "search" then
+        -- /mc find <query> — open the panel on the search view with the
+        -- rest of the line as the query. No query: just open the view.
+        if MC.panel and not MC.panel.frame:IsShown() then MC.panel:Show() end
+        if rawQuery ~= cmd then
+            local query = strtrim(rawQuery:sub(#cmd + 1))
+            if MC.Search and MC.Search.AddRecent then MC.Search:AddRecent(query) end
+            MC.SelectSearch(query)
+        elseif MC.SelectSearch then
+            MC.SelectSearch()
+        end
     elseif cmd == "help" then
         PrintHelp()
     else
-        print(format("%s Unknown command '%s'. Type /mc help.", PREFIX, cmd))
+        -- Anything unrecognized is a query. "/mc storm song" reads better
+        -- than an error for the thing people will actually type, at the
+        -- cost of typos ("/mc sharng on") silently becoming searches.
+        if MC.SelectSearch then
+            if MC.panel and not MC.panel.frame:IsShown() then MC.panel:Show() end
+            MC.SelectSearch(rawQuery)
+        else
+            print(format("%s Unknown command '%s'. Type /mc help.", PREFIX, cmd))
+        end
     end
 end

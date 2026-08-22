@@ -4,18 +4,22 @@ Collectionist tracks mounts, pets, toys, housing decor, recipes, rares, treasure
 
 Hover an entry for costs, requirements, progress, and drop information. Shift-click copies its Wowhead URL; Ctrl-click prints its IDs and source data for troubleshooting. TomTom is optional—without it, Collectionist falls back to Blizzard map pins.
 
+The title-bar magnifier (or `/mc find`) searches every collectible by name, zone, or source across all trackers at once; results keep the usual row clicks. Collectionist also appends a status line to item tooltips game-wide—green "Collected", or "Missing" with where to get it (toggle in Options).
+
 Collection Score summarizes collected content by estimated time investment. Unavailable collectibles are reported separately as Legacies. Optional Sharing compares totals and per-item ownership with guild members and online Battle.net friends who also use Collectionist; a fresh installation sends nothing until Sharing is explicitly enabled during onboarding.
 
 ## Slash commands
 
 - `/mc` — toggle the panel
 - `/mc <module>` — switch to mounts, pets, decorations, toys, recipes, rares, treasures, or achievements
+- `/mc find <text>` — search every collectible (any unrecognized `/mc <text>` searches too)
 - `/mc scan` — rescan all trackers
 - `/mc collected [module]` — toggle collected or learned entries
 - `/mc score` — print Collection Score and its tracker breakdown
-- `/mc filter all|current|<expansion>` — change the expansion scope
 - `/mc sharing on|off|announce|sync|prune|clear|status` — manage Sharing
-- `/mc theme modern|simple` — change the account-wide UI theme
+- `/mc targets` — toggle the pinned-targets overlay
+- `/mc style classic|premium` — switch the UI shell (takes effect after a reload)
+- `/mc whatsnew` — what changed in this version
 - `/mc reset` — reset panel position, size, scale, and opacity
 - `/mc version` / `/mc help`
 

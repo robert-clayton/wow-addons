@@ -36,7 +36,10 @@ local SOURCE_ORDER = {
     "drop", "worlddrop", "quest", "treasure", "pvp",
     "unavailable", "unknown",
 }
-local SOURCE_LABELS = {
+-- Exported on MC so Search (and future callers) resolve recipe source
+-- labels without a second drifting copy; the local alias keeps the two
+-- render paths below unchanged.
+MC.RecipeSourceLabels = {
     trainer        = "Trainer",
     vendor         = "Vendor",
     discovery      = "Discovery",
@@ -52,6 +55,7 @@ local SOURCE_LABELS = {
     -- Says the addon hasn't catalogued it, not that the recipe has no source.
     unknown        = "Source not catalogued",
 }
+local SOURCE_LABELS = MC.RecipeSourceLabels
 local SOURCE_SET = {}
 for _, s in ipairs(SOURCE_ORDER) do SOURCE_SET[s] = true end
 

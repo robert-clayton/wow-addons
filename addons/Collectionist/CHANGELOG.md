@@ -1,3 +1,10 @@
+# 1.15.0
+### Added
+- **Search everything.** A magnifier in the title bar — or `/mc find`, or just typing anything after `/mc` — searches every collectible the addon knows by name, zone, or source. "Storm song" finds the Stormsong Valley mounts, "Kael" finds his drops across five trackers. Results group by tracker, and every row keeps its usual clicks: waypoint, Wowhead link, Alt-click to pin.
+- Search respects Options > Expansions like the tabs do, but ignores the hide-unavailable and Trading Post toggles — those curate the trackers; search answers whether something exists at all. Your last few queries are remembered as clickable recents.
+- **Collection status on item tooltips.** Hover a mount, pet, toy, or decoration anywhere in the game — bags, loot, the auction house — and Collectionist appends one line: green "Collected", or "Missing" plus where to get it, in that source's color. Turn it off in Options > General if you'd rather not know.
+- Escape backs out of search to whatever tab you were reading; an empty input's Escape leaves search, a full one just clears.
+
 # 1.14.0
 ### Added
 - **Recipes drop map pins.** Click a recipe you haven't learned and Collectionist points you at it, the same way rares and treasures already did. Around 5,900 recipes now have a location — the vendor who sells it, the boss who drops it, the quest that rewards it, or the trainer who teaches it.

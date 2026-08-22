@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.14.0
+## Version: 1.15.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -200,6 +200,12 @@ Modules\Recipes\Data\AttGaps.lua
 Modules\Recipes\Init.lua
 Modules\Recipes\Scanner.lua
 Modules\Recipes\UI.lua
+
+# Global search + game-wide item tooltips. Both index against the
+# manifests the modules registered above, so they load after every module
+# block. Core references MC.Search only through runtime guards.
+Search.lua
+Tooltips.lua
 
 # Roster — standalone (no longer a tab module). Loads after the other
 # modules so it can read their Scanner.results at broadcast time. Comms

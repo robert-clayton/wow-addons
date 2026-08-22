@@ -926,3 +926,151 @@ lib._populateConfigBody = function(panel, defs, target)
     content:SetHeight(totalH)
     if target.finish then target.finish(totalH) end
 end
+
+--------------------------------------------------------------------------
+-- MakeSearchInput: a themed single-line search box.
+--
+--   opts = {
+--       placeholder   — dim prompt shown while empty (default "Search…")
+--       width/height  — frame size (height default 26)
+--       onChanged(text) — every keystroke (also fires on Clear())
+--       onEscape()    — Escape with an EMPTY box (a non-empty one clears
+--                       first, which is what a search box should do)
+--       onEnter(text) — Enter commits
+--       maxLetters    — default 64
+--   }
+--
+-- Returns a Frame exposing:
+--   :GetText() :SetText(t) :Clear() :Focus() :ClearFocus()
+--
+-- Not pooled: the search view owns exactly one for its lifetime and
+-- re-parents nothing. One theme hook at creation covers repaints; there
+-- is no per-render acquisition to accumulate hooks over.
+--------------------------------------------------------------------------
+function lib.MakeSearchInput(parent, opts)
+    opts = opts or {}
+    local h = opts.height or 26
+
+    local frame = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    frame:SetHeight(h)
+    frame:SetBackdrop(theme.btnBackdrop)
+
+    local magnifier = frame:CreateTexture(nil, "ARTWORK")
+    magnifier:SetSize(13, 13)
+    magnifier:SetPoint("LEFT", frame, "LEFT", 8, 0)
+    magnifier:SetTexture("Interface\\Common\\UI-Searchbox-Icon")
+
+    -- Font before SetText (house rule).
+    local edit = CreateFrame("EditBox", nil, frame)
+    edit:SetFont(theme.font, theme.fontSize, lib.FontFlags())
+    edit:SetTextInsets(24, 22, 0, 0)
+    edit:SetAllPoints()
+    edit:SetAutoFocus(false)
+    edit:SetMaxLetters(opts.maxLetters or 64)
+
+    local placeholder = frame:CreateFontString(nil, "OVERLAY")
+    placeholder:SetFont(theme.font, theme.fontSize, lib.FontFlags())
+    placeholder:SetPoint("LEFT", frame, "LEFT", 25, 0)
+    placeholder:SetPoint("RIGHT", frame, "RIGHT", -24, 0)
+    placeholder:SetJustifyH("LEFT")
+    placeholder:SetWordWrap(false)
+    placeholder:SetText(opts.placeholder or "Search…")
+
+    -- Clear affordance: a text "x" rather than a texture asset, matching
+    -- the close-button treatment used across this UI's chrome.
+    local clearBtn = CreateFrame("Button", nil, frame)
+    clearBtn:SetSize(16, 16)
+    clearBtn:SetPoint("RIGHT", frame, "RIGHT", -4, 0)
+    local clearFs = clearBtn:CreateFontString(nil, "OVERLAY")
+    clearFs:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
+    clearFs:SetPoint("CENTER", 0, 1)
+    clearFs:SetText("x")
+    clearBtn:SetFontString(clearFs)
+    clearBtn:Hide()
+
+    local function paintFocus(focused)
+        local c = theme.colors
+        frame:SetBackdropColor(unpack(c.btnBg))
+        if focused then
+            local ac = c.accent
+            frame:SetBackdropBorderColor(ac[1], ac[2], ac[3], 0.9)
+        else
+            frame:SetBackdropBorderColor(unpack(c.btnBorder))
+        end
+        local tc = focused and c.text or c.textDim
+        edit:SetTextColor(tc[1], tc[2], tc[3], tc[4] or 1)
+        local dc = c.textDim
+        magnifier:SetVertexColor(dc[1], dc[2], dc[3])
+        placeholder:SetTextColor(dc[1], dc[2], dc[3])
+    end
+
+    local function refresh()
+        local text = edit:GetText() or ""
+        local has = text ~= ""
+        placeholder:SetShown(not has)
+        clearBtn:SetShown(has)
+        if opts.onChanged then opts.onChanged(text) end
+    end
+
+    edit:SetScript("OnTextChanged", refresh)  -- not OnTextChanged(true): no history compare needed
+    edit:SetScript("OnEditFocusGained", function() paintFocus(true) end)
+    edit:SetScript("OnEditFocusLost", function() paintFocus(false) end)
+    edit:SetScript("OnEscapePressed", function(self)
+        if self:GetText() ~= "" then
+            self:SetText("")
+            refresh()
+        else
+            self:ClearFocus()
+            if opts.onEscape then opts.onEscape() end
+        end
+    end)
+    edit:SetScript("OnEnterPressed", function(self)
+        self:ClearFocus()
+        if opts.onEnter then opts.onEnter(self:GetText() or "") end
+    end)
+
+    clearBtn:SetScript("OnClick", function()
+        -- SetText alone: OnTextChanged fires refresh(), which updates
+        -- placeholder/clear visibility and notifies onChanged once.
+        edit:SetText("")
+        edit:SetFocus()
+    end)
+    clearBtn:SetScript("OnEnter", function()
+        clearFs:SetTextColor(1, 1, 1, 1)
+    end)
+    clearBtn:SetScript("OnLeave", function()
+        local dc = theme.colors.textDim
+        clearFs:SetTextColor(dc[1], dc[2], dc[3])
+    end)
+
+    if lib.RegisterThemeHook then
+        lib.RegisterThemeHook(function()
+            frame:SetBackdrop(theme.btnBackdrop)
+            paintFocus(edit:HasFocus())
+            local dc = theme.colors.textDim
+            clearFs:SetTextColor(dc[1], dc[2], dc[3])
+        end)
+    end
+
+    paintFocus(false)
+
+    function frame:GetText() return edit:GetText() or "" end
+    -- SetText/Clear deliberately do NOT call refresh() themselves:
+    -- programmatic SetText fires OnTextChanged, which refreshes and
+    -- notifies exactly once.
+    function frame:SetText(t)
+        edit:SetText(t or "")
+    end
+    function frame:Clear()
+        edit:SetText("")
+    end
+    function frame:Focus()
+        edit:SetFocus()
+        edit:SetCursorPosition(#edit:GetText())
+    end
+    function frame:ClearFocus()
+        edit:ClearFocus()
+    end
+
+    return frame
+end

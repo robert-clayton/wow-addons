@@ -7,6 +7,14 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.15.0", sections = {
+        { heading = "Added", lines = {
+            "|cffffd200Search everything.|r A magnifier in the title bar — or /mc find, or just typing anything after /mc — searches every collectible the addon knows by name, zone, or source. \"Storm song\" finds the Stormsong Valley mounts, \"Kael\" finds his drops across five trackers. Results group by tracker, and every row keeps its usual clicks: waypoint, Wowhead link, Alt-click to pin.",
+            "Search respects Options > Expansions like the tabs do, but ignores the hide-unavailable and Trading Post toggles — those curate the trackers; search answers whether something exists at all. Your last few queries are remembered as clickable recents.",
+            "|cffffd200Collection status on item tooltips.|r Hover a mount, pet, toy, or decoration anywhere in the game — bags, loot, the auction house — and Collectionist appends one line: green \"Collected\", or \"Missing\" plus where to get it, in that source's color. Turn it off in Options > General if you'd rather not know.",
+            "Escape backs out of search to whatever tab you were reading; an empty input's Escape leaves search, a full one just clears.",
+        } },
+    } },
     { version = "1.14.0", sections = {
         { heading = "Added", lines = {
             "|cffffd200Recipes drop map pins.|r Click a recipe you haven't learned and Collectionist points you at it, the same way rares and treasures already did. Around 5,900 recipes now have a location — the vendor who sells it, the boss who drops it, the quest that rewards it, or the trainer who teaches it.",
@@ -67,19 +75,6 @@ MC.CHANGELOG = {
             "The collection spine kept its full width when collapsing to compact.",
             "The first time you hovered a sidebar entry it flashed near-white instead of lifting slightly.",
             "Collectionist could not be expanded again after collapsing it all the way down to the strip.",
-        } },
-    } },
-    { version = "1.12.1", sections = {
-        { heading = "Added", lines = {
-            "Now tracking 11 collectibles that were missing: the Umbral Ashes mount; pets Three-Eyed Fish, Pale Hexscale, J'imothy, Lil'Kruul, and Furiostraza (the last two with full Family Battler of Outland and Cataclysm checklists); toys Gold Starfish, Otoola's Recognition, G-00, Ula'tek's Sssacrificial Rain, and Preyhunter's Masquerade.",
-        } },
-        { heading = "Fixed", lines = {
-            "Rare and treasure waypoints, scores, and puzzle notes now point at the right target. The lists had been copied from the achievement window's two columns in the wrong order, so most rows carried a neighbor's info.",
-            "Unbound Manawyrm and Retrained Skyrazor track the right mounts. They had Alunira's and Azure Worldchiller's IDs.",
-            "The Silvermoon Court and Hara'ti Inscription contracts are now recognized once you learn them.",
-            "Ten pets show their real battle family.",
-            "The Ever Painting checklist and three relic tasks in the Arcantina and Zul'Aman tick the correct criteria.",
-            "The Ritual Sites gate tracks the actual \"Ritual Site Disruptor\" achievement.",
         } },
     } },
 }
