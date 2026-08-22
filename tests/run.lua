@@ -233,6 +233,74 @@ do
         "single-entry list is a no-op")
 end
 
+-- "Closest to done" ranking.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    -- Goals.lua grabs the library at load. Restore the global afterwards:
+    -- later blocks load Core.lua, which needs the fuller stub.
+    local savedLibStub = LibStub
+    LibStub = function(name)
+        if name == "MidnightUI-1.0" then return { Theme = { colors = {} } } end
+    end
+    loadAddon("addons/Collectionist/Goals.lua", MC)
+    LibStub = savedLibStub
+
+    local function mod(key, label, byExpansion, bySource)
+        return { key = key, label = label,
+                 Scanner = { results = { byExpansion = byExpansion,
+                                         bySource = bySource or {} } } }
+    end
+
+    MC.modules = {
+        -- 2 left, 96% done
+        mod("mounts", "Mounts", { df = { total = 50, collected = 48 } }),
+        -- 1 left: fewer remaining wins even though the percentage is lower
+        mod("toys", "Toys", { tww = { total = 20, collected = 19 } }),
+        -- barely started: excluded by the completion floor
+        mod("pets", "Pets", { legion = { total = 100, collected = 5 } }),
+        -- finished: not a goal
+        mod("recipes2", "Done", { wrath = { total = 10, collected = 10 } }),
+        -- no content: must not divide by zero or rank
+        mod("empty", "Empty", { cata = { total = 0, collected = 0 } }),
+    }
+
+    local goals = MC.Goals:Collect()
+    equal(#goals, 2, "only unfinished, sufficiently-complete goals rank")
+    equal(goals[1].moduleLabel, "Toys", "fewest remaining ranks first")
+    equal(goals[1].remaining, 1, "remaining is total minus collected")
+    equal(goals[2].moduleLabel, "Mounts", "the 2-left goal follows")
+
+    -- An unknown expansion key has no label or order to rank by and must be
+    -- dropped rather than sorted against a nil.
+    MC.modules = { mod("mounts", "Mounts", { notreal = { total = 4, collected = 3 } }) }
+    equal(#MC.Goals:Collect(), 0, "a goal in an unknown expansion is dropped")
+
+    -- Items come from the uncollected buckets, and future content never
+    -- becomes something to go do now.
+    MC.modules = { mod("mounts", "Mounts",
+        { df = { total = 4, collected = 2 } },
+        { vendor = {
+            { name = "Now",    expansion = "df" },
+            { name = "Later",  expansion = "df", future = true },
+            { name = "Other",  expansion = "tww" },
+            { name = "Have",   expansion = "df", collected = true },
+        } }) }
+    local g = MC.Goals:Collect()
+    equal(#g, 1, "one goal from one expansion bucket")
+    equal(#g[1].items, 1, "future, collected and other-expansion rows are excluded")
+    equal(g[1].items[1].name, "Now", "the actionable row is the one listed")
+
+    -- Ranking must be a total order, or the list reshuffles between renders.
+    MC.modules = {
+        mod("a", "Alpha", { df = { total = 10, collected = 9 } }),
+        mod("b", "Bravo", { df = { total = 10, collected = 9 } }),
+    }
+    local first = MC.Goals:Collect()[1].moduleLabel
+    equal(MC.Goals:Collect()[1].moduleLabel, first, "identical goals rank deterministically")
+end
+
 do
     local MC = {}
     GetCurrentRegion = function() return 1 end

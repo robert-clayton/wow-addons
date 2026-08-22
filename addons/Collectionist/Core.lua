@@ -1787,6 +1787,7 @@ function MC._ApplyIndicatorVisibility()
     -- Search rides the chain's compact/strip hiding but, being an action
     -- rather than a readout, stays available on the Options page.
     setIndicatorShown(MC.searchIndicator, viewHidden)
+    setIndicatorShown(MC.goalsIndicator, viewHidden)
     -- The counter hides for Options, since it counts a tracker list.
     -- Exception: the strip is built around it (icon, wordmark, counter,
     -- restore) and would collapse to a gap without it. Its value is the
@@ -2057,6 +2058,7 @@ function MC.CreatePanel()
             -- Options and search have no per-source row groups to order.
             local applies = not (MC.IsOptionsSelected and MC.IsOptionsSelected())
                 and not (MC.IsSearchSelected and MC.IsSearchSelected())
+                and not (MC.IsGoalsSelected and MC.IsGoalsSelected())
             if not applies then btn:Hide() return end
             btn:Show()
             local mode = MC.SORT_MODE_BY_KEY[MC.GetSortMode()]
@@ -2087,6 +2089,18 @@ function MC.CreatePanel()
         -- the input; no duplicate guard here.
         searchBtn:SetScript("OnClick", function() MC.SelectSearch() end)
         MC.searchIndicator = searchBtn
+
+        -- Closest to done. Sits with search as a view action rather than a
+        -- readout, so it survives the Options page the same way.
+        local goalsBtn = MUI.MakeHeaderIconBtn(bar,
+            "Interface\\Common\\ReputationStar", 13,
+            theme.colors.btnTealFg,
+            theme.colors.btnTealHoverBg,
+            theme.colors.btnTealHoverBd,
+            "Closest to done  (/mc goals)")
+        goalsBtn:SetPoint("RIGHT", searchBtn, "LEFT", -10, 0)
+        goalsBtn:SetScript("OnClick", function() MC.SelectGoals() end)
+        MC.goalsIndicator = goalsBtn
 
         MC.RefreshPeerIndicator()
 
@@ -2330,6 +2344,30 @@ function MC.SelectSearch(query)
     end)
 end
 
+function MC.SelectGoals()
+    if not MC.panel or MC.IsGoalsSelected() then return end
+    local wasOptions = MC.IsOptionsSelected()
+    MC.activeSelection = MC.GOALS_KEY
+
+    if MC.TabBar and MC.TabBar.SetActive then
+        MC.TabBar:SetActive(MC.GOALS_KEY)
+    end
+    if wasOptions then MC._ApplyIndicatorVisibility() end
+    -- Search owns floating chrome above the scroll viewport; leaving it for
+    -- another view has to take that chrome down or it hangs over the goals.
+    if MC.Search and MC.Search.HideView then MC.Search:HideView() end
+    MC._ApplyIndicatorVisibility()
+
+    TransitionContent(function()
+        if wasOptions and MC.panel.ClearConfigContent then
+            MC.panel:ClearConfigContent()
+        elseif MC.panel.pool then
+            MC.panel.pool:ReleaseAll()
+        end
+        if MC.Goals then MC.Goals:Render() end
+    end)
+end
+
 -- Re-render the options page on the next frame, once, however many
 -- callers ask for it.
 --
@@ -2372,6 +2410,12 @@ function MC.RefreshActive()
     -- painting a tracker list over the results.
     if MC.IsSearchSelected() then
         if MC.Search and MC.Search.RefreshResults then MC.Search:RefreshResults() end
+        if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        return
+    end
+    -- Goals rank live scanner output, so a rescan has to redraw them too.
+    if MC.IsGoalsSelected() then
+        if MC.Goals then MC.Goals:Render() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
         return
     end
@@ -2600,6 +2644,7 @@ local function PrintHelp()
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc find <text> - global search (also: just /mc <anything>)")
+    print("  /mc goals       - what you are closest to finishing")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -2760,6 +2805,10 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         elseif MC.SelectSearch then
             MC.SelectSearch()
         end
+    elseif cmd == "goals" or cmd == "next" then
+        -- /mc goals — what you are closest to finishing.
+        if MC.panel and not MC.panel.frame:IsShown() then MC.panel:Show() end
+        if MC.SelectGoals then MC.SelectGoals() end
     elseif cmd == "help" then
         PrintHelp()
     else

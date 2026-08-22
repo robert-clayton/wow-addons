@@ -205,6 +205,7 @@ Modules\Recipes\UI.lua
 # manifests the modules registered above, so they load after every module
 # block. Core references MC.Search only through runtime guards.
 Search.lua
+Goals.lua
 Tooltips.lua
 
 # Roster — standalone (no longer a tab module). Loads after the other
