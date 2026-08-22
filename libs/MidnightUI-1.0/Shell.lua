@@ -472,7 +472,14 @@ function ShellProto:_CreateContent()
         UpdateScrollBar()
     end)
     scroll:SetScript("OnScrollRangeChanged", function() UpdateScrollBar() end)
-    scroll:SetScript("OnVerticalScroll", function() UpdateScrollBar() end)
+    -- Scrolling into unbuilt rows has to repaint them. Only when the view has
+    -- moved far enough to eat into the overscan margin, though: firing a
+    -- refresh on every scroll tick would re-run the module render dozens of
+    -- times per wheel spin.
+    scroll:SetScript("OnVerticalScroll", function()
+        UpdateScrollBar()
+        self:_MaybeRepaintWindow()
+    end)
 
     f.scrollFrame = scroll
     f.scrollChild = content
@@ -1222,6 +1229,22 @@ end
 function ShellProto:GetConfigContentRail()
     local target = self._cfgContentTarget
     return target and target.store and target.store._cfgRail or nil
+end
+
+-- Repaint the windowed row list if the viewport has moved far enough that
+-- unbuilt rows could be showing. The threshold is half the overscan, so a
+-- repaint always lands before the built region runs out.
+function ShellProto:_MaybeRepaintWindow()
+    local pool = self.pool
+    if not (pool and pool._winTop and self.scrollFrame) then return end
+    local off = self.scrollFrame:GetVerticalScroll() or 0
+    if math.abs(off - (pool._winAt or 0)) < 300 then return end
+    -- Re-entrancy guard: the refresh calls RefreshScrollContent, which can
+    -- resize the child and fire OnVerticalScroll again.
+    if self._repainting then return end
+    self._repainting = true
+    if self.opts and self.opts.onRefresh then self.opts.onRefresh(self) end
+    self._repainting = false
 end
 
 function ShellProto:RefreshScrollContent(height)

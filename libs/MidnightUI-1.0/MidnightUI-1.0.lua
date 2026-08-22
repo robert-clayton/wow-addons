@@ -549,6 +549,44 @@ function lib.MakeHeaderIconBtn(parent, texPath, iconSize, fgColor, hoverBg, hove
     return btn
 end
 
+-- ---------------------------------------------------------------- windowing
+--
+-- Row lists are windowed: a render pass walks every entry to compute layout,
+-- but only builds frames for the ones near the viewport. Groups default to
+-- EXPANDED, so opening Recipes asked for 10,318 frames in one pass and the
+-- client visibly stalled.
+--
+-- The important property is that only *painting* is skipped. Every renderer
+-- still advances yOff by its own height, so the content height, the scroll
+-- range and the thumb are identical to what a full build produces -- the list
+-- does not grow as you scroll into it.
+--
+-- Overscan keeps a screen of built rows above and below the viewport, so a
+-- normal scroll never outruns the repaint.
+local OVERSCAN = 600
+
+-- Called once at the top of a render pass. Without it the window is nil and
+-- every renderer builds unconditionally, which is exactly the old behaviour --
+-- so any consumer that has not opted in keeps working.
+function lib.BeginRenderPass(pool, scrollFrame)
+    if not pool then return end
+    pool._winTop, pool._winBot = nil, nil
+    if not scrollFrame then return end
+    local viewH = scrollFrame:GetHeight()
+    if not viewH or viewH <= 0 then return end
+    local off = scrollFrame:GetVerticalScroll() or 0
+    pool._winTop = off - OVERSCAN
+    pool._winBot = off + viewH + OVERSCAN
+    pool._winAt  = off
+end
+
+local function offscreen(pool, yOff, height)
+    local top = pool and pool._winTop
+    if not top then return false end
+    return (yOff + (height or 0)) < top or yOff > pool._winBot
+end
+lib.IsOffscreen = offscreen
+
 -- Render a collapsible group header.
 --   opts: { height, indent, collKey, accentR/G/B, label, labelColor, count,
 --           countColor, [icon], [fontSize], [countFontSize] }
@@ -556,6 +594,13 @@ end
 function lib.RenderCollapsibleHeader(pool, parent, yOff, opts, db, refreshCb)
     local theme = lib.Theme
     local collapsed = db.collapsed[opts.collKey] == true
+
+    -- Skipping a header must still report `collapsed`: callers decide whether
+    -- to walk the children from it, and an offscreen collapsed group would
+    -- otherwise lay out its entire contents and push everything below it down.
+    if offscreen(pool, yOff, opts.height) then
+        return nil, collapsed, yOff + opts.height + 2
+    end
 
     local header = pool:Acquire(parent)
     header:SetHeight(opts.height)
@@ -696,6 +741,10 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
     local pad = opts.padding or 6
     local indent = opts.indent or 8
     local height = opts.height or 22
+
+    -- The whole point of the window: 10,290 of the Recipes tab's 10,318 rows
+    -- return here without touching the frame pool.
+    if offscreen(pool, yOff, height) then return yOff + height end
 
     local row = pool:Acquire(parent)
     row:SetHeight(height)
@@ -1226,6 +1275,7 @@ end
 function lib.RenderModulePage(panel, opts)
     if not panel or not panel.scrollChild then return end
     panel.pool:ReleaseAll()
+    lib.BeginRenderPass(panel.pool, panel.scrollFrame)
 
     local r = opts.results
     if not r or not r.total then

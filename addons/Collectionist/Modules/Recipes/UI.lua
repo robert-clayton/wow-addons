@@ -87,6 +87,9 @@ function UI:Refresh()
     if not mod.Scanner then return end
 
     self.panel.pool:ReleaseAll()
+    -- This module renders its own tree rather than going through
+    -- MUI.RenderModulePage, so it opts into the viewport window itself.
+    MUI.BeginRenderPass(self.panel.pool, self.panel.scrollFrame)
 
     local child = self.panel.scrollChild
     local yOff = 0

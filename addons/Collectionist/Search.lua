@@ -706,6 +706,9 @@ function Search:RenderResults()
     if GameTooltip then GameTooltip:Hide() end
 
     panel.pool:ReleaseAll()
+    -- Search renders the same pooled rows as a module page and can match
+    -- thousands of items, so it takes the same viewport window.
+    MUI.BeginRenderPass(panel.pool, panel.scrollFrame)
     local child = panel.scrollChild
     MUI.HideEmptyMessage(child)
 

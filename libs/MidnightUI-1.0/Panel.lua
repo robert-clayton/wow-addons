@@ -392,7 +392,10 @@ function PanelProto:CreateScrollFrame()
         UpdateScrollBar()
     end)
     scroll:SetScript("OnScrollRangeChanged", function() UpdateScrollBar() end)
-    scroll:SetScript("OnVerticalScroll", function() UpdateScrollBar() end)
+    scroll:SetScript("OnVerticalScroll", function()
+        UpdateScrollBar()
+        if self._MaybeRepaintWindow then self:_MaybeRepaintWindow() end
+    end)
 
     f.scrollFrame = scroll
     f.scrollChild = content
@@ -591,6 +594,20 @@ function PanelProto:_PopulateConfigBody(defs)
 end
 
 -- Scroll content helpers
+-- Repaint the windowed row list once the viewport has moved far enough that
+-- unbuilt rows could be showing. Mirrors ShellProto:_MaybeRepaintWindow; the
+-- two protos do not share a base.
+function PanelProto:_MaybeRepaintWindow()
+    local pool = self.pool
+    if not (pool and pool._winTop and self.scrollFrame) then return end
+    local off = self.scrollFrame:GetVerticalScroll() or 0
+    if math.abs(off - (pool._winAt or 0)) < 300 then return end
+    if self._repainting then return end
+    self._repainting = true
+    if self.opts and self.opts.onRefresh then self.opts.onRefresh(self) end
+    self._repainting = false
+end
+
 function PanelProto:RefreshScrollContent(height)
     if self.scrollChild then
         self.scrollChild:SetHeight(math.max(height, 1))
