@@ -38,6 +38,7 @@ stored. They are unrepresentable, not merely untested.
 | 3 | `emit-lua.py` | Writes Lua back out to `build/emitted/` |
 | 4 | `dump-emitted-data.lua` | Loads the emitted Lua through the same harness |
 | 5 | `compare-roundtrip.py` | Diffs steps 1 and 4 |
+| 6 | `ingest-upstream.py` | Copies the catalog and adds the upstream inventories to `build/collectionist-full.db` |
 
 Step 1 **loads** rather than parses. Every previous attempt in this repo to
 read these files with regex missed something: nested tables, escaped quotes,
@@ -87,19 +88,63 @@ name is derivable offline and `C_ToyBox` supplies it in game. Tracked rather
 than dropped — silently discarding rows at ingest is how a catalog quietly
 shrinks.
 
+## Upstream reconciliation
+
+`ingest-upstream.py` loads 48,335 upstream records — 34,289 DB2 rows from 66
+per-expansion inventories, and 14,046 ATT recipe-acquisition rows — each with
+the file path, its SHA-256, and its row count recorded in `source_snapshot`.
+That does not pin the ATT *repository* (the checkout that resolved 8,975 recipe
+sources lived in `%TEMP%` and is gone), but it makes "which bytes produced this
+row" answerable and turns a silent upstream change into a hash change.
+
+Only genuinely upstream files are read. `manifests/` is derived from `ids/`, and
+the `*-audit.csv` files are outputs of previous runs; ingesting either would
+repeat the mistake the navigation audit made when it read its own previous
+output as pre-existing coverage and went from 721 candidates to 55.
+
+Four views replace what used to be a bespoke script per audit:
+
+| View | Count | What it means |
+|---|---|---|
+| `upstream_missing_from_catalog` | 15,258 | A work queue, not a defect list — most are `internal_dnt`, `snapshot_candidate` or store-only, excluded by policy. Filter on `statuses`. |
+| `catalog_missing_from_upstream` | 467 | The catalog ships an id no inventory contains. 225 are Midnight, which has no inventory. |
+| `upstream_name_mismatch` | 10 | All ten verified as the *snapshot* being stale, not the catalog. |
+| `upstream_expansion_mismatch` | 687 | 601 are Midnight decorations datamined during DF; correct as shipped. |
+
+**Grouped by identity, not by row.** The per-expansion inventories overlap by
+design — 14,048 distinct recipe ids appear across 23,337 rows — so comparing
+each listing separately reported 4,221 expansion mismatches where the real
+figure is 687.
+
+### Direction is not obvious, and the views do not assert one
+
+All 32 name differences were checked by hand. Twenty-two were genuinely
+different strings, and in **every** case the upstream snapshot was the wrong
+side: Blizzard renamed the MoP yaks for the Remix event, "The Pigskin" became
+"The Swineskin", and five decoration rows carry a literal `[DNT] [AUTOGEN]`
+datamine placeholder upstream against a real name in the catalog. Only the ten
+punctuation differences ran the other way — the catalog had substituted `'` for
+`"` and dropped apostrophes, presumably to avoid Lua escaping — and those are
+now fixed.
+
+Treat a non-empty view as a question, not an answer.
+
 ## Known gaps
 
-- **Upstream ingest is not wired yet.** The database is currently seeded from
-  the committed Lua (`source_snapshot.source = 'shipped-lua'`). DB2, ATT and
-  HandyNotes still feed the old generators; moving them behind
-  `source_snapshot` is the next step, and is what makes provenance per-row
-  real rather than nominal.
 - **The emitter writes to `build/emitted/` only.** It does not yet replace the
   files under `addons/`, which have a hand-tuned layout, comments, and a TOC
   order that the round trip does not model. The proof establishes that it
   *could*; switching over is a separate, reviewable change.
 - **132 source keys** are used by data but declared in no label table, so they
   render as raw lowercase. `build-db.py` lists them on every run.
+- **HandyNotes is not ingested.** Its rare/treasure navigation candidates are
+  the remaining upstream, and they need normalisation (aliases, phase
+  duplicates, cross-publisher overlap) before they are loadable.
+- **Only the committed catalog is versioned.** `data/collectionist.db` holds
+  the catalog alone, at 6.7 MB. Upstream ingest lands in
+  `build/collectionist-full.db` (31 MB) because the CSVs behind it are already
+  committed under `research/` and the ingest is deterministic — committing the
+  loaded copy would store the same 20 MB twice in a format git cannot delta.
 
 ## Concurrency
 

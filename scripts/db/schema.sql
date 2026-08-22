@@ -54,8 +54,39 @@ CREATE TABLE source_snapshot (
     version     TEXT,                      -- build number, commit sha, addon version
     fetched_at  TEXT,
     note        TEXT,
+    -- Pinning. The ATT checkout that resolved 8,975 recipe sources lived in
+    -- %TEMP% with no recorded SHA, so the exact input could not be recovered
+    -- and no claim derived from it could be re-checked. Hashing the extracted
+    -- artifact does not pin the upstream repository, but it does make "which
+    -- bytes produced this row" answerable, and a silent upstream change becomes
+    -- a hash change rather than an unexplained diff.
+    path        TEXT,                      -- repo-relative file the rows came from
+    sha256      TEXT,
+    row_count   INTEGER,
     UNIQUE (source, version)
 );
+
+-- Upstream records, kept as they arrived rather than merged straight into the
+-- catalog. Two different things want answering and only this separation
+-- answers both: "what does the catalog ship" and "what does the upstream say
+-- exists". Previously the second question needed a bespoke script per audit,
+-- and each one re-derived the join a little differently.
+CREATE TABLE upstream_row (
+    id          INTEGER PRIMARY KEY,
+    snapshot_id INTEGER NOT NULL REFERENCES source_snapshot(id) ON DELETE CASCADE,
+    domain      TEXT NOT NULL,             -- 'mounts', 'recipes', 'achievements', ...
+    expansion   TEXT REFERENCES expansion(key),
+    id_kind     TEXT NOT NULL,             -- which collectible column this keys to
+    natural_id  INTEGER NOT NULL,
+    name        TEXT,
+    status      TEXT,                      -- the upstream's own classification
+    -- The whole record, so a question nobody has asked yet does not require
+    -- re-reading the CSV and re-deciding which columns mattered.
+    payload     TEXT NOT NULL,
+    UNIQUE (snapshot_id, domain, id_kind, natural_id)
+);
+
+CREATE INDEX upstream_lookup ON upstream_row (domain, id_kind, natural_id);
 
 -- ---------------------------------------------------------------- content
 
@@ -316,3 +347,111 @@ SELECT DISTINCT w.location_key
 FROM waypoint w
 WHERE w.location_key IS NOT NULL
   AND w.location_key NOT IN (SELECT key FROM location);
+
+-- ------------------------------------------------------- upstream vs catalog
+
+-- The join every gap audit re-implemented, written once. Each audit script had
+-- its own copy and they did not agree: one keyed decorations on item_id where
+-- another used decor_id, and one read a column by its output name so the whole
+-- name-preference walk was dead code.
+CREATE VIEW upstream_catalog_match AS
+SELECT u.id                AS upstream_id,
+       s.source            AS upstream_source,
+       u.domain,
+       u.expansion         AS upstream_expansion,
+       u.id_kind,
+       u.natural_id,
+       u.name              AS upstream_name,
+       u.status            AS upstream_status,
+       c.id                AS collectible_id,
+       c.module            AS catalog_module,
+       c.expansion         AS catalog_expansion,
+       c.name              AS catalog_name
+FROM upstream_row u
+JOIN source_snapshot s ON s.id = u.snapshot_id
+LEFT JOIN collectible c
+       ON (u.id_kind = 'mount_id'       AND c.mount_id       = u.natural_id)
+       OR (u.id_kind = 'species_id'     AND c.species_id     = u.natural_id)
+       OR (u.id_kind = 'decor_id'       AND c.decor_id       = u.natural_id)
+       OR (u.id_kind = 'spell_id'       AND c.spell_id       = u.natural_id)
+       OR (u.id_kind = 'item_id'        AND c.item_id        = u.natural_id
+           AND c.module = 'toys')
+       OR (u.id_kind = 'achievement_id' AND c.achievement_id = u.natural_id
+           AND c.module = 'achievements');
+
+-- Upstream knows about it, the catalog does not ship it.
+--
+-- Grouped by identity, not by row. The per-expansion inventories OVERLAP --
+-- 14,048 distinct recipe ids appear across 23,337 inventory rows, because each
+-- expansion re-lists what it considers in scope. Counting rows instead of ids
+-- would report one missing recipe as three.
+--
+-- This is a WORK QUEUE, not a defect list. Most entries here are deliberate:
+-- store-only collectibles are excluded by standing policy, and never-
+-- implemented records exist in DB2 but not in the game. Filter on statuses
+-- before treating any count here as a gap.
+CREATE VIEW upstream_missing_from_catalog AS
+SELECT domain, id_kind, natural_id,
+       MIN(upstream_name)                        AS upstream_name,
+       GROUP_CONCAT(DISTINCT upstream_status)    AS statuses,
+       GROUP_CONCAT(DISTINCT upstream_expansion) AS expansions
+FROM upstream_catalog_match
+WHERE collectible_id IS NULL
+GROUP BY domain, id_kind, natural_id;
+
+-- The catalog ships an id the upstream inventory does not contain. Far more
+-- suspicious than the reverse: either the id is wrong, or it belongs to an
+-- expansion whose inventory was never extracted.
+CREATE VIEW catalog_missing_from_upstream AS
+SELECT c.id, c.module, c.expansion, c.name,
+       COALESCE(c.mount_id, c.species_id, c.decor_id, c.spell_id) AS natural_id
+FROM collectible c
+-- Without this guard the view reports the entire catalog as unmatched whenever
+-- upstream has not been ingested -- which is the normal state of the committed
+-- database, since ingest writes to build/collectionist-full.db.
+WHERE EXISTS (SELECT 1 FROM upstream_row)
+  AND c.module IN ('mounts', 'pets', 'decorations', 'recipes')
+  AND c.navigation_only = 0
+  AND NOT EXISTS (
+        SELECT 1 FROM upstream_row u
+        WHERE (u.id_kind = 'mount_id'   AND u.natural_id = c.mount_id)
+           OR (u.id_kind = 'species_id' AND u.natural_id = c.species_id)
+           OR (u.id_kind = 'decor_id'   AND u.natural_id = c.decor_id)
+           OR (u.id_kind = 'spell_id'   AND u.natural_id = c.spell_id));
+
+-- Same id, different name -- one row per collectible, not per inventory listing.
+--
+-- Direction is NOT obvious and this view does not assert one. Checked by hand
+-- across all 32: every genuinely different name was the SNAPSHOT being stale or
+-- internal, never the catalog. Blizzard renamed the MoP yaks for the Remix
+-- event, "The Pigskin" became "The Swineskin", and five decoration rows carry
+-- a literal "[DNT] [AUTOGEN]" datamine placeholder upstream against a real name
+-- in the catalog. Only the punctuation differences ran the other way.
+CREATE VIEW upstream_name_mismatch AS
+SELECT collectible_id, catalog_module, catalog_expansion, natural_id,
+       MIN(upstream_name) AS upstream_name, catalog_name
+FROM upstream_catalog_match
+WHERE collectible_id IS NOT NULL
+  AND COALESCE(upstream_name, '') <> ''
+  AND COALESCE(catalog_name, '')  <> ''
+GROUP BY collectible_id
+HAVING SUM(CASE WHEN upstream_name = catalog_name THEN 1 ELSE 0 END) = 0;
+
+-- Shipped under an expansion that NO inventory listing this id agrees with.
+--
+-- Expect ~601 Midnight decorations here permanently. Housing decor was
+-- datamined during Dragonflight, so the DF inventory lists it, but a
+-- decoration belongs to the expansion whose content AWARDS it -- not to the
+-- build that first datamined the item. Those rows are correct as shipped.
+--
+-- The "no inventory agrees" form is the point. Comparing against each listing
+-- separately reported 4,221 mismatches where the real figure is a fraction of
+-- that: the inventories overlap by design, so any id listed in three of them
+-- disagreed with at least two no matter where the catalog placed it.
+CREATE VIEW upstream_expansion_mismatch AS
+SELECT collectible_id, catalog_module, catalog_name, catalog_expansion,
+       GROUP_CONCAT(DISTINCT upstream_expansion) AS upstream_expansions
+FROM upstream_catalog_match
+WHERE collectible_id IS NOT NULL AND upstream_expansion IS NOT NULL
+GROUP BY collectible_id
+HAVING SUM(CASE WHEN upstream_expansion = catalog_expansion THEN 1 ELSE 0 END) = 0;

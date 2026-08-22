@@ -15,3 +15,7 @@ python scripts/db/build-db.py
 python scripts/db/emit-lua.py
 luajit scripts/db/dump-emitted-data.lua  > build/emitted.jsonl
 python scripts/db/compare-roundtrip.py
+
+# Upstream reconciliation, into build/collectionist-full.db. Runs last because
+# the round trip above must pass against the catalog alone.
+python scripts/db/ingest-upstream.py

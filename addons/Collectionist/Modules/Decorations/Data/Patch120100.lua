@@ -42,7 +42,7 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "vendor",
         decorations = {
-            { decorID = 26375, itemID = 281580, name = "Pungent Atal-Utek Shroom", source = "vendor", sourceInfo = "Firetender Zab'ni - 250 Voidlight Marl; requires Stinking Vessel", zone = "The Coiled Isle", cost = { currency = { MC.CURRENCY.VoidlightMarl, 250 } } },
+            { decorID = 26375, itemID = 281580, name = "Pungent Atal'Utek Shroom", source = "vendor", sourceInfo = "Firetender Zab'ni - 250 Voidlight Marl; requires Stinking Vessel", zone = "The Coiled Isle", cost = { currency = { MC.CURRENCY.VoidlightMarl, 250 } } },
         },
     },
 
@@ -228,7 +228,7 @@ MC.RegisterContent("midnight", "decorations", {
             { decorID = 26487, itemID = 279112, name = "Clumped Asteroidea", source = "drop", sourceInfo = "Nymrissa Wavecaller, The Tidebound Grotto", zone = "The Tidebound Grotto" },
             { decorID = 26205, itemID = 279115, name = "Soulcoiler's Ritual Candle", source = "drop", sourceInfo = "Nekzali, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
             { decorID = 16093, itemID = 264716, name = "Hexed Tomb Brazier", source = "drop", sourceInfo = "The Entombed, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
-            { decorID = 26374, itemID = 279118, name = "Lost Explorers Mailbox", source = "drop", sourceInfo = "The Lost Explorers, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
+            { decorID = 26374, itemID = 279118, name = "Lost Explorers' Mailbox", source = "drop", sourceInfo = "The Lost Explorers, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
             { decorID = 1426, itemID = 244343, name = "Vessel of the Howling Ossuary", source = "drop", sourceInfo = "Sszorak, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
             { decorID = 25813, itemID = 279122, name = "Venom-Fanged Font", source = "drop", sourceInfo = "The Twin Fangs, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
             { decorID = 25812, itemID = 279131, name = "Pillar of the Coiled Isle", source = "drop", sourceInfo = "The Coiled Altar, The Venomous Abyss", zone = "The Venomous Abyss", availableAfter = MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2 },
