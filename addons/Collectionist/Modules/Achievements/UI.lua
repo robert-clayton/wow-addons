@@ -128,6 +128,7 @@ function UI:RenderCategoryGroup(parent, category, sourceBuckets, yOff)
 end
 
 function UI:RenderSourceGroup(parent, category, srcType, entries, yOff)
+    MC.SortEntries(entries)
     local sr, sg, sb = subColor()
     local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
         label       = MC.AchievementSourceLabels[srcType] or srcType,

@@ -1272,8 +1272,12 @@ end
 --   opts.emptyMessages       — { allDone, noneLeft }
 --   opts.progressText        — function(r) -> string (default "X / Y")
 --   opts.db, opts.refreshCb  — passed to the default collected-section header
+-- Consumers set lib.defaultSortEntries once (Collectionist points it at
+-- MC.SortEntries) rather than threading a sorter through every module's opts.
+-- The library stays ignorant of what the ordering means.
 function lib.RenderModulePage(panel, opts)
     if not panel or not panel.scrollChild then return end
+    local sortEntries = opts.sortEntries or lib.defaultSortEntries
     panel.pool:ReleaseAll()
     lib.BeginRenderPass(panel.pool, panel.scrollFrame)
 
@@ -1292,6 +1296,7 @@ function lib.RenderModulePage(panel, opts)
         seen[srcType] = true
         local entries = r.bySource and r.bySource[srcType]
         if entries and #entries > 0 then
+            if sortEntries then sortEntries(entries) end
             yOff = opts.renderSourceGroup(child, srcType, entries, yOff)
             yOff = yOff + PAD
         end
@@ -1299,6 +1304,7 @@ function lib.RenderModulePage(panel, opts)
     if r.bySource then
         for srcType, entries in pairs(r.bySource) do
             if not seen[srcType] and #entries > 0 then
+                if sortEntries then sortEntries(entries) end
                 yOff = opts.renderSourceGroup(child, srcType, entries, yOff)
                 yOff = yOff + PAD
             end
@@ -1306,6 +1312,7 @@ function lib.RenderModulePage(panel, opts)
     end
 
     if opts.showCollected ~= false and r.collected and #r.collected > 0 then
+        if sortEntries then sortEntries(r.collected) end
         if opts.renderCollectedGroup then
             yOff = opts.renderCollectedGroup(child, r.collected, yOff)
         elseif opts.renderRow then

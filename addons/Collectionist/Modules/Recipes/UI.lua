@@ -208,6 +208,7 @@ function UI:RenderProfession(parent, profInfo, result, skillLine, yOff)
 end
 
 function UI:RenderSourceGroup(parent, srcType, recipes, skillLine, yOff)
+    MC.SortEntries(recipes)
     local sr, sg, sb = MUI.Theme:SourceColor(srcType)
     local _, collapsed, newY = MUI.RenderSourceHeader(self.panel.pool, parent, yOff, {
         label       = SOURCE_LABELS[srcType] or srcType,

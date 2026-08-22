@@ -116,6 +116,81 @@ function MC.HasObtainableEntries(bySource)
     return false
 end
 
+-- ---------------------------------------------------------------- sorting
+--
+-- How rows are ordered inside a source group. Rows are already grouped by
+-- source, so "sort by source" would be a no-op; what varies inside a group is
+-- the curated order the data shipped in, the name, and the expansion.
+--
+-- Order here is the cycle order of the title-bar control.
+MC.SORT_MODES = {
+    { key = "default",   label = "Default", tip = "The order the data ships in" },
+    { key = "name",      label = "A-Z",     tip = "Alphabetical by name" },
+    { key = "expansion", label = "Newest",  tip = "Newest expansion first" },
+}
+
+MC.SORT_MODE_BY_KEY = {}
+for i, m in ipairs(MC.SORT_MODES) do
+    m.index = i
+    MC.SORT_MODE_BY_KEY[m.key] = m
+end
+
+-- Per module, so "A-Z" on a 10,000-row recipe list does not also reorder a
+-- curated 40-row rare list where the shipped order is the useful one.
+function MC.GetSortMode(moduleKey)
+    local db = MC.db
+    local key = db and db.sortMode and db.sortMode[moduleKey or MC.activeModule]
+    return MC.SORT_MODE_BY_KEY[key] and key or "default"
+end
+
+function MC.CycleSortMode(moduleKey)
+    moduleKey = moduleKey or MC.activeModule
+    if not (MC.db and moduleKey) then return "default" end
+    MC.db.sortMode = MC.db.sortMode or {}
+    local cur = MC.SORT_MODE_BY_KEY[MC.GetSortMode(moduleKey)]
+    local nextMode = MC.SORT_MODES[(cur.index % #MC.SORT_MODES) + 1]
+    MC.db.sortMode[moduleKey] = nextMode.key
+    return nextMode.key
+end
+
+local function expansionOrder(entry)
+    local e = entry.expansion and MC.EXPANSION_BY_KEY[entry.expansion]
+    return e and e.order or -1
+end
+
+-- Sorts a bucket IN PLACE. Position inside a bucket carries no meaning beyond
+-- display, so there is nothing to preserve by copying first.
+--
+-- Every comparator falls through to `name` and then to the entry's original
+-- index. table.sort is not stable in Lua, so without a total order two rows
+-- that compare equal could swap places between renders -- and with a windowed
+-- list that repaints on scroll, that shows up as rows visibly jumping.
+function MC.SortEntries(entries, moduleKey)
+    if type(entries) ~= "table" or #entries < 2 then return entries end
+    local mode = MC.GetSortMode(moduleKey)
+    if mode == "default" then return entries end
+
+    local pos = {}
+    for i = 1, #entries do pos[entries[i]] = i end
+
+    local function byName(a, b)
+        local an, bn = a.name or "", b.name or ""
+        if an ~= bn then return an < bn end
+        return pos[a] < pos[b]
+    end
+
+    if mode == "name" then
+        table.sort(entries, byName)
+    elseif mode == "expansion" then
+        table.sort(entries, function(a, b)
+            local ao, bo = expansionOrder(a), expansionOrder(b)
+            if ao ~= bo then return ao > bo end
+            return byName(a, b)
+        end)
+    end
+    return entries
+end
+
 -- Insert a scan entry into the per-source (and, when given, per-category)
 -- buckets, creating sub-tables on demand. Shared by every module scanner.
 function MC.BucketEntry(result, source, entry, category)

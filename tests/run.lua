@@ -164,6 +164,75 @@ end
 
 -- Future content remains discoverable without entering obtainable totals or
 -- score until its release instant.
+-- Row ordering inside a source group.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    MC.db = { sortMode = {} }
+    MC.activeModule = "mounts"
+
+    local function names(list)
+        local out = {}
+        for i, e in ipairs(list) do out[i] = e.name end
+        return table.concat(out, ",")
+    end
+    local function sample()
+        return {
+            { name = "Cobalt",  expansion = "wrath" },
+            { name = "Amber",   expansion = "midnight" },
+            { name = "Basalt",  expansion = "wrath" },
+            { name = "Dune",    expansion = "vanilla" },
+        }
+    end
+
+    equal(MC.GetSortMode("mounts"), "default", "sort defaults to the shipped order")
+    equal(names(MC.SortEntries(sample(), "mounts")), "Cobalt,Amber,Basalt,Dune",
+        "default mode leaves the shipped order alone")
+
+    MC.db.sortMode.mounts = "name"
+    equal(names(MC.SortEntries(sample(), "mounts")), "Amber,Basalt,Cobalt,Dune",
+        "A-Z sorts by name")
+
+    MC.db.sortMode.mounts = "expansion"
+    -- Newest first, and the two Wrath rows fall back to name rather than to
+    -- whatever order table.sort happened to leave them in.
+    equal(names(MC.SortEntries(sample(), "mounts")), "Amber,Basalt,Cobalt,Dune",
+        "newest-first orders by expansion then name")
+
+    -- Ties must be resolved deterministically. A windowed list repaints on
+    -- scroll, so an unstable comparator would show rows visibly swapping.
+    MC.db.sortMode.mounts = "name"
+    local dupes = {
+        { name = "Same", expansion = "wrath" },
+        { name = "Same", expansion = "midnight" },
+        { name = "Same", expansion = "vanilla" },
+    }
+    for _, e in ipairs(dupes) do e.mark = e.expansion end
+    MC.SortEntries(dupes, "mounts")
+    local first = dupes[1].mark
+    MC.SortEntries(dupes, "mounts")
+    equal(dupes[1].mark, first, "re-sorting equal names is stable")
+
+    -- Cycling wraps and is remembered per module.
+    MC.db.sortMode.mounts = "default"
+    equal(MC.CycleSortMode("mounts"), "name", "cycle: default -> name")
+    equal(MC.CycleSortMode("mounts"), "expansion", "cycle: name -> expansion")
+    equal(MC.CycleSortMode("mounts"), "default", "cycle wraps back to default")
+    MC.db.sortMode.pets = "name"
+    equal(MC.GetSortMode("mounts"), "default", "sort mode is per module")
+    equal(MC.GetSortMode("pets"), "name", "each module keeps its own mode")
+
+    -- A junk value must not leak into the label lookup.
+    MC.db.sortMode.mounts = "bogus"
+    equal(MC.GetSortMode("mounts"), "default", "unknown mode falls back to default")
+
+    -- Lists too short to order must survive untouched.
+    equal(names(MC.SortEntries({}, "mounts")), "", "empty list is a no-op")
+    equal(names(MC.SortEntries({ { name = "Solo" } }, "mounts")), "Solo",
+        "single-entry list is a no-op")
+end
+
 do
     local MC = {}
     GetCurrentRegion = function() return 1 end

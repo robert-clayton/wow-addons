@@ -1779,6 +1779,11 @@ function MC._ApplyIndicatorVisibility()
     setIndicatorShown(MC.expansionFilterBtn, viewHidden or MC.IsOptionsSelected())
     setIndicatorShown(MC.scoreIndicator, viewHidden)
     setIndicatorShown(MC.peerIndicator, viewHidden)
+    -- Sort orders a tracker list, so it hides with the view chrome AND on
+    -- Options/search, which have no source groups to order. Hiding here is
+    -- the chrome half; RefreshSortIndicator owns the per-tab half.
+    setIndicatorShown(MC.sortIndicator, viewHidden)
+    if not viewHidden and MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
     -- Search rides the chain's compact/strip hiding but, being an action
     -- rather than a readout, stays available on the Options page.
     setIndicatorShown(MC.searchIndicator, viewHidden)
@@ -1943,6 +1948,9 @@ function MC.CreatePanel()
         })
     end
 
+    -- One binding instead of a sortEntries option on six module pages; the
+    -- library stays ignorant of what the ordering means.
+    MUI.defaultSortEntries = MC.SortEntries
     MC.panel = panel
 
     if MC.TabBar then
@@ -2020,6 +2028,42 @@ function MC.CreatePanel()
         })
         MC.peerIndicator = peerBtn
 
+        -- Row order. A labelled indicator rather than an icon: the current
+        -- mode has to be readable at a glance, or cycling through three
+        -- states with no visible label is a guessing game.
+        local sortBtn = MUI.MakeIndicatorBtn(bar, {
+            tooltip = function(_, tt)
+                tt:SetText("Sort rows")
+                for _, m in ipairs(MC.SORT_MODES) do
+                    local active = m.key == MC.GetSortMode()
+                    tt:AddDoubleLine(m.label, m.tip,
+                        active and 1 or 0.6, active and 1 or 0.6, active and 1 or 0.6,
+                        0.7, 0.7, 0.7)
+                end
+                tt:AddLine(" ")
+                tt:AddLine("Click to cycle. Remembered per tab.", 0.6, 0.6, 0.6)
+            end,
+            onClick = function()
+                MC.CycleSortMode()
+                MC.RefreshSortIndicator()
+                MC.RefreshActive()
+            end,
+        })
+        MC.sortIndicator = sortBtn
+
+        function MC.RefreshSortIndicator()
+            local btn = MC.sortIndicator
+            if not btn then return end
+            -- Options and search have no per-source row groups to order.
+            local applies = not (MC.IsOptionsSelected and MC.IsOptionsSelected())
+                and not (MC.IsSearchSelected and MC.IsSearchSelected())
+            if not applies then btn:Hide() return end
+            btn:Show()
+            local mode = MC.SORT_MODE_BY_KEY[MC.GetSortMode()]
+            btn:SetLabel(mode and mode.label or "Default")
+        end
+        MC.RefreshSortIndicator()
+
         -- Anchor chain right→left from progressText (or bar's right edge).
         local rightAnchor, rightPoint, rightOfsX = bar, "RIGHT", -68
         if panel.titleProgressText then
@@ -2027,6 +2071,7 @@ function MC.CreatePanel()
         end
         scoreBtn:SetPoint("RIGHT", rightAnchor, rightPoint, rightOfsX, 0)
         peerBtn:SetPoint("RIGHT", scoreBtn, "LEFT", -10, 0)
+        sortBtn:SetPoint("RIGHT", peerBtn, "LEFT", -10, 0)
 
         -- Search. A view action rather than an indicator, so it stays up
         -- on the Options page (unlike score/peer) and only follows the
@@ -2037,7 +2082,7 @@ function MC.CreatePanel()
             theme.colors.btnTealHoverBg,
             theme.colors.btnTealHoverBd,
             "Search  (/mc find)")
-        searchBtn:SetPoint("RIGHT", peerBtn, "LEFT", -10, 0)
+        searchBtn:SetPoint("RIGHT", sortBtn, "LEFT", -10, 0)
         -- SelectSearch already handles the already-open case by refocusing
         -- the input; no duplicate guard here.
         searchBtn:SetScript("OnClick", function() MC.SelectSearch() end)
@@ -2338,6 +2383,8 @@ function MC.RefreshActive()
     -- Score depends on every scanner; refresh it whenever any tab
     -- redraws so the title-bar number tracks the latest scan.
     if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+    -- Sort is remembered per tab, so the label follows the active one.
+    if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
 end
 
 --------------------------------------------------------------------------
