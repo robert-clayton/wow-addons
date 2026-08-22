@@ -187,6 +187,12 @@ CREATE TABLE collectible (
 
 CREATE INDEX collectible_module_exp ON collectible (module, expansion);
 CREATE INDEX collectible_source     ON collectible (module, source);
+-- Not unique: several rows legitimately share an npc or a quest. Indexed
+-- because the upstream reconciliation joins on them across 18k HandyNotes rows.
+CREATE INDEX collectible_npc        ON collectible (npc_id)         WHERE npc_id IS NOT NULL;
+CREATE INDEX collectible_quest      ON collectible (quest_id)       WHERE quest_id IS NOT NULL;
+CREATE INDEX collectible_item       ON collectible (item_id)        WHERE item_id IS NOT NULL;
+CREATE INDEX collectible_achv       ON collectible (achievement_id) WHERE achievement_id IS NOT NULL;
 
 -- Natural keys are unique per module. This is what makes a duplicate ID a
 -- write failure instead of something a test has to notice later.
@@ -376,8 +382,12 @@ LEFT JOIN collectible c
        OR (u.id_kind = 'spell_id'       AND c.spell_id       = u.natural_id)
        OR (u.id_kind = 'item_id'        AND c.item_id        = u.natural_id
            AND c.module = 'toys')
-       OR (u.id_kind = 'achievement_id' AND c.achievement_id = u.natural_id
-           AND c.module = 'achievements');
+       OR (u.id_kind = 'achievement_id' AND c.achievement_id = u.natural_id)
+       -- HandyNotes keys on the npc and on the quest completion flag. Neither
+       -- is unique in the catalog, so these deliberately do not constrain the
+       -- module: a rare npc can back a rare row and a treasure row both.
+       OR (u.id_kind = 'npc_id'   AND c.npc_id   = u.natural_id)
+       OR (u.id_kind = 'quest_id' AND c.quest_id = u.natural_id);
 
 -- Upstream knows about it, the catalog does not ship it.
 --
@@ -432,10 +442,47 @@ SELECT collectible_id, catalog_module, catalog_expansion, natural_id,
        MIN(upstream_name) AS upstream_name, catalog_name
 FROM upstream_catalog_match
 WHERE collectible_id IS NOT NULL
+  -- DB2 only. HandyNotes' "name" is a map-pin LABEL written by the publisher
+  -- ("Pepe: A Tiny Explorer's Hat", "Rare spawns every 20 min"), not a
+  -- canonical string, so comparing it to a catalog name is meaningless.
+  -- Including it turned a 10-row list into 509 rows of noise.
+  AND upstream_source = 'db2'
   AND COALESCE(upstream_name, '') <> ''
   AND COALESCE(catalog_name, '')  <> ''
 GROUP BY collectible_id
 HAVING SUM(CASE WHEN upstream_name = catalog_name THEN 1 ELSE 0 END) = 0;
+
+-- Map nodes HandyNotes describes that the catalog does not track, ranked by
+-- how many independent publishers corroborate them.
+--
+-- Twenty addons from two publisher families cover the same world and disagree
+-- about coordinates by roughly a percent, so `publishers` is the useful signal
+-- rather than a tie-break: a node two unrelated authors both placed is far
+-- better evidence than one only a single author lists. Ordering by it puts the
+-- defensible candidates first instead of leaving 6,341 rows in file order.
+--
+-- These are navigation candidates, NOT collectibles. The policy is already
+-- written: such rows render with a "Location only" label, keep their waypoint
+-- and metadata, can be pinned, and never enter completion denominators,
+-- Collection Score, collected lists or roster bitmaps.
+CREATE VIEW handynotes_navigation_queue AS
+SELECT u.domain,
+       u.id_kind,
+       u.natural_id,
+       u.name AS label,
+       CAST(REPLACE(u.status, 'publishers=', '') AS INTEGER) AS publishers,
+       json_extract(u.payload, '$.map_ids')     AS map_ids,
+       json_extract(u.payload, '$.coords')      AS coords,
+       json_extract(u.payload, '$.spawn_count') AS spawn_count,
+       json_extract(u.payload, '$.rewards')     AS rewards
+FROM upstream_row u
+JOIN source_snapshot s ON s.id = u.snapshot_id AND s.source = 'handynotes'
+WHERE NOT EXISTS (
+        SELECT 1 FROM collectible c
+        WHERE (u.id_kind = 'npc_id'         AND c.npc_id         = u.natural_id)
+           OR (u.id_kind = 'quest_id'       AND c.quest_id       = u.natural_id)
+           OR (u.id_kind = 'achievement_id' AND c.achievement_id = u.natural_id))
+ORDER BY publishers DESC, u.domain, u.natural_id;
 
 -- Shipped under an expansion that NO inventory listing this id agrees with.
 --
@@ -453,5 +500,6 @@ SELECT collectible_id, catalog_module, catalog_name, catalog_expansion,
        GROUP_CONCAT(DISTINCT upstream_expansion) AS upstream_expansions
 FROM upstream_catalog_match
 WHERE collectible_id IS NOT NULL AND upstream_expansion IS NOT NULL
+  AND upstream_source = 'db2'
 GROUP BY collectible_id
 HAVING SUM(CASE WHEN upstream_expansion = catalog_expansion THEN 1 ELSE 0 END) = 0;

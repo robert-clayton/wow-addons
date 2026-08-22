@@ -38,7 +38,9 @@ stored. They are unrepresentable, not merely untested.
 | 3 | `emit-lua.py` | Writes Lua back out to `build/emitted/` |
 | 4 | `dump-emitted-data.lua` | Loads the emitted Lua through the same harness |
 | 5 | `compare-roundtrip.py` | Diffs steps 1 and 4 |
-| 6 | `ingest-upstream.py` | Copies the catalog and adds the upstream inventories to `build/collectionist-full.db` |
+| 6 | `dump-handynotes.lua` | Loads 20 HandyNotes addons from the WoW install and dumps every map node |
+| 7 | `normalize-handynotes.py` | Dedupes across publishers into `research/collectionist/sources/handynotes-nodes.csv` |
+| 8 | `ingest-upstream.py` | Copies the catalog and adds every upstream to `build/collectionist-full.db` |
 
 Step 1 **loads** rather than parses. Every previous attempt in this repo to
 read these files with regex missed something: nested tables, escaped quotes,
@@ -110,6 +112,12 @@ Four views replace what used to be a bespoke script per audit:
 | `catalog_missing_from_upstream` | 467 | The catalog ships an id no inventory contains. 225 are Midnight, which has no inventory. |
 | `upstream_name_mismatch` | 10 | All ten verified as the *snapshot* being stale, not the catalog. |
 | `upstream_expansion_mismatch` | 687 | 601 are Midnight decorations datamined during DF; correct as shipped. |
+| `handynotes_navigation_queue` | 6,341 | Map nodes HandyNotes describes that the catalog does not track, ranked by publisher corroboration. |
+
+`upstream_name_mismatch` and `upstream_expansion_mismatch` are **DB2-only by
+construction**. HandyNotes' "name" is a map-pin label written by the publisher,
+not a canonical string; including it turned a 10-row list into 509 rows of
+noise.
 
 **Grouped by identity, not by row.** The per-expansion inventories overlap by
 design — 14,048 distinct recipe ids appear across 23,337 rows — so comparing
@@ -129,6 +137,68 @@ now fixed.
 
 Treat a non-empty view as a question, not an answer.
 
+## HandyNotes
+
+Twenty addons from two publisher families, read out of the WoW install:
+
+    core     ns.Map + a class hierarchy    map.nodes[55264393] = Item({...})
+    handler  ns.RegisterPoints(zone, pts)  [54534241] = {quest=..., loot={}}
+
+Both lines above describe the **same node** — quest 79550, item 213202 — about
+one percent apart on the map. That is the normalisation problem in one line:
+the quest id is the identity and the coordinates are not. 3,057 of 5,126
+distinct quest ids are described by more than one addon, so importing rows as
+they arrive would count most of the set twice.
+
+`dump-handynotes.lua` loads the zone files rather than parsing them, which
+matters more here than anywhere else in the pipeline: the coordinate key is an
+**integer**, so a node at x < 10% is seven digits rather than eight, and the
+pattern-matching audit that preceded this required exactly eight and silently
+dropped every one of them. The class hierarchy is open-ended
+(`ns.node.FrogPrincess`, `ns.node.DracthyrSupplyChest`), so nothing is
+enumerated — any `ns.<kind>.<Name>` auto-vivifies into a recording constructor.
+
+343 of 344 files load. The one failure is a nil table index in the addon's own
+source, not a stub gap.
+
+### Identity, and what has none
+
+| Bucket | Rows | Key |
+|---|---|---|
+| rares | 2,796 | npc id |
+| treasures | 4,862 | quest id — the completion flag, and why the identity contract was widened to accept `questID` |
+| achievement_criteria | 82 | achievement id, aggregating its criteria |
+| *no identity* | 4,843 | — |
+
+The last row is reported by spawn group rather than as a bare number:
+scavenger pools (377), scout packs (327), disturbed earth (233), snufflings
+(214). These are "N spawn points of type X" with no per-node identity at all.
+
+Two recoveries were worth making: 2,336 pins carry no npc and no quest but do
+carry an `achievement` + `criteria` pair, and 121 skyriding races name their
+quest only inside a label template (`label = "{quest:75317}"`) where no field
+read would find it.
+
+### Why a committed CSV sits in the middle
+
+Every other upstream is a file in the repo; HandyNotes is read from the
+player's game install. `normalize-handynotes.py` writes the normalised extract
+to `research/collectionist/sources/handynotes-nodes.csv` so the ingest is
+reproducible from a checkout and `source_snapshot` hashes something that will
+still exist tomorrow. `run.sh` skips the dump when no AddOns directory is
+present and ingests the committed CSV regardless.
+
+### The queue
+
+**1,680 untracked nodes are corroborated by two or more independent
+publishers** (106 rares, 1,574 treasures); 4,661 more rest on a single
+publisher. Sort by `publishers` and the defensible candidates come first.
+
+These are navigation candidates, not collectibles: per existing policy they
+render with a "Location only" label, keep waypoint and metadata, can be pinned,
+and never enter completion denominators, Collection Score, collected lists or
+roster bitmaps.
+
 ## Known gaps
 
 - **The emitter writes to `build/emitted/` only.** It does not yet replace the
@@ -137,9 +207,6 @@ Treat a non-empty view as a question, not an answer.
   *could*; switching over is a separate, reviewable change.
 - **132 source keys** are used by data but declared in no label table, so they
   render as raw lowercase. `build-db.py` lists them on every run.
-- **HandyNotes is not ingested.** Its rare/treasure navigation candidates are
-  the remaining upstream, and they need normalisation (aliases, phase
-  duplicates, cross-publisher overlap) before they are loadable.
 - **Only the committed catalog is versioned.** `data/collectionist.db` holds
   the catalog alone, at 6.7 MB. Upstream ingest lands in
   `build/collectionist-full.db` (31 MB) because the CSVs behind it are already

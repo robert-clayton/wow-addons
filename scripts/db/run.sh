@@ -18,4 +18,16 @@ python scripts/db/compare-roundtrip.py
 
 # Upstream reconciliation, into build/collectionist-full.db. Runs last because
 # the round trip above must pass against the catalog alone.
+#
+# The HandyNotes dump reads the player's WoW install and is skipped when that
+# path is not present -- CI has no game client. The normalised extract it feeds
+# is committed, so the ingest below still works from a bare checkout.
+ADDONS="${WOW_ADDONS:-X:/Program Files/World of Warcraft/_retail_/Interface/AddOns}"
+if [ -d "$ADDONS" ]; then
+    luajit scripts/db/dump-handynotes.lua "$ADDONS" > build/handynotes.jsonl
+    python scripts/db/normalize-handynotes.py
+else
+    echo "skipping HandyNotes dump: no AddOns directory at $ADDONS"
+fi
+
 python scripts/db/ingest-upstream.py

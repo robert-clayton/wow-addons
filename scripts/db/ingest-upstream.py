@@ -138,7 +138,7 @@ def main():
     # Idempotent: drop everything this script owns, then re-ingest. Appending
     # would double every row on the second run.
     con.execute("DELETE FROM upstream_row")
-    con.execute("DELETE FROM source_snapshot WHERE source IN ('db2', 'att')")
+    con.execute("DELETE FROM source_snapshot WHERE source IN ('db2', 'att', 'handynotes')")
 
     total, skipped_files = 0, 0
     for dirname, expansion in sorted(EXPANSION_DIR.items()):
@@ -167,16 +167,47 @@ def main():
                                   None, status_col="source_kind")
         total += att_added
 
+    # HandyNotes, via the normalised extract. Unlike the DB2 and ATT files this
+    # one is produced from the player's WoW install, so normalize-handynotes.py
+    # writes it into research/ first -- otherwise the ingest would depend on
+    # which addons happen to be installed, and source_snapshot would hash
+    # something that does not exist in a checkout.
+    hn = os.path.join(RESEARCH, "sources", "handynotes-nodes.csv")
+    hn_added = 0
+    if os.path.exists(hn):
+        with open(hn, encoding="utf-8-sig", newline="") as fh:
+            hn_rows = list(csv.DictReader(fh))
+        snap = snapshot(con, "handynotes", "nodes", hn, len(hn_rows))
+        for r in hn_rows:
+            raw = (r.get("natural_id") or "").strip()
+            if not raw.isdigit():
+                continue
+            try:
+                con.execute(
+                    "INSERT INTO upstream_row (snapshot_id, domain, expansion, id_kind,"
+                    " natural_id, name, status, payload) VALUES (?,?,?,?,?,?,?,?)",
+                    (snap, r["domain"], None, r["id_kind"], int(raw),
+                     (r.get("label") or "").strip() or None,
+                     # Publisher count doubles as a confidence signal: a node
+                     # two independent addons agree on is stronger evidence
+                     # than one only a single publisher lists.
+                     "publishers=%s" % (r.get("publisher_count") or "0"),
+                     json.dumps(compact(r), separators=(",", ":"), sort_keys=True)))
+                hn_added += 1
+            except sqlite3.IntegrityError:
+                pass
+        total += hn_added
+
     con.commit()
 
     print("analysis database: %s" % os.path.relpath(DB_PATH, ROOT).replace("\\", "/"))
-    print("upstream rows %d   (db2 %d, att %d)   files without an inventory %d"
-          % (total, total - att_added, att_added, skipped_files))
+    print("upstream rows %d   (db2 %d, att %d, handynotes %d)   inventories absent %d"
+          % (total, total - att_added - hn_added, att_added, hn_added, skipped_files))
     print()
     for src, n, files in con.execute(
             "SELECT s.source, COUNT(u.id), COUNT(DISTINCT s.id) FROM source_snapshot s"
             " LEFT JOIN upstream_row u ON u.snapshot_id = s.id"
-            " WHERE s.source IN ('db2','att') GROUP BY s.source"):
+            " WHERE s.source IN ('db2','att','handynotes') GROUP BY s.source"):
         print("   %-5s %6d rows from %d pinned files" % (src, n, files))
 
     print()
@@ -190,6 +221,14 @@ def main():
             "SELECT COALESCE(statuses,'(none)'), COUNT(*)"
             " FROM upstream_missing_from_catalog GROUP BY 1 ORDER BY 2 DESC LIMIT 10"):
         print("      %-28s %6d" % (status, n))
+    q = con.execute(
+        "SELECT publishers >= 2, COUNT(*) FROM handynotes_navigation_queue GROUP BY 1").fetchall()
+    if q:
+        print()
+        print("   handynotes_navigation_queue:")
+        for corroborated, n in sorted(q, reverse=True):
+            print("      %-28s %6d" % ("2+ publishers agree" if corroborated
+                                       else "single publisher only", n))
     con.close()
 
 
