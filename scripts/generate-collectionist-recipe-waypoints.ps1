@@ -121,10 +121,16 @@ foreach ($row in $rows) {
         }
     }
 
-    # Key by the coordinates themselves, not by parent id. Parent keys are not
-    # unique - difficulty and encounter ids are global, so one key could map to
-    # two unrelated places.
-    $sig = "$map|" + (($spawns | ForEach-Object { (Format-Coord $_[0]) + ',' + (Format-Coord $_[1]) }) -join ';')
+    # Key by coordinates AND name, not by parent id.
+    #
+    # Parent ids are not unique: difficulty and encounter ids are global, so one
+    # key could map to two unrelated places. But coordinates alone are not
+    # unique either - 48 signatures host more than one source, whether two
+    # vendors sharing a shopfront or three different quests from one
+    # quest-giver. Collapsing those let one name win and labelled every other
+    # recipe there with somebody else's source.
+    $sig = "$map|" + (($spawns | ForEach-Object { (Format-Coord $_[0]) + ',' + (Format-Coord $_[1]) }) -join ';') +
+           '|' + $row.source_parent_name
     if (-not $locations.Contains($sig)) {
         $locations[$sig] = @{
             map    = $map
