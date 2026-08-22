@@ -4,7 +4,15 @@
 *.md text eol=lf
 *.sh text eol=lf
 *.ps1 text eol=lf
+*.py text eol=lf
+*.sql text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
 *.tga binary
 *.png binary
+
+# The content database is committed so a checkout can emit without first
+# rebuilding from upstream sources. Git cannot merge a SQLite file, and a
+# textual merge would silently corrupt one: -merge makes a concurrent edit a
+# visible conflict to resolve by re-running scripts/db/run.sh instead.
+*.db binary -merge -diff
