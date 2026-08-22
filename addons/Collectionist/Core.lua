@@ -1946,6 +1946,9 @@ function MC.CreatePanel()
             minHeight     = 140,
             maxHeight     = 900,
             onRefresh     = function() MC.RefreshActive() end,
+            -- Compact drops the sidebar, so the page title becomes the page
+            -- picker. The lib owns the affordance; the list of pages is ours.
+            onTitleClick  = function(shell, anchor) MC.ShowPagePicker(anchor) end,
         })
     end
 
@@ -2346,6 +2349,47 @@ function MC.SelectSearch(query)
             MC.Search:ShowView(query, true)
         end
     end)
+end
+
+-- The compact view has no sidebar, so switching page there means clicking the
+-- title. Lists the same things the sidebar does, in the same order, plus the
+-- two views that live in the header rather than the rail.
+function MC.ShowPagePicker(anchorFrame)
+    if not (MC.panel and anchorFrame) then return end
+    MC._pagePicker = MC._pagePicker or MUI.MakeDropdown()
+
+    local items = {}
+    for _, m in ipairs(MC.modules or {}) do
+        if not (MC.IsModuleEnabled and MC.IsModuleEnabled(m.key) == false) then
+            local key = m.key
+            items[#items + 1] = {
+                label = m.label or key,
+                selected = (MC.activeSelection == nil or MC.activeSelection == key)
+                    and MC.activeModule == key
+                    and not MC.IsOptionsSelected() and not MC.IsSearchSelected()
+                    and not MC.IsGoalsSelected(),
+                onClick = function() MC.SwitchTab(key) end,
+            }
+        end
+    end
+
+    items[#items + 1] = {
+        label = "Closest to Done",
+        selected = MC.IsGoalsSelected(),
+        onClick = function() if not MC.IsGoalsSelected() then MC.SelectGoals() end end,
+    }
+    items[#items + 1] = {
+        label = "Search",
+        selected = MC.IsSearchSelected(),
+        onClick = function() MC.SelectSearch() end,
+    }
+    items[#items + 1] = {
+        label = "Options",
+        selected = MC.IsOptionsSelected(),
+        onClick = function() if MC.SelectOptions then MC.SelectOptions() end end,
+    }
+
+    MC._pagePicker:ShowAt(anchorFrame, "BOTTOMLEFT", "TOPLEFT", items)
 end
 
 function MC.SelectGoals()

@@ -321,6 +321,41 @@ function ShellProto:_CreateHeader()
     title:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD, -14)
     bar.pageTitle = title
 
+    -- The compact view drops the sidebar, which is the only way to change
+    -- page -- so the title doubles as the page picker there. A FontString
+    -- cannot take mouse input, so a hit frame sits over it, sized to the text
+    -- rather than the bar so the rest of the header stays a drag surface.
+    -- The lib does not know what the pages are: opts.onTitleClick supplies them.
+    local titleHit = CreateFrame("Button", nil, bar)
+    titleHit:SetPoint("TOPLEFT", title, "TOPLEFT", -4, 4)
+    titleHit:SetPoint("BOTTOMRIGHT", title, "BOTTOMRIGHT", 18, -4)
+    titleHit:RegisterForClicks("LeftButtonUp")
+    titleHit:Hide()
+    bar.pageTitleHit = titleHit
+
+    -- A caret, shown only while the title is clickable, so the affordance is
+    -- visible rather than something the player has to discover.
+    local caret = bar:CreateFontString(nil, "OVERLAY")
+    caret:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
+    caret:SetPoint("LEFT", title, "RIGHT", 5, -2)
+    caret:SetText("h88")
+    caret:Hide()
+    bar.pageTitleCaret = caret
+
+    titleHit:SetScript("OnEnter", function()
+        local c = lib.Theme.colors.accent
+        title:SetTextColor(c[1], c[2], c[3])
+        caret:SetTextColor(c[1], c[2], c[3])
+    end)
+    titleHit:SetScript("OnLeave", function()
+        local c = lib.Theme.colors.title
+        title:SetTextColor(c[1], c[2], c[3], c[4] or 1)
+        caret:SetTextColor(c[1], c[2], c[3], 0.7)
+    end)
+    titleHit:SetScript("OnClick", function()
+        if shell.opts.onTitleClick then shell.opts.onTitleClick(shell, titleHit) end
+    end)
+
     local subtitle = bar:CreateFontString(nil, "OVERLAY")
     subtitle:SetFont(theme.font, theme.fontSize, lib.FontFlags())
     subtitle:SetPoint("TOPLEFT", bar, "TOPLEFT", CONTENT_PAD + 1, -44)
@@ -982,6 +1017,9 @@ function ShellProto:ApplyMinimizeState()
         end
         if self.opts.onRefresh then self.opts.onRefresh(self) end
     end
+    -- The picker only exists in the compact view, so it follows every state
+    -- change rather than only a SetPageHeader call.
+    self:_ApplyTitlePicker()
     if self.opts.onViewChanged then self.opts.onViewChanged(self, mode) end
 end
 
@@ -1022,7 +1060,25 @@ function ShellProto:SetPageHeader(title, subtitle)
     if not bar then return end
     bar.pageTitle:SetText(title or "")
     bar.pageSubtitle:SetText(subtitle or "")
+    self:_ApplyTitlePicker()
     self:UpdateSpine()
+end
+
+-- The title is a page picker only in the compact view. In the full view the
+-- sidebar is right there and a second way to do the same thing is clutter.
+function ShellProto:_ApplyTitlePicker()
+    local bar = self.frame and self.frame.titleBar
+    if not (bar and bar.pageTitleHit) then return end
+    local on = self.opts.onTitleClick and self:GetViewMode() == "compact"
+    if on then
+        bar.pageTitleHit:Show()
+        bar.pageTitleCaret:Show()
+        local c = lib.Theme.colors.title
+        bar.pageTitleCaret:SetTextColor(c[1], c[2], c[3], 0.7)
+    else
+        bar.pageTitleHit:Hide()
+        bar.pageTitleCaret:Hide()
+    end
 end
 
 -- The shell's signature element: a segmented "collection spine" along
