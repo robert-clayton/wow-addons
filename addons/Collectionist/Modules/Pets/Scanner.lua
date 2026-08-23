@@ -47,9 +47,25 @@ function Scanner:Scan()
             local hideUnavailable = mod.db == nil or mod.db.hideUnavailable ~= false
             if not (pet.unavailable and not isCollected and hideUnavailable) then
                 if groupVisible then
-                    local icon, petType = nil, pet.petType
+                    -- Take the client's name for this species, the way Mounts
+                    -- and Toys already do. Two reasons, and the second matters
+                    -- more than the first:
+                    --
+                    -- It makes a catalog typo self-correcting -- the shipped
+                    -- string stops being the thing a player reads.
+                    --
+                    -- And it makes a WRONG speciesID visible. Collection state
+                    -- is keyed on speciesID alone (GetNumCollectedInfo above);
+                    -- the name is never consulted. So a row with the wrong id
+                    -- silently reports a pet you own as missing, forever, with
+                    -- nothing on screen to suggest anything is wrong. Showing
+                    -- what the id actually points at turns that into something
+                    -- you can see.
+                    local icon, petType, liveName = nil, pet.petType, nil
                     if hasGetInfo then
-                        local _, petIcon, petPetType = C_PetJournal.GetPetInfoBySpeciesID(pet.speciesID)
+                        local petName, petIcon, petPetType =
+                            C_PetJournal.GetPetInfoBySpeciesID(pet.speciesID)
+                        if petName and petName ~= "" then liveName = petName end
                         if petIcon and petIcon ~= 0 and petIcon ~= "" then icon = petIcon end
                         if petPetType and petPetType > 0 then petType = petPetType end
                     end
@@ -57,7 +73,7 @@ function Scanner:Scan()
                     local entry = {
                         moduleKey         = "pets",
                         speciesID         = pet.speciesID,
-                        name              = pet.name,
+                        name              = liveName or pet.name,
                         petType           = petType,
                         source            = pet.source,
                         sourceInfo        = pet.sourceInfo,

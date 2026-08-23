@@ -43,9 +43,9 @@ MC.RegisterContent("midnight", "pets", {
     {
         source = "wild",
         pets = {
-            { speciesID = 5035, itemID = 270248, npcID = 262248, name = "Autumn Snapling",
+            { speciesID = 5035, itemID = 270248, npcID = 262248, name = "Autumnal Sapling",
               petType = 8, source = "wild", sourceInfo = "One-click capture on the Coiled Isle",
-              canBattle = false, waypoint = { COILED_ISLE, 0.679, 0.815, "Autumn Snapling" }, zone = "The Coiled Isle" },
+              canBattle = false, waypoint = { COILED_ISLE, 0.679, 0.815, "Autumnal Sapling" }, zone = "The Coiled Isle" },
             { speciesID = 5031, itemID = 270254, npcID = 262247, name = "Caustic Writhling",
               petType = 8, source = "wild", sourceInfo = "One-click capture in the Vaults of Atal'Utek",
               canBattle = false, waypoint = { VAULTS_OF_ATAL_UTEK, 0.381, 0.307, "Caustic Writhling" }, zone = "Vaults of Atal'Utek" },
