@@ -57,6 +57,11 @@ EXPANSION_DIR = {
     "shadowlands": "shadowlands",
     "dragonflight": "df",
     "tww": "tww",
+    # Added when a player reported an owned pet showing as missing. The repo had
+    # no Midnight inventory at all, so catalog_missing_from_upstream flagged 110
+    # of 118 Midnight pet rows as unverifiable and nothing could tell a wrong id
+    # from an unchecked one.
+    "midnight": "midnight",
 }
 
 # ids/<file>.csv -> (domain, collectible column, the CSV's id column, name column)

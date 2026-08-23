@@ -43,9 +43,9 @@ MC.RegisterContent("midnight", "pets", {
     {
         source = "wild",
         pets = {
-            { speciesID = 5035, itemID = 270248, npcID = 262248, name = "Autumnal Sapling",
+            { speciesID = 5035, itemID = 270248, npcID = 262248, name = "Autumn Snapling",
               petType = 8, source = "wild", sourceInfo = "One-click capture on the Coiled Isle",
-              canBattle = false, waypoint = { COILED_ISLE, 0.679, 0.815, "Autumnal Sapling" }, zone = "The Coiled Isle" },
+              canBattle = false, waypoint = { COILED_ISLE, 0.663, 0.626, "Autumn Snapling" }, zone = "The Coiled Isle" },
             { speciesID = 5031, itemID = 270254, npcID = 262247, name = "Caustic Writhling",
               petType = 8, source = "wild", sourceInfo = "One-click capture in the Vaults of Atal'Utek",
               canBattle = false, waypoint = { VAULTS_OF_ATAL_UTEK, 0.381, 0.307, "Caustic Writhling" }, zone = "Vaults of Atal'Utek" },
@@ -60,13 +60,13 @@ MC.RegisterContent("midnight", "pets", {
               canBattle = false, waypoint = { COILED_ISLE, 0.620, 0.819, "Nightfur Kapara" }, zone = "The Coiled Isle" },
             { speciesID = 5028, itemID = 270214, npcID = 262222, name = "Poisoned Parasite",
               petType = 8, source = "wild", sourceInfo = "One-click capture on the Coiled Isle",
-              canBattle = false, waypoint = { COILED_ISLE, 0.582, 0.386, "Poisoned Parasite" }, zone = "The Coiled Isle" },
+              canBattle = false, waypoint = { COILED_ISLE, 0.7183, 0.6484, "Poisoned Parasite" }, zone = "The Coiled Isle" },
             { speciesID = 5033, itemID = 270251, npcID = 262244, name = "Sleek Snakebiter",
               petType = 5, source = "wild", sourceInfo = "One-click capture on the Coiled Isle",
-              canBattle = false, waypoint = { COILED_ISLE, 0.607, 0.779, "Sleek Snakebiter" }, zone = "The Coiled Isle" },
+              canBattle = false, waypoint = { COILED_ISLE, 0.654, 0.498, "Sleek Snakebiter" }, zone = "The Coiled Isle" },
             { speciesID = 5034, itemID = 270250, npcID = 262243, name = "Steady Croakfrog",
               petType = 9, source = "wild", sourceInfo = "One-click capture on the Coiled Isle",
-              canBattle = false, waypoint = { COILED_ISLE, 0.661, 0.561, "Steady Croakfrog" }, zone = "The Coiled Isle" },
+              canBattle = false, waypoint = { COILED_ISLE, 0.7237, 0.5502, "Steady Croakfrog" }, zone = "The Coiled Isle" },
         },
     },
     {
