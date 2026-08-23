@@ -366,6 +366,11 @@ MC.FACTION = {
     RitualSites     = 2792,  -- 12.0.5
     ZuljarrasForces = 2772,  -- 12.1 Coiled Isle renown
     CaptainTokka    = 2773,  -- 12.1 Cursed Fishing friendship
+    -- The addon's own text calls this "Preyseeker's Journey" and "Prey
+    -- Journey"; DB2 names it Preyhunter's Journey. Same parent faction (2698)
+    -- as Silvermoon Court and Zul'jarra's Forces, which resolve through
+    -- C_MajorFactions today.
+    PreyhuntersJourney = 2808, -- 12.1 Prey progression track
 }
 
 -- Currency IDs. Used by C_CurrencyInfo.GetCurrencyInfo and cost = { ... } blocks.

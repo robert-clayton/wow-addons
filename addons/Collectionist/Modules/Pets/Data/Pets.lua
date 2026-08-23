@@ -201,7 +201,9 @@ MC.RegisterContent("midnight", "pets", {
 
             -- Preyseeker's Journey vendors (Remnant of Anguish, currency 3392)
             { speciesID = 4930, npcID = 255522, name = "Lil' Preyseeker",       petType = 6,  source = "vendor", sourceInfo = "Construct V'anore - Preyseeker's Journey Rank 9",         canBattle = true,  waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
-              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 1200 } } },
+              cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 1200 } },
+              renown = { factionID = MC.FACTION.PreyhuntersJourney, level = 9,
+                         factionName = "Preyhunter's Journey" } },
             { speciesID = 4976, npcID = 257546, name = "Voldy",                 petType = 7,  source = "vendor", sourceInfo = "Construct V'anore, Silvermoon City",                      canBattle = false, waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 800 } } },
 
