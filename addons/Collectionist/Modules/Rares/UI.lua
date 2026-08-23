@@ -70,7 +70,6 @@ function UI:RenderRareRow(parent, rare, yOff, isCollected)
         leading     = { kind = "dot", size = 6, color = { sr, sg, sb } },
         name        = rare.name,
         info        = rare.future and MC.GetAvailabilityBadge(rare)
-                   or (rare.navigationOnly and ("Location only - " .. (rare.zone or "map")))
                    or rare.zone,
         isCollected = isCollected,
         onEnter = function(r)

@@ -129,7 +129,6 @@ Modules\Rares\Data\TheWarWithin.lua
 Modules\Rares\Data\Rares.lua
 Modules\Rares\Data\Patch120007.lua
 Modules\Rares\Data\Patch120100.lua
-Modules\Rares\Data\Navigation.lua
 Modules\Rares\Init.lua
 Modules\Rares\Scanner.lua
 Modules\Rares\UI.lua
@@ -148,7 +147,6 @@ Modules\Treasures\Data\Dragonflight.lua
 Modules\Treasures\Data\TheWarWithin.lua
 Modules\Treasures\Data\Treasures.lua
 Modules\Treasures\Data\Patch120100.lua
-Modules\Treasures\Data\Navigation.lua
 Modules\Treasures\Init.lua
 Modules\Treasures\Scanner.lua
 Modules\Treasures\UI.lua

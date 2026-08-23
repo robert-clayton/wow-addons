@@ -238,9 +238,6 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
                     entry.expansion = entry.expansion or expansionKey
                     entry.moduleKey = entry.moduleKey or moduleKey
                     entry.availableAfter = entry.availableAfter or group.availableAfter
-                    if group.navigationOnly and entry.navigationOnly == nil then
-                        entry.navigationOnly = true
-                    end
                 end
             end
         end
@@ -686,10 +683,6 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         tt:AddLine(item.sourceInfo, 1, 1, 1, true)
     end
 
-    if item.navigationOnly then
-        tt:AddLine("Location only — excluded from completion totals and saved ownership.",
-            0.72, 0.72, 0.72, true)
-    end
 
     if item.availableAfter and MC.IsContentAvailable
        and not MC.IsContentAvailable(item) then

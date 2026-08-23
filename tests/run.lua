@@ -632,59 +632,6 @@ do
     equal(trPaired, 948, "trainer recipes pinned for BOTH factions")
     equal(trNeutral, 1714, "trainer recipes at a neutral hub")
 
-    -- Navigation-only rares and treasures. These are map references, not
-    -- collectibles: the whole contract is that they render and pin but never
-    -- touch completion denominators, Collection Score, collected lists or the
-    -- roster bitmap. Assert the shape here rather than trusting the generator.
-    do
-        local navMC = { modules = {}, modulesByKey = {} }
-        for k, v in pairs(MC) do navMC[k] = v end
-        navMC.RareData, navMC.TreasureData = {}, {}
-        local realRare, realTreasure = MC.RareData, MC.TreasureData
-        MC.RareData, MC.TreasureData = {}, {}
-        loadAddon("addons/Collectionist/Modules/Rares/Data/Navigation.lua", MC)
-        loadAddon("addons/Collectionist/Modules/Treasures/Data/Navigation.lua", MC)
-
-        local checks = {
-            { data = MC.RareData,     list = "rares",     id = "npcID",   label = "rare",     expected = 745 },
-            { data = MC.TreasureData, list = "treasures", id = "questID", label = "treasure", expected = 429 },
-        }
-        for _, c in ipairs(checks) do
-            local groups, entries = 0, 0
-            for _, group in ipairs(c.data or {}) do
-                if group.navigationOnly then
-                    groups = groups + 1
-                    truthy(group.source and group.source ~= "", c.label .. " nav group has a source key")
-                    truthy(group.zone and group.zone ~= "", c.label .. " nav group has a zone")
-                    for _, e in ipairs(group[c.list] or {}) do
-                        entries = entries + 1
-                        truthy(e[c.id], c.label .. " nav entry has a stable identity")
-                        truthy(e.name and e.name ~= "", c.label .. " nav entry is named")
-                        truthy(e.waypoint, c.label .. " nav entry has a waypoint")
-                        -- Never a collectible: no collected/learned state, and
-                        -- no score that could reach Collection Score.
-                        truthy(e.collected == nil, c.label .. " nav entry has no collected state")
-                        truthy(e.score == nil, c.label .. " nav entry carries no score")
-                        local wp = e.waypoint
-                        local tuples = (type(wp[1]) == "table") and wp or { wp }
-                        for _, t in ipairs(tuples) do
-                            truthy(type(t[1]) == "number" and t[1] > 0, c.label .. " nav mapID > 0")
-                            truthy(type(t[2]) == "number" and t[2] > 0 and t[2] <= 1, c.label .. " nav x in 0..1")
-                            truthy(type(t[3]) == "number" and t[3] > 0 and t[3] <= 1, c.label .. " nav y in 0..1")
-                        end
-                    end
-                end
-            end
-            truthy(groups > 0, c.label .. " navigation groups registered")
-            -- Pinned, not just non-zero. These counts move whenever the name
-            -- or the zone quality gates that produced Navigation.lua before it was frozen
-            -- change, and "> 0" would let a gate that silently dropped half the
-            -- dataset pass. Update deliberately, per regeneration.
-            equal(entries, c.expected, c.label .. " navigation entry count")
-        end
-        equal(#MC.RareData > 0, true, "rare navigation data loaded")
-        MC.RareData, MC.TreasureData = realRare, realTreasure
-    end
 
     -- The resolver must never hand a character the other faction's capital.
     do
@@ -2334,7 +2281,7 @@ do
     rareMC.RareData = {
         { achievementID = 10, criteriaCount = 2, source = "coiled_isle",
           zone = "Test", expansion = "midnight", criteriaNPCIDs = { 1, 2 } },
-        { navigationOnly = true, source = "navigation", zone = "Test",
+        { source = "navigation", zone = "Test",
           expansion = "midnight", rares = {
               { npcID = 333, name = "Untracked Rare",
                 waypoint = { 1, 0.3, 0.4 } },
@@ -2348,16 +2295,6 @@ do
     equal(rareScanner.results.totalAll, 1, "only live rare criteria counted")
     criteriaCount = 2
     equal(rareScanner:Scan(), true, "complete rare criteria scan")
-    equal(rareScanner.results.totalAll, 2, "rare criteria denominator")
-    equal(rareScanner.results.total, 2,
-        "navigation-only rare stays out of visible completion denominator")
-    equal(rareScanner.results.navigationCount, 1,
-        "navigation-only rare display count")
-    local rareNavigation = rareScanner.results.bySource.navigation[1]
-    equal(rareNavigation.npcID, 333, "navigation-only rare entity")
-    equal(rareNavigation.navigationOnly, true, "navigation-only rare marker")
-    equal(rareNavigation.collected, nil,
-        "navigation-only rare has no completion state")
     equal(rareScanner.results._partial, nil, "complete rare scan is not partial")
     rareMC.RareData[1].criteriaNPCIDs = { 1, false }
     rareMC.RareData[1].criteriaObjectIDs = { false, 777 }
@@ -2374,7 +2311,7 @@ do
     treasureMC.TreasureData = {
         { achievementID = 20, criteriaCount = 2, source = "coiled_isle",
           zone = "Test", expansion = "midnight", criteriaNames = { "One", "Two" } },
-        { navigationOnly = true, source = "navigation", zone = "Test",
+        { source = "navigation", zone = "Test",
           expansion = "midnight", treasures = {
               { objectID = 444, name = "Untracked Treasure",
                 waypoint = { 1, 0.4, 0.5 } },
@@ -2392,16 +2329,6 @@ do
     criteriaCount = 2
     equal(treasureScanner:Scan(), true, "complete treasure criteria scan")
     equal(treasureScanner.results.totalAll, 2, "treasure criteria denominator")
-    equal(treasureScanner.results.total, 2,
-        "navigation-only treasure stays out of visible completion denominator")
-    equal(treasureScanner.results.navigationCount, 1,
-        "navigation-only treasure display count")
-    local treasureNavigation = treasureScanner.results.bySource.navigation[1]
-    equal(treasureNavigation.objectID, 444, "navigation-only treasure entity")
-    equal(treasureNavigation.navigationOnly, true,
-        "navigation-only treasure marker")
-    equal(treasureNavigation.collected, nil,
-        "navigation-only treasure has no completion state")
     equal(treasureScanner.results._partial, nil,
         "complete treasure scan is not partial")
 end
@@ -2423,17 +2350,9 @@ do
         MountData = {}, PetData = {}, ToyData = {}, DecorationData = {},
         RareData = {
             { achievementID = 10, criteriaCount = 2 },
-            { navigationOnly = true, rares = {
-                { npcID = 333, name = "Untracked Rare",
-                  waypoint = { 1, 0.3, 0.4 } },
-            } },
         },
         TreasureData = {
             { achievementID = 20, criteriaCount = 1 },
-            { navigationOnly = true, treasures = {
-                { objectID = 444, name = "Untracked Treasure",
-                  waypoint = { 1, 0.4, 0.5 } },
-            } },
         },
         modulesByKey = {},
     }
@@ -2441,10 +2360,8 @@ do
     MC.Bitmap:Init()
     equal(MC.Bitmap.ids.rares[1], "10:1", "rare criterion key")
     equal(MC.Bitmap.ids.treasures[1], "20:1", "treasure criterion key")
-    equal(#MC.Bitmap.ids.rares, 2,
-        "navigation-only rares stay out of roster bitmap")
-    equal(#MC.Bitmap.ids.treasures, 1,
-        "navigation-only treasures stay out of roster bitmap")
+    equal(#MC.Bitmap.ids.rares, 2, "one bitmap slot per rare criterion")
+    equal(#MC.Bitmap.ids.treasures, 1, "one bitmap slot per treasure criterion")
 
     criteriaCounts[10] = 1
     MC.Bitmap._criteriaReady = false

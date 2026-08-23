@@ -120,7 +120,6 @@ function Scanner:Scan()
         end
     end
 
-    MC.BucketNavigationGroups(result, MC.TreasureData, "treasures", "treasures", "Treasure")
 
     result._partial = pending > 0 and pending or nil
     self.results = result

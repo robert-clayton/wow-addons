@@ -70,7 +70,6 @@ function UI:RenderTreasureRow(parent, t, yOff, isCollected)
         leading     = { kind = "dot", size = 6, color = { sr, sg, sb } },
         name        = t.name,
         info        = t.future and MC.GetAvailabilityBadge(t)
-                   or (t.navigationOnly and ("Location only - " .. (t.zone or "map")))
                    or t.zone,
         isCollected = isCollected,
         onEnter = function(r)
