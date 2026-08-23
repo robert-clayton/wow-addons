@@ -1391,11 +1391,19 @@ function MC.OnScanComplete(mod)
     -- Search marks its index dirty here and pays for the rebuild on the
     -- next open/query; a login wave fires one of these per module.
     if MC.Search and MC.Search.Invalidate then MC.Search:Invalidate() end
-    -- Not while Options owns the content area: the module's rows would
-    -- render straight over the settings page.
+    -- Not while another view owns the content area: the module's rows
+    -- would render straight over it. Options was the only view this
+    -- guarded when it was written, and Search and Targets inherited the
+    -- hole -- a scan completing behind either one repainted the tracker
+    -- list over the top of it, including the progress counter, so the
+    -- page appeared to lose its content for no reason the player could
+    -- see. Any new full-content view has to be listed here too.
+    local viewOwnsContent = MC.IsOptionsSelected()
+        or (MC.IsSearchSelected and MC.IsSearchSelected())
+        or (MC.IsTargetsSelected and MC.IsTargetsSelected())
     if MC.activeModule == mod.key and mod.UI and MC.panel
        and MC.panel.frame and MC.panel.frame:IsShown()
-       and not MC.IsOptionsSelected() then
+       and not viewOwnsContent then
         mod.UI:Refresh()
     end
 end
@@ -2081,8 +2089,6 @@ function MC.CreatePanel()
                         active and 1 or 0.6, active and 1 or 0.6, active and 1 or 0.6,
                         0.7, 0.7, 0.7)
                 end
-                tt:AddLine(" ")
-                tt:AddLine("Click to cycle. Remembered per tab.", 0.6, 0.6, 0.6)
             end,
             onClick = function()
                 MC.CycleSortMode()
@@ -2101,9 +2107,10 @@ function MC.CreatePanel()
             -- back and, with the chain collapsed in compact, it lands on top
             -- of the page title.
             if MC._indicatorsHidden then btn:Hide() return end
-            -- Options and search have no per-source row groups to order.
+            -- Options, search and targets have no per-source row groups.
             local applies = not (MC.IsOptionsSelected and MC.IsOptionsSelected())
                 and not (MC.IsSearchSelected and MC.IsSearchSelected())
+                and not (MC.IsTargetsSelected and MC.IsTargetsSelected())
             if not applies then btn:Hide() return end
             btn:Show()
             local mode = MC.SORT_MODE_BY_KEY[MC.GetSortMode()]
@@ -2392,12 +2399,22 @@ function MC.ShowPagePicker(anchorFrame)
                 label = m.label or key,
                 selected = (MC.activeSelection == nil or MC.activeSelection == key)
                     and MC.activeModule == key
-                    and not MC.IsOptionsSelected() and not MC.IsSearchSelected(),
+                    and not MC.IsOptionsSelected() and not MC.IsSearchSelected()
+                    and not (MC.IsTargetsSelected and MC.IsTargetsSelected()),
                 onClick = function() MC.SwitchTab(key) end,
             }
         end
     end
 
+    if MC.Targets and MC.TARGETS_KEY then
+        items[#items + 1] = {
+            label = "Targets",
+            selected = MC.IsTargetsSelected(),
+            onClick = function()
+                if not MC.IsTargetsSelected() then MC.SelectTargets() end
+            end,
+        }
+    end
     items[#items + 1] = {
         label = "Search",
         selected = MC.IsSearchSelected(),
@@ -2410,6 +2427,40 @@ function MC.ShowPagePicker(anchorFrame)
     }
 
     MC._pagePicker:ShowAt(anchorFrame, "BOTTOMLEFT", "TOPLEFT", items)
+end
+
+-- The Targets page. Mirrors SelectOptions: the view owns the whole content
+-- area, so the transition releases the tracker rows before it draws.
+--
+-- Premium only by construction -- the sidebar is where it is reached from,
+-- and the classic shell keeps the floating overlay (/mc targets) as its
+-- path to the same pins.
+function MC.SelectTargets()
+    if not MC.panel then return end
+    if not (MC.Targets and MC.Targets.RenderPage) then return end
+    -- Re-clicking the row would cross-fade the page back over itself.
+    if MC.IsTargetsSelected() then return end
+
+    local wasOptions = MC.IsOptionsSelected()
+    MC.activeSelection = MC.TARGETS_KEY
+
+    -- Search parents its input and scope chips to the window frame, so
+    -- nothing else takes them down on the way out.
+    if MC.Search and MC.Search.HideView then MC.Search:HideView() end
+
+    if MC.TabBar and MC.TabBar.SetActive then
+        MC.TabBar:SetActive(MC.TARGETS_KEY)
+    end
+    MC._ApplyIndicatorVisibility()
+
+    TransitionContent(function()
+        if wasOptions and MC.panel.ClearConfigContent then
+            MC.panel:ClearConfigContent()
+        elseif MC.panel.pool then
+            MC.panel.pool:ReleaseAll()
+        end
+        MC.Targets:RenderPage()
+    end)
 end
 
 -- Re-render the options page on the next frame, once, however many
@@ -2461,6 +2512,12 @@ function MC.RefreshActive()
         if MC.Search and MC.Search.RefreshResults then MC.Search:RefreshResults() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
         if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
+        return
+    end
+    -- Targets rows carry live scanner entries, so a rescan redraws them.
+    if MC.IsTargetsSelected and MC.IsTargetsSelected() then
+        if MC.Targets and MC.Targets.RenderPage then MC.Targets:RenderPage() end
+        if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
         return
     end
     local mod = MC.modulesByKey[MC.activeModule]
@@ -2686,7 +2743,7 @@ local function PrintHelp()
     print("  /mc score - show your Collection Score breakdown")
     print("  /mc whatsnew - what changed in this version")
     print("  /mc style classic|premium - switch UI shell (reload required)")
-    print("  /mc targets - toggle the pinned-targets overlay")
+    print("  /mc targets - toggle the on-screen targets list (the Targets tab always shows them)")
     print("  /mc find <text> - global search (also: just /mc <anything>)")
     print("  /mc mem [gc|attribute] - memory report; 'gc' collects first,")
     print("                  'attribute' measures each structure by releasing it")

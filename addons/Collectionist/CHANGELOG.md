@@ -6,6 +6,7 @@
 - Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.
 
 ### Added
+- **A Targets tab.** What you pinned now has a page of its own in the sidebar, grouped by what it came from, instead of only the small on-screen list. It sits with Options at the bottom, in its own colour, because it is what you are working on rather than another collection to browse. Right-click a row to unpin it.
 - **Sort rows.** A control in the title bar cycles Default, A-Z, Z-A, and expansion order both ways. Each tab remembers its own.
 - **Locations for older collectibles.** 519 mounts, pets and toys outside the current expansion now have a map pin where before they had nothing.
 - **Hide unobtainable recipes**, in Options > Trackers. Recipes removed from the game stop filling the list and stop counting against your totals; they're still counted as Legacies.
@@ -13,6 +14,7 @@
 - `/mc mem` reports where the addon's memory is going, and `/mc mem gc` collects first so you can tell what's held from what's merely uncollected.
 
 ### Fixed
+- A finishing scan no longer paints a tracker list over whatever you were looking at. Search results could be replaced by the last tab's rows a second after you opened them, with no way to tell why.
 - Recipes you can no longer obtain no longer count toward Collection Score. They're Legacies, the same as every other tracker treats them.
 - Rare and treasure zones show their real names instead of raw keys like `arathi_highlands`, and six zones that were listed twice under different spellings are merged.
 - Recipe map pins name the vendor or quest that actually teaches the recipe, instead of borrowing the name of whatever else stands in the same spot.

@@ -68,6 +68,10 @@ lib.Themes.default = {
             [755] = { 0.82, 0.32, 0.62 },  -- Jewelcrafting
             [773] = { 0.42, 0.72, 0.90 },  -- Inscription
         },
+        -- Targets is a working set, not a catalog, and carries its own
+        -- accent so the sidebar row and its page read as a different
+        -- kind of thing from the trackers above them.
+        targetAccent   = { 0.95, 0.72, 0.28 },
         headerHover    = { 1, 1, 1, 0.06 },
         headerDivider  = { 1, 1, 1, 0.08 },            -- row sep derives x0.6
         arrowColor     = { 0.62, 0.62, 0.62 },
@@ -403,6 +407,7 @@ function lib.Pool:ReleaseAll()
         -- their upvalues the scan entry it last displayed -- so the pool held a
         -- parallel copy of the catalog that no rescan could ever free.
         frame._userOnEnter, frame._userOnLeave, frame._userOnClick = nil, nil, nil
+        frame._userOnRightClick = nil
         frame._hoverTex, frame._hoverColor = nil, nil
         self.inactive[#self.inactive + 1] = frame
         self.active[i] = nil
@@ -762,14 +767,18 @@ local function _rowOnLeave(self)
     if self._userOnLeave then self._userOnLeave(self) end
 end
 local function _rowOnMouseUp(self, button)
-    if button == "LeftButton" and self._userOnClick then self._userOnClick() end
+    if button == "LeftButton" then
+        if self._userOnClick then self._userOnClick() end
+    elseif button == "RightButton" then
+        if self._userOnRightClick then self._userOnRightClick() end
+    end
 end
 
 -- Shared row scaffold used by every module's UI.
 --   opts = { height, indent, padding,
 --            leading = { kind = "icon"|"dot", size, texture, color, fallback },
 --            name, info, isCollected,
---            onEnter, onLeave, onClick }
+--            onEnter, onLeave, onClick, onRightClick }
 -- Returns the new yOff.
 function lib.RenderItemRow(pool, parent, yOff, opts)
     local pad = opts.padding or 6
@@ -909,11 +918,12 @@ function lib.RenderItemRow(pool, parent, yOff, opts)
     row._userOnEnter  = opts.onEnter
     row._userOnLeave  = opts.onLeave
     row._userOnClick  = opts.onClick
+    row._userOnRightClick = opts.onRightClick
     row._onEnter = _rowOnEnter
     row._onLeave = _rowOnLeave
     -- Always wire OnMouseUp so collected rows still respond to shift-click
     -- (Wowhead) and ctrl-click (info dump). DoItemAction decides what to do.
-    row._onMouseUp = opts.onClick and _rowOnMouseUp or nil
+    row._onMouseUp = (opts.onClick or opts.onRightClick) and _rowOnMouseUp or nil
 
     return yOff + height
 end

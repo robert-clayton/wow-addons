@@ -416,7 +416,9 @@ function lib.MakeNavRow(parent, opts)
     function row:Repaint()
         local th = lib.Theme
         local c = th.colors
-        local ac = c.accent
+        -- accentKey names a palette entry rather than carrying a colour, so
+        -- an overriding row still follows a theme switch.
+        local ac = (opts.accentKey and c[opts.accentKey]) or c.accent
         lib.SetGradient(activeWash, "HORIZONTAL",
             { ac[1], ac[2], ac[3], 0.10 },
             { ac[1], ac[2], ac[3], 0 })

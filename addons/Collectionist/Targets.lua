@@ -380,6 +380,17 @@ end
 function Targets:Refresh()
     local pins, t = getPins()
     local n = pins and #pins or 0
+    -- The sidebar row carries the pin count, and the page is a second view
+    -- of the same list; both go stale on a pin/unpin unless told. Ordered
+    -- before the overlay work below, which can bail out several ways.
+    if MC.PremiumNav and MC.PremiumNav.RefreshCounts then
+        MC.PremiumNav:RefreshCounts()
+    end
+    if MC.IsTargetsSelected and MC.IsTargetsSelected() and not self._rendering then
+        self._rendering = true
+        self:RenderPage()
+        self._rendering = false
+    end
     if not self.frame then
         -- Lazy: no frame until the first refresh with pins present.
         if n == 0 then return end
@@ -525,4 +536,144 @@ function Targets:OnScanComplete(mod)
     -- Always refresh while pins exist: the first completing scan of the
     -- session builds and shows the overlay.
     self:Refresh()
+end
+
+--------------------------------------------------------------------------
+-- The Targets page: the same pins as the overlay, rendered into the
+-- window's content area as a full view rather than a HUD.
+--
+-- Deliberately NOT windowed. Every other list in the addon runs through
+-- lib.BeginRenderPass because it may hold thousands of rows; this one is
+-- capped at MAX_PINS, so windowing would only add a way for the page to
+-- paint nothing.
+--
+-- MC.TARGETS_KEY lives here rather than in Constants because the whole
+-- view does: Core nil-guards every call into it, so the addon stays
+-- loadable with this file absent.
+--------------------------------------------------------------------------
+MC.TARGETS_KEY = "__targets"
+-- The sidebar row shows "pinned / cap", so the cap has to leave this file.
+MC.TARGET_CAP = MAX_PINS
+
+function MC.IsTargetsSelected()
+    return MC.activeSelection == MC.TARGETS_KEY
+end
+
+-- Pins in sidebar order, so the page reads in the same order as the nav.
+local function pinsByModule()
+    local pins = getPins()
+    if not pins or #pins == 0 then return nil, 0 end
+    local groups, order = {}, {}
+    for _, pin in ipairs(pins) do
+        local key = pin.module or "?"
+        if not groups[key] then
+            groups[key] = {}
+            order[#order + 1] = key
+        end
+        local g = groups[key]
+        g[#g + 1] = pin
+    end
+    -- MC.modules is the sidebar's own order; anything whose module is gone
+    -- (disabled, renamed) keeps its pin and follows at the end rather than
+    -- vanishing from a list the player put it in.
+    local sorted = {}
+    for _, mod in ipairs(MC.modules or {}) do
+        if groups[mod.key] then
+            sorted[#sorted + 1] = mod.key
+            groups[mod.key]._label = mod.label or mod.key
+        end
+    end
+    for _, key in ipairs(order) do
+        if not groups[key]._label then
+            sorted[#sorted + 1] = key
+            groups[key]._label = key
+        end
+    end
+    return groups, #pins, sorted
+end
+
+function Targets:RenderPage()
+    local panel = MC.panel
+    if not (panel and panel.scrollChild and panel.pool) then return end
+    local lib = LibStub and LibStub("MidnightUI-1.0", true)
+    if not lib then return end
+
+    if MC.HideInfoTooltip then MC.HideInfoTooltip() end
+    if GameTooltip then GameTooltip:Hide() end
+
+    panel.pool:ReleaseAll()
+    local child = panel.scrollChild
+    lib.HideEmptyMessage(child)
+
+    local groups, count, order = pinsByModule()
+    if not groups then
+        local yOff = lib.ShowEmptyMessage(child,
+            "Nothing pinned. Alt-click any uncollected row to make it a target, "
+            .. "and it shows up here and in the on-screen list.")
+        panel:RefreshScrollContent(yOff)
+        if panel.titleProgressText then panel.titleProgressText:SetText("") end
+        return
+    end
+
+    local theme = lib.Theme
+    local accent = theme.colors.targetAccent or theme.colors.accent
+    local yOff = 0
+
+    for _, modKey in ipairs(order) do
+        local group = groups[modKey]
+        local _, collapsed, newY = lib.RenderSourceHeader(panel.pool, child, yOff, {
+            height      = 20,
+            indent      = 0,
+            collKey     = "target_" .. modKey,
+            label       = group._label,
+            accentColor = accent,
+            count       = #group,
+        }, self:PageDB(), function() Targets:RenderPage() end)
+        yOff = newY
+
+        if not collapsed then
+            for _, pin in ipairs(group) do
+                local entry = self._live[pin.key] or entryFromPin(pin)
+                local thisPin = pin
+                yOff = lib.RenderItemRow(panel.pool, child, yOff, {
+                    height   = 22,
+                    indent   = 8,
+                    leading  = { kind = "icon", size = 16,
+                                 texture = pin.icon,
+                                 fallback = FALLBACK_ICON },
+                    name     = pin.name or "?",
+                    info     = pin.zone,
+                    onEnter  = function(r)
+                        GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
+                        GameTooltip:AddLine(thisPin.name or "?", 1, 1, 1)
+                        GameTooltip:AddLine("Click to route, right-click to unpin.",
+                            0.7, 0.7, 0.7)
+                        GameTooltip:Show()
+                    end,
+                    onLeave  = MC.RowOnLeave,
+                    onClick  = function()
+                        if MC.DoItemAction then
+                            MC.DoItemAction(entry, thisPin.skillLine)
+                        end
+                    end,
+                    -- Unpin calls Refresh, which redraws this page while it
+                    -- is the selected view -- so no explicit re-render here.
+                    onRightClick = function() Targets:Unpin(thisPin.key) end,
+                })
+            end
+        end
+    end
+
+    panel:RefreshScrollContent(yOff)
+    if panel.titleProgressText then
+        panel.titleProgressText:SetText(format("%d / %d pinned", count, MAX_PINS))
+    end
+end
+
+-- Collapsed-header state for the page. Account-wide (MC.db), like every
+-- other collapse key; the pins themselves stay per-character.
+function Targets:PageDB()
+    if not MC.db then return {} end
+    MC.db[MC.TARGETS_KEY] = MC.db[MC.TARGETS_KEY] or {}
+    return MC.db[MC.TARGETS_KEY]
 end

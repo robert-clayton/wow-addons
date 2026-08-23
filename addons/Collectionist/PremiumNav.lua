@@ -10,6 +10,7 @@ local OPT_GAP    = 14
 -- window's), so the row doesn't sit flush against the frame border.
 local OPT_INSET  = 4
 local OPT_ICON   = "Interface\\Icons\\INV_Misc_Gear_01"
+local TGT_ICON   = "Interface\\Icons\\INV_Misc_Map_01"
 
 -- Tracker pages carry no subtitle: the list under the title already
 -- says what it is, and the line was pure decoration.
@@ -35,6 +36,15 @@ local function ModuleCounts(mod)
     local total = r.totalAll or r.total
     if not total or total == 0 then return nil end
     return (r.collectedCountAll or r.collectedCount or 0), total
+end
+
+-- "pinned / cap", not "collected / total": the cap is the number that
+-- matters, since reaching it evicts the oldest pin.
+local function TargetCounts()
+    local pins = MC.db and MC.db.targets and MC.db.targets.pins
+    local n = pins and #pins or 0
+    if n == 0 then return nil end
+    return n, MC.TARGET_CAP or 10
 end
 
 --------------------------------------------------------------------------
@@ -110,12 +120,38 @@ function Nav:Create(panel, modules, onSwitch)
     self.rows[MC.OPTIONS_KEY] = optRow
     self.optionsRow = optRow
 
+    -- Targets: the working set, not a catalog. It joins Options in the
+    -- bottom-anchored group (both sit below the hairline, off Reflow's
+    -- list) and paints in targetAccent so the difference in kind is
+    -- visible before you read the label.
+    if MC.TARGETS_KEY then
+        local tgtRow = MUI.MakeNavRow(panel.navContainer, {
+            icon      = TGT_ICON,
+            label     = "Targets",
+            accentKey = "targetAccent",
+            onClick   = function() onSwitch(MC.TARGETS_KEY) end,
+            tooltip   = function(_, tt)
+                tt:SetText("Targets")
+                tt:AddLine("What you are working on right now.",
+                    0.7, 0.7, 0.7, true)
+                tt:AddLine("Alt-click any uncollected row to pin it.",
+                    0.7, 0.7, 0.7, true)
+            end,
+        })
+        tgtRow:SetHeight(NAV_ROW_H)
+        tgtRow:SetPoint("BOTTOMLEFT", optRow, "TOPLEFT", 0, 0)
+        tgtRow:SetPoint("BOTTOMRIGHT", optRow, "TOPRIGHT", 0, 0)
+        self.rows[MC.TARGETS_KEY] = tgtRow
+        self.targetsRow = tgtRow
+    end
+
     -- The hairline that separates it from the trackers. Inset from both
     -- edges so it reads as a divider inside the list, not as chrome.
     local sep = panel.navContainer:CreateTexture(nil, "ARTWORK")
     sep:SetHeight(1)
-    sep:SetPoint("BOTTOMLEFT", optRow, "TOPLEFT", 12, OPT_GAP / 2)
-    sep:SetPoint("BOTTOMRIGHT", optRow, "TOPRIGHT", -12, OPT_GAP / 2)
+    local groupTop = self.targetsRow or optRow
+    sep:SetPoint("BOTTOMLEFT", groupTop, "TOPLEFT", 12, OPT_GAP / 2)
+    sep:SetPoint("BOTTOMRIGHT", groupTop, "TOPRIGHT", -12, OPT_GAP / 2)
     self.optionsSep = sep
 
     -- The single accent bar that travels between rows. Created last so it
@@ -145,6 +181,9 @@ function Nav:SetActive(key)
             -- No expansion scope here: Options is not a filtered list.
             self.panel:SetPageHeader("Options",
                 "How Collectionist tracks, and how it looks")
+        elseif MC.TARGETS_KEY and key == MC.TARGETS_KEY then
+            self.panel:SetPageHeader("Targets",
+                "What you are working on right now")
         elseif key == MC.SEARCH_KEY then
             self.panel:SetPageHeader("Search",
                 "Every collectible, by name, zone, or source")
@@ -184,6 +223,12 @@ function Nav:Reflow()
         optRow._active = (self.activeKey == MC.OPTIONS_KEY)
         optRow:Repaint()
     end
+    local tgtRow = MC.TARGETS_KEY and self.rows[MC.TARGETS_KEY]
+    if tgtRow then
+        tgtRow._active = (self.activeKey == MC.TARGETS_KEY)
+        tgtRow._c, tgtRow._t = TargetCounts()
+        tgtRow:Repaint()
+    end
     if self.optionsSep then
         local dv = MUI.Theme.colors.optionsDivider
         self.optionsSep:SetColorTexture(dv[1], dv[2], dv[3], dv[4] or 0.06)
@@ -208,6 +253,8 @@ function Nav:RefreshCounts()
             row:SetCounts(ModuleCounts(mod))
         end
     end
+    local tgtRow = MC.TARGETS_KEY and self.rows[MC.TARGETS_KEY]
+    if tgtRow then tgtRow:SetCounts(TargetCounts()) end
     -- Fresh scan results move the spine's lit segments too.
     if self.panel and self.panel.UpdateSpine then self.panel:UpdateSpine() end
 end

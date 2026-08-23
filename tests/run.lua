@@ -258,6 +258,106 @@ do
         "single-entry list is a no-op")
 end
 
+-- Targets: the page's grouping, and the guard that stops a completing scan
+-- painting a tracker list over a full-content view.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    local printed = {}
+    local realPrint = print
+    print = function(...) printed[#printed + 1] = select(1, ...) end
+    loadAddon("addons/Collectionist/Targets.lua", MC)
+
+    -- The overlay needs a real CreateFrame, which this harness has no use
+    -- for. _EnsureFrame returns nil without the library, so Refresh bails
+    -- there and the pin API under test runs on its own.
+    local savedLibStub = LibStub
+    LibStub = function() return nil end
+
+    truthy(MC.TARGETS_KEY, "Targets exports a view key")
+    equal(MC.TARGET_CAP, 10, "the pin cap is exported for the sidebar count")
+
+    MC.db = { targets = { pins = {} } }
+    MC.modules = {
+        { key = "mounts", label = "Mounts" },
+        { key = "pets",   label = "Pets" },
+    }
+
+    -- IsTargetsSelected reads the same activeSelection every other view does.
+    MC.activeSelection = nil
+    equal(MC.IsTargetsSelected(), false, "no view selected means Targets is not")
+    MC.activeSelection = MC.TARGETS_KEY
+    equal(MC.IsTargetsSelected(), true, "Targets selected")
+
+    -- Pinning: keyed per module, capped, and collected rows are refused.
+    MC.activeModule = "mounts"
+    MC.ToggleTargetPin({ moduleKey = "mounts", mountID = 7, name = "Alpha" })
+    equal(#MC.db.targets.pins, 1, "an uncollected row pins")
+    MC.ToggleTargetPin({ moduleKey = "mounts", mountID = 7, name = "Alpha" })
+    equal(#MC.db.targets.pins, 0, "pinning the same row again unpins it")
+    MC.ToggleTargetPin({ moduleKey = "mounts", mountID = 9, name = "Have",
+                         collected = true })
+    equal(#MC.db.targets.pins, 0, "a collected row is refused")
+
+    for i = 1, MC.TARGET_CAP + 2 do
+        MC.ToggleTargetPin({ moduleKey = "mounts", mountID = 100 + i,
+                             name = "M" .. i })
+    end
+    equal(#MC.db.targets.pins, MC.TARGET_CAP, "the cap holds")
+    equal(MC.db.targets.pins[1].name, "M3", "the oldest pin is the one evicted")
+
+    -- The page itself. Goals shipped blank because nothing asserted that a
+    -- view with data actually emits rows; this does.
+    local rows, headers, progress = {}, {}, nil
+    local fakeLib = {
+        Theme = { colors = { targetAccent = { 1, 1, 1 }, accent = { 0, 0, 0 } } },
+        HideEmptyMessage = function() end,
+        ShowEmptyMessage = function(_, text) rows[#rows + 1] = "EMPTY:" .. text; return 40 end,
+        RenderSourceHeader = function(_, _, yOff, opts)
+            headers[#headers + 1] = opts.label .. "=" .. opts.count
+            return nil, false, yOff + 20
+        end,
+        RenderItemRow = function(_, _, yOff, opts)
+            rows[#rows + 1] = opts.name
+            return yOff + 22
+        end,
+    }
+    LibStub = function() return fakeLib end
+    MC.panel = {
+        scrollChild = {},
+        pool = { ReleaseAll = function() end },
+        RefreshScrollContent = function() end,
+        titleProgressText = { SetText = function(_, t) progress = t end },
+    }
+    MC.HideInfoTooltip = function() end
+
+    MC.db.targets.pins = {}
+    MC.Targets:RenderPage()
+    equal(#rows, 1, "an empty Targets page shows exactly one message")
+    truthy(rows[1]:find("^EMPTY:"), "and that message is the empty state")
+
+    rows, headers = {}, {}
+    MC.db.targets.pins = {
+        { key = "mounts:mountID:1", module = "mounts", name = "Mount A" },
+        { key = "pets:speciesID:2", module = "pets",   name = "Pet B" },
+        { key = "mounts:mountID:3", module = "mounts", name = "Mount C" },
+        { key = "gone:id:4",        module = "gone",   name = "Orphan" },
+    }
+    MC.Targets:RenderPage()
+    equal(#rows, 4, "every pin renders a row")
+    equal(#headers, 3, "one header per module holding pins")
+    equal(headers[1], "Mounts=2", "sidebar order first, with its pin count")
+    equal(headers[2], "Pets=1", "then the next module in sidebar order")
+    equal(headers[3], "gone=1", "a pin whose module is gone still renders, last")
+    equal(rows[1], "Mount A", "rows follow their group")
+    equal(rows[3], "Pet B", "and groups do not interleave")
+    equal(progress, "4 / 10 pinned", "the counter reports pins against the cap")
+
+    LibStub = savedLibStub
+    print = realPrint
+end
+
 -- Derived HandyNotes pins for mounts, pets and toys.
 do
     local MC = {}
