@@ -40,8 +40,11 @@ MC.RegisterContent("midnight", "mounts", {
     { source = "achievement", mounts = {
         { mountID = 2917, name = "Anu'shalla, Shadow's Guidance", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rInsurmountable Collection|n|cFFFFD200Category: |rMounts" },
     } },
-    { source = "drop", mounts = {
-        { mountID = 2492, name = "Spring Butterfly", source = "drop", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Drop:|r Apothecary Hummel" },
+    -- Love is in the Air, not a rare drop. Filing it under "drop" put it in
+    -- the zone sub-grouping that source gets, and with no zone to group by it
+    -- landed under an "Unknown" header.
+    { source = "worldevent", mounts = {
+        { mountID = 2492, name = "Spring Butterfly", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Drop:|r Apothecary Hummel" },
     } },
     { source = "quest", mounts = {
         { mountID = 2754, name = "Peridot Dragonhawk", source = "quest", sourceInfo = "|cFFFFD200World Quest: |rFrom Darkness, Light|n|cFFFFD200Zone: |rIsle of Quel'Danas" },
