@@ -433,17 +433,23 @@ local function heapKB()
     return ok and kb or nil
 end
 
--- release() must drop the last reference and return a restore function.
+-- release() must drop the LAST reference and return a REBUILD function.
+--
+-- The first version of this returned a `restore` closure that captured the very
+-- data it had just released. The closure was itself a live reference, so the
+-- collector could free nothing and every structure measured 0 KB -- an
+-- instrument that reported the absence of what it was built to find. Rebuild
+-- from scratch instead: it costs a rescan, and a rescan is what this data is.
 local function attribute(label, release)
     local before = heapKB()
     if not before then return end
-    local ok, restore = pcall(release)
+    local ok, rebuild = pcall(release)
     if not ok then
-        print(sformat("  %-22s (could not release: %s)", label, tostring(restore)))
+        print(sformat("  %-22s (could not release: %s)", label, tostring(rebuild)))
         return
     end
     local after = heapKB()
-    if type(restore) == "function" then pcall(restore) end
+    if type(rebuild) == "function" then pcall(rebuild) end
     if after then
         print(sformat("  %-22s %s", label, kbStr(before - after)))
     end
@@ -458,51 +464,55 @@ function Mem.ReportAttribution()
     print(P .. " attribution - releasing each structure and measuring the drop")
     print("  (destructive but recoverable; everything below is derived data)")
 
-    -- The search index, including every record and its haystack string.
-    attribute("search index", function()
-        local S = MC.Search
-        if not (S and S.index) then return end
-        local index, byItemID = S.index, S.byItemID
-        S.index, S.byItemID, S._staticCount = nil, nil, nil
-        return function()
-            S.index, S.byItemID = index, byItemID
-            if S.EnsureIndex then pcall(function() S:EnsureIndex() end) end
-        end
-    end)
+    -- Order matters. Search records for rares and treasures hold `ref` pointers
+    -- straight into those scanners' entry tables, so measuring a scanner while
+    -- the index is up would credit its entries to nobody -- the index would
+    -- still be holding them. The index comes down first and STAYS down until
+    -- every scanner has been measured; everything is rebuilt at the end.
+    local S = MC.Search
+    local hadIndex = S and S.index ~= nil
+    if hadIndex then
+        attribute("search index", function()
+            S.index, S.byItemID, S._staticCount, S._membership = nil, nil, nil, nil
+            return nil
+        end)
+    else
+        print("  search index           (not built)")
+    end
 
-    -- One module's scan results at a time, so the per-module cost is visible
-    -- rather than one lump for all eight.
+    -- The entry count goes on the line. A structure holding twenty thousand
+    -- tables and reporting 0 KB is an instrument failure, not a measurement,
+    -- and that has to be visible without doing arithmetic in your head.
     for _, mod in ipairs(MC.modules or {}) do
         local scanner = mod.Scanner
         if scanner and scanner.results then
-            attribute("scan: " .. (mod.label or mod.key), function()
-                local held = scanner.results
+            local n = Mem.ModuleEntries and Mem.ModuleEntries(mod) or nil
+            local label = "scan: " .. (mod.label or mod.key)
+            if n then label = sformat("%s (%s)", label, comma(n)) end
+            attribute(label, function()
                 scanner.results = {}
-                return function() scanner.results = held end
+                return nil
             end)
         end
     end
 
-    -- The frame pool's idle list. Frames themselves are never freed by the
-    -- client, so this measures only the Lua-side bookkeeping hanging off them.
+    -- Frames themselves are never freed by the client, so this measures only
+    -- the Lua-side references hanging off the idle list.
     attribute("pooled frame refs", function()
-        -- Resolve the library here; MUI is not a file-scope local in this file,
-        -- and a nil global would make this silently measure nothing.
         local okLib, lib = pcall(LibStub, "MidnightUI-1.0", true)
         local pools = (okLib and type(lib) == "table" and rawget(lib, "_pools")) or {}
-        local saved = {}
-        for i, pool in ipairs(pools) do
-            saved[i] = pool.inactive
-            pool.inactive = {}
-        end
-        return function()
-            for i, pool in ipairs(pools) do
-                if saved[i] then pool.inactive = saved[i] end
-            end
-        end
+        for _, pool in ipairs(pools) do pool.inactive = {} end
+        return nil
     end)
 
-    print("  rebuilding - run /mc mem to confirm the totals came back")
+    print("  rebuilding ...")
+    for _, mod in ipairs(MC.modules or {}) do
+        local scanner = mod.Scanner
+        if scanner and scanner.Scan then pcall(function() scanner:Scan() end) end
+    end
+    if hadIndex and S.EnsureIndex then pcall(function() S:EnsureIndex() end) end
+    if MC.RefreshActive then pcall(MC.RefreshActive) end
+    print("  done - run /mc mem to confirm the totals came back")
 end
 
 -- Single entry point for the slash dispatch. `arg` is the already-lowercased
