@@ -284,6 +284,19 @@ local function newNamespace(addon)
     return ns, maps, registered
 end
 
+-- Lua's pairs() has no defined order, so iterating a node table directly makes
+-- the dump differ between runs on the same install -- and every artifact
+-- derived from it, including which coordinate a consumer sees first. Sort the
+-- coordinate keys so the pipeline is reproducible.
+local function sortedCoordKeys(tbl)
+    local keys = {}
+    for k in pairs(tbl or {}) do
+        if type(k) == "number" then keys[#keys + 1] = k end
+    end
+    table.sort(keys)
+    return keys
+end
+
 local function coordToXY(key)
     -- The key is an integer, NOT a fixed-width string: 55264393 is (0.5526,
     -- 0.4393) and 5264393 is (0.0526, 0.4393). Requiring eight digits drops
@@ -390,7 +403,8 @@ for _, addon in ipairs(listAddons()) do
 
         local before = totals.nodes
         for _, m in ipairs(maps) do
-            for coord, node in pairs(m.nodes or {}) do
+            for _, coord in ipairs(sortedCoordKeys(m.nodes)) do
+                local node = m.nodes[coord]
                 local x, y = coordToXY(coord)
                 if x and type(node) == "table" then
                     totals.nodes = totals.nodes + 1
@@ -401,7 +415,8 @@ for _, addon in ipairs(listAddons()) do
         end
         for _, reg in ipairs(registered) do
             local zone = tonumber(reg.zone)
-            for coord, point in pairs(reg.points or {}) do
+            for _, coord in ipairs(sortedCoordKeys(reg.points)) do
+                local point = reg.points[coord]
                 local x, y = coordToXY(coord)
                 if x and type(point) == "table" then
                     local merged = {}
