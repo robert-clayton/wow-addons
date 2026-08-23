@@ -21,12 +21,12 @@ MC.RegisterContent("midnight", "mounts", {
         source = "renown",
         mounts = {
             { mountID = 3060, itemID = 276802, name = "Indigo Coiled Horror", source = "renown",
-              sourceInfo = "Jan'sari the Watchful - Zul'jarra's Forces Renown 17 and 6,000 Voidlight Marl",
+              sourceInfo = "Jan'sari the Watchful - 6,000 Voidlight Marl",
               waypoint = MC.LOC.Jansari, zone = "The Coiled Isle",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } },
               renown = { factionID = MC.FACTION.ZuljarrasForces, level = 17, factionName = "Zul'jarra's Forces" }, score = T.long },
             { mountID = 3054, itemID = 276551, name = "Violet-Backed Skyfang", source = "renown",
-              sourceInfo = "Jan'sari the Watchful - Zul'jarra's Forces Renown 19 and 8,000 Voidlight Marl",
+              sourceInfo = "Jan'sari the Watchful - 8,000 Voidlight Marl",
               waypoint = MC.LOC.Jansari, zone = "The Coiled Isle",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } },
               renown = { factionID = MC.FACTION.ZuljarrasForces, level = 19, factionName = "Zul'jarra's Forces" }, score = T.long },
@@ -83,7 +83,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "delve",
         mounts = {
             { mountID = 3043, itemID = 276162, name = "Corroded Soul Crusher", source = "delve",
-              sourceInfo = "Telemancer Astrandis - Delver's Journey Rank 5 and 10 Voidlight Marl",
+              sourceInfo = "Telemancer Astrandis - 10 Voidlight Marl",
               waypoint = MC.LOC.TelemancerAstrandis, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } },
               renown = { factionID = MC.FACTION.DelversJourney, level = 5,
@@ -99,7 +99,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "prey",
         mounts = {
             { mountID = 3032, itemID = 275660, name = "Preyhunter's Fury", source = "prey",
-              sourceInfo = "Construct V'anore - Prey Journey Rank 10 and 2,250 Remnants of Anguish (Season 2)",
+              sourceInfo = "Construct V'anore - 2,250 Remnants of Anguish (Season 2)",
               waypoint = MC.LOC.ConstructVanore, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 2250 } },
               renown = { factionID = MC.FACTION.PreyhuntersJourney, level = 10,

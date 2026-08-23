@@ -85,7 +85,7 @@ MC.RegisterContent("midnight", "pets", {
               canBattle = false, waypoint = { COILED_ISLE, 0.516, 0.498, "Second Mate Sluggs" }, zone = "The Coiled Isle",
               cost = { gold = 1000000 } },
             { speciesID = 5093, itemID = 276248, npcID = 267805, name = "Snek'zali",
-              petType = 8, source = "vendor", sourceInfo = "Jan'sari the Watchful - Renown 12, Zul'Jarra's Forces",
+              petType = 8, source = "vendor", sourceInfo = "Jan'sari the Watchful",
               canBattle = false, waypoint = { COILED_ISLE, 0.588, 0.450, "Jan'sari the Watchful" }, zone = "The Coiled Isle",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } },
               renown = { factionID = MC.FACTION.ZuljarrasForces, level = 12, factionName = "Zul'Jarra's Forces" }, score = T.medium },

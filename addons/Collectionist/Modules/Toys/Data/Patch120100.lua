@@ -8,7 +8,7 @@ MC.RegisterContent("midnight", "toys", {
         source = "renown",
         toys = {
             { itemID = 276925, name = "Idol of Ula'tek", source = "renown",
-              sourceInfo = "Jan'sari the Watchful - Renown 13, Zul'Jarra's Forces",
+              sourceInfo = "Jan'sari the Watchful",
               waypoint = { COILED_ISLE, 0.588, 0.450, "Jan'sari the Watchful" }, zone = "The Coiled Isle",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 4000 } },
               renown = { factionID = MC.FACTION.ZuljarrasForces, level = 13, factionName = "Zul'Jarra's Forces" }, score = T.medium },

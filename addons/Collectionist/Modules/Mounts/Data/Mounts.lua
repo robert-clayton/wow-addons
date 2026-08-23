@@ -125,39 +125,39 @@ MC.RegisterContent("midnight", "mounts", {
         source = "renown",
         mounts = {
             -- Silvermoon Court (factionID 2710)
-            { mountID = 2761, name = "Crimson Silvermoon Hawkstrider", source = "renown", sourceInfo = "Caeris Fairdawn - Renown 17, Silvermoon Court",
+            { mountID = 2761, name = "Crimson Silvermoon Hawkstrider", source = "renown", sourceInfo = "Caeris Fairdawn",
               waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 17, factionName = "Silvermoon Court" }, score = T.long },
-            { mountID = 2753, name = "Fiery Dragonhawk", source = "renown", sourceInfo = "Caeris Fairdawn - Renown 19, Silvermoon Court",
+            { mountID = 2753, name = "Fiery Dragonhawk", source = "renown", sourceInfo = "Caeris Fairdawn",
               waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 19, factionName = "Silvermoon Court" }, score = T.long },
 
             -- Amani Tribe (factionID 2696)
-            { mountID = 2776, name = "Amani Blessed Bear", source = "renown", sourceInfo = "Magovu - Renown 17, Amani Tribe",
+            { mountID = 2776, name = "Amani Blessed Bear", source = "renown", sourceInfo = "Magovu",
               waypoint = LOC.Magovu, zone = "Zul'Aman",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 17, factionName = "Amani Tribe" }, score = T.long },
-            { mountID = 2694, name = "Amani Windcaller", source = "renown", sourceInfo = "Magovu - Renown 19, Amani Tribe",
+            { mountID = 2694, name = "Amani Windcaller", source = "renown", sourceInfo = "Magovu",
               waypoint = LOC.Magovu, zone = "Zul'Aman",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 19, factionName = "Amani Tribe" }, score = T.long },
 
             -- Hara'ti (factionID 2704)
-            { mountID = 2614, name = "Fierce Grimlynx", source = "renown", sourceInfo = "Naynar - Renown 16, Hara'ti",
+            { mountID = 2614, name = "Fierce Grimlynx", source = "renown", sourceInfo = "Naynar",
               waypoint = LOC.Naynar, zone = "Harandar",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Harati, level = 16, factionName = "Hara'ti" }, score = T.long },
-            { mountID = 2710, name = "Cerulean Sporeglider", source = "renown", sourceInfo = "Naynar - Renown 19, Hara'ti",
+            { mountID = 2710, name = "Cerulean Sporeglider", source = "renown", sourceInfo = "Naynar",
               waypoint = LOC.Naynar, zone = "Harandar",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Harati, level = 19, factionName = "Hara'ti" }, score = T.long },
 
             -- The Singularity (factionID 2699)
-            { mountID = 2789, name = "Ravenous Shredclaw", source = "renown", sourceInfo = "Void Researcher Anomander - Renown 17, The Singularity",
+            { mountID = 2789, name = "Ravenous Shredclaw", source = "renown", sourceInfo = "Void Researcher Anomander",
               waypoint = LOC.Anomander, zone = "Voidstorm",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.Singularity, level = 17, factionName = "The Singularity" }, score = T.long },
-            { mountID = 2828, name = "Voidbound Stormray", source = "renown", sourceInfo = "Void Researcher Anomander - Renown 19, The Singularity",
+            { mountID = 2828, name = "Voidbound Stormray", source = "renown", sourceInfo = "Void Researcher Anomander",
               waypoint = LOC.Anomander, zone = "Voidstorm",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 8000 } }, renown = { factionID = MC.FACTION.Singularity, level = 19, factionName = "The Singularity" }, score = T.long },
 
             -- Patch 12.0.5: Ritual Sites renown (Sergeant Vornin)
-            { mountID = 2935, name = "Void-Touched Hawkstrider", source = "renown", sourceInfo = "Sergeant Vornin - 4,500 Voidlight Marl, Ritual Sites Renown 8",
+            { mountID = 2935, name = "Void-Touched Hawkstrider", source = "renown", sourceInfo = "Sergeant Vornin - 4,500 Voidlight Marl",
               waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 4500 } },
               renown = { factionID = MC.FACTION.RitualSites, level = 8, factionName = "Ritual Sites" } },

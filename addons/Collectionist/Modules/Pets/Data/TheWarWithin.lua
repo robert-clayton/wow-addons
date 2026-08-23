@@ -184,10 +184,10 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, zone = "Siren Isle", cost = { currency = { MC.CURRENCY.FlameBlessedIron, 750 } } },
             { speciesID = 4829, itemID = 244910, npcID = 245476, name = "Penumbral Terror",    petType = 6, source = "vendor", sourceInfo = "Shad'anis - 4 Untethered Coins",
               canBattle = true, zone = "K'aresh", cost = { currency = { MC.CURRENCY.UntetheredCoin, 4 } } },
-            { speciesID = 4832, itemID = 244913, npcID = 245479, name = "Looker Gaz'kreth Jr.", petType = 6, source = "vendor", sourceInfo = "Manaforge Vandals - Renown 13 (Shadow Point)",
+            { speciesID = 4832, itemID = 244913, npcID = 245479, name = "Looker Gaz'kreth Jr.", petType = 6, source = "vendor", sourceInfo = "Manaforge Vandals (Shadow Point)",
               canBattle = true, zone = "K'aresh",
               renown = { factionID = MC.FACTION.ManaforgeVandals, level = 13, factionName = "Manaforge Vandals" }, score = T.medium },
-            { speciesID = 4859, itemID = 246694, npcID = 247463, name = "Zo'ya",               petType = 8, source = "vendor", sourceInfo = "Manaforge Vandals - Renown 8 (Shadow Point)",
+            { speciesID = 4859, itemID = 246694, npcID = 247463, name = "Zo'ya",               petType = 8, source = "vendor", sourceInfo = "Manaforge Vandals (Shadow Point)",
               canBattle = true, zone = "K'aresh",
               renown = { factionID = MC.FACTION.ManaforgeVandals, level = 8, factionName = "Manaforge Vandals" }, score = T.medium },
 

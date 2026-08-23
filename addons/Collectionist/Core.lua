@@ -664,32 +664,6 @@ local STANDING_ORDER = {
 local STANDINGS = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
 
 --------------------------------------------------------------------------
--- A row with a structured `renown` requirement gets a live "<track> Renown
--- current/required" line further down, in red or green. Most sourceInfo strings
--- ALSO state the requirement in prose -- 107 of the 110 such rows -- so the
--- tooltip said the same thing twice, once without the player's progress and
--- once with it.
---
--- Stripped at render rather than rewritten in the data: the strings are
--- hand-authored in a dozen different shapes, search indexes them, and a regex
--- pass over 107 authored lines is a worse trade than one function that leaves
--- anything it does not recognise alone. Nine strings currently fall through and
--- keep their prose, which is what they did before.
-local function stripRenownProse(info)
-    if type(info) ~= "string" then return info end
-    local out = info
-    out = out:gsub("%s*[,%-]%s*[^,%-]-Renown%s+%d+%s*$", "")
-    out = out:gsub("%s*[,%-]%s*Renown%s+%d+,%s*[^,]-$", "")
-    out = out:gsub("([%-,]%s*)[^,%-]-Renown%s+%d+%s+and%s+", "%1")
-    out = out:gsub("%s*%%([^()]-Renown%s+%d+%%)%s*$", "")
-    out = out:gsub("^[^,%-()]-Renown%s+%d+%s*%%(([^()]+)%%)%s*$", "%1")
-    if out:match("^%s*[^,%-]-Renown%s+%d+%s*$") then return info end
-    out = out:gsub("%s*[,%-]%s*$", ""):gsub("^%s+", "")
-    -- Never hand back nothing; the prose is better than a blank line.
-    if out == "" then return info end
-    return out
-end
-
 -- The big info tooltip (renown, cost, drop info, click hints)
 --------------------------------------------------------------------------
 local theme = MUI.Theme
@@ -710,9 +684,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         sr or 0.7, sg or 0.7, sb or 0.7)
 
     if item.sourceInfo then
-        local info = item.sourceInfo
-        if item.renown then info = stripRenownProse(info) end
-        tt:AddLine(info, 1, 1, 1, true)
+        tt:AddLine(item.sourceInfo, 1, 1, 1, true)
     end
 
 

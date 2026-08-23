@@ -184,15 +184,15 @@ MC.RegisterContent("midnight", "pets", {
         source = "vendor",
         pets = {
             -- Renown vendors (Voidlight Marl, currency 3316)
-            { speciesID = 4952, npcID = 256271, name = "Blitzcreek",            petType = 8,  source = "vendor", sourceInfo = "Void Researcher Anomander - Renown 14, The Singularity", canBattle = true,  waypoint = LOC.Anomander, zone = "Voidstorm",
+            { speciesID = 4952, npcID = 256271, name = "Blitzcreek",            petType = 8,  source = "vendor", sourceInfo = "Void Researcher Anomander", canBattle = true,  waypoint = LOC.Anomander, zone = "Voidstorm",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.Singularity, level = 14, factionName = "The Singularity" } },
-            { speciesID = 4928, npcID = 255257, name = "Dragonhawk Munchkin",   petType = 2,  source = "vendor", sourceInfo = "Caeris Fairdawn - Renown 12, Silvermoon Court",          canBattle = true,  waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
+            { speciesID = 4928, npcID = 255257, name = "Dragonhawk Munchkin",   petType = 2,  source = "vendor", sourceInfo = "Caeris Fairdawn",          canBattle = true,  waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 12, factionName = "Silvermoon Court" } },
             { speciesID = 4984, npcID = 257802, name = "Medusa",                petType = 6,  source = "vendor", sourceInfo = "Thraxadar - Revered, Slayer's Duellum",                  canBattle = false, waypoint = LOC.Thraxadar, zone = "Voidstorm",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Revered", factionName = "Slayer's Duellum" } },
-            { speciesID = 4929, npcID = 255295, name = "Munchy",                petType = 8,  source = "vendor", sourceInfo = "Naynar - Renown 12, Hara'ti",                            canBattle = true,  waypoint = LOC.Naynar, zone = "Harandar",
+            { speciesID = 4929, npcID = 255295, name = "Munchy",                petType = 8,  source = "vendor", sourceInfo = "Naynar",                            canBattle = true,  waypoint = LOC.Naynar, zone = "Harandar",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.Harati, level = 12, factionName = "Hara'ti" } },
-            { speciesID = 4888, npcID = 250583, name = "Naloki",                petType = 5,  source = "vendor", sourceInfo = "Magovu - Renown 12, Amani Tribe",                        canBattle = false, waypoint = LOC.Magovu, zone = "Zul'Aman",
+            { speciesID = 4888, npcID = 250583, name = "Naloki",                petType = 5,  source = "vendor", sourceInfo = "Magovu",                        canBattle = false, waypoint = LOC.Magovu, zone = "Zul'Aman",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 2500 } }, renown = { factionID = MC.FACTION.AmaniTribe, level = 12, factionName = "Amani Tribe" } },
 
             -- Brimming Arcana vendor (currency 3379)
@@ -200,7 +200,7 @@ MC.RegisterContent("midnight", "pets", {
               cost = { currency = { MC.CURRENCY.BrimmingArcana, 200 } } },
 
             -- Preyseeker's Journey vendors (Remnant of Anguish, currency 3392)
-            { speciesID = 4930, npcID = 255522, name = "Lil' Preyseeker",       petType = 6,  source = "vendor", sourceInfo = "Construct V'anore - Preyseeker's Journey Rank 9",         canBattle = true,  waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
+            { speciesID = 4930, npcID = 255522, name = "Lil' Preyseeker",       petType = 6,  source = "vendor", sourceInfo = "Construct V'anore",         canBattle = true,  waypoint = LOC.ConstructVanore, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.RemnantOfAnguish, 1200 } },
               renown = { factionID = MC.FACTION.PreyhuntersJourney, level = 9,
                          factionName = "Preyhunter's Journey" } },
@@ -216,12 +216,12 @@ MC.RegisterContent("midnight", "pets", {
               canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } }, achievementID = 62518 },
             { speciesID = 5036, npcID = 262422, name = "Rescued Dragonhawk Chick", petType = 2, source = "vendor",
-              sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl, Ritual Sites Renown 6 (item: Void-Touched Dragonhawk Egg)",
+              sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl (item: Void-Touched Dragonhawk Egg)",
               canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } },
               renown = { factionID = MC.FACTION.RitualSites, level = 6, factionName = "Ritual Sites" } },
             { speciesID = 5037, npcID = 262427, name = "Void-Infused Mindbreaker Fry", petType = 6, source = "vendor",
-              sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl, Ritual Sites Renown 6",
+              sourceInfo = "Sergeant Vornin - 1,800 Voidlight Marl",
               canBattle = true, waypoint = LOC.SergeantVornin, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 1800 } },
               renown = { factionID = MC.FACTION.RitualSites, level = 6, factionName = "Ritual Sites" } },

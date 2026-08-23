@@ -159,7 +159,7 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "renown",
         decorations = {
-            { decorID = 25307, itemID = 276083, name = "Sunstrider Omnium Simulacrum", source = "renown", sourceInfo = "Sergeant Vornin - 500 Voidlight Marl, Ritual Sites Rank 3", waypoint = LOC.SergeantVornin, zone = "Silvermoon City", cost = { currency = { MC.CURRENCY.VoidlightMarl, 500 } }, renown = { factionID = MC.FACTION.RitualSites, level = 3, factionName = "Ritual Sites" } },
+            { decorID = 25307, itemID = 276083, name = "Sunstrider Omnium Simulacrum", source = "renown", sourceInfo = "Sergeant Vornin - 500 Voidlight Marl", waypoint = LOC.SergeantVornin, zone = "Silvermoon City", cost = { currency = { MC.CURRENCY.VoidlightMarl, 500 } }, renown = { factionID = MC.FACTION.RitualSites, level = 3, factionName = "Ritual Sites" } },
         },
     },
 

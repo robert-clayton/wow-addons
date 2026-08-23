@@ -230,5 +230,33 @@ if S and S.Invalidate then
     ok(S:IsCollected(nil) == false, "IsCollected is safe on a missing record")
 end
 
+-- A row with a structured renown requirement renders its own live
+-- "<track> Renown current/required" line, in red until met. If sourceInfo ALSO
+-- states the requirement the tooltip says it twice -- once without the player's
+-- progress, once with it -- which is what shipped and what this stops coming
+-- back. The prose was cleaned out of 68 strings across 11 files; this asserts
+-- nobody re-adds it.
+do
+    local offenders = {}
+    for _, mod in ipairs(MC.modules or {}) do
+        local field = ({ mounts = "MountData", pets = "PetData", toys = "ToyData",
+                         decorations = "DecorationData" })[mod.key]
+        local groups = field and rawget(MC, field)
+        for _, group in ipairs(groups or {}) do
+            for _, listKey in ipairs({ "mounts", "pets", "toys", "decorations", "items" }) do
+                for _, e in ipairs((type(group) == "table" and group[listKey]) or {}) do
+                    if type(e) == "table" and e.renown and type(e.sourceInfo) == "string"
+                       and (e.sourceInfo:find("Renown%s+%d") or e.sourceInfo:find("Rank%s+%d")) then
+                        offenders[#offenders + 1] = (e.name or "?") .. ": " .. e.sourceInfo
+                    end
+                end
+            end
+        end
+    end
+    for i = 1, math.min(#offenders, 5) do print("  DUPLICATE " .. offenders[i]) end
+    ok(#offenders == 0,
+       "no row states its renown requirement in both sourceInfo and the renown field")
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)
