@@ -148,7 +148,7 @@ local _, _, MC, ENV = loadAll(true)
 ok(count(MC.modules) == 8, "all 8 modules registered (" .. count(MC.modules) .. ")")
 ok(MC.TabBar ~= nil, "the nav bar registered")
 ok(type(MC.SortEntries) == "function", "sorting is available")
-ok(MC.GOALS_KEY and MC.SEARCH_KEY and MC.OPTIONS_KEY, "the three view keys exist")
+ok(MC.SEARCH_KEY and MC.OPTIONS_KEY, "the two view keys exist")
 ok(count(MC.MountPins) + count(MC.PetPins) + count(MC.ToyPins) > 400, "derived pins loaded")
 
 -- The search index is refreshed IN PLACE after a scan rather than rebuilt:

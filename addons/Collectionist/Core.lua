@@ -1821,7 +1821,6 @@ function MC._ApplyIndicatorVisibility()
     -- Search rides the chain's compact/strip hiding but, being an action
     -- rather than a readout, stays available on the Options page.
     setIndicatorShown(MC.searchIndicator, viewHidden)
-    setIndicatorShown(MC.goalsIndicator, viewHidden)
     -- The counter hides for Options, since it counts a tracker list.
     -- Exception: the strip is built around it (icon, wordmark, counter,
     -- restore) and would collapse to a gap without it. Its value is the
@@ -2102,10 +2101,9 @@ function MC.CreatePanel()
             -- back and, with the chain collapsed in compact, it lands on top
             -- of the page title.
             if MC._indicatorsHidden then btn:Hide() return end
-            -- Options, search and goals have no per-source row groups to order.
+            -- Options and search have no per-source row groups to order.
             local applies = not (MC.IsOptionsSelected and MC.IsOptionsSelected())
                 and not (MC.IsSearchSelected and MC.IsSearchSelected())
-                and not (MC.IsGoalsSelected and MC.IsGoalsSelected())
             if not applies then btn:Hide() return end
             btn:Show()
             local mode = MC.SORT_MODE_BY_KEY[MC.GetSortMode()]
@@ -2136,18 +2134,6 @@ function MC.CreatePanel()
         -- the input; no duplicate guard here.
         searchBtn:SetScript("OnClick", function() MC.SelectSearch() end)
         MC.searchIndicator = searchBtn
-
-        -- Closest to done. Sits with search as a view action rather than a
-        -- readout, so it survives the Options page the same way.
-        local goalsBtn = MUI.MakeHeaderIconBtn(bar,
-            "Interface\\Common\\ReputationStar", 13,
-            theme.colors.btnTealFg,
-            theme.colors.btnTealHoverBg,
-            theme.colors.btnTealHoverBd,
-            "Closest to done")
-        goalsBtn:SetPoint("RIGHT", searchBtn, "LEFT", -10, 0)
-        goalsBtn:SetScript("OnClick", function() MC.SelectGoals() end)
-        MC.goalsIndicator = goalsBtn
 
         MC.RefreshPeerIndicator()
 
@@ -2406,18 +2392,12 @@ function MC.ShowPagePicker(anchorFrame)
                 label = m.label or key,
                 selected = (MC.activeSelection == nil or MC.activeSelection == key)
                     and MC.activeModule == key
-                    and not MC.IsOptionsSelected() and not MC.IsSearchSelected()
-                    and not MC.IsGoalsSelected(),
+                    and not MC.IsOptionsSelected() and not MC.IsSearchSelected(),
                 onClick = function() MC.SwitchTab(key) end,
             }
         end
     end
 
-    items[#items + 1] = {
-        label = "Closest to Done",
-        selected = MC.IsGoalsSelected(),
-        onClick = function() if not MC.IsGoalsSelected() then MC.SelectGoals() end end,
-    }
     items[#items + 1] = {
         label = "Search",
         selected = MC.IsSearchSelected(),
@@ -2430,37 +2410,6 @@ function MC.ShowPagePicker(anchorFrame)
     }
 
     MC._pagePicker:ShowAt(anchorFrame, "BOTTOMLEFT", "TOPLEFT", items)
-end
-
-function MC.SelectGoals()
-    if not MC.panel then return end
-    -- Clicking the icon again backs out to the tracker underneath. Goals is a
-    -- detour, not a destination, and there was otherwise no way out of it
-    -- except picking a tab from the sidebar.
-    if MC.IsGoalsSelected() then
-        if MC.activeModule then MC.SwitchTab(MC.activeModule) end
-        return
-    end
-    local wasOptions = MC.IsOptionsSelected()
-    MC.activeSelection = MC.GOALS_KEY
-
-    if MC.TabBar and MC.TabBar.SetActive then
-        MC.TabBar:SetActive(MC.GOALS_KEY)
-    end
-    if wasOptions then MC._ApplyIndicatorVisibility() end
-    -- Search owns floating chrome above the scroll viewport; leaving it for
-    -- another view has to take that chrome down or it hangs over the goals.
-    if MC.Search and MC.Search.HideView then MC.Search:HideView() end
-    MC._ApplyIndicatorVisibility()
-
-    TransitionContent(function()
-        if wasOptions and MC.panel.ClearConfigContent then
-            MC.panel:ClearConfigContent()
-        elseif MC.panel.pool then
-            MC.panel.pool:ReleaseAll()
-        end
-        if MC.Goals then MC.Goals:Render() end
-    end)
 end
 
 -- Re-render the options page on the next frame, once, however many
@@ -2510,13 +2459,6 @@ function MC.RefreshActive()
     -- painting a tracker list over the results.
     if MC.IsSearchSelected() then
         if MC.Search and MC.Search.RefreshResults then MC.Search:RefreshResults() end
-        if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
-        if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
-        return
-    end
-    -- Goals rank live scanner output, so a rescan has to redraw them too.
-    if MC.IsGoalsSelected() then
-        if MC.Goals then MC.Goals:Render() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
         if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
         return
@@ -2746,7 +2688,6 @@ local function PrintHelp()
     print("  /mc style classic|premium - switch UI shell (reload required)")
     print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc find <text> - global search (also: just /mc <anything>)")
-    print("  /mc goals       - what you are closest to finishing")
     print("  /mc mem [gc|attribute] - memory report; 'gc' collects first,")
     print("                  'attribute' measures each structure by releasing it")
     print("  /mc version - show addon version")
@@ -2909,10 +2850,6 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         elseif MC.SelectSearch then
             MC.SelectSearch()
         end
-    elseif cmd == "goals" or cmd == "next" then
-        -- /mc goals — what you are closest to finishing.
-        if MC.panel and not MC.panel.frame:IsShown() then MC.panel:Show() end
-        if MC.SelectGoals then MC.SelectGoals() end
     elseif cmd == "mem" or cmd == "memory" then
         -- /mc mem [gc] — where the memory actually is. Diagnostic only:
         -- it reads, it never changes state, and `gc` only asks the

@@ -204,7 +204,6 @@ Modules\Recipes\UI.lua
 # manifests the modules registered above, so they load after every module
 # block. Core references MC.Search only through runtime guards.
 Search.lua
-Goals.lua
 Tooltips.lua
 
 # /mc mem. Reads the pools, the index and every scanner's results at call

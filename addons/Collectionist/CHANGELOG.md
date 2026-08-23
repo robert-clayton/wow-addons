@@ -7,7 +7,6 @@
 
 ### Added
 - **Sort rows.** A control in the title bar cycles Default, A-Z, Z-A, and expansion order both ways. Each tab remembers its own.
-- **Closest to Done.** A star beside the magnifier, or `/mc goals`: the collections you're nearest to finishing, fewest-left first, with a click to pin what's missing.
 - **Locations for older collectibles.** 519 mounts, pets and toys outside the current expansion now have a map pin where before they had nothing.
 - **Hide unobtainable recipes**, in Options > Trackers. Recipes removed from the game stop filling the list and stop counting against your totals; they're still counted as Legacies.
 - In the compact window, clicking the page title opens a list of the other tabs — the sidebar isn't there to switch with.
