@@ -19,6 +19,7 @@ Libs\MidnightUI-1.0\MidnightUI-1.0.xml
 Core.lua
 Data\Constants.lua
 Data\Locations.lua
+Data\HandyNotesPins.lua
 Data\Expansions.lua
 Data\Changelog.lua
 TabBar.lua

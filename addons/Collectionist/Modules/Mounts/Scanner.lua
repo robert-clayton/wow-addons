@@ -77,7 +77,10 @@ function Scanner:Scan()
                             name              = mountName,
                             source            = mount.source,
                             sourceInfo        = mount.sourceInfo,
-                            waypoint           = mount.waypoint,
+                            waypoint           = mount.waypoint
+                                -- Derived pins fill the gap where the catalog has none; a
+                                -- hand-written waypoint on the row itself always wins.
+                                or (mount.mountID and MC.MountPins and MC.MountPins[mount.mountID]),
                             overworldWaypoint = mount.overworldWaypoint,
                             cost              = mount.cost,
                             dropInfo          = mount.dropInfo,

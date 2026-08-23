@@ -61,7 +61,10 @@ function Scanner:Scan()
                         petType           = petType,
                         source            = pet.source,
                         sourceInfo        = pet.sourceInfo,
-                        waypoint          = pet.waypoint,
+                        waypoint          = pet.waypoint
+                            -- Derived pins fill the gap where the catalog has none; a
+                            -- hand-written waypoint on the row itself always wins.
+                            or (pet.speciesID and MC.PetPins and MC.PetPins[pet.speciesID]),
                         overworldWaypoint = pet.overworldWaypoint,
                         cost              = pet.cost,
                         dropInfo          = pet.dropInfo,

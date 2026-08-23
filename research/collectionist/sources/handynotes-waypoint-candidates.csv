@@ -1,0 +1,748 @@
+module,natural_id,name,map_id,x,y,label,publishers,spawns,confidence
+mounts,293,Illidari Doomhawk,71,0.644,0.507,Illidari Doomhawk,1,1,medium
+mounts,561,Thundering Onyx Cloud Serpent,554,0.6587,0.566,Thundering Onyx Cloud Serpent,1,1,medium
+mounts,657,Garn Nighthowl,525,0.132,0.506,Garn Nighthowl,1,1,medium
+mounts,803,Mastercraft Gravewing,1961,0.465,0.7959,Mastercraft Gravewing,1,1,high
+mounts,1043,Kua'fon,862,0.706,0.51,Kua'fon,1,1,high
+mounts,1173,Broken Highland Mustang,14,0.4891,0.3996,Broken Highland Mustang,1,1,high
+mounts,1174,Highland Mustang,14,0.5356,0.5764,Highland Mustang,1,1,high
+mounts,1180,Swift Albino Raptor,14,0.6534,0.7116,Swift Albino Raptor,1,1,high
+mounts,1183,Skullripper,14,0.5715,0.4575,Skullripper,1,1,high
+mounts,1185,Witherbark Direwing,14,0.6748,0.6058,Witherbark Direwing,1,1,high
+mounts,1199,Blackpaw,62,0.495,0.251,Blackpaw,1,2,low
+mounts,1200,Ashenvale Chimaera,62,0.5653,0.3078,Ashenvale Chimaera,1,1,high
+mounts,1201,Frightened Kodo,62,0.4131,0.6548,Frightened Kodo,1,1,high
+mounts,1229,Rusty Mechanocrawler,1462,0.5289,0.4092,Rusty Mechanocrawler,1,1,medium
+mounts,1248,Junkheap Drifter,1462,0.6563,0.785,Junkheap Drifter,1,1,high
+mounts,1249,Child of Torcali,862,0.6817,0.4172,Child of Torcali,1,1,high
+mounts,1257,Silent Glider,1355,0.602,0.474,Silent Glider,1,1,high
+mounts,1297,Clutch of Ha-Li,1530,0.2951,0.38,Clutch of Ha-Li,1,1,high
+mounts,1298,Hopecrusher Gargon,1525,0.5198,0.5179,Hopecrusher Gargon,1,1,high
+mounts,1306,Swift Gloomhoof,1565,0.5787,0.4983,Swift Gloomhoof,1,1,high
+mounts,1307,Sundancer,1533,0.614,0.905,Sundancer,1,1,high
+mounts,1310,Horrid Dredwing,1525,0.4584,0.7919,Horrid Dredwing,1,1,high
+mounts,1313,Rajani Warserpent,1530,0.219,0.1232,Rajani Warserpent,1,1,high
+mounts,1314,Drake of the Four Winds,1527,0.739,0.8353,Drake of the Four Winds,1,1,high
+mounts,1317,Waste Marauder,1527,0.6859,0.3204,Waste Marauder,1,1,high
+mounts,1319,Malevolent Drone,1527,0.3085,0.4971,Malevolent Drone,1,1,high
+mounts,1324,Elusive Quickhoof,864,0.43,0.69,Elusive Quickhoof,1,1,high
+mounts,1327,Ren's Stalwart Hound,1530,0.1218,0.3091,Ren's Stalwart Hound,1,1,high
+mounts,1328,Xinlao,1530,0.3415,0.6805,Xinlao,1,1,high
+mounts,1329,Springfur Alpaca,1527,0.47,0.48,Springfur Alpaca,1,1,high
+mounts,1355,Wakener's Runestag,1662,0.295,0.455,Wakener's Runestag,1,1,medium
+mounts,1358,Enchanted Wakener's Runestag,1662,0.295,0.455,Enchanted Wakener's Runestag,1,1,medium
+mounts,1360,Shimmermist Runner,1565,0.2628,0.5897,Shimmermist Runner,1,1,high
+mounts,1362,Spinemaw Gladechewer,1565,0.2788,0.5248,Spinemaw Gladechewer,1,1,high
+mounts,1366,Bonehoof Tauralus,1536,0.4421,0.5132,Bonehoof Tauralus,1,1,high
+mounts,1370,Armored Bonehoof Tauralus,1536,0.5174,0.4439,Armored Bonehoof Tauralus,1,1,high
+mounts,1372,Blisterback Bloodtusk,1536,0.3371,0.8016,Blisterback Bloodtusk,1,1,high
+mounts,1373,Gorespine,1536,0.6602,0.3532,Gorespine,1,1,high
+mounts,1376,Silvertip Dredwing,1662,0.265,0.455,Silvertip Dredwing,1,1,medium
+mounts,1378,Harvester's Dredwing,1543,0.2946,0.1808,Harvester's Dredwing,1,1,medium
+mounts,1379,Endmire Flyer,1525,0.6248,0.4716,Endmire Flyer,1,1,high
+mounts,1392,Pale Acidmaw,1662,0.295,0.455,Pale Acidmaw,1,1,medium
+mounts,1393,Wild Glimmerfur Prowler,1565,0.3011,0.5536,Wild Glimmerfur Prowler,1,1,high
+mounts,1397,Wildseed Cradle,1565,0.6389,0.3778,Wildseed Cradle,1,1,high
+mounts,1404,Silverwind Larion,1533,0.3601,0.2652,Silverwind Larion,1,1,high
+mounts,1408,Gruesome Flayedwing,1662,0.265,0.41,Gruesome Flayedwing,1,1,medium
+mounts,1410,Hulking Deathroc,1536,0.57,0.7421,Hulking Deathroc,1,1,high
+mounts,1411,Predatory Plagueroc,1536,0.316,0.354,Predatory Plagueroc,1,1,high
+mounts,1413,Dauntless Duskrunner,1662,0.295,0.41,Dauntless Duskrunner,1,1,medium
+mounts,1414,Sinrunner Blanchy,1525,0.6287,0.4341,Sinrunner Blanchy,1,1,medium
+mounts,1415,Arboreal Gulper,1565,0.3242,0.3026,Arboreal Gulper,1,1,high
+mounts,1426,Ascended Skymane,1533,0.5349,0.8868,Ascended Skymane,1,1,high
+mounts,1434,Deepstar Aurelid,1970,0.5228,0.7541,Deepstar Aurelid,1,1,high
+mounts,1437,Battle-Bound Warhound,1536,0.5035,0.4728,Battle-Bound Warhound,1,1,high
+mounts,1442,Corridor Creeper,1911,0.5519,0.7712,Corridor Creeper,1,1,medium
+mounts,1449,Lord of the Corpseflies,1961,0.5993,0.4371,Lord of the Corpseflies,1,1,high
+mounts,1467,Noble Bruffalon,2151,0.3432,0.5997,Noble Bruffalon,1,1,high
+mounts,1469,Magmashell,2022,0.711,0.251,Magmashell,1,1,high
+mounts,1475,Hand of Bahmethra,1543,0.8537,0.5524,Hand of Bahmethra,1,1,medium
+mounts,1476,Wild Hunt Legsplitter,1543,0.22,0.4412,Wild Hunt Legsplitter,1,1,medium
+mounts,1477,Undying Darkhound,1543,0.3386,0.5473,Undying Darkhound,1,1,medium
+mounts,1478,Skyskin Hornstrider,2085,0.6124,0.4679,Skyskin Hornstrider,1,1,medium
+mounts,1482,Xy Trustee's Gearglider,2371,0.4196,0.2212,Xy Trustee's Gearglider,1,1,high
+mounts,1487,Summer Wilderling,1961,0.3318,0.3938,Summer Wilderling,1,1,high
+mounts,1493,Forsworn Aquilon,1961,0.5687,0.3237,Forsworn Aquilon,1,1,high
+mounts,1502,Fallen Charger,1543,0.1771,0.4953,Fallen Charger,1,1,medium
+mounts,1503,Hand of Nilganihmaht,1543,0.255,0.368,Hand of Nilganihmaht,1,1,medium
+mounts,1506,Crimson Shardhide,1961,0.4422,0.295,Crimson Shardhide,1,1,high
+mounts,1509,Garnet Razorwing,1961,0.5627,0.6617,Garnet Razorwing,1,1,high
+mounts,1510,Dusklight Razorwing,1961,0.2572,0.5108,Dusklight Razorwing,1,1,high
+mounts,1511,"Maelie, the Wanderer",1961,0.6068,0.2192,"Maelie, the Wanderer",1,1,high
+mounts,1514,Rampaging Mauler,1961,0.13,0.75,Rampaging Mauler,1,1,high
+mounts,1545,Divine Kiss of Ohn'ahra,2023,0.5747,0.3193,Divine Kiss of Ohn'ahra,1,1,high
+mounts,1553,Liberated Slyvern,2024,0.2856,0.4743,Liberated Slyvern,1,1,high
+mounts,1564,Colossal Soulshredder Mawrat,1911,0.5528,0.5,Colossal Soulshredder Mawrat,1,1,medium
+mounts,1565,Colossal Umbrahide Mawrat,1911,0.5328,0.4528,Colossal Umbrahide Mawrat,1,1,medium
+mounts,1566,Colossal Ebonclaw Mawrat,1911,0.4744,0.7453,Colossal Ebonclaw Mawrat,1,1,medium
+mounts,1569,Patient Bufonid,1970,0.345,0.6548,Patient Bufonid,1,1,high
+mounts,1584,Colossal Plaguespew Mawrat,1970,0.632,0.2603,Colossal Plaguespew Mawrat,1,1,medium
+mounts,1603,Subterranean Magmammoth,2133,0.5589,0.5537,Subterranean Magmammoth,1,1,high
+mounts,1622,Stormhide Salamanther,2112,0.3811,0.3773,Stormhide Salamanther,1,1,medium
+mounts,1623,Seething Slug,2133,0.3233,0.3935,Seething Slug,1,1,high
+mounts,1629,Scrappy Worldsnail,2022,0.3473,0.4672,Scrappy Worldsnail,1,1,high
+mounts,1638,Explorer's Stonehide Packbeast,2025,0.6137,0.3139,Explorer's Stonehide Packbeast,1,1,high
+mounts,1639,"Lizi, Thunderspine Tramper",2023,0.562,0.771,"Lizi, Thunderspine Tramper",1,1,high
+mounts,1656,Otto,2022,0.2033,0.3977,Otto,1,1,medium
+mounts,1664,Guardian Vorquin,2151,0.3561,0.5948,Guardian Vorquin,1,1,high
+mounts,1665,Swift Armored Vorquin,2151,0.3561,0.5948,Swift Armored Vorquin,1,1,high
+mounts,1667,Armored Vorquin Leystrider,2151,0.3561,0.5948,Armored Vorquin Leystrider,1,1,high
+mounts,1668,Majestic Armored Vorquin,2151,0.3561,0.5948,Majestic Armored Vorquin,1,1,high
+mounts,1672,Zenet Hatchling,2023,0.3145,0.6387,Zenet Hatchling,1,1,high
+mounts,1674,Temperamental Skyclaw,2024,0.1904,0.2397,Temperamental Skyclaw,1,1,high
+mounts,1683,Crimson Vorquin,2151,0.3561,0.5948,Crimson Vorquin,1,1,high
+mounts,1684,Sapphire Vorquin,2151,0.3561,0.5948,Sapphire Vorquin,1,1,high
+mounts,1685,Bronze Vorquin,2151,0.3561,0.5948,Bronze Vorquin,1,1,high
+mounts,1686,Obsidian Vorquin,2151,0.3561,0.5948,Obsidian Vorquin,1,1,high
+mounts,1729,Big Slick in the City,2133,0.4425,0.7993,Big Slick in the City,1,1,high
+mounts,1730,Igneous Shalewing,2133,0.5589,0.5537,Igneous Shalewing,1,1,high
+mounts,1732,Cobalt Shalewing,2133,0.4222,0.6524,Cobalt Shalewing,1,1,high
+mounts,1736,Boulder Hauler,2133,0.5808,0.5381,Boulder Hauler,1,1,high
+mounts,1794,Pattie,2025,0.6016,0.5874,Pattie,1,1,medium
+mounts,1813,Mimiron's Jumpjets,2112,0.87,0.25,Mimiron's Jumpjets,1,1,medium
+mounts,1834,Ochre Dreamtalon,2200,0.4867,0.6789,Ochre Dreamtalon,1,1,high
+mounts,1837,Delugen,2200,0.5022,0.618,Delugen,1,1,high
+mounts,1838,Talont,2200,0.5022,0.618,Talont,1,1,high
+mounts,1839,Stargrazer,2200,0.5022,0.618,Stargrazer,1,1,high
+mounts,1938,Mammyth,2200,0.5022,0.618,Mammyth,1,1,high
+mounts,1939,Imagiwing,2200,0.5022,0.618,Imagiwing,1,1,high
+mounts,1940,Salatrancer,2200,0.5022,0.618,Salatrancer,1,1,high
+mounts,1943,"Incognitro, the Indecipherable Felcycle",2255,0.5615,0.1797,"Incognitro, the Indecipherable Felcycle",1,1,medium
+mounts,1944,Golden Regal Scarab,2112,0.1921,0.5029,Golden Regal Scarab,1,1,medium
+mounts,2038,Clayscale Hornstrider,2262,0.5533,0.5134,Clayscale Hornstrider,1,1,medium
+mounts,2165,Soaring Meaderbee,2248,0.7433,0.453,Soaring Meaderbee,1,1,high
+mounts,2176,Alunira,2248,0.2333,0.5817,Alunira,1,1,high
+mounts,2192,Beledar's Spawn,2215,0.25,0.45,Beledar's Spawn,1,1,high
+mounts,2205,Ol' Mole Rufus,2214,0.5672,0.7668,Ol' Mole Rufus,1,1,high
+mounts,2272,Crimson Armored Growler,2346,0.3915,0.2219,Crimson Armored Growler,1,1,high
+mounts,2283,Innovation Investigator,2346,0.432,0.828,Innovation Investigator,1,1,high
+mounts,2284,Ochre Delivery Rocket,2346,0.5329,0.7271,Ochre Delivery Rocket,1,1,high
+mounts,2286,Blackwater Shredder Deluxe Mk 2,2346,0.6342,0.1673,Blackwater Shredder Deluxe Mk 2,1,1,high
+mounts,2287,Darkfuse Demolisher,2346,0.3072,0.389,Darkfuse Demolisher,1,1,high
+mounts,2288,Personalized Goblin S.C.R.A.P.per,2346,0.2574,0.3813,Personalized Goblin S.C.R.A.P.per,1,1,high
+mounts,2290,Asset Advocator,2346,0.432,0.828,Asset Advocator,1,1,high
+mounts,2292,Margin Manipulator,2346,0.432,0.828,Margin Manipulator,1,1,high
+mounts,2293,Darkfuse Spy-Eye,2346,0.402,0.919,Darkfuse Spy-Eye,1,1,high
+mounts,2294,Mean Green Flying Machine,2346,0.2712,0.7256,Mean Green Flying Machine,1,1,high
+mounts,2333,Soweezi's Vintage Waveshredder,2369,0.6998,0.4855,Soweezi's Vintage Waveshredder,1,1,high
+mounts,2469,Prismatic Snapdragon,2369,0.71,0.4862,Prismatic Snapdragon,1,1,high
+mounts,2601,Pearlescent Krolusk,2371,0.7014,0.4983,Pearlescent Krolusk,1,1,high
+mounts,2603,Sthaarbs's Last Lunch,2371,0.7404,0.3254,Sthaarbs's Last Lunch,1,1,high
+pets,44,Siamese Cat,109,0.4352,0.3526,Siamese Cat,1,1,high
+pets,51,Senegal,109,0.4352,0.3526,Senegal,1,1,high
+pets,55,Undercity Cockroach,109,0.4352,0.3526,Undercity Cockroach,1,1,high
+pets,69,Snowy Owl,83,0.574,0.46,Snowy Owl,1,1,medium
+pets,78,Crimson Snake,109,0.4352,0.3526,Crimson Snake,1,1,high
+pets,136,Mana Wyrmling,109,0.4352,0.3526,Mana Wyrmling,1,1,high
+pets,137,Brown Rabbit,109,0.4352,0.3526,Brown Rabbit,1,1,high
+pets,139,Red Moth,109,0.4352,0.3526,Red Moth,1,1,high
+pets,145,Blue Dragonhawk Hatchling,109,0.4352,0.3526,Blue Dragonhawk Hatchling,1,1,high
+pets,199,Kirin Tor Familiar,125,0.2435,0.5372,Kirin Tor Familiar,1,1,medium
+pets,238,Razormaw Hatchling,56,0.698,0.292,Razormaw Hatchling,1,1,medium
+pets,265,Pebble,207,0.5537,0.1414,Pebble,1,1,medium
+pets,279,Tiny Shale Spider,207,0.612,0.226,Tiny Shale Spider,1,1,medium
+pets,306,Winterspring Cub,83,0.5992,0.5159,Winterspring Cub,1,1,medium
+pets,374,Black Lamb,37,0.354,0.686,Black Lamb,1,1,medium
+pets,389,Tiny Harvester,52,0.448,0.346,Tiny Harvester,1,1,medium
+pets,391,Mountain Cottontail,49,0.386,0.648,Mountain Cottontail,1,1,medium
+pets,392,Redridge Rat,49,0.302,0.622,Redridge Rat,1,1,medium
+pets,395,Fledgling Buzzard,49,0.27,0.324,Fledgling Buzzard,1,1,medium
+pets,396,Dusk Spiderling,47,0.322,0.528,Dusk Spiderling,1,1,medium
+pets,399,Rat Snake,47,0.508,0.606,Rat Snake,1,1,medium
+pets,400,Widow Spiderling,47,0.326,0.494,Widow Spiderling,1,1,medium
+pets,402,Swamp Moth,51,0.714,0.328,Swamp Moth,1,1,medium
+pets,409,Polly,50,0.484,0.45,Polly,1,1,medium
+pets,410,Wharf Rat,210,0.426,0.726,Wharf Rat,1,1,medium
+pets,411,Baby Ape,210,0.632,0.808,Baby Ape,1,1,medium
+pets,416,Scorpling,17,0.598,0.604,Scorpling,1,1,medium
+pets,422,Moccasin,51,0.38,0.446,Moccasin,1,1,medium
+pets,423,Lava Crab,32,0.5,0.526,Lava Crab,1,1,medium
+pets,427,Ash Spiderling,32,0.324,0.452,Ash Spiderling,1,1,medium
+pets,428,Molten Hatchling,32,0.494,0.514,Molten Hatchling,1,1,medium
+pets,429,Lava Beetle,36,0.548,0.316,Lava Beetle,1,1,medium
+pets,437,Little Black Ram,48,0.244,0.5,Little Black Ram,1,1,medium
+pets,438,King Snake,15,0.41,0.278,King Snake,1,1,medium
+pets,439,Restless Shadeling,42,0.46,0.714,Restless Shadeling,1,1,medium
+pets,442,Irradiated Roach,27,0.272,0.36,Irradiated Roach,1,1,medium
+pets,443,Grasslands Cottontail,14,0.376,0.45,Grasslands Cottontail,1,1,high
+pets,445,Tiny Twister,14,0.46,0.494,Tiny Twister,1,1,high
+pets,446,Jade Oozeling,26,0.572,0.44,Jade Oozeling,1,1,medium
+pets,447,Fawn,37,0.37,0.56,Fawn,1,1,medium
+pets,449,Brown Marmot,26,0.338,0.672,Brown Marmot,1,1,medium
+pets,453,Infested Bear Cub,25,0.344,0.674,Infested Bear Cub,1,1,medium
+pets,454,Undercity Rat,90,0.566,0.286,Undercity Rat,1,1,medium
+pets,455,Blighted Squirrel,21,0.52,0.448,Blighted Squirrel,1,1,medium
+pets,457,Festering Maggot,23,0.588,0.45,Festering Maggot,1,1,medium
+pets,458,Lost of Lordaeron,18,0.592,0.478,Lost of Lordaeron,1,1,medium
+pets,460,Ruby Sapling,94,0.458,0.516,Ruby Sapling,1,1,medium
+pets,461,Larva,95,0.44,0.386,Larva,1,1,medium
+pets,463,Spirit Crab,95,0.146,0.464,Spirit Crab,1,1,medium
+pets,465,Ravager Hatchling,106,0.494,0.556,Ravager Hatchling,1,1,medium
+pets,468,Creepy Crawly,1,0.482,0.268,Creepy Crawly,1,1,medium
+pets,473,Turquoise Turtle,76,0.422,0.494,Turquoise Turtle,1,1,medium
+pets,475,Giraffe Calf,199,0.456,0.422,Giraffe Calf,1,1,medium
+pets,477,Gazelle Fawn,7,0.454,0.444,Gazelle Fawn,1,1,medium
+pets,483,Horny Toad,66,0.508,0.636,Horny Toad,1,1,medium
+pets,485,Stone Armadillo,66,0.678,0.734,Stone Armadillo,1,1,medium
+pets,488,Coral Snake,65,0.622,0.528,Coral Snake,1,1,medium
+pets,489,Spawn of Onyxia,70,0.52,0.744,Spawn of Onyxia,1,1,medium
+pets,491,Sand Kitten,71,0.5,0.264,Sand Kitten,1,1,medium
+pets,492,Stinkbug,71,0.484,0.516,Stinkbug,1,1,medium
+pets,493,Shimmershell Snail,62,0.384,0.766,Shimmershell Snail,1,1,high
+pets,494,Silithid Hatchling,71,0.35,0.444,Silithid Hatchling,1,1,medium
+pets,495,Frog,63,0.692,0.628,Frog,1,1,medium
+pets,496,Rusty Snail,63,0.122,0.142,Rusty Snail,1,1,medium
+pets,498,Tainted Moth,77,0.436,0.666,Tainted Moth,1,1,medium
+pets,499,Tainted Rat,77,0.398,0.376,Tainted Rat,1,1,medium
+pets,500,Minfernal,77,0.434,0.38,Minfernal,1,1,medium
+pets,502,Spotted Bell Frog,78,0.686,0.47,Spotted Bell Frog,1,1,medium
+pets,504,Diemetradon Hatchling,78,0.366,0.63,Diemetradon Hatchling,1,1,medium
+pets,505,Twilight Iguana,64,0.558,0.616,Twilight Iguana,1,1,medium
+pets,506,Venomspitter Hatchling,65,0.566,0.746,Venomspitter Hatchling,1,1,medium
+pets,508,Darkshore Cub,62,0.41,0.778,Darkshore Cub,1,1,high
+pets,509,Tiny Bog Beast,56,0.54,0.252,Tiny Bog Beast,1,1,medium
+pets,513,Qiraji Guardling,81,0.352,0.77,Qiraji Guardling,1,1,medium
+pets,515,Sporeling Sprout,102,0.192,0.504,Sporeling Sprout,1,1,high
+pets,517,Warpstalker Hatchling,108,0.418,0.246,Warpstalker Hatchling,1,1,high
+pets,518,Clefthoof Runt,107,0.654,0.476,Clefthoof Runt,1,1,high
+pets,519,Fel Flame,104,0.466,0.458,Fel Flame,1,1,high
+pets,521,Fledgling Nether Ray,109,0.484,0.782,Fledgling Nether Ray,1,1,high
+pets,523,Devouring Maggot,117,0.57,0.564,Devouring Maggot,1,1,high
+pets,525,Turkey,117,0.438,0.438,Turkey,1,1,medium
+pets,528,Scalded Basilisk Hatchling,105,0.72,0.18,Scalded Basilisk Hatchling,1,1,high
+pets,529,Fjord Worg Pup,117,0.306,0.57,Fjord Worg Pup,1,1,high
+pets,530,Oily Slimeling,114,0.596,0.394,Oily Slimeling,1,1,medium
+pets,532,Stunted Shardhorn,119,0.286,0.514,Stunted Shardhorn,1,1,medium
+pets,534,Imperial Eagle Chick,116,0.568,0.356,Imperial Eagle Chick,1,1,high
+pets,535,Water Waveling,121,0.418,0.822,Water Waveling,1,1,medium
+pets,537,Dragonbone Hatchling,115,0.574,0.584,Dragonbone Hatchling,1,1,high
+pets,538,Scourged Whelpling,118,0.728,0.434,Scourged Whelpling,1,1,medium
+pets,540,Carrion Rat,198,0.782,0.49,Carrion Rat,1,1,high
+pets,541,Fire-Proof Roach,198,0.54,0.528,Fire-Proof Roach,1,1,high
+pets,542,Mac Frog,249,0.608,0.8,Mac Frog,1,1,medium
+pets,543,Locust,249,0.58,0.33,Locust,1,1,medium
+pets,544,Oasis Moth,249,0.468,0.336,Oasis Moth,1,1,medium
+pets,545,Leopard Scorpid,249,0.514,0.222,Leopard Scorpid,1,1,medium
+pets,546,Tol'vir Scarab,249,0.456,0.174,Tol'vir Scarab,1,1,medium
+pets,547,Nordrassil Wisp,198,0.634,0.276,Nordrassil Wisp,1,1,high
+pets,548,Wildhammer Gryphon Hatchling,241,0.558,0.14,Wildhammer Gryphon Hatchling,1,1,high
+pets,549,Yellow-Bellied Marmot,241,0.534,0.716,Yellow-Bellied Marmot,1,1,high
+pets,550,Highlands Mouse,241,0.206,0.146,Highlands Mouse,1,1,medium
+pets,552,Twilight Fiendling,241,0.578,0.526,Twilight Fiendling,1,1,high
+pets,557,Nether Faerie Dragon,69,0.61,0.316,Nether Faerie Dragon,1,1,medium
+pets,558,Arctic Fox Kit,120,0.41,0.812,Arctic Fox Kit,1,1,medium
+pets,560,Sea Gull,71,0.548,0.398,Sea Gull,1,1,medium
+pets,634,Crystal Spider,83,0.506,0.546,Crystal Spider,1,1,medium
+pets,637,Skittering Cavern Crawler,105,0.51,0.822,Skittering Cavern Crawler,1,1,high
+pets,638,Nether Roach,109,0.35,0.648,Nether Roach,1,1,high
+pets,639,Borean Marmot,114,0.506,0.218,Borean Marmot,1,1,high
+pets,640,Snowshoe Hare,25,0.512,0.224,Snowshoe Hare,1,1,medium
+pets,644,Fjord Rat,117,0.688,0.258,Fjord Rat,1,1,high
+pets,645,Highlands Turkey,241,0.302,0.284,Highlands Turkey,1,1,medium
+pets,649,Biletoad,119,0.46,0.532,Biletoad,1,1,high
+pets,755,Death's Head Cockroach,198,0.306,0.39,Death's Head Cockroach,1,1,high
+pets,823,Highlands Skunk,241,0.696,0.686,Highlands Skunk,1,1,medium
+pets,834,Grinder,422,0.718,0.376,Grinder,1,1,medium
+pets,836,Aqua Strider,422,0.642,0.5848,Aqua Strider,1,1,medium
+pets,851,Horned Lizard,249,0.702,0.58,Horned Lizard,1,1,medium
+pets,1073,Terky,114,0.5462,0.8937,Terky,1,1,medium
+pets,1162,Fluxfire Feline,469,0.456,0.528,Fluxfire Feline,1,1,medium
+pets,1178,Sunreaver Micro-Sentry,504,0.4909,0.8962,Sunreaver Micro-Sentry,1,1,medium
+pets,1201,Spawn of G'nathus,388,0.204,0.074,Spawn of G'nathus,1,1,medium
+pets,1323,Ashleaf Spriteling,554,0.6725,0.4421,Ashleaf Spriteling,1,1,medium
+pets,1328,Ruby Droplet,554,0.64,0.27,Ruby Droplet,1,1,medium
+pets,1329,Dandelion Frolicker,554,0.4617,0.7088,Dandelion Frolicker,1,1,medium
+pets,1330,Death Adder Hatchling,554,0.2876,0.4361,Death Adder Hatchling,1,1,medium
+pets,1336,Skunky Alemental,554,0.3779,0.7773,Skunky Alemental,1,1,medium
+pets,1337,Spineclaw Crab,554,0.1803,0.6202,Spineclaw Crab,1,1,medium
+pets,1338,Gulp Froglet,554,0.6209,0.7715,Gulp Froglet,1,1,medium
+pets,1343,Bonkers,554,0.5916,0.404,Bonkers,1,1,medium
+pets,1345,Gu'chi Swarmling,554,0.4238,0.7523,Gu'chi Swarmling,1,1,medium
+pets,1348,Jadefire Spirit,555,0.4811,0.6069,Jadefire Spirit,1,1,medium
+pets,1471,Fruit Hunter,525,0.6438,0.6583,Fruit Hunter,1,1,high
+pets,1515,Stonegrinder,535,0.54,0.276,Stonegrinder,1,1,medium
+pets,1524,"Netherspawn, Spawn of Netherspawn",550,0.4758,0.7036,"Netherspawn, Spawn of Netherspawn",1,1,high
+pets,1537,Crimson Spore,543,0.571,0.653,Crimson Spore,1,1,high
+pets,1538,Umbrafen Spore,539,0.5582,0.1998,Umbrafen Spore,1,1,high
+pets,1540,Brilliant Spore,542,0.3832,0.2797,Brilliant Spore,1,1,high
+pets,1541,Hydraling,542,0.2944,0.4162,Hydraling,1,1,high
+pets,1564,Doom Bloom,543,0.506,0.532,Doom Bloom,1,1,medium
+pets,1576,Eye of Observation,535,0.314,0.476,Eye of Observation,1,1,high
+pets,1601,Servant of Demidos,539,0.4602,0.7164,Servant of Demidos,1,1,high
+pets,1660,Fel Pup,534,0.309,0.68,Fel Pup,1,1,high
+pets,1690,Shard of Cyrukh,534,0.633,0.281,Shard of Cyrukh,1,1,high
+pets,1716,Fledgling Warden Owl,630,0.482,0.738,Fledgling Warden Owl,1,1,high
+pets,1764,Energized Manafiend,550,0.2597,0.3472,Energized Manafiend,1,1,high
+pets,1765,Empyreal Manafiend,550,0.2378,0.3861,Empyreal Manafiend,1,1,high
+pets,1766,Empowered Manafiend,550,0.2816,0.2964,Empowered Manafiend,1,1,high
+pets,1890,Corgi Pup,75,0.507,0.411,Corgi Pup,1,1,medium
+pets,2198,Taptaf,896,0.6492,0.8327,Taptaf,1,1,high
+pets,2372,Shadowback Crawler,942,0.704,0.318,Shadowback Crawler,1,1,high
+pets,2373,River Frog,942,0.634,0.332,River Frog,1,1,high
+pets,2374,Freshwater Crawler,942,0.654,0.674,Freshwater Crawler,1,1,high
+pets,2375,Vale Marmot,942,0.494,0.36,Vale Marmot,1,1,high
+pets,2376,Valley Chicken,942,0.456,0.646,Valley Chicken,1,1,high
+pets,2379,Honey Bee,942,0.734,0.678,Honey Bee,1,1,high
+pets,2380,Parasitic Boarfly,895,0.566,0.156,Parasitic Boarfly,1,1,high
+pets,2383,Giant Woodworm,895,0.776,0.858,Giant Woodworm,1,1,high
+pets,2384,Shore Butterfly,862,0.598,0.792,Shore Butterfly,1,1,high
+pets,2386,Coastal Scuttler,896,0.274,0.722,Coastal Scuttler,1,1,high
+pets,2387,Golden Beetle,862,0.404,0.35,Golden Beetle,1,1,high
+pets,2388,Bloodfever Tarantula,863,0.352,0.612,Bloodfever Tarantula,1,1,high
+pets,2389,Elusive Skimmer,863,0.426,0.806,Elusive Skimmer,1,1,high
+pets,2390,Leafy Flutterwing,862,0.706,0.302,Leafy Flutterwing,1,1,high
+pets,2392,Young Sand Sifter,863,0.772,0.524,Young Sand Sifter,1,1,high
+pets,2393,Sticky Oozeling,863,0.236,0.584,Sticky Oozeling,1,1,high
+pets,2394,Returned Hatchling,863,0.332,0.562,Returned Hatchling,1,1,high
+pets,2395,Glutted Bleeder,863,0.504,0.664,Glutted Bleeder,1,1,high
+pets,2397,Spectral Raven,863,0.378,0.22,Spectral Raven,1,1,high
+pets,2398,Boghopper,863,0.318,0.396,Boghopper,1,1,high
+pets,2432,Fuzzy Creepling,14,0.5694,0.533,Fuzzy Creepling,1,1,high
+pets,2433,Aldrusian Sproutling,14,0.2175,0.2217,Aldrusian Sproutling,1,1,high
+pets,2435,Teeny Titan Orb,14,0.5707,0.3472,Teeny Titan Orb,1,1,high
+pets,2436,Scabby,14,0.1327,0.3534,Scabby,1,1,high
+pets,2438,Foulfeather,14,0.356,0.6435,Foulfeather,1,1,high
+pets,2440,Fozling,14,0.5981,0.2809,Fozling,1,1,high
+pets,2441,Squawkling,14,0.5219,0.7487,Squawkling,1,1,high
+pets,2442,Bumbles,942,0.711,0.6917,Bumbles,1,1,medium
+pets,2525,Redridge Tarantula,49,0.25,0.694,Redridge Tarantula,1,1,medium
+pets,2538,Dasher,862,0.6956,0.3691,Dasher,1,1,high
+pets,2544,Darkshore Sentinel,62,0.416,0.764,Darkshore Sentinel,1,2,low
+pets,2545,Gust of Cyclarus,62,0.4376,0.5348,Gust of Cyclarus,1,1,high
+pets,2546,Detective Ray,62,0.3932,0.6213,Detective Ray,1,1,high
+pets,2547,Hydrath Droplet,62,0.5242,0.3217,Hydrath Droplet,1,1,high
+pets,2549,Void Jelly,62,0.4054,0.8527,Void Jelly,1,1,high
+pets,2550,Zur'aj the Depleted,62,0.4061,0.8267,Zur'aj the Depleted,1,1,high
+pets,2645,Sandclaw Pincher,1355,0.348,0.302,Sandclaw Pincher,1,1,high
+pets,2646,Sandclaw Sunshell,1355,0.768,0.506,Sandclaw Sunshell,1,1,high
+pets,2647,Glimmershell Scuttler,1355,0.514,0.524,Glimmershell Scuttler,1,1,high
+pets,2648,Chitterspine Skitterling,1355,0.5,0.306,Chitterspine Skitterling,1,1,high
+pets,2649,Hissing Chitterspine,1355,0.42,0.069,Hissing Chitterspine,1,1,high
+pets,2650,Great Sea Albatross,1355,0.444,0.508,Great Sea Albatross,1,1,high
+pets,2651,Deeptide Fingerling,1355,0.71,0.462,Deeptide Fingerling,1,1,high
+pets,2652,Bloodseeker,1355,0.454,0.436,Bloodseeker,1,1,high
+pets,2653,Spireshell Snail,1355,0.422,0.608,Spireshell Snail,1,1,high
+pets,2660,Muck Slug,1355,0.38,0.456,Muck Slug,1,1,high
+pets,2661,Rustyroot Snooter,1462,0.768,0.412,Rustyroot Snooter,1,1,high
+pets,2662,Duskytooth Snooter,1462,0.426,0.284,Duskytooth Snooter,1,1,high
+pets,2663,Junkheap Roach,1462,0.684,0.264,Junkheap Roach,1,1,high
+pets,2664,Experimental Roach,1462,0.704,0.566,Experimental Roach,1,1,high
+pets,2665,Fleeting Frog,1462,0.466,0.364,Fleeting Frog,1,1,high
+pets,2666,Yellow Junkhopper,1462,0.338,0.766,Yellow Junkhopper,1,1,high
+pets,2667,Motorized Croaker,1462,0.224,0.798,Motorized Croaker,1,1,high
+pets,2669,Rustbolt Clucker,1462,0.746,0.356,Rustbolt Clucker,1,1,high
+pets,2670,Mechagon Marmot,1462,0.814,0.326,Mechagon Marmot,1,1,high
+pets,2671,Specimen 97,1462,0.606,0.248,Specimen 97,1,1,high
+pets,2673,Scrapyard Tunneler,1462,0.25,0.2,Scrapyard Tunneler,1,1,high
+pets,2676,Malfunctioning Microbot,1462,0.62,0.606,Malfunctioning Microbot,1,1,high
+pets,2678,Abyssal Slitherling,1355,0.4,0.648,Abyssal Slitherling,1,1,high
+pets,2681,Murgle,1355,0.2941,0.2899,Murgle,1,1,high
+pets,2682,Necrofin Tadpole,1355,0.3737,0.8256,Necrofin Tadpole,1,1,high
+pets,2684,Glittering Diamondshell,1355,0.1445,0.28,Glittering Diamondshell,1,1,high
+pets,2686,Pearlescent Glimmershell,1355,0.4335,0.5507,Pearlescent Glimmershell,1,1,high
+pets,2689,Chitterspine Needler,1355,0.486,0.176,Chitterspine Needler,1,1,high
+pets,2690,Caverndark Nightmare,1355,0.4079,0.0735,Caverndark Nightmare,1,1,high
+pets,2693,Spawn of Nalaada,1355,0.5175,0.7487,Spawn of Nalaada,1,1,high
+pets,2695,Daggertooth Frenzy,1355,0.1195,0.24,Daggertooth Frenzy,1,1,high
+pets,2697,Amethyst Softshell,1355,0.0945,0.24,Amethyst Softshell,1,1,high
+pets,2700,Wriggler,1355,0.1445,0.24,Wriggler,1,1,high
+pets,2701,Seafury,1355,0.4272,0.874,Seafury,1,1,high
+pets,2702,Stormwrath,1355,0.4299,0.7551,Stormwrath,1,1,high
+pets,2703,Sandkeep,1355,0.1195,0.28,Sandkeep,1,1,high
+pets,2706,Brinestone Algan,1355,0.3693,0.112,Brinestone Algan,1,1,high
+pets,2707,Budding Algan,1355,0.0945,0.28,Budding Algan,1,1,high
+pets,2708,Coral Lashling,1355,0.5466,0.4179,Coral Lashling,1,1,high
+pets,2709,Skittering Eel,1355,0.48,0.2427,Skittering Eel,1,1,high
+pets,2712,Snowsoft Nibbler,1462,0.4455,0.3964,Snowsoft Nibbler,1,1,high
+pets,2715,Lost Robogrip,1462,0.6065,0.4217,Lost Robogrip,1,1,high
+pets,2719,Bonebiter,1462,0.6584,0.2288,Bonebiter,1,1,high
+pets,2720,Arachnoid Skitterbot,1462,0.8814,0.2077,Arachnoid Skitterbot,1,1,high
+pets,2721,Echoing Oozeling,1462,0.6997,0.6201,Echoing Oozeling,1,1,medium
+pets,2753,Spraybot 0D,1462,0.6843,0.4776,Spraybot 0D,1,1,high
+pets,2756,Irradiated Elementaling,1462,0.6997,0.6201,Irradiated Elementaling,1,1,high
+pets,2766,Armored Vaultbot,1462,0.5382,0.4933,Armored Vaultbot,1,1,high
+pets,2794,Crimson Skipper,942,0.6065,0.1775,Crimson Skipper,1,1,high
+pets,2845,K'uddly,1530,0.5202,0.4173,K'uddly,1,1,high
+pets,2846,Corrupted Tentacle,1530,0.5295,0.6225,Corrupted Tentacle,1,1,high
+pets,2847,Rotbreath,1527,0.3468,0.189,Rotbreath,1,1,high
+pets,2848,Aqir Tunneler,1527,0.2123,0.6105,Aqir Tunneler,1,1,high
+pets,2851,Wicked Lurker,1527,0.5976,0.7241,Wicked Lurker,1,1,high
+pets,2891,Blushing Spiderling,1525,0.43,0.791,Blushing Spiderling,1,1,high
+pets,2892,Bound Lightspawn,1525,0.253,0.485,Bound Lightspawn,1,1,medium
+pets,2893,Animated Tome,1525,0.3831,0.6914,Animated Tome,1,1,high
+pets,2895,Lost Soul,1525,0.494,0.79,Lost Soul,1,1,high
+pets,2896,Primordial Bogling,1525,0.35,0.323,Primordial Bogling,1,1,high
+pets,2902,Dusky Dredwing Pup,1525,0.39,0.5,Dusky Dredwing Pup,1,1,high
+pets,2904,Violet Dredwing Pup,1662,0.265,0.455,Violet Dredwing Pup,1,1,medium
+pets,2905,Dodger,1565,0.3176,0.41,Dodger,1,1,high
+pets,2908,Chirpy Valeshrieker,1565,0.511,0.574,Chirpy Valeshrieker,1,1,high
+pets,2909,Cloudfeather Fledgling,1565,0.5294,0.3729,Cloudfeather Fledgling,1,1,high
+pets,2911,Amber Glitterwing,1565,0.4195,0.3253,Amber Glitterwing,1,1,high
+pets,2912,Dusty Sporeflutterer,1662,0.295,0.455,Dusty Sporeflutterer,1,1,medium
+pets,2914,Starry Dreamfoal,1565,0.3623,0.6527,Starry Dreamfoal,1,1,high
+pets,2919,Gorm Rootstinger,1565,0.308,0.498,Gorm Rootstinger,1,1,high
+pets,2920,Gorm Needler,1565,0.4752,0.2845,Gorm Needler,1,1,high
+pets,2921,Gorm Harrier,1565,0.56,0.2101,Gorm Harrier,1,1,high
+pets,2923,Pearlwing Heron,1662,0.295,0.455,Pearlwing Heron,1,1,medium
+pets,2924,Tranquil Wader,1565,0.526,0.618,Tranquil Wader,1,1,high
+pets,2925,Golden Cloudfeather,1533,0.5043,0.5804,Golden Cloudfeather,1,1,high
+pets,2926,Fledgling Teroclaw,1533,0.426,0.614,Fledgling Teroclaw,1,1,high
+pets,2927,Fluttering Glimmerfly,1533,0.484,0.634,Fluttering Glimmerfly,1,1,high
+pets,2929,Vibrant Glimmerfly,1533,0.514,0.552,Vibrant Glimmerfly,1,1,high
+pets,2930,Glimmerpool Hatchling,1533,0.456,0.294,Glimmerpool Hatchling,1,1,high
+pets,2931,Brightscale Hatchling,1662,0.295,0.41,Brightscale Hatchling,1,1,medium
+pets,2932,Silvershell Snapper,1533,0.4135,0.4887,Silvershell Snapper,1,1,high
+pets,2933,Sable,1662,0.295,0.41,Sable,1,1,medium
+pets,2935,Purity,1533,0.6487,0.7114,Purity,1,1,high
+pets,2937,Rustfur Kit,1533,0.506,0.628,Rustfur Kit,1,1,high
+pets,2939,Wader Chick,1533,0.534,0.814,Wader Chick,1,1,high
+pets,2943,Wild Etherwyrm,1533,0.52,0.232,Wild Etherwyrm,1,1,high
+pets,2944,Oonar's Arm,1536,0.5144,0.4848,Oonar's Arm,1,1,high
+pets,2945,Corpulent Bonetusk,1662,0.265,0.41,Corpulent Bonetusk,1,1,medium
+pets,2947,Luminous Webspinner,1536,0.5401,0.1234,Luminous Webspinner,1,1,high
+pets,2948,Boneweave Hatchling,1536,0.555,0.2361,Boneweave Hatchling,1,1,high
+pets,2950,Clutch,1536,0.308,0.276,Clutch,1,1,high
+pets,2953,Shy Melvin,1536,0.7683,0.5707,Shy Melvin,1,1,high
+pets,2954,Plaguelouse Larva,1662,0.265,0.41,Plaguelouse Larva,1,1,medium
+pets,2955,Corpselouse Larva,1536,0.4246,0.5345,Corpselouse Larva,1,1,high
+pets,2956,Feasting Larva,1536,0.4246,0.5345,Feasting Larva,1,1,high
+pets,2957,Writhing Spine,1536,0.621,0.758,Writhing Spine,1,1,high
+pets,2960,Invertebrate Oil,1536,0.57,0.7421,Invertebrate Oil,1,1,high
+pets,2964,Foulwing Buzzer,1536,0.5384,0.1877,Foulwing Buzzer,1,1,high
+pets,2965,Bloodfeaster Spiderling,1662,0.265,0.455,Bloodfeaster Spiderling,1,1,medium
+pets,3007,Rosetipped Spiderling,1525,0.554,0.774,Rosetipped Spiderling,1,1,high
+pets,3008,Lost Quill,1525,0.3772,0.6925,Lost Quill,1,1,high
+pets,3009,The Count,1525,0.5737,0.4337,The Count,1,1,high
+pets,3013,Bloodlouse Larva,1536,0.5589,0.3897,Bloodlouse Larva,1,1,high
+pets,3014,Mire Creeper,1525,0.558,0.596,Mire Creeper,1,1,high
+pets,3015,Withering Creeper,1525,0.642,0.544,Withering Creeper,1,1,high
+pets,3021,Deepwood Leaper,1565,0.378,0.52,Deepwood Leaper,1,1,high
+pets,3022,Shimmerbough Hoarder,1565,0.4971,0.5589,Shimmerbough Hoarder,1,1,high
+pets,3026,Tower Deathroach,1911,0.7394,0.3537,Tower Deathroach,1,1,medium
+pets,3027,Hissing Deathroach,1911,0.7394,0.3537,Hissing Deathroach,1,1,medium
+pets,3030,Ashen Chomper,1911,0.4773,0.1915,Ashen Chomper,1,1,medium
+pets,3032,Frenzied Mawrat,1911,0.4773,0.1915,Frenzied Mawrat,1,1,medium
+pets,3034,Torghast Lurker,1911,0.7547,0.4699,Torghast Lurker,1,1,medium
+pets,3035,Lavender Nibbler,1565,0.5406,0.7601,Lavender Nibbler,1,1,high
+pets,3037,Dread,1543,0.1919,0.4608,Dread,1,1,medium
+pets,3040,Sharpclaw,1543,0.5562,0.6318,Sharpclaw,1,1,medium
+pets,3041,Death Seeker,1911,0.5519,0.7712,Death Seeker,1,1,medium
+pets,3045,Iridescent Ooze,1536,0.5766,0.7581,Iridescent Ooze,1,1,high
+pets,3047,Spinebug,1536,0.4151,0.1953,Spinebug,1,1,high
+pets,3049,Pulsating Maggot,1536,0.452,0.52,Pulsating Maggot,1,1,high
+pets,3050,Bleak Skitterer,1536,0.616,0.326,Bleak Skitterer,1,1,high
+pets,3051,Animated Cruor,1536,0.324,0.686,Animated Cruor,1,1,high
+pets,3052,Necroray Spawnling,1536,0.634,0.474,Necroray Spawnling,1,1,high
+pets,3063,Larion Pouncer,1533,0.2243,0.2285,Larion Pouncer,1,1,high
+pets,3080,Verdant Kit,1565,0.4,0.59,Verdant Kit,1,1,high
+pets,3081,Decay Grub,1565,0.642,0.236,Decay Grub,1,1,high
+pets,3082,Starmoth,1565,0.532,0.322,Starmoth,1,1,high
+pets,3083,Crawbat,1536,0.526,0.604,Crawbat,1,1,high
+pets,3098,Lil'Abom,1543,0.365,0.674,Lil'Abom,1,1,medium
+pets,3099,Infused Etherwyrm,1543,0.2318,0.4238,Infused Etherwyrm,1,1,medium
+pets,3100,Timeless Mechanical Dragonling,75,0.507,0.411,Timeless Mechanical Dragonling,1,1,medium
+pets,3101,Sly,1543,0.4216,0.4448,Sly,1,1,medium
+pets,3103,Copperback Etherwyrm,1543,0.4113,0.4541,Copperback Etherwyrm,1,1,medium
+pets,3114,Fodder,1543,0.3386,0.5473,Fodder,1,1,medium
+pets,3116,Invasive Buzzer,1543,0.22,0.4412,Invasive Buzzer,1,1,medium
+pets,3117,Amaranthine Stinger,1543,0.8537,0.5524,Amaranthine Stinger,1,1,medium
+pets,3130,Gilded Darknight,1911,0.6294,0.7482,Gilded Darknight,1,1,high
+pets,3132,Mord'al Eveningstar,1911,0.3604,0.4728,Mord'al Eveningstar,1,1,medium
+pets,3136,Korthian Specimen,1961,0.2775,0.5885,Korthian Specimen,1,1,high
+pets,3221,Lightless Tormentor,1911,0.4744,0.7453,Lightless Tormentor,1,1,medium
+pets,3247,Pocopoc,1970,0.3716,0.4467,Pocopoc,1,1,high
+pets,3259,Shaggy,2151,0.3432,0.5997,Shaggy,1,1,medium
+pets,3261,Wakyn,2102,0.4295,0.8468,Wakyn,1,1,medium
+pets,3269,Azure Frillfish,2022,0.4045,0.4136,Azure Frillfish,1,1,high
+pets,3272,Pricklefury Hare,2022,0.772,0.32,Pricklefury Hare,1,1,high
+pets,3273,Magma Slug,2022,0.606,0.376,Magma Slug,1,1,high
+pets,3275,Chestnut,2025,0.4943,0.6289,Chestnut,1,1,high
+pets,3276,Treeflitter,2023,0.675,0.726,Treeflitter,1,1,high
+pets,3280,Shyfly,2022,0.394,0.788,Shyfly,1,1,high
+pets,3287,Ghostflame,2112,0.3811,0.3773,Ghostflame,1,1,medium
+pets,3290,Bunbo,2151,0.2926,0.5268,Bunbo,1,1,medium
+pets,3291,Scruffles,2151,0.5817,0.4826,Scruffles,1,1,high
+pets,3293,Ashenwing,2151,0.4373,0.6121,Ashenwing,1,1,high
+pets,3301,Wild Duckling,2022,0.798,0.494,Wild Duckling,1,1,high
+pets,3303,Mallard Duckling,2112,0.4375,0.7494,Mallard Duckling,1,1,medium
+pets,3309,Viridescent Duck,2023,0.706,0.3543,Viridescent Duck,1,1,high
+pets,3321,Blackfeather Nester,2024,0.2654,0.4626,Blackfeather Nester,1,1,high
+pets,3322,Woodbiter Piculet,2023,0.64,0.348,Woodbiter Piculet,1,1,high
+pets,3323,Brightfeather,2151,0.2926,0.5268,Brightfeather,1,1,medium
+pets,3330,Buckie,2151,0.3432,0.5997,Buckie,1,1,high
+pets,3331,Emmah,2151,0.2926,0.5268,Emmah,1,1,high
+pets,3332,Patos,2151,0.2926,0.5268,Patos,1,1,high
+pets,3333,Berylmane,2151,0.2926,0.5268,Berylmane,1,1,medium
+pets,3334,Time-Lost Vorquin Foal,2085,0.6124,0.4679,Time-Lost Vorquin Foal,1,1,medium
+pets,3338,Kobaldt,2151,0.2926,0.5268,Kobaldt,1,1,high
+pets,3353,Stoneshell,2023,0.738,0.352,Stoneshell,1,1,high
+pets,3357,Azure Crystalspine,2024,0.152,0.24,Azure Crystalspine,1,1,high
+pets,3359,Snowclaw Cub,2024,0.6743,0.184,Snowclaw Cub,1,1,high
+pets,3360,Bugbiter Tortoise,2022,0.228,0.95,Bugbiter Tortoise,1,1,high
+pets,3362,Sapphire Crab,2248,0.4062,0.5986,Sapphire Crab,1,1,high
+pets,3365,Roseate Hopper,2022,0.6467,0.6939,Roseate Hopper,1,1,high
+pets,3367,Emberling,2022,0.794,0.354,Emberling,1,1,high
+pets,3382,Stormie,2112,0.3811,0.3773,Stormie,1,1,medium
+pets,3403,Blue Dasher,2025,0.624,0.152,Blue Dasher,1,1,high
+pets,3404,Polliswog,2025,0.432,0.836,Polliswog,1,1,high
+pets,3405,Living Mud Mask,2025,0.4047,0.4531,Living Mud Mask,1,1,high
+pets,3415,Cubbly,2025,0.5245,0.8361,Cubbly,1,1,medium
+pets,3476,Gilded Mechafrog,2151,0.2926,0.5268,Gilded Mechafrog,1,1,high
+pets,3493,Roland,2133,0.5244,0.2683,Roland,1,1,medium
+pets,3533,Brul,2133,0.4151,0.8613,Brul,1,1,high
+pets,3535,Diamondshell,2133,0.5589,0.5537,Diamondshell,1,1,high
+pets,3536,Bashful,2133,0.4445,0.804,Bashful,1,1,high
+pets,3537,Thimblerig,2133,0.5808,0.5381,Thimblerig,1,1,high
+pets,3538,Tricky,2133,0.4445,0.804,Tricky,1,1,high
+pets,3540,Brulee,2133,0.4445,0.804,Brulee,1,1,high
+pets,3541,Ridged Shalewing,2133,0.4222,0.6524,Ridged Shalewing,1,1,high
+pets,3546,Skaarn,2133,0.6543,0.5587,Skaarn,1,1,high
+pets,3548,Aquapo,2133,0.4836,0.7509,Aquapo,1,1,high
+pets,3551,Teardrop Moth,2133,0.5776,0.691,Teardrop Moth,1,1,high
+pets,3555,Axel,2112,0.13,0.574,Axel,1,1,medium
+pets,3557,Roggy,2133,0.4445,0.804,Roggy,1,1,medium
+pets,4275,Flooftalon,2200,0.486,0.736,Flooftalon,1,1,high
+pets,4276,Fol'ya Pup,2200,0.396,0.482,Fol'ya Pup,1,1,high
+pets,4277,Sapnibbler,2200,0.542,0.732,Sapnibbler,1,1,high
+pets,4278,Leyhart,2200,0.466,0.796,Leyhart,1,1,high
+pets,4279,Slumbertooth,2200,0.482,0.764,Slumbertooth,1,1,high
+pets,4280,Pewling,2200,0.372,0.36,Pewling,1,1,high
+pets,4287,Reverie,2200,0.5022,0.618,Reverie,1,1,high
+pets,4289,Dreamborne Scarab,2200,0.5022,0.618,Dreamborne Scarab,1,1,high
+pets,4290,Dreamhoof,2200,0.5022,0.618,Dreamhoof,1,1,high
+pets,4292,Memorie,2200,0.5022,0.618,Memorie,1,1,high
+pets,4297,Kal'andu,2200,0.5201,0.6363,Kal'andu,1,1,high
+pets,4300,Somnolet,2200,0.5022,0.618,Somnolet,1,1,high
+pets,4302,Pale Slumbertooth,2200,0.3431,0.6765,Pale Slumbertooth,1,1,high
+pets,4303,Snaggletoof,2200,0.576,0.262,Snaggletoof,1,1,high
+pets,4304,Dream Badger,2200,0.516,0.608,Dream Badger,1,1,high
+pets,4309,Drowsey,2200,0.5022,0.618,Drowsey,1,1,high
+pets,4310,Snorr,2200,0.5022,0.618,Snorr,1,1,high
+pets,4462,Thunder,2215,0.6445,0.1882,Thunder,1,1,high
+pets,4467,Hallowed Glowfly,2215,0.6576,0.244,Hallowed Glowfly,1,1,high
+pets,4470,Oop'lajax,2214,0.5477,0.3027,Oop'lajax,1,1,high
+pets,4473,Spinner,2213,0.6739,0.7441,Spinner,1,1,medium
+pets,4513,Pillarnest Bonedrinker,2255,0.4955,0.437,Pillarnest Bonedrinker,1,1,high
+pets,4527,Lil' Moss Rosy,2248,0.5973,0.2868,Lil' Moss Rosy,1,1,high
+pets,4534,Nightfarm Growthling,2215,0.6459,0.3069,Nightfarm Growthling,1,1,high
+pets,4536,Blightbud,2214,0.4409,0.4896,Blightbud,1,1,high
+pets,4596,Faithful Dog,2248,0.3144,0.513,Faithful Dog,1,1,high
+pets,4597,Wobbles,2214,0.435,0.3529,Wobbles,1,1,high
+pets,4598,Coppers,2214,0.435,0.3529,Coppers,1,1,high
+pets,4599,Mind Slurp,2256,0.6272,0.8795,Mind Slurp,1,1,medium
+pets,4632,Eepy,2346,0.2712,0.7256,Eepy,1,1,high
+pets,4637,Wavebreaker Mechasaur,2346,0.6342,0.1673,Wavebreaker Mechasaur,1,1,high
+pets,4638,Crimson Mechasaur,2346,0.3538,0.4142,Crimson Mechasaur,1,1,high
+pets,4639,Viridian Mechasaur,2346,0.2574,0.3813,Viridian Mechasaur,1,1,high
+pets,4641,Rocketfist,2346,0.5329,0.7271,Rocketfist,1,1,high
+pets,4644,Professor Punch,2346,0.3538,0.4142,Professor Punch,1,1,high
+pets,4645,Bilgewater Junkhauler,2346,0.3915,0.2219,Bilgewater Junkhauler,1,1,high
+pets,4648,Steamwheedle Flunkie,2346,0.3538,0.4142,Steamwheedle Flunkie,1,1,high
+pets,4649,Blackwater Kegmover,2346,0.3538,0.4142,Blackwater Kegmover,1,1,high
+pets,4650,Venture Companyman,2346,0.3538,0.4142,Venture Companyman,1,1,high
+pets,4653,Lab Rat,2346,0.2574,0.3813,Lab Rat,1,1,high
+pets,4655,Cruncher,2346,0.2574,0.3813,Cruncher,1,1,high
+pets,4661,Mechagopher,2346,0.3538,0.4142,Mechagopher,1,1,high
+pets,4708,Marmaduke,2369,0.6832,0.4496,Marmaduke,1,1,high
+pets,4727,Skitterbite,2369,0.6998,0.4855,Skitterbite,1,1,high
+pets,4813,Ixthal the Observling,2371,0.7778,0.2787,Ixthal the Observling,1,1,high
+pets,4834,Jimmy,2371,0.562,0.5058,Jimmy,1,1,high
+pets,4838,"Palek'ti, the Mouth of Nothingness",2371,0.5405,0.5884,"Palek'ti, the Mouth of Nothingness",1,1,high
+pets,4842,Duskthief,2371,0.527,0.566,Duskthief,1,1,high
+pets,4845,Mr. Long-Legs,2371,0.609,0.3835,Mr. Long-Legs,1,1,high
+pets,4846,"Heka'Tarnos, Bringer of Discord",2371,0.7523,0.3098,"Heka'Tarnos, Bringer of Discord",1,1,high
+pets,5137,Lil' Mon,2512,0.7003,0.6344,Lil' Mon,1,1,high
+toys,43824,The Schools of Arcane Magic - Mastery,125,0.2435,0.5372,The Schools of Arcane Magic - Mastery,1,1,medium
+toys,85973,Ancient Pandaren Fishing Charm,376,0.468,0.246,Ancient Pandaren Fishing Charm,1,1,medium
+toys,86565,Battle Horn,376,0.346,0.596,Battle Horn,1,1,medium
+toys,86568,Mr. Smite's Brass Compass,390,0.8808,0.4433,Mr. Smite's Brass Compass,1,1,medium
+toys,86571,Kang's Bindstone,390,0.1523,0.3522,Kang's Bindstone,1,1,medium
+toys,86573,Shard of Archstone,379,0.576,0.75,Shard of Archstone,1,1,medium
+toys,86575,Chalice of Secrets,390,0.3957,0.2514,Chalice of Secrets,1,1,medium
+toys,86578,Eternal Warrior's Sigil,422,0.378,0.296,Eternal Warrior's Sigil,1,1,medium
+toys,86581,Farwater Conch,379,0.7414,0.7879,Farwater Conch,1,1,medium
+toys,86582,Aqua Jewel,390,0.694,0.3065,Aqua Jewel,1,1,medium
+toys,86583,Salyin Battle Banner,376,0.706,0.526,Salyin Battle Banner,1,1,medium
+toys,86586,Panflute of Pandaria,390,0.386,0.55,Panflute of Pandaria,1,1,medium
+toys,86588,Pandaren Firework Launcher,379,0.4081,0.4263,Pandaren Firework Launcher,1,1,medium
+toys,86589,Ai'Li's Skymirror,422,0.3471,0.2321,Ai'Li's Skymirror,1,1,medium
+toys,86590,Essence of the Breeze,390,0.4282,0.6924,Essence of the Breeze,1,1,medium
+toys,86593,Hozen Beach Ball,422,0.5534,0.6355,Hozen Beach Ball,1,1,medium
+toys,86594,Helpful Wikky's Whistle,390,0.308,0.915,Helpful Wikky's Whistle,1,1,medium
+toys,104262,Odd Polished Stone,554,0.6208,0.6372,Odd Polished Stone,1,1,medium
+toys,104294,Rime of the Time Lost Mariner,554,0.2608,0.2283,Rime of the Time Lost Mariner,1,1,medium
+toys,104302,Blackflame Daggers,554,0.6238,0.4384,Blackflame Daggers,1,1,medium
+toys,104331,Warning Sign,554,0.5329,0.8314,Warning Sign,1,1,medium
+toys,108631,Crashin' Thrashin' Roller Controller,534,0.836,0.436,Crashin' Thrashin' Roller Controller,1,1,high
+toys,108633,Crashin' Thrashin' Cannon Controller,534,0.806,0.564,Crashin' Thrashin' Cannon Controller,1,1,high
+toys,108634,Crashin' Thrashin' Mortar Controller,534,0.88,0.558,Crashin' Thrashin' Mortar Controller,1,1,high
+toys,108735,Arena Master's War Horn,525,0.2317,0.2495,Arena Master's War Horn,1,1,high
+toys,108739,Pretty Draenor Pearl,525,0.2174,0.0962,Pretty Draenor Pearl,1,1,high
+toys,108743,Deceptia's Smoldering Boots,535,0.5884,0.1206,Deceptia's Smoldering Boots,1,1,high
+toys,109739,Star Chart,539,0.4939,0.7358,Star Chart,1,1,high
+toys,111476,Stolen Breath,525,0.2726,0.5001,Stolen Breath,1,1,high
+toys,113375,Vindicator's Armor Polish Kit,539,0.5114,0.7912,Vindicator's Armor Polish Kit,1,1,high
+toys,113540,Ba'ruun's Bountiful Bloom,539,0.5289,0.1674,Ba'ruun's Bountiful Bloom,1,1,high
+toys,113542,Whispers of Rai'Vosh,539,0.4882,0.2268,Whispers of Rai'Vosh,1,1,high
+toys,113543,Spirit of Shinri,539,0.6062,0.5807,Spirit of Shinri,1,1,high
+toys,113570,Ancient's Bloom,539,0.483,0.6553,Ancient's Bloom,1,1,high
+toys,113631,Hypnosis Goggles,539,0.374,0.4894,Hypnosis Goggles,1,1,high
+toys,113670,Mournful Moan of Murmur,535,0.34,0.572,Mournful Moan of Murmur,1,1,high
+toys,114227,Bubble Wand,543,0.406,0.602,Bubble Wand,1,1,high
+toys,116113,Breath of Talador,535,0.304,0.65,Breath of Talador,1,1,high
+toys,116120,Tasty Talador Lunch,535,0.5736,0.2866,Tasty Talador Lunch,1,1,high
+toys,116122,Burning Legion Missive,535,0.566,0.649,Burning Legion Missive,1,3,low
+toys,116125,Klikixx's Webspinner,535,0.668,0.856,Klikixx's Webspinner,1,1,high
+toys,117550,Angry Beehive,539,0.5529,0.7486,Angry Beehive,1,1,high
+toys,117569,Giant Deathweb Egg,535,0.6649,0.8691,Giant Deathweb Egg,1,1,high
+toys,118221,Petrification Stone,543,0.574,0.686,Petrification Stone,1,1,high
+toys,118222,Spirit of Bashiok,543,0.4,0.79,Spirit of Bashiok,1,1,high
+toys,118224,Ogre Brewing Kit,543,0.382,0.662,Ogre Brewing Kit,1,1,high
+toys,118244,Iron Buccaneer's Hat,550,0.3431,0.769,Iron Buccaneer's Hat,1,1,high
+toys,118716,Goren Garb,543,0.489,0.473,Goren Garb,1,1,high
+toys,119163,Soul Inhaler,525,0.4348,0.0885,Soul Inhaler,1,1,high
+toys,119180,"Goren ""Log"" Roller",525,0.6656,0.2556,"Goren ""Log"" Roller",1,1,high
+toys,119432,Botani Camouflage,543,0.692,0.446,Botani Camouflage,1,1,high
+toys,120276,Outrider's Bridle Chain,550,0.8137,0.6037,Outrider's Bridle Chain,1,1,high
+toys,122117,Cursed Feather of Ikzan,534,0.22,0.378,Cursed Feather of Ikzan,1,1,high
+toys,127394,Podling Camouflage,534,0.645,0.421,Podling Camouflage,1,1,high
+toys,127652,Felflame Campfire,534,0.407,0.698,Felflame Campfire,1,1,high
+toys,127655,Sassy Imp,534,0.312,0.722,Sassy Imp,1,1,high
+toys,127659,Ghostly Iron Buccaneer's Hat,534,0.3616,0.7912,Ghostly Iron Buccaneer's Hat,1,1,high
+toys,127668,Jewel of Hellfire,534,0.287,0.233,Jewel of Hellfire,1,1,high
+toys,127669,Skull of the Mad Chief,534,0.3469,0.3464,Skull of the Mad Chief,1,1,high
+toys,127670,Accursed Tome of the Sargerei,534,0.2343,0.704,Accursed Tome of the Sargerei,1,1,high
+toys,127709,Throbbing Blood Orb,534,0.268,0.442,Throbbing Blood Orb,1,1,high
+toys,127766,The Perfect Blossom,534,0.4077,0.7556,The Perfect Blossom,1,1,high
+toys,127859,Dazzling Rod,534,0.429,0.353,Dazzling Rod,1,1,high
+toys,128223,Bottomless Stygana Mushroom Brew,534,0.4996,0.7677,Bottomless Stygana Mushroom Brew,1,1,high
+toys,134022,Burgy Blackheart's Handsome Hat,205,0.57,0.696,Burgy Blackheart's Handsome Hat,1,1,medium
+toys,134023,Bottled Tornado,390,0.14,0.586,Bottled Tornado,1,1,medium
+toys,134024,Cursed Swabby Helmet,554,0.404,0.93,Cursed Swabby Helmet,1,1,medium
+toys,138415,Slightly-Chewed Insult Book,210,0.364,0.672,Slightly-Chewed Insult Book,1,1,medium
+toys,163713,Brazier Cap,14,0.7953,0.2945,Brazier Cap,1,1,high
+toys,163735,Foul Belly,14,0.223,0.5106,Foul Belly,1,1,high
+toys,163740,Drust Ritual Knife,896,0.3368,0.7173,Drust Ritual Knife,1,1,high
+toys,163741,Magic Fun Rock,14,0.429,0.566,Magic Fun Rock,1,1,high
+toys,163742,Heartsbane Grimoire,896,0.4422,0.277,Heartsbane Grimoire,1,1,high
+toys,163744,Coldrage's Cooler,14,0.4931,0.8426,Coldrage's Cooler,1,1,high
+toys,163745,Witherbark Gong,14,0.6285,0.812,Witherbark Gong,1,1,high
+toys,163750,Kovork Kostume,14,0.2529,0.4856,Kovork Kostume,1,1,high
+toys,163775,Molok Morion,14,0.4765,0.78,Molok Morion,1,1,high
+toys,163828,Toy Siege Tower,14,0.3709,0.3921,Toy Siege Tower,1,1,high
+toys,163829,Toy War Machine,14,0.3909,0.3921,Toy War Machine,1,1,high
+toys,166784,Narassin's Soul Gem,62,0.5847,0.2424,Narassin's Soul Gem,1,1,high
+toys,166785,Detoxified Blight Grenade,62,0.4092,0.5645,Detoxified Blight Grenade,1,1,high
+toys,166787,Twiddle Twirler: Sentinel's Glaive,62,0.3803,0.7584,Twiddle Twirler: Sentinel's Glaive,1,1,high
+toys,167931,Mechagonian Sawblades,1462,0.4482,0.4637,Mechagonian Sawblades,1,1,high
+toys,169303,Hell-Bent Bracers,1527,0.4932,0.8235,Hell-Bent Bracers,1,1,high
+toys,169347,Judgment of Mechagon,1462,0.5733,0.5827,Judgment of Mechagon,1,1,high
+toys,170187,Shadescale,1355,0.6274,0.0809,Shadescale,1,1,high
+toys,170196,Shirakess Warning Sign,1355,0.6587,0.2243,Shirakess Warning Sign,1,1,high
+toys,173984,Scroll of Aeons,1533,0.535,0.8037,Scroll of Aeons,1,1,high
+toys,174873,Trans-mogu-rifier,1530,0.2913,0.2207,Trans-mogu-rifier,1,1,high
+toys,174874,Budget K'thir Disguise,1527,0.55,0.94,Budget K'thir Disguise,1,1,high
+toys,174921,Void-Touched Skull,1470,0.589,0.529,Void-Touched Skull,1,1,medium
+toys,174926,Overly Sensitive Void Spectacles,1470,0.591,0.639,Overly Sensitive Void Spectacles,1,1,medium
+toys,179393,Mirror of Envious Dreams,1525,0.6932,0.7795,Mirror of Envious Dreams,1,1,high
+toys,180873,Smolderheart,1525,0.3404,0.5555,Smolderheart,1,1,high
+toys,180993,Bat Visage Bobber,1525,0.7359,0.7539,Bat Visage Bobber,1,1,high
+toys,181825,Phial of Ravenous Slime,1536,0.5986,0.7906,Phial of Ravenous Slime,1,1,high
+toys,182694,Stylish Black Parasol,1525,0.3839,0.4424,Stylish Black Parasol,1,1,high
+toys,182729,Hearty Dragon Plume,1565,0.4821,0.3927,Hearty Dragon Plume,1,1,high
+toys,182732,The Necronom-i-nom,1536,0.4238,0.2333,The Necronom-i-nom,1,1,high
+toys,182780,Muckpool Cookpot,1525,0.2969,0.3723,Muckpool Cookpot,1,1,high
+toys,183901,Bonestorm Top,1543,0.4912,0.8175,Bonestorm Top,1,1,medium
+toys,183903,Smelly Jelly,1536,0.57,0.7421,Smelly Jelly,1,1,medium
+toys,183986,Bondable Sinstone,1525,0.6336,0.7398,Bondable Sinstone,1,1,high
+toys,183988,Bondable Val'kyr Diadem,1533,0.7047,0.3645,Bondable Val'kyr Diadem,1,1,high
+toys,184075,Stonewrought Sentry,1525,0.4733,0.5536,Stonewrought Sentry,1,1,high
+toys,184223,Helm of the Dominated,1911,0.5519,0.7712,Helm of the Dominated,1,1,medium
+toys,184292,Ancient Elethium Coin,1543,0.1694,0.5102,Ancient Elethium Coin,1,1,medium
+toys,184312,Borr-Geth's Fiery Brimstone,1543,0.3901,0.4119,Borr-Geth's Fiery Brimstone,1,1,medium
+toys,184318,Battlecry of Krexus,1536,0.4408,0.3989,Battlecry of Krexus,1,1,high
+toys,184404,Ever-Abundant Hearth,1533,0.5115,0.1953,Ever-Abundant Hearth,1,1,high
+toys,184413,Mnemonic Attunement Pane,1533,0.4348,0.2524,Mnemonic Attunement Pane,1,1,high
+toys,184476,Regenerating Slime Vial,1536,0.5266,0.3542,Regenerating Slime Vial,1,1,high
+toys,184489,Fae Harp,1565,0.678,0.3462,Fae Harp,1,1,high
+toys,184490,Fae Pipes,1565,0.4482,0.7587,Fae Pipes,1,1,high
+toys,186501,Doomwalker Trophy Stand,71,0.644,0.507,Doomwalker Trophy Stand,1,1,medium
+toys,187051,Forgotten Feather,1961,0.689,0.299,Forgotten Feather,1,1,high
+toys,187075,Box of Rattling Chains,1911,0.5328,0.4528,Box of Rattling Chains,1,1,high
+toys,187139,Bottled Shade Heart,1543,0.2767,0.2526,Bottled Shade Heart,1,1,medium
+toys,187140,Ring of Duplicity,1961,0.4384,0.7698,Ring of Duplicity,1,1,high
+toys,187155,Guise of the Changeling,1961,0.413,0.433,Guise of the Changeling,1,1,high
+toys,187159,Shadow Slicing Shortsword,1961,0.394,0.427,Shadow Slicing Shortsword,1,1,high
+toys,187176,Vesper of Harmony,1961,0.5687,0.3237,Vesper of Harmony,1,1,high
+toys,187185,Vesper of Faith,1543,0.4113,0.4541,Vesper of Faith,1,1,medium
+toys,187339,Silver Shardhide Whistle,1961,0.475,0.292,Silver Shardhide Whistle,1,1,high
+toys,187344,Offering Kit Maker,1961,0.4533,0.6714,Offering Kit Maker,1,1,high
+toys,187417,Adamant Vaults Cell,1911,0.6294,0.7482,Adamant Vaults Cell,1,1,high
+toys,187420,Maw-Ocular Viewfinder,1961,0.503,0.759,Maw-Ocular Viewfinder,1,1,high
+toys,188952,Dominated Hearthstone,1911,0.4744,0.7453,Dominated Hearthstone,1,1,high
+toys,190196,Enlightened Hearthstone,1970,0.475,0.564,Enlightened Hearthstone,1,1,high
+toys,190238,Xy'rath's Booby-Trapped Cache,1970,0.6405,0.4975,Xy'rath's Booby-Trapped Cache,1,1,high
+toys,190333,Jiro Circle of Song,1970,0.3716,0.4467,Jiro Circle of Song,1,1,high
+toys,190457,Protopological Cube,1970,0.7753,0.582,Protopological Cube,1,1,high
+toys,190734,Makaris's Satchel of Mines,1970,0.6002,0.2583,Makaris's Satchel of Mines,1,1,high
+toys,190926,Infested Automa Core,2066,0.4924,0.3441,Infested Automa Core,1,1,medium
+toys,192485,Stored Wisdom Device,1970,0.4743,0.8855,Stored Wisdom Device,1,1,high
+toys,198039,Rock of Appreciation,2023,0.4703,0.7119,Rock of Appreciation,1,1,high
+toys,198474,Artist's Easel,2024,0.0785,0.5348,Artist's Easel,1,1,medium
+toys,200116,Everlasting Horn of Lavaswimming,2022,0.3028,0.7005,Everlasting Horn of Lavaswimming,1,1,medium
+toys,200160,Notfar's Favorite Food,2024,0.2058,0.4943,Notfar's Favorite Food,1,1,high
+toys,200628,Somewhat-Stabilized Arcana,2024,0.462,0.258,Somewhat-Stabilized Arcana,1,1,high
+toys,200869,Ohn Lite Branded Horn,2023,0.7349,0.5613,Ohn Lite Branded Horn,1,1,high
+toys,200878,Wheeled Floaty Boaty Controller,2023,0.5198,0.5839,Wheeled Floaty Boaty Controller,1,1,high
+toys,200999,The Super Shellkhan Gang,2025,0.3846,0.6826,The Super Shellkhan Gang,1,1,high
+toys,201927,Gleaming Arcanocrystal,2024,0.4512,0.594,Gleaming Arcanocrystal,1,1,high
+toys,201933,Black Dragon's Challenge Dummy,2022,0.446,0.701,Black Dragon's Challenge Dummy,1,1,medium
+toys,202019,Golden Dragon Goblet,2022,0.658,0.4182,Golden Dragon Goblet,1,1,high
+toys,202020,Chasing Storm,2085,0.6124,0.4679,Chasing Storm,1,1,medium
+toys,202022,Yennu's Kite,2022,0.4671,0.3121,Yennu's Kite,1,1,high
+toys,202253,Primal Stave of Claw and Fur,2024,0.658,0.1269,Primal Stave of Claw and Fur,1,1,high
+toys,202283,Reading Glasses,2024,0.658,0.1269,Reading Glasses,1,1,high
+toys,202711,Lost Compass,2024,0.7489,0.5501,Lost Compass,1,1,high
+toys,203734,Snow Blanket,2024,0.658,0.1269,Snow Blanket,1,1,high
+toys,203757,Brazier of Madness,337,0.5662,0.5126,Brazier of Madness,1,1,medium
+toys,205418,Blazing Shadowflame Cinder,2133,0.2854,0.4791,Blazing Shadowflame Cinder,1,1,high
+toys,205419,Dinn's Drum,2133,0.2851,0.5115,Dinn's Drum,1,1,high
+toys,205463,Molten Lava Ball,2200,0.4578,0.1879,Molten Lava Ball,1,1,high
+toys,205796,Molten Lava Pack,2133,0.4567,0.3327,Molten Lava Pack,1,1,high
+toys,206696,Tricked-Out Thinking Cap,2112,0.2667,0.5389,Tricked-Out Thinking Cap,1,1,medium
+toys,206993,Investi-gator's Pocketwatch,2025,0.5464,0.8589,Investi-gator's Pocketwatch,1,1,high
+toys,207099,Tiny Box of Tiny Rocks,2151,0.3026,0.8,Tiny Box of Tiny Rocks,1,1,medium
+toys,207730,Idol of Ohn'ahra,2023,0.3955,0.5886,Idol of Ohn'ahra,1,1,medium
+toys,208092,Torch of Pyrreth,2022,0.5457,0.2038,Torch of Pyrreth,1,1,medium
+toys,210411,Fast Growing Seed,2200,0.3726,0.3069,Fast Growing Seed,1,1,high
+toys,210725,Owl Post,2200,0.4749,0.3485,Owl Post,1,1,high
+toys,210864,Improvised Leafbed,2200,0.5813,0.773,Improvised Leafbed,1,1,medium
+toys,224552,Cave Spelunker's Torch,2215,0.5838,0.2715,Cave Spelunker's Torch,1,1,high
+toys,224554,Silver Linin' Scepter,2215,0.4594,0.4513,Silver Linin' Scepter,1,1,high
+toys,224643,Pet-Sized Candle,2214,0.435,0.3529,Pet-Sized Candle,1,1,medium
+toys,225347,Web-Vandal's Spinning Wheel,2255,0.7861,0.332,Web-Vandal's Spinning Wheel,1,1,high
+toys,225556,Ancient Construct,2249,0.4958,0.3598,Ancient Construct,1,1,medium
+toys,225659,Arathi Book Collection,2215,0.4003,0.5112,Arathi Book Collection,1,1,high
+toys,226373,Everlasting Noggenfogger Elixir,2346,0.2712,0.7256,Everlasting Noggenfogger Elixir,1,1,high
+toys,228966,Starry-Eyed Goggles,46,0.4818,0.7996,Starry-Eyed Goggles,1,1,medium
+toys,234473,Soweezi's Comfy Lawn Chair,2369,0.6998,0.4855,Soweezi's Comfy Lawn Chair,1,1,high
+toys,234950,Atomic Regoblinator,2346,0.3072,0.389,Atomic Regoblinator,1,1,high
+toys,234951,Uncracked Cold Ones,2346,0.534,0.5272,Uncracked Cold Ones,1,1,high
+toys,235669,Steamwheedle Cartel Banner,2346,0.2712,0.7256,Steamwheedle Cartel Banner,1,1,high
+toys,235670,Bilgewater Cartel Banner,2346,0.3915,0.2219,Bilgewater Cartel Banner,1,1,high
+toys,235671,Blackwater Cartel Banner,2346,0.6342,0.1673,Blackwater Cartel Banner,1,1,high
+toys,235672,Venture Co. Banner,2346,0.5329,0.7271,Venture Co. Banner,1,1,high
+toys,235799,Throwin' Sawblade,2346,0.5329,0.7271,Throwin' Sawblade,1,1,high
+toys,235801,Personal Fishing Barge,2346,0.6342,0.1673,Personal Fishing Barge,1,1,high
+toys,235807,Storefront-in-a-Box,2346,0.3915,0.2219,Storefront-in-a-Box,1,1,high
+toys,237345,Limited Edition Rocket Bobber,2346,0.3409,0.7126,Limited Edition Rocket Bobber,1,1,high
+toys,237346,Artisan Beverage Goblet Bobber,2346,0.3409,0.7126,Artisan Beverage Goblet Bobber,1,1,high
+toys,237347,Organically-Sourced Wellington Bobber,2346,0.3409,0.7126,Organically-Sourced Wellington Bobber,1,1,high
+toys,237382,Undermine Supply Crate,2346,0.2574,0.3813,Undermine Supply Crate,1,1,high
+toys,242323,Chowdar's Favorite Ribbon,2472,0.7294,0.8327,Chowdar's Favorite Ribbon,1,1,high
+toys,245970,P.O.S.T. Master's Express Hearthstone,2472,0.4776,0.6265,P.O.S.T. Master's Express Hearthstone,1,1,high
+toys,249713,Cartel Transmorpher,2371,0.4196,0.2212,Cartel Transmorpher,1,1,high
+toys,258963,Shroom Jumper's Parachute,2413,0.7168,0.31,Shroom Jumper's Parachute,1,1,high
+toys,259084,Gift of the Cycle,2576,0.4723,0.5078,Gift of the Cycle,1,1,medium
+toys,267139,Hungry Black Hole,2405,0.6453,0.7547,Hungry Black Hole,1,1,high

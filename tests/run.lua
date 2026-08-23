@@ -326,6 +326,32 @@ do
     equal(MC.Goals:Collect()[1].moduleLabel, first, "identical goals rank deterministically")
 end
 
+-- Derived HandyNotes pins for mounts, pets and toys.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/HandyNotesPins.lua", MC)
+
+    local total = 0
+    for _, tbl in pairs({ MC.MountPins, MC.PetPins, MC.ToyPins }) do
+        for id, wp in pairs(tbl) do
+            total = total + 1
+            truthy(type(id) == "number" and id > 0, "pin key is a natural id")
+            truthy(type(wp) == "table" and #wp == 4, "pin is a 4-element tuple")
+            -- The same constraints the content database enforces. A y of 0
+            -- pins the top edge of the map and nothing at runtime notices.
+            truthy(type(wp[1]) == "number" and wp[1] > 0, "map id is positive")
+            truthy(type(wp[2]) == "number" and wp[2] > 0 and wp[2] <= 1, "x is a 0-1 fraction")
+            truthy(type(wp[3]) == "number" and wp[3] > 0 and wp[3] <= 1, "y is a 0-1 fraction")
+            truthy(type(wp[4]) == "string" and wp[4] ~= "", "pin carries a label")
+        end
+    end
+    truthy(total > 400, "the derived pin tables are populated")
+
+    -- Only the high-confidence tier ships. If a future pass lands the medium
+    -- tier too this count moves deliberately, not by accident.
+    equal(total, 519, "shipped pin count (high-confidence tier only)")
+end
+
 do
     local MC = {}
     GetCurrentRegion = function() return 1 end

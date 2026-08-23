@@ -170,12 +170,25 @@ def main():
         w.writerow(["domain", "id_kind", "natural_id", "label", "publishers",
                     "publisher_count", "families", "map_ids", "coords",
                     "quest_ids", "loot_item_ids", "achievement_ids", "criteria_ids", "rewards",
-                    "node_classes", "spawn_count"])
+                    "node_classes", "spawn_count", "map_count"])
         for (domain, id_kind, nid), g in sorted(groups.items()):
-            # Deduplicate coordinates but keep every distinct one: several are
-            # genuine multi-spawn points, and the rest record where the
-            # publishers disagree.
-            coords = sorted(set(g["coords"]))
+            # Deduplicate but preserve FIRST-SEEN order. This was
+            # sorted(set(...)) over strings like "1536:0.51,0.48", which sorts
+            # map ids as ASCII -- "103" before "47", "1525" before "1536". Any
+            # consumer taking "the first coordinate" was therefore taking an
+            # arbitrary map, and that shipped a real error: pet 2944 (Oonar's
+            # Arm) came out in Revendreth because "1525" sorted before the
+            # "1536" Maldraxxus spawns that actually award it.
+            #
+            # First-seen order is the order the publisher wrote them, which is
+            # at least meaningful. Consumers that need one point should still
+            # pick deliberately rather than take coords[0] -- see the
+            # reward-node filter in handynotes-waypoint-candidates.md.
+            coords, seen = [], set()
+            for c in g["coords"]:
+                if c not in seen:
+                    seen.add(c)
+                    coords.append(c)
             w.writerow([
                 domain, id_kind, nid,
                 g["labels"][0] if g["labels"] else "",
@@ -191,6 +204,10 @@ def main():
                 ";".join(sorted(g["rewards"])),
                 ";".join(sorted(c for c in g["classes"] if c)),
                 len(coords),
+                # A group spanning several maps cannot be reduced to one pin
+                # without a decision. Surfacing the count stops a consumer
+                # silently taking the first and calling it the location.
+                len(g["maps"]),
             ])
 
     shared = sum(1 for g in groups.values() if len(g["addons"]) > 1)

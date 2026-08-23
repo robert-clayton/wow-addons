@@ -63,7 +63,10 @@ function Scanner:Scan()
                         name              = toyName,
                         source            = toy.source,
                         sourceInfo        = toy.sourceInfo,
-                        waypoint          = toy.waypoint,
+                        waypoint          = toy.waypoint
+                            -- Derived pins fill the gap where the catalog has none; a
+                            -- hand-written waypoint on the row itself always wins.
+                            or (toy.itemID and MC.ToyPins and MC.ToyPins[toy.itemID]),
                         overworldWaypoint = toy.overworldWaypoint,
                         cost              = toy.cost,
                         dropInfo          = toy.dropInfo,
