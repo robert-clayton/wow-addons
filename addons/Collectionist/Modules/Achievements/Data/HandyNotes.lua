@@ -9,12 +9,6 @@ MC.RegisterContent("vanilla", "achievements", {
         { achievementID = 6585, name = "Kalimdor Safari", description = "Catch every battle pet in Kalimdor." },
         { achievementID = 6586, name = "Eastern Kingdoms Safari", description = "Catch every battle pet in Eastern Kingdoms." },
     } },
-    { category = "exploration", source = "zone", achievements = {
-        { achievementID = 17366, name = "Relics of a Fallen Empire", description = "Deliver a Restored Hakkari Bijou to someone with a great interest in such artifacts." },
-    } },
-    { category = "features", source = "professions", achievements = {
-        { achievementID = 17367, name = "Deadliest Cache", description = "Fish up a Gurubashi Cache in Zul'Gurub." },
-    } },
 })
 
 MC.RegisterContent("tbc", "achievements", {
@@ -30,12 +24,6 @@ MC.RegisterContent("wrath", "achievements", {
     { category = "collections", source = "pets", achievements = {
         { achievementID = 6588, name = "Northrend Safari", description = "Catch every battle pet in Northrend." },
     } },
-    { category = "exploration", source = "zone", achievements = {
-        { achievementID = 1206, name = "To All The Squirrels I've Loved Before", description = "Show the critters of Azeroth how much you /love them." },
-        { achievementID = 1254, name = "Friend or Fowl?", description = "Slay 15 turkeys in 3 minutes." },
-        { achievementID = 2556, name = "Pest Control", description = "Slay the following pests." },
-        { achievementID = 2557, name = "To All The Squirrels Who Shared My Life", description = "Show more critters of Azeroth how much you /love them." },
-    } },
     { category = "features", source = "professions", achievements = {
         { achievementID = 2096, name = "The Coin Master", description = "Complete the coin fishing achievements listed below." },
     } },
@@ -45,9 +33,6 @@ MC.RegisterContent("cata", "achievements", {
     { category = "collections", source = "mounts", achievements = {
         { achievementID = 5767, name = "Scourer of the Eternal Sands", description = "Obtain the reins of the Grey Riding Camel from Dormus the Camel-Hoarder." },
     } },
-    { category = "exploration", source = "zone", achievements = {
-        { achievementID = 4958, name = "The First Rule of Ring of Blood is You Don't Talk About Ring of Blood", description = "Complete the Ring of Blood, Amphitheater of Anguish and Crucible of Carnage." },
-    } },
 })
 
 MC.RegisterContent("mop", "achievements", {
@@ -56,10 +41,7 @@ MC.RegisterContent("mop", "achievements", {
         { achievementID = 8397, name = "Crazy for Cats", description = "Obtain 20 of the cats listed below." },
     } },
     { category = "exploration", source = "zone", achievements = {
-        { achievementID = 6350, name = "To All the Squirrels I Once Caressed?", description = "There are even more critters in Pandaria. They also need /love." },
         { achievementID = 6926, name = "Tranquil Master", description = "Purge Pandaria of Sha corruption, defeating each known manifestation of negative emotion." },
-        { achievementID = 8533, name = "Ordos", description = "Defeat Ordos, Fire-God of the Yaungol, atop the Timeless Isle." },
-        { achievementID = 8728, name = "Going To Need A Bigger Bag", description = "Obtain all of the rare items from the Timeless Isle listed below." },
     } },
 })
 
@@ -76,9 +58,7 @@ MC.RegisterContent("wod", "achievements", {
     } },
     { category = "exploration", source = "zone", achievements = {
         { achievementID = 9838, name = "What A Strange, Interdimensional Trip It's Been", description = "Defeat the following Draenor bosses while being accompanied by Pepe." },
-        { achievementID = 10053, name = "I Found Pepe!", description = "Find Pepe wearing his viking, ninja, knight, and pirate outfits." },
         { achievementID = 10334, name = "Predator", description = "Defeat Xemirkol in Tanaan Jungle." },
-        { achievementID = 14728, name = "To All the Squirrels Through Time and Space", description = "Draenor is home to many familiar, but different critters, who have been waiting to get some /love." },
     } },
 })
 
@@ -86,9 +66,6 @@ MC.RegisterContent("legion", "achievements", {
     { category = "collections", source = "pets", achievements = {
         { achievementID = 11233, name = "Broken Isles Safari", description = "Catch every battle pet in the Broken Isles." },
         { achievementID = 12088, name = "Anomalous Animals of Argus", description = "Defeat the following corrupted pets on Argus." },
-    } },
-    { category = "exploration", source = "zone", achievements = {
-        { achievementID = 10770, name = "The Tangerine Traveler", description = "Find Pepe wearing his tiny, adorable goggles." },
     } },
 })
 
@@ -187,7 +164,6 @@ MC.RegisterContent("df", "achievements", {
     { category = "exploration", source = "zone", achievements = {
         { achievementID = 16502, name = "Storming the Runway", description = "Collect an armor set from the Primal Storms." },
         { achievementID = 17736, name = "The Gift of Cheese", description = "Share the Recipe Rat's greatest recipe with hungry rats across Azeroth." },
-        { achievementID = 18833, name = "Elusive Legends of the Dragon Isles", description = "Slay all of the following special elusive beasts hiding on the Dragon Isles as a skinner." },
     } },
     { category = "features", source = "dragonriding", achievements = {
         { achievementID = 18928, name = "Storm Rider: Bronze", description = "Complete all Storm Gryphon races." },
@@ -218,10 +194,8 @@ MC.RegisterContent("tww", "achievements", {
         { achievementID = 40703, name = "The Ringing Deeps Glyph Hunter", description = "Discover the following Skyriding Glyphs in The Ringing Deeps:" },
         { achievementID = 40704, name = "Hallowfall Glyph Hunter", description = "Discover the following Skyriding Glyphs in Hallowfall:" },
         { achievementID = 40705, name = "Azj-Kahet Glyph Hunter", description = "Discover the following Skyriding Glyphs in Azj-Kahet:" },
-        { achievementID = 42727, name = "K'aresh Glyph Hunter", description = "Discover the following Skyriding Glyphs in K'aresh:" },
     } },
     { category = "exploration", source = "zone", achievements = {
-        { achievementID = 40967, name = "Ratts' Revenge", description = "Uncover Ratts' story and take back her stolen prize." },
         { achievementID = 40979, name = "No Crate Left Behind", description = "Find and return all Celebration Crates." },
     } },
     { category = "features", source = "dragonriding", achievements = {
@@ -271,17 +245,6 @@ MC.RegisterContent("tww", "achievements", {
 })
 
 MC.RegisterContent("midnight", "achievements", {
-    { category = "exploration", source = "zone", achievements = {
-        { achievementID = 61081, name = "Share a Drink", description = "Share a Toasting Brew in the Arcantina with all of the following races." },
-        { achievementID = 61455, name = "Shadowpine Scattered", description = "Find all of the Shadowpine Songseekers in Zul'aman." },
-        { achievementID = 61912, name = "Anchoring the Defense", description = "Construct one of each of the following defenses for the Stormarion Assault." },
-        { achievementID = 61922, name = "Ninety Percent is Good Enough", description = "Finish Stormarion Assault with the Singularity Anchor at 90 percent health or higher." },
-        { achievementID = 62188, name = "More Than Just Their Roots", description = "Listen to the stories of the Haranir who went to the surface, seeking the world trees." },
-        { achievementID = 62199, name = "Put a Pin in It", description = "Find and join Chu'ke the possessed doll in Zul'Aman." },
-        { achievementID = 62200, name = "Gnome Alone", description = "Collect all of the lost gnome's writings in Zul'Aman." },
-        { achievementID = 62201, name = "The Frog and the Princesses", description = "/kiss all of the \"princess\" frogs in Zul'Aman." },
-        { achievementID = 62202, name = "Spiritpaw Marathon", description = "Assist the Spiritpaw Runner in Zul'Aman." },
-    } },
     { category = "features", source = "delves", achievements = {
         { achievementID = 61713, name = "Midnight Delver Damage Dealer III", description = "Complete every Midnight delve on Tier 11 with lives remaining as a damage dealer." },
         { achievementID = 61716, name = "Midnight Delver Healer III", description = "Complete every Midnight delve on Tier 11 with lives remaining as a healer." },

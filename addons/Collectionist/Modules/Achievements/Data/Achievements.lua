@@ -371,66 +371,6 @@ MC.RegisterContent("midnight", "achievements", {
         category = "exploration",
         source = "lore",
         achievements = {
-            {
-                achievementID = 62104,
-                name          = "Midnight Lore Hunter",
-                zone          = "Midnight (all zones)",
-                description   = "Find every lore object in the four Midnight zones.",
-                taskList = {
-                    intro = "Each lore object is a single-use ground interactable (tablet, mural, runestone, plaque). Reading one gives 250 reputation with that zone's faction.",
-                    tasks = {
-                        -- Eversong Woods (faction 2710 Silvermoon Court)
-                        { achievementID = 62104, criteriaID = 111828, label = "Memorial Plaque (Eversong)",
-                          waypoint = { M.Eversong, 0.4795, 0.8820, "Memorial Plaque" } },
-                        { achievementID = 62104, criteriaID = 111829, label = "Shrine of Dath'remar (Eversong)",
-                          waypoint = { M.Eversong, 0.3760, 0.1378, "Shrine of Dath'remar" } },
-                        { achievementID = 62104, criteriaID = 111830, label = "Mirveda's Notes — Dead Scar (Eversong)",
-                          waypoint = { M.Eversong, 0.5052, 0.4347, "Mirveda's Notes" } },
-                        { achievementID = 62104, criteriaID = 111831, label = "Dar'khan's Notes — Profane Research (Eversong)",
-                          waypoint = { M.Eversong, 0.3605, 0.7251, "Dar'khan's Notes" } },
-                        { achievementID = 62104, criteriaID = 111832, label = "Hawkstrider Husbandry Manual (Eversong)",
-                          waypoint = { M.Eversong, 0.5781, 0.5092, "Hawkstrider Husbandry Manual" } },
-                        { achievementID = 62104, criteriaID = 111833, label = "Unfinished Sheet Music (Silvermoon City)",
-                          waypoint = { M.Silvermoon, 0.3810, 0.7699, "Unfinished Sheet Music" } },
-
-                        -- Harandar (faction 2704 Hara'ti)
-                        { achievementID = 62104, criteriaID = 111823, label = "Tarnished Mural (Harandar)",
-                          waypoint = { M.Harandar, 0.5566, 0.5402, "Tarnished Mural" } },
-                        { achievementID = 62104, criteriaID = 111824, label = "Ancient Runestone (Harandar)",
-                          waypoint = { M.Harandar, 0.3333, 0.6084, "Ancient Runestone" } },
-                        { achievementID = 62104, criteriaID = 111825, label = "Derelict Mural (Harandar)",
-                          waypoint = { M.Harandar, 0.7244, 0.3809, "Derelict Mural" } },
-                        { achievementID = 62104, criteriaID = 111826, label = "Forgotten Mural (Harandar)",
-                          waypoint = { M.Harandar, 0.6821, 0.2379, "Forgotten Mural" } },
-
-                        -- Voidstorm (faction 2699 The Singularity)
-                        { achievementID = 62104, criteriaID = 111834, label = "Void Armor (Voidstorm)",
-                          waypoint = { M.Voidstorm, 0.6342, 0.7822, "Void Armor" } },
-                        { achievementID = 62104, criteriaID = 111835, label = "Ancient Tablet (Voidstorm)",
-                          waypoint = { M.Voidstorm, 0.5032, 0.8768, "Ancient Tablet" } },
-                        { achievementID = 62104, criteriaID = 111836, label = "Abandoned Telescope (Voidstorm)",
-                          waypoint = { M.Voidstorm, 0.4048, 0.5863, "Abandoned Telescope" } },
-                        { achievementID = 62104, criteriaID = 111837, label = "Tattered Page (Voidstorm)",
-                          waypoint = { M.Voidstorm, 0.6038, 0.4550, "Tattered Page" } },
-                        { achievementID = 62104, criteriaID = 111838, label = "Shadowgraft Harness (Voidstorm)",
-                          waypoint = { M.Voidstorm, 0.2783, 0.5402, "Shadowgraft Harness" } },
-
-                        -- Zul'Aman (faction 2696 Amani Tribe)
-                        { achievementID = 62104, criteriaID = 111772, label = "Tablet of Akil'zon (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.5310, 0.8211, "Tablet of Akil'zon" } },
-                        { achievementID = 62104, criteriaID = 111773, label = "Tablet of Halazzi (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.3208, 0.3165, "Tablet of Halazzi" } },
-                        { achievementID = 62104, criteriaID = 111774, label = "Tablet of Jan'alai (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.5513, 0.1762, "Tablet of Jan'alai" } },
-                        { achievementID = 62104, criteriaID = 111775, label = "Tablet of Nalorakk (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.3017, 0.8466, "Tablet of Nalorakk" } },
-                        { achievementID = 62104, criteriaID = 111777, label = "Tablet of Kulzi (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.3926, 0.4472, "Tablet of Kulzi" } },
-                        { achievementID = 62104, criteriaID = 111778, label = "Tablet of Filo (Zul'Aman)",
-                          waypoint = { M.ZulAman, 0.5292, 0.3212, "Tablet of Filo" } },
-                    },
-                },
-            },
         },
     },
 
@@ -493,36 +433,6 @@ MC.RegisterContent("midnight", "achievements", {
                         { achievementID = 61453, label = "Making an Amani Out of You (Zul'Aman)" },
                         { achievementID = 62260, label = "That's Aln, Folks! (Harandar)" },
                         { achievementID = 62256, label = "Yelling into the Voidstorm (Voidstorm)" },
-                    },
-                },
-            },
-            {
-                achievementID = 62057,
-                name          = "Midnight: The Highest Peaks",
-                zone          = "Midnight (all zones)",
-                description   = "Complete the Highest Peaks vista achievement in every Midnight zone.",
-                taskList = {
-                    intro = "Find every telescope across the four zones.",
-                    tasks = {
-                        { achievementID = 62288, label = "Highest Peaks: Eversong Woods" },
-                        { achievementID = 62289, label = "Highest Peaks: Zul'Aman" },
-                        { achievementID = 62290, label = "Highest Peaks: Harandar" },
-                        { achievementID = 62291, label = "Highest Peaks: Voidstorm" },
-                    },
-                },
-            },
-            {
-                achievementID = 61854,
-                name          = "The Midnight Explorer",
-                zone          = "Midnight (all zones)",
-                description   = "Discover every named sub-zone across all four Midnight zones.",
-                taskList = {
-                    intro = "Complete each zone's Explorer achievement.",
-                    tasks = {
-                        { achievementID = 61855, label = "Explore Eversong Woods" },
-                        { achievementID = 61856, label = "Explore Zul'Aman" },
-                        { achievementID = 61520, label = "Explore Harandar" },
-                        { achievementID = 61857, label = "Explore Voidstorm" },
                     },
                 },
             },
@@ -605,30 +515,6 @@ MC.RegisterContent("midnight", "achievements", {
         category = "exploration",
         source = "explore",
         achievements = {
-            {
-                achievementID = 61855,
-                name          = "Explore Eversong Woods",
-                zone          = "Eversong Woods",
-                description   = "Discover every named sub-zone in Eversong Woods. Walk into each one — the area name fades onto the screen.",
-            },
-            {
-                achievementID = 61856,
-                name          = "Explore Zul'Aman",
-                zone          = "Zul'Aman",
-                description   = "Discover every named sub-zone in Zul'Aman.",
-            },
-            {
-                achievementID = 61520,
-                name          = "Explore Harandar",
-                zone          = "Harandar",
-                description   = "Discover every named sub-zone in Harandar.",
-            },
-            {
-                achievementID = 61857,
-                name          = "Explore Voidstorm",
-                zone          = "Voidstorm",
-                description   = "Discover every named sub-zone in Voidstorm.",
-            },
         },
     },
 
@@ -639,27 +525,6 @@ MC.RegisterContent("midnight", "achievements", {
         category = "exploration",
         source = "zone",
         achievements = {
-            {
-                achievementID = 61961,
-                name          = "Runestone Rush",
-                zone          = "Eversong Woods",
-                description   = "Defend each Eversong runestone from the boss that spawns when you tap it.",
-                taskList = {
-                    intro = "Click a runestone to summon its boss. Kill the boss and that runestone counts.",
-                    tasks = {
-                        { achievementID = 61961, criteriaID = 111480, label = "Elrendar River Runestone (Sapmaw the Infestor)",
-                          waypoint = { M.Eversong, 0.4740, 0.5860, "Elrendar River Runestone" } },
-                        { achievementID = 61961, criteriaID = 111481, label = "Ath'ran Runestone (Commander Viskaj)",
-                          waypoint = { M.Eversong, 0.3840, 0.5580, "Ath'ran Runestone" } },
-                        { achievementID = 61961, criteriaID = 111482, label = "Dawnstar Spire Runestone (Hal'nok the Trampler)",
-                          waypoint = { M.Eversong, 0.6140, 0.6280, "Dawnstar Spire Runestone" } },
-                        { achievementID = 61961, criteriaID = 111483, label = "Sanctum of the Moon Runestone (Commander Gravok)",
-                          waypoint = { M.Eversong, 0.4100, 0.7380, "Sanctum of the Moon Runestone" } },
-                        { achievementID = 61961, criteriaID = 111484, label = "Sunstrider Isle Runestone (Claw of the Void)",
-                          waypoint = { M.Eversong, 0.4060, 0.1360, "Sunstrider Isle Runestone" } },
-                    },
-                },
-            },
             -- The following are tracked at the achievement level. They
             -- have richer per-criterion guides we can fill in later from
             -- HandyNotes; for now players see overall progress + the
@@ -689,117 +554,6 @@ MC.RegisterContent("midnight", "achievements", {
                 zone          = "Harandar",
                 description   = "Complete the seven Haranir storyline quests in Harandar. Reward: On'ohia's Call decoration.",
             },
-            {
-                achievementID = 62121,
-                name          = "Sacred Buffet Devotee",
-                zone          = "Zul'Aman",
-                description   = "Receive every blessing at the Altar of Blessings (Amani'Zar Village).",
-                waypoint      = { M.ZulAman, 0.4316, 0.6928, "Altar of Blessings" },
-            },
-            {
-                achievementID = 62133,
-                name          = "Thrill of the Chase",
-                zone          = "Voidstorm",
-                description   = "Complete the Voidstorm hunt event — kill the wandering apex predators.",
-            },
-            {
-                achievementID = 61913,
-                name          = "A Singular Problem",
-                zone          = "Voidstorm",
-                description   = "Complete each phase of the Singularity Renown side quest.",
-            },
-            {
-                achievementID = 61860,
-                name          = "From The Cradle to the Grave",
-                zone          = "Harandar",
-                description   = "Fly upward above The Den until you find The Cradle.",
-                waypoint      = { M.Harandar, 0.4930, 0.5436, "The Cradle (fly UP)" },
-            },
-            {
-                achievementID = 61219,
-                name          = "No Time to Paws",
-                zone          = "Harandar",
-                description   = "Complete the Lil' Scoots quest chain in record time.",
-            },
-            {
-                achievementID = 61344,
-                name          = "Chronicler of the Haranir",
-                zone          = "Harandar",
-                description   = "Read all 21 Haranir lore books across 7 storyline-gated series.",
-                taskList = {
-                    intro = "21 books in 7 series. Each series only spawns its books once you've finished its parent campaign quest. If a parent below shows |cffff5555[ ]|r, that series isn't unlocked yet.",
-                    tasks = {
-                        -- Series 1: Laments of Wey'nan
-                        { questID = 88993, label = "[Parent] Wey'nan's Ward — unlocks Laments of Wey'nan" },
-                        { achievementID = 61344, questID = 93470, label = "Laments of Wey'nan: Pt 1 — Finding Hope",
-                          waypoint = { M.Harandar, 0.4323, 0.3733, "Laments of Wey'nan 1" } },
-                        { achievementID = 61344, questID = 93471, label = "Laments of Wey'nan: Pt 2 — Hunting Purpose",
-                          waypoint = { M.Harandar, 0.4153, 0.3585, "Laments of Wey'nan 2" } },
-                        { achievementID = 61344, questID = 93472, label = "Laments of Wey'nan: Pt 3 — There Must Be More",
-                          waypoint = { M.Harandar, 0.4230, 0.3548, "Laments of Wey'nan 3" } },
-                        -- Series 2: Echoes of Our Past
-                        { questID = 88994, label = "[Parent] The Cauldron of Echoes — unlocks Echoes of Our Past" },
-                        { achievementID = 61344, questID = 93475, label = "Echoes of Our Past: Pt 1 — Fading History",
-                          waypoint = { M.Harandar, 0.6000, 0.2089, "Echoes of Our Past 1" } },
-                        { achievementID = 61344, questID = 93474, label = "Echoes of Our Past: Pt 2 — Alndust",
-                          waypoint = { M.Harandar, 0.5971, 0.1851, "Echoes of Our Past 2" } },
-                        { achievementID = 61344, questID = 93473, label = "Echoes of Our Past: Pt 3 — Dangerous Memories",
-                          waypoint = { M.Harandar, 0.6115, 0.1596, "Echoes of Our Past 3" } },
-                        -- Series 3: Seeker's Trail
-                        { questID = 88995, label = "[Parent] Aln'hara's Bloom — unlocks Seeker's Trail" },
-                        { achievementID = 61344, questID = 93479, label = "Seeker's Trail: Pt 1 — Call of Aln'hara",
-                          waypoint = { M.Harandar, 0.5368, 0.6695, "Seeker's Trail 1" } },
-                        { achievementID = 61344, questID = 93478, label = "Seeker's Trail: Pt 2 — Seeking Peace",
-                          waypoint = { M.Harandar, 0.5503, 0.6627, "Seeker's Trail 2" } },
-                        { achievementID = 61344, questID = 93476, label = "Seeker's Trail: Pt 3 — Unending Mission",
-                          waypoint = { M.Harandar, 0.5591, 0.6686, "Seeker's Trail 3" } },
-                        -- Series 4: Words of Obayo
-                        { questID = 88996, label = "[Parent] The Echoless Flame — unlocks Words of Obayo" },
-                        { achievementID = 61344, questID = 93482, label = "Words of Obayo: Pt 1 — The Flame",
-                          waypoint = { M.Harandar, 0.6485, 0.3846, "Words of Obayo 1" } },
-                        { achievementID = 61344, questID = 93481, label = "Words of Obayo: Pt 2 — The Rift",
-                          waypoint = { M.Harandar, 0.6143, 0.3503, "Words of Obayo 2" } },
-                        { achievementID = 61344, questID = 93480, label = "Words of Obayo: Pt 3 — The Silence",
-                          waypoint = { M.Harandar, 0.6259, 0.3571, "Words of Obayo 3" } },
-                        -- Series 5: Tending the Lands
-                        { questID = 88997, label = "[Parent] Russula's Outreach — unlocks Tending the Lands" },
-                        { achievementID = 61344, questID = 93485, label = "Tending the Lands: Pt 1 — The Conflict",
-                          waypoint = { M.Harandar, 0.6343, 0.4008, "Tending the Lands 1" } },
-                        { achievementID = 61344, questID = 93484, label = "Tending the Lands: Pt 2 — The Plan",
-                          waypoint = { M.Harandar, 0.6107, 0.3896, "Tending the Lands 2" } },
-                        { achievementID = 61344, questID = 93483, label = "Tending the Lands: Pt 3 — The Cycle",
-                          waypoint = { M.Harandar, 0.6138, 0.3716, "Tending the Lands 3" } },
-                        -- Series 6: Ways of the Roots
-                        { questID = 88998, label = "[Parent] Root of the World — unlocks Ways of the Roots" },
-                        { achievementID = 61344, questID = 93488, label = "Ways of the Roots: Pt 1 — Serving",
-                          waypoint = { M.Harandar, 0.4083, 0.3629, "Ways of the Roots 1" } },
-                        { achievementID = 61344, questID = 93487, label = "Ways of the Roots: Pt 2 — Growing",
-                          waypoint = { M.Harandar, 0.4148, 0.3416, "Ways of the Roots 2" } },
-                        { achievementID = 61344, questID = 93486, label = "Ways of the Roots: Pt 3 — Pruning",
-                          waypoint = { M.Harandar, 0.4051, 0.3471, "Ways of the Roots 3" } },
-                        -- Series 7: Awe'ohna's Path — rotating weekly Lost Legends
-                        -- (89268) from Zur'ashar Kassameh in The Den. Relic #7
-                        -- only unlocks after relics 1-6 on this character.
-                        -- Books spawn only the week relic #7 is the active
-                        -- relic. Pts 2 & 3 are inside a cave at their coords.
-                        { questID = 89268, label = "[Parent] Lost Legends weekly (relic #7) — Zur'ashar Kassameh, The Den",
-                          waypoint = { M.Harandar, 0.5415, 0.5314, "Zur'ashar Kassameh" } },
-                        { achievementID = 61344, label = "Awe'ohna's Path: Pt 1 — Questions",
-                          waypoint = { M.Harandar, 0.7189, 0.5894, "Awe'ohna's Path 1" } },
-                        { achievementID = 61344, label = "Awe'ohna's Path: Pt 2 — Answers (inside cave)",
-                          waypoint = { M.Harandar, 0.7352, 0.5820, "Awe'ohna's Path 2 (in cave)" } },
-                        { achievementID = 61344, label = "Awe'ohna's Path: Pt 3 — The Cradle (inside cave)",
-                          waypoint = { M.Harandar, 0.7346, 0.5746, "Awe'ohna's Path 3 (in cave)" } },
-                    },
-                },
-            },
-            {
-                achievementID = 61052,
-                name          = "Dust 'Em Off",
-                zone          = "Harandar",
-                description   = "Catch all 120 Glowing Moths across Harandar. Moth tiers unlock at Hara'ti Renown 1, 4, and 9. Talk to Mothkeeper Wew'tam to see which moths you still need.",
-                waypoint      = { M.Harandar, 0.4930, 0.5436, "Mothkeeper Wew'tam" },
-            },
         },
     },
 
@@ -810,14 +564,6 @@ MC.RegisterContent("midnight", "achievements", {
         category = "quests",
         source = "metas",
         achievements = {
-            {
-                achievementID = 62110,
-                name          = "Loremaster of Midnight",
-                zone          = "Midnight (all zones)",
-                description   = "Complete every storyline campaign across the four Midnight zones.",
-                -- Sub-achievement IDs not yet confirmed; once they are,
-                -- add them as a taskList of achievementID-only tasks.
-            },
         },
     },
 

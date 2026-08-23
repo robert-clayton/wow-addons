@@ -238,10 +238,6 @@ MC.RegisterContent("midnight", "achievements", {
         category = "features",
         source = "raid",
         achievements = {
-            { achievementID = 63237, name = "Rotmire", zone = "Sporefall",
-              description = "Defeat Rotmire in Sporefall on any difficulty." },
-            { achievementID = 63242, name = "Rotmire Guild Run", zone = "Sporefall",
-              description = "Defeat Rotmire on Normal difficulty or higher while in a guild group." },
         },
     },
     {

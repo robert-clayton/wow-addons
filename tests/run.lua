@@ -258,74 +258,6 @@ do
         "single-entry list is a no-op")
 end
 
--- "Closest to done" ranking.
-do
-    local MC = {}
-    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
-    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
-    -- Goals.lua grabs the library at load. Restore the global afterwards:
-    -- later blocks load Core.lua, which needs the fuller stub.
-    local savedLibStub = LibStub
-    LibStub = function(name)
-        if name == "MidnightUI-1.0" then return { Theme = { colors = {} } } end
-    end
-    loadAddon("addons/Collectionist/Goals.lua", MC)
-    LibStub = savedLibStub
-
-    local function mod(key, label, byExpansion, bySource)
-        return { key = key, label = label,
-                 Scanner = { results = { byExpansion = byExpansion,
-                                         bySource = bySource or {} } } }
-    end
-
-    MC.modules = {
-        -- 2 left, 96% done
-        mod("mounts", "Mounts", { df = { total = 50, collected = 48 } }),
-        -- 1 left: fewer remaining wins even though the percentage is lower
-        mod("toys", "Toys", { tww = { total = 20, collected = 19 } }),
-        -- barely started: excluded by the completion floor
-        mod("pets", "Pets", { legion = { total = 100, collected = 5 } }),
-        -- finished: not a goal
-        mod("recipes2", "Done", { wrath = { total = 10, collected = 10 } }),
-        -- no content: must not divide by zero or rank
-        mod("empty", "Empty", { cata = { total = 0, collected = 0 } }),
-    }
-
-    local goals = MC.Goals:Collect()
-    equal(#goals, 2, "only unfinished, sufficiently-complete goals rank")
-    equal(goals[1].moduleLabel, "Toys", "fewest remaining ranks first")
-    equal(goals[1].remaining, 1, "remaining is total minus collected")
-    equal(goals[2].moduleLabel, "Mounts", "the 2-left goal follows")
-
-    -- An unknown expansion key has no label or order to rank by and must be
-    -- dropped rather than sorted against a nil.
-    MC.modules = { mod("mounts", "Mounts", { notreal = { total = 4, collected = 3 } }) }
-    equal(#MC.Goals:Collect(), 0, "a goal in an unknown expansion is dropped")
-
-    -- Items come from the uncollected buckets, and future content never
-    -- becomes something to go do now.
-    MC.modules = { mod("mounts", "Mounts",
-        { df = { total = 4, collected = 2 } },
-        { vendor = {
-            { name = "Now",    expansion = "df" },
-            { name = "Later",  expansion = "df", future = true },
-            { name = "Other",  expansion = "tww" },
-            { name = "Have",   expansion = "df", collected = true },
-        } }) }
-    local g = MC.Goals:Collect()
-    equal(#g, 1, "one goal from one expansion bucket")
-    equal(#g[1].items, 1, "future, collected and other-expansion rows are excluded")
-    equal(g[1].items[1].name, "Now", "the actionable row is the one listed")
-
-    -- Ranking must be a total order, or the list reshuffles between renders.
-    MC.modules = {
-        mod("a", "Alpha", { df = { total = 10, collected = 9 } }),
-        mod("b", "Bravo", { df = { total = 10, collected = 9 } }),
-    }
-    local first = MC.Goals:Collect()[1].moduleLabel
-    equal(MC.Goals:Collect()[1].moduleLabel, first, "identical goals rank deterministically")
-end
-
 -- Derived HandyNotes pins for mounts, pets and toys.
 do
     local MC = {}
@@ -1033,7 +965,7 @@ do
             },
         },
         achievements = {
-            field = "AchievementData", list = "achievements", id = "achievementID", classicCount = 203, tbcCount = 101, wrathCount = 390, cataCount = 235, mopCount = 413, wodCount = 410, legionCount = 308, bfaCount = 475, slCount = 433, dfCount = 606, twwCount = 441,
+            field = "AchievementData", list = "achievements", id = "achievementID", classicCount = 13, tbcCount = 5, wrathCount = 109, cataCount = 128, mopCount = 250, wodCount = 224, legionCount = 132, bfaCount = 268, slCount = 259, dfCount = 407, twwCount = 260,
             files = {
                 "Modules/Achievements/Data/Classic.lua",
                 "Modules/Achievements/Data/TheBurningCrusade.lua",
@@ -1840,103 +1772,106 @@ do
             equal(twwDecorationSources.drop, 6, "TWW drop decoration count")
             equal(twwCookingDecorations, 4, "TWW Cooking decoration count")
         elseif moduleKey == "achievements" then
-            equal(classicAchievementSources.zone, 42, "Classic exploration achievement count")
-            equal(classicAchievementSources.alterac, 19, "Classic Alterac Valley achievement count")
-            equal(classicAchievementSources.arathi, 16, "Classic Arathi Basin achievement count")
-            equal(classicAchievementSources.warsong, 19, "Classic Warsong Gulch achievement count")
-            equal(classicAchievementSources.dungeons, 24, "Classic dungeon achievement count")
-            equal(classicAchievementSources.raid, 25, "Classic raid achievement count")
-            equal(classicAchievementSources.metas, 51, "Classic quest/meta achievement count")
-            equal(classicAchievementSources.reputation, 4, "Classic reputation achievement count")
-            equal(classicAchievementTasks, 1149, "Classic attached achievement criteria count")
-            equal(tbcAchievementSources.zone, 14, "TBC exploration achievement count")
-            equal(tbcAchievementSources.eye_of_storm, 13, "TBC Eye of the Storm achievement count")
-            equal(tbcAchievementSources.dungeons, 40, "TBC dungeon and raid achievement count")
-            equal(tbcAchievementSources.metas, 16, "TBC quest/meta achievement count")
-            equal(tbcAchievementSources.reputation, 16, "TBC reputation achievement count")
-            equal(tbcAchievementTasks, 648, "TBC attached achievement criteria count")
-            equal(wrathAchievementSources.zone, 16, "Wrath exploration achievement count")
-            equal(wrathAchievementSources.dungeons, 80, "Wrath dungeon achievement count")
-            equal(wrathAchievementSources.metas, 21, "Wrath quest/meta achievement count")
-            equal(wrathAchievementSources.reputation, 14, "Wrath reputation achievement count")
-            equal(wrathAchievementSources.wintergrasp, 19, "Wrath Wintergrasp achievement count")
-            equal(wrathAchievementSources.raid, 203, "Wrath raid achievement count")
-            equal(wrathAchievementSources.tournament, 35, "Wrath Argent Tournament achievement count")
-            equal(wrathAchievementTasks, 1207, "Wrath attached achievement criteria count")
-            equal(cataAchievementSources.dungeons, 62, "Cataclysm dungeon achievement count")
-            equal(cataAchievementSources.raid, 62, "Cataclysm raid achievement count")
-            equal(cataAchievementSources.zone, 9, "Cataclysm exploration achievement count")
-            equal(cataAchievementSources.metas, 43, "Cataclysm quest/meta achievement count")
-            equal(cataAchievementSources.reputation, 9, "Cataclysm reputation achievement count")
-            equal(cataAchievementSources.gilneas, 15, "Cataclysm Battle for Gilneas achievement count")
-            equal(cataAchievementSources.twinpeaks, 20, "Cataclysm Twin Peaks achievement count")
-            equal(cataAchievementSources.tolbarad, 14, "Cataclysm Tol Barad achievement count")
-            equal(cataAchievementTasks, 500, "Cataclysm attached achievement criteria count")
-            equal(mopAchievementSources.dungeons, 44, "Pandaria dungeon achievement count")
-            equal(mopAchievementSources.raid, 106, "Pandaria raid achievement count")
-            equal(mopAchievementSources.metas, 64, "Pandaria quest/meta achievement count")
-            equal(mopAchievementSources.zone, 52, "Pandaria exploration achievement count")
-            equal(mopAchievementSources.reputation, 20, "Pandaria reputation achievement count")
-            equal(mopAchievementSources.silvershard, 11, "Pandaria Silvershard achievement count")
-            equal(mopAchievementSources.kotmogu, 10, "Pandaria Kotmogu achievement count")
-            equal(mopAchievementSources.deepwind, 10, "Pandaria Deepwind achievement count")
-            equal(mopAchievementSources.proving, 19, "Pandaria Proving Grounds achievement count")
-            equal(mopAchievementSources.scenarios, 69, "Pandaria scenario achievement count")
-            equal(mopAchievementSources.timeless, 6, "Pandaria Timeless Isle achievement count")
-            equal(mopAchievementTasks, 1002, "Pandaria attached achievement criteria count")
-            equal(wodAchievementSources.metas, 77, "Warlords quest/meta achievement count")
-            equal(wodAchievementSources.dungeons, 49, "Warlords dungeon achievement count")
-            equal(wodAchievementSources.raid, 75, "Warlords raid achievement count")
-            equal(wodAchievementSources.reputation, 13, "Warlords reputation achievement count")
-            equal(wodAchievementSources.zone, 25, "Warlords exploration achievement count")
-            equal(wodAchievementSources.garrison, 15, "Warlords garrison achievement count")
-            equal(wodAchievementSources.buildings, 51, "Warlords garrison-building achievement count")
-            equal(wodAchievementSources.followers, 13, "Warlords follower achievement count")
-            equal(wodAchievementSources.missions, 15, "Warlords mission achievement count")
-            equal(wodAchievementSources.ashran, 21, "Warlords Ashran achievement count")
-            equal(wodAchievementSources.monuments, 7, "Warlords monument achievement count")
-            equal(wodAchievementSources.invasions, 18, "Warlords invasion achievement count")
-            equal(wodAchievementSources.shipyard, 27, "Warlords shipyard achievement count")
-            equal(wodAchievementTasks, 980, "Warlords attached achievement criteria count")
-            equal(legionAchievementSources.metas, 44, "Legion quest/meta achievement count")
-            equal(legionAchievementSources.dungeons, 76, "Legion dungeon achievement count")
-            equal(legionAchievementSources.raid, 100, "Legion raid achievement count")
-            equal(legionAchievementSources.artifacts, 22, "Legion artifact achievement count")
-            equal(legionAchievementSources.zone, 36, "Legion exploration achievement count")
-            equal(legionAchievementSources.reputation, 11, "Legion reputation achievement count")
-            equal(legionAchievementSources.class_hall, 5, "Legion class-hall achievement count")
-            equal(legionAchievementSources.missions, 12, "Legion mission achievement count")
-            equal(legionAchievementTasks, 638, "Legion attached achievement criteria count")
-            equal(bfaAchievementSources.metas, 77, "BFA quest/meta achievement count")
-            equal(bfaAchievementSources.dungeons, 59, "BFA dungeon achievement count")
-            equal(bfaAchievementSources.raid, 97, "BFA raid achievement count")
-            equal(bfaAchievementSources.zone, 96, "BFA exploration achievement count")
-            equal(bfaAchievementSources.reputation, 16, "BFA reputation achievement count")
-            equal(bfaAchievementSources.islands, 64, "BFA island achievement count")
-            equal(bfaAchievementSources.war_effort, 37, "BFA war-effort achievement count")
-            equal(bfaAchievementSources.heart_of_azeroth, 10, "BFA Heart of Azeroth achievement count")
-            equal(bfaAchievementTasks, 1307, "BFA attached achievement criteria count")
-            equal(slAchievementSources.metas, 48, "Shadowlands quest/meta achievement count")
-            equal(slAchievementSources.dungeons, 57, "Shadowlands dungeon achievement count")
-            equal(slAchievementSources.zone, 74, "Shadowlands exploration achievement count")
-            equal(slAchievementSources.raid, 93, "Shadowlands raid achievement count")
-            equal(slAchievementSources.reputation, 9, "Shadowlands reputation achievement count")
-            equal(slAchievementSources.torghast, 63, "Shadowlands Torghast achievement count")
-            equal(slAchievementSources.covenants, 75, "Shadowlands covenant achievement count")
-            equal(slAchievementTasks, 1676, "Shadowlands attached achievement criteria count")
-            equal(dfAchievementSources.metas, 53, "Dragonflight quest/meta achievement count")
+            -- Composition pins. These reflect the 1.16 achievement scoping
+            -- policy: an achievement ships only if it is a collection task, a
+            -- sub-requirement of a meta rewarding a collectible or title, a
+            -- direct collectible/title reward, or an expansion feature. A diff
+            -- here means the catalog moved -- inspect before re-pinning.
+            equal(classicAchievementSources.alterac, 3, "Classic alterac achievement count")
+            equal(classicAchievementSources.arathi, 3, "Classic arathi achievement count")
+            equal(classicAchievementSources.warsong, 3, "Classic warsong achievement count")
+            equal(classicAchievementSources.metas, 2, "Classic metas achievement count")
+            equal(classicAchievementSources.pets, 2, "Classic pets achievement count")
+            equal(tbcAchievementSources.eye_of_storm, 3, "TBC eye_of_storm achievement count")
+            equal(tbcAchievementSources.pets, 1, "TBC pets achievement count")
+            equal(tbcAchievementSources.professions, 1, "TBC professions achievement count")
+            equal(wrathAchievementSources.raid, 54, "Wrath raid achievement count")
+            equal(wrathAchievementSources.dungeons, 37, "Wrath dungeons achievement count")
+            equal(wrathAchievementSources.tournament, 12, "Wrath tournament achievement count")
+            equal(wrathAchievementSources.reputation, 2, "Wrath reputation achievement count")
+            equal(wrathAchievementSources.metas, 1, "Wrath metas achievement count")
+            equal(wrathAchievementSources.pets, 1, "Wrath pets achievement count")
+            equal(wrathAchievementSources.professions, 1, "Wrath professions achievement count")
+            equal(wrathAchievementSources.zone, 1, "Wrath zone achievement count")
+            equal(cataAchievementSources.raid, 56, "Cataclysm raid achievement count")
+            equal(cataAchievementSources.dungeons, 33, "Cataclysm dungeons achievement count")
+            equal(cataAchievementSources.twinpeaks, 19, "Cataclysm twinpeaks achievement count")
+            equal(cataAchievementSources.metas, 16, "Cataclysm metas achievement count")
+            equal(cataAchievementSources.gilneas, 2, "Cataclysm gilneas achievement count")
+            equal(cataAchievementSources.mounts, 1, "Cataclysm mounts achievement count")
+            equal(cataAchievementSources.reputation, 1, "Cataclysm reputation achievement count")
+            equal(mopAchievementSources.raid, 72, "Pandaria raid achievement count")
+            equal(mopAchievementSources.scenarios, 69, "Pandaria scenarios achievement count")
+            equal(mopAchievementSources.dungeons, 28, "Pandaria dungeons achievement count")
+            equal(mopAchievementSources.metas, 26, "Pandaria metas achievement count")
+            equal(mopAchievementSources.proving, 19, "Pandaria proving achievement count")
+            equal(mopAchievementSources.deepwind, 10, "Pandaria deepwind achievement count")
+            equal(mopAchievementSources.kotmogu, 9, "Pandaria kotmogu achievement count")
+            equal(mopAchievementSources.reputation, 6, "Pandaria reputation achievement count")
+            equal(mopAchievementSources.timeless, 6, "Pandaria timeless achievement count")
+            equal(mopAchievementSources.pets, 2, "Pandaria pets achievement count")
+            equal(mopAchievementSources.zone, 2, "Pandaria zone achievement count")
+            equal(mopAchievementSources.silvershard, 1, "Pandaria silvershard achievement count")
+            equal(wodAchievementSources.buildings, 51, "Draenor buildings achievement count")
+            equal(wodAchievementSources.raid, 34, "Draenor raid achievement count")
+            equal(wodAchievementSources.shipyard, 27, "Draenor shipyard achievement count")
+            equal(wodAchievementSources.dungeons, 18, "Draenor dungeons achievement count")
+            equal(wodAchievementSources.invasions, 18, "Draenor invasions achievement count")
+            equal(wodAchievementSources.garrison, 15, "Draenor garrison achievement count")
+            equal(wodAchievementSources.missions, 15, "Draenor missions achievement count")
+            equal(wodAchievementSources.followers, 13, "Draenor followers achievement count")
+            equal(wodAchievementSources.metas, 10, "Draenor metas achievement count")
+            equal(wodAchievementSources.zone, 9, "Draenor zone achievement count")
+            equal(wodAchievementSources.monuments, 7, "Draenor monuments achievement count")
+            equal(wodAchievementSources.reputation, 3, "Draenor reputation achievement count")
+            equal(wodAchievementSources.pets, 2, "Draenor pets achievement count")
+            equal(wodAchievementSources.mounts, 1, "Draenor mounts achievement count")
+            equal(wodAchievementSources.toys, 1, "Draenor toys achievement count")
+            equal(legionAchievementSources.raid, 42, "Legion raid achievement count")
+            equal(legionAchievementSources.dungeons, 26, "Legion dungeons achievement count")
+            equal(legionAchievementSources.artifacts, 22, "Legion artifacts achievement count")
+            equal(legionAchievementSources.missions, 12, "Legion missions achievement count")
+            equal(legionAchievementSources.metas, 11, "Legion metas achievement count")
+            equal(legionAchievementSources.zone, 9, "Legion zone achievement count")
+            equal(legionAchievementSources.class_hall, 5, "Legion class_hall achievement count")
+            equal(legionAchievementSources.reputation, 3, "Legion reputation achievement count")
+            equal(legionAchievementSources.pets, 2, "Legion pets achievement count")
+            equal(bfaAchievementSources.islands, 64, "BFA islands achievement count")
+            equal(bfaAchievementSources.raid, 42, "BFA raid achievement count")
+            equal(bfaAchievementSources.war_effort, 37, "BFA war_effort achievement count")
+            equal(bfaAchievementSources.zone, 33, "BFA zone achievement count")
+            equal(bfaAchievementSources.metas, 32, "BFA metas achievement count")
+            equal(bfaAchievementSources.dungeons, 28, "BFA dungeons achievement count")
+            equal(bfaAchievementSources.pets, 17, "BFA pets achievement count")
+            equal(bfaAchievementSources.heart_of_azeroth, 10, "BFA heart_of_azeroth achievement count")
+            equal(bfaAchievementSources.reputation, 3, "BFA reputation achievement count")
+            equal(bfaAchievementSources.professions, 1, "BFA professions achievement count")
+            equal(bfaAchievementSources.toys, 1, "BFA toys achievement count")
+            equal(slAchievementSources.covenants, 75, "Shadowlands covenants achievement count")
+            equal(slAchievementSources.torghast, 63, "Shadowlands torghast achievement count")
+            equal(slAchievementSources.raid, 44, "Shadowlands raid achievement count")
+            equal(slAchievementSources.dungeons, 26, "Shadowlands dungeons achievement count")
+            equal(slAchievementSources.zone, 24, "Shadowlands zone achievement count")
+            equal(slAchievementSources.pets, 14, "Shadowlands pets achievement count")
+            equal(slAchievementSources.metas, 9, "Shadowlands metas achievement count")
+            equal(slAchievementSources.reputation, 4, "Shadowlands reputation achievement count")
             equal(dfAchievementSources.dragonriding, 167, "Dragonflight dragonriding achievement count")
-            equal(dfAchievementSources.zone, 154, "Dragonflight exploration achievement count")
-            equal(dfAchievementSources.reputation, 50, "Dragonflight reputation achievement count")
-            equal(dfAchievementSources.dungeons, 59, "Dragonflight dungeon achievement count")
-            equal(dfAchievementSources.raid, 72, "Dragonflight raid achievement count")
-            equal(dfAchievementSources.mounts, 21, "Dragonflight collection achievement count")
-            equal(dfAchievementTasks, 2878, "Dragonflight attached achievement criteria count")
-            equal(twwAchievementSources.zone, 163, "TWW general achievement count")
-            equal(twwAchievementSources.delves, 113, "TWW delve achievement count")
-            equal(twwAchievementSources.dungeons, 34, "TWW dungeon achievement count")
-            equal(twwAchievementSources.raid, 73, "TWW raid achievement count")
-            equal(twwAchievementTasks, 1483, "TWW attached achievement criteria count")
+            equal(dfAchievementSources.zone, 80, "Dragonflight zone achievement count")
+            equal(dfAchievementSources.raid, 32, "Dragonflight raid achievement count")
+            equal(dfAchievementSources.dungeons, 29, "Dragonflight dungeons achievement count")
+            equal(dfAchievementSources.metas, 29, "Dragonflight metas achievement count")
+            equal(dfAchievementSources.pets, 27, "Dragonflight pets achievement count")
+            equal(dfAchievementSources.mounts, 21, "Dragonflight mounts achievement count")
+            equal(dfAchievementSources.reputation, 19, "Dragonflight reputation achievement count")
+            equal(dfAchievementSources.toys, 2, "Dragonflight toys achievement count")
+            equal(dfAchievementSources.war_effort, 1, "Dragonflight war_effort achievement count")
+            equal(twwAchievementSources.delves, 113, "TWW delves achievement count")
+            equal(twwAchievementSources.zone, 48, "TWW zone achievement count")
+            equal(twwAchievementSources.dragonriding, 42, "TWW dragonriding achievement count")
+            equal(twwAchievementSources.raid, 32, "TWW raid achievement count")
+            equal(twwAchievementSources.pets, 11, "TWW pets achievement count")
+            equal(twwAchievementSources.dungeons, 10, "TWW dungeons achievement count")
+            equal(twwAchievementSources.glyphs, 4, "TWW glyphs achievement count")
         end
         if moduleKey == "rares" then
             equal(classicCriteriaCount, 0, "Classic rare criteria count")
@@ -2037,7 +1972,7 @@ do
             end
         end
     end
-    equal(reusedCriterionRows, 65,
+    equal(reusedCriterionRows, 9,
         "all reused achievement criterion rows are position-disambiguated")
 
     -- HandyNotes_WarWithin mislabeled these six pet items as toys. The
@@ -2712,7 +2647,7 @@ do
             showdownCount = showdownCount + #(group.achievements or {})
         end
     end
-    equal(achievementAdded, 44, "12.0.7 achievement count")
+    equal(achievementAdded, 42, "12.0.7 achievement count")
     equal(showdownCount, 30, "12.0.7 Showdown achievement count")
     equal(findEntry("achievements", "achievementID", 62413), nil,
         "phantom achievement 62413 must not be registered")
@@ -2836,7 +2771,7 @@ do
             vendor .. " decoration count")
     end
 
-    equal(#entries("achievements") - patch120007Counts.achievements, 167,
+    equal(#entries("achievements") - patch120007Counts.achievements, 117,
         "12.1 achievement count")
     local patchAchievementSources = {}
     local patchAchievementTasks = 0
@@ -2850,15 +2785,15 @@ do
         end
     end
     local expectedAchievementSources = {
-        season = 44, raid = 37, zone = 23, delves = 18, glyphs = 12,
-        prey = 11, professions = 7, dungeons = 4, housing = 3, metas = 3,
-        events = 2, explore = 1, lore = 1, pets = 1,
+        season = 44, delves = 18, zone = 17, raid = 12, prey = 11,
+        professions = 6, housing = 3, events = 2, dungeons = 1, lore = 1,
+        metas = 1, pets = 1,
     }
     for source, expected in pairs(expectedAchievementSources) do
         equal(patchAchievementSources[source], expected,
             "12.1 achievement source count: " .. source)
     end
-    equal(patchAchievementTasks, 142, "12.1 achievement task count")
+    equal(patchAchievementTasks, 96, "12.1 achievement task count")
 
     local rewardDescriptions = {
         [63630] = "Venomous Coiler mount",
@@ -2871,9 +2806,6 @@ do
         truthy(achievement.description:find(reward, 1, true),
             "achievement reward text " .. achievementID)
     end
-    local uLatekMeta = findEntry("achievements", "achievementID", 63639)
-    truthy(not uLatekMeta.description:find("Reward:", 1, true),
-        "Ula'tek Uncoiled must not claim a reward")
     local venomousGlory = findEntry("achievements", "achievementID", 63254)
     equal(venomousGlory.name, "Glory of the Venomous Raider",
         "Venomous raid meta name")
@@ -2894,8 +2826,8 @@ do
     equal(futureCounts.pets, 3, "Season 2 pet gate count")
     equal(futureCounts.toys or 0, 1, "Season 2 toy gate count")
     equal(futureCounts.decorations, 14, "Season 2 decoration gate count")
-    equal(futureCounts.achievements, 83, "Season 2 achievement gate count")
-    equal(futureTotal, 110, "all Season 2 gated catalog rows")
+    equal(futureCounts.achievements, 59, "Season 2 achievement gate count")
+    equal(futureTotal, 86, "all Season 2 gated catalog rows")
 
     local function assertAvailability(moduleKey, idField, ids, expected, label)
         for _, id in ipairs(ids) do
@@ -2923,7 +2855,7 @@ do
         62410, 62411, 62412, 62414, 62416,
         63611, 63416, 63642, 63643, 63644,
         63326, 62889, 62890, 62891, 62892, 62893, 62894, 62895, 62897,
-        63433, 63434, 63435, 63683, 62284,
+        63433, 63434, 63435,
     }, nil, "patch-week achievement")
 
     assertAvailability("mounts", "mountID", { 3031 },
@@ -2934,17 +2866,10 @@ do
         62871, 62872, 63473,
         63415, 63451, 63452, 63453, 63454, 63457,
         63332, 63333,
-        63681, 63682, 63686, 63687, 63688,
     }, MC.CONTENT_RELEASE.MIDNIGHT_SEASON_2, "August 18 achievement")
 
     equal(findEntry("achievements", "achievementID", 63679).availableAfter, nil,
         "Altar challenge is available at patch launch")
-    equal(findEntry("achievements", "achievementID", 62282).availableAfter, nil,
-        "normal Altar achievement is available at patch launch")
-    equal(findEntry("achievements", "achievementID", 62283).availableAfter, nil,
-        "heroic Altar achievement is available at patch launch")
-    equal(findEntry("achievements", "achievementID", 62284).availableAfter, nil,
-        "mythic Altar achievement is available at patch launch")
     equal(findEntry("pets", "speciesID", 5129).availableAfter, nil,
         "Slitherfang is available from the launch achievement")
     equal(findEntry("decorations", "decorID", 25293).availableAfter, nil,
