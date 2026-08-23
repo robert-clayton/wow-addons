@@ -258,5 +258,27 @@ do
        "no row states its renown requirement in both sourceInfo and the renown field")
 end
 
+-- Premium is the default shell, including for anyone upgrading from before it
+-- existed. Nothing writes uiStyle except SetUIStyle, so an untouched install
+-- has it nil and falls through to the default.
+--
+-- Real empty tables, not the harness stub: the permissive environment answers
+-- every field with a truthy placeholder, so CollectionistDB.uiStyle would read
+-- as "set" and the fallback would never be exercised.
+do
+    local savedDB, savedMCdb = ENV.CollectionistDB, MC.db
+    ENV.CollectionistDB = {}
+    MC.db = {}
+    ok(type(MC.GetUIStyle) == "function", "the shell accessor loaded")
+    ok(MC.GetUIStyle and MC.GetUIStyle() == "premium",
+       "an install that never chose a shell gets premium")
+
+    -- A deliberate choice still wins; a default is not a reset.
+    MC.db.uiStyle = "classic"
+    ok(MC.GetUIStyle() == "classic", "an explicit classic choice is respected")
+
+    ENV.CollectionistDB, MC.db = savedDB, savedMCdb
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

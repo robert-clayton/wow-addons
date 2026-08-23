@@ -1,8 +1,8 @@
 local _, MC = ...
 
 --------------------------------------------------------------------------
--- UI style (shell) axis: "classic" (default, the compact panel) vs
--- "premium" (the application-style shell). Storage mirrors the theme
+-- UI style (shell) axis: "premium" (default, the application-style shell) vs
+-- "classic" (the compact panel). Storage mirrors the theme
 -- accessors exactly (Core.lua GetTheme/SetTheme): account-wide primary,
 -- per-char fallback, dual-write; the PLAYER_LOGOUT snapshot propagates
 -- it to alts.
@@ -13,10 +13,20 @@ local _, MC = ...
 -- registry, the shared frame pool, and CreatePanel's one-shot indicator
 -- chain). A /reload resets all five for free.
 --------------------------------------------------------------------------
+-- Premium is the default, and that default reaches everyone upgrading from
+-- before it existed. Nothing writes uiStyle except SetUIStyle, which returns
+-- early when the value already matches -- so the key is nil for anyone who has
+-- not deliberately picked a shell, and the fallback below is what they get.
+-- v1.12.1 was tagged two hours before the premium shell was written, so no
+-- 1.12 install can hold a stored "classic": theirs is nil and they land here.
+--
+-- Someone who ran /mc style classic AFTER premium shipped DID choose, and that
+-- choice is stored and still wins. Overriding it would be resetting a
+-- preference, not changing a default.
 function MC.GetUIStyle()
     return (CollectionistDB and CollectionistDB.uiStyle)
         or (MC.db and MC.db.uiStyle)
-        or "classic"
+        or "premium"
 end
 
 function MC.SetUIStyle(name)

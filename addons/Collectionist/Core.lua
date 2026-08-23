@@ -2698,7 +2698,7 @@ function MC.BuildConfig()
             { label = "Simple (compact)", value = "classic" },
             { label = "Premium", value = "premium" },
         },
-        get = function() return MC.GetUIStyle and MC.GetUIStyle() or "classic" end,
+        get = function() return MC.GetUIStyle and MC.GetUIStyle() or "premium" end,
         set = function(v) if MC.SetUIStyle then MC.SetUIStyle(v) end end }
     defs[#defs + 1] = { type = "slider", label = "Background Opacity", min = 0.1, max = 1.0, step = 0.05,
         get = function() return MC.db.frameAlpha or 1.0 end,
@@ -2885,7 +2885,7 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
     elseif cmd == "style" then
         local a = (arg or ""):lower()
         if a == "" or a == "status" then
-            print(format("%s UI style: %s", PREFIX, MC.GetUIStyle and MC.GetUIStyle() or "classic"))
+            print(format("%s UI style: %s", PREFIX, MC.GetUIStyle and MC.GetUIStyle() or "premium"))
             print("    available: classic, premium (takes effect after /reload)")
         elseif (a == "classic" or a == "premium") and MC.SetUIStyle then
             MC.SetUIStyle(a)

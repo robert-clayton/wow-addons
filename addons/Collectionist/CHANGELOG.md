@@ -1,5 +1,6 @@
 # 1.16.0
 ### Changed
+- **The Premium shell is now the default.** If you never picked a window style you'll come back to the sidebar layout instead of the compact panel. If you deliberately chose Simple, you keep it — Options > Appearance still switches either way.
 - **Big tabs open instantly now.** Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can actually see are built now, so switching tabs is immediate no matter how much you track.
 - **Much lighter on memory.** The search index is no longer built at all until you actually search — it was the single largest thing the addon held, and most sessions never used it. Item tooltips keep working: they use a much smaller lookup of their own. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.
 - Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.
