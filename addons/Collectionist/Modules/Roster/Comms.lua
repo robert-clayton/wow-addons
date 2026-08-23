@@ -308,7 +308,12 @@ local function newBitmapGeneration(fingerprint, payload)
         stamp = lastBitmapGenerationStamp + 1
     end
     lastBitmapGenerationStamp = stamp
-    return format("%d-%d-%s", stamp, #payload,
+    -- %.0f, not %d. The stamp is an epoch in MILLISECONDS -- about 1.79e12 --
+    -- and %d asks the runtime to convert the double to an integer, which
+    -- overflows and raises "integer overflow attempting to store". %f formats
+    -- the double directly and, with zero precision, emits exactly the same
+    -- digits, so the wire format and parseBitmapGeneration are unchanged.
+    return format("%.0f-%d-%s", stamp, #payload,
         bitmapPayloadHash(fingerprint, payload))
 end
 

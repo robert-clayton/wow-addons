@@ -352,6 +352,31 @@ do
     equal(total, 519, "shipped pin count (high-confidence tier only)")
 end
 
+-- Bitmap generation stamps are epoch MILLISECONDS, ~1.79e12. string.format
+-- with %d asks the runtime to convert that double to an integer, and WoW's
+-- raises "integer overflow attempting to store" -- while the LuaJIT on this
+-- machine happily formats it, so the bug is invisible here. The contract that
+-- can be tested is the one that matters: the emitted text must be plain digits
+-- and must parse back, whichever formatter produced it.
+do
+    local stamp = 1787482391114
+    local generation = string.format("%.0f-%d-%s", stamp, 1430, "8593ad12")
+    equal(generation, "1787482391114-1430-8593ad12",
+        "a millisecond stamp formats without scientific notation or rounding")
+    local gs, gl, gh = generation:match("^(%d+)%-(%d+)%-(%x+)$")
+    equal(tonumber(gs), stamp, "the stamp round-trips through the wire format")
+    equal(tonumber(gl), 1430, "the payload length round-trips")
+    equal(gh, "8593ad12", "the hash round-trips")
+
+    -- And the source must not reintroduce %d for the stamp.
+    local fh = assert(io.open("addons/Collectionist/Modules/Roster/Comms.lua", "r"))
+    local src = fh:read("*a")
+    fh:close()
+    truthy(src:find('format("%%.0f%-%%d%-%%s"', 1, false) ~= nil
+           or src:find('format("%.0f-%d-%s"', 1, true) ~= nil,
+        "the generation stamp is formatted with %.0f, not %d")
+end
+
 do
     local MC = {}
     GetCurrentRegion = function() return 1 end

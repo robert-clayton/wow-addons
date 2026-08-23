@@ -2490,9 +2490,14 @@ function MC.RefreshActive()
     -- scans, theme switches, resizes, filter changes. While Options owns
     -- the content area it is the thing that has to be redrawn; letting a
     -- module render would paint a tracker list over it.
+    -- Every early return below still has to settle the sort chip: it is hidden
+    -- on these views, and RefreshActive is what runs when one is entered.
+    -- Leaving it to the tracker path meant the chip survived the switch and sat
+    -- on top of the page title.
     if MC.IsOptionsSelected() then
         MC.QueueConfigRebuild()
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
         return
     end
     -- While search owns the content area, a stale-path refresh re-runs the
@@ -2501,12 +2506,14 @@ function MC.RefreshActive()
     if MC.IsSearchSelected() then
         if MC.Search and MC.Search.RefreshResults then MC.Search:RefreshResults() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
         return
     end
     -- Goals rank live scanner output, so a rescan has to redraw them too.
     if MC.IsGoalsSelected() then
         if MC.Goals then MC.Goals:Render() end
         if MC.RefreshScoreIndicator then MC.RefreshScoreIndicator() end
+        if MC.RefreshSortIndicator then MC.RefreshSortIndicator() end
         return
     end
     local mod = MC.modulesByKey[MC.activeModule]

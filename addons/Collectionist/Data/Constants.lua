@@ -121,10 +121,11 @@ MC.SORT_MODES = {
     { key = "default",  label = "Default",      tip = "The order the data ships in" },
     { key = "name_asc", label = "A-Z",          tip = "Name, A to Z" },
     { key = "name_desc", label = "Z-A",         tip = "Name, Z to A" },
-    -- Arrows rather than words: "Expansion Ascending" is too long for a
-    -- control that has to hold a fixed width next to four other labels.
-    { key = "exp_asc",   label = "Expansion ▲", tip = "Expansion, oldest first" },
-    { key = "exp_desc", label = "Expansion ▼", tip = "Expansion, newest first" },
+    -- Words, not arrows. U+25B2/U+25BC rendered as empty boxes in the game's
+    -- font, and a label nobody can read is worse than a longer one. These also
+    -- fit the control's fixed width, which "Expansion ascending" would not.
+    { key = "exp_asc",  label = "Oldest",  tip = "Expansion order, oldest first" },
+    { key = "exp_desc", label = "Newest",  tip = "Expansion order, newest first" },
 }
 
 MC.SORT_MODE_BY_KEY = {}
