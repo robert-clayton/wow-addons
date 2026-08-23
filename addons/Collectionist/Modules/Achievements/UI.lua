@@ -156,6 +156,11 @@ function UI:RenderCollectedGroup(parent, entries, yOff)
 end
 
 function UI:RenderAchievementRow(parent, ach, yOff, isCollected)
+    -- Offscreen: bail before the opts table below is constructed. Lua builds
+    -- it at the call site, so letting RenderItemRow skip saves the frame but
+    -- not the garbage.
+    if MUI.RowHidden(self.panel.pool, yOff, ROW_HEIGHT) then return yOff + ROW_HEIGHT end
+
     local sr, sg, sb = zoneColor()
     -- Show "3/5" progress in the right-side info column. For completed
     -- rows fall back to the zone label since the count is implicit.

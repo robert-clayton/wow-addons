@@ -108,6 +108,11 @@ function UI:RenderZoneSubGroup(parent, zoneName, pets, yOff, sr, sg, sb)
 end
 
 function UI:RenderPetRow(parent, pet, yOff, isCollected)
+    -- Offscreen: bail before the opts table below is constructed. Lua builds
+    -- it at the call site, so letting RenderItemRow skip saves the frame but
+    -- not the garbage.
+    if MUI.RowHidden(self.panel.pool, yOff, ROW_HEIGHT) then return yOff + ROW_HEIGHT end
+
     local theme = MUI.Theme
     local typeName = MC.PetTypeNames[pet.petType] or ""
     return MUI.RenderItemRow(self.panel.pool, parent, yOff, {

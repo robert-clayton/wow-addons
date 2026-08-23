@@ -58,6 +58,11 @@ function UI:RenderSourceGroup(parent, srcType, entries, yOff)
 end
 
 function UI:RenderTreasureRow(parent, t, yOff, isCollected)
+    -- Offscreen: bail before the opts table below is constructed. Lua builds
+    -- it at the call site, so letting RenderItemRow skip saves the frame but
+    -- not the garbage.
+    if MUI.RowHidden(self.panel.pool, yOff, ROW_HEIGHT) then return yOff + ROW_HEIGHT end
+
     local sr, sg, sb = zoneColor()
     return MUI.RenderItemRow(self.panel.pool, parent, yOff, {
         height      = ROW_HEIGHT,

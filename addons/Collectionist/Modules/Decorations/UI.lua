@@ -99,6 +99,11 @@ function UI:RenderProfSubGroup(parent, skillLine, decos, yOff)
 end
 
 function UI:RenderDecoRow(parent, deco, yOff, isCollected)
+    -- Offscreen: bail before the opts table below is constructed. Lua builds
+    -- it at the call site, so letting RenderItemRow skip saves the frame but
+    -- not the garbage.
+    if MUI.RowHidden(self.panel.pool, yOff, ROW_HEIGHT) then return yOff + ROW_HEIGHT end
+
     local theme = MUI.Theme
     return MUI.RenderItemRow(self.panel.pool, parent, yOff, {
         height      = ROW_HEIGHT,

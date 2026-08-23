@@ -17,7 +17,7 @@ MC.Bitmap = Bitmap
 local MODULE_SECTIONS = { "mounts", "pets", "toys", "decorations", "rares", "treasures" }
 
 -- Per-module ID list (declaration-order). ids[modKey][i] -> canonical
--- ID; indexOf[modKey] is the reverse.
+-- ID.
 local function push(out, id)
     -- Skip falsy IDs — a nil hole here would shift every later bit and
     -- corrupt cross-peer ownership lookups.
@@ -79,13 +79,13 @@ end
 
 local function buildIndex()
     Bitmap.ids = {}
-    Bitmap.indexOf = {}
+    -- No reverse lookup is built. There was one -- Bitmap.indexOf, a full
+    -- id -> position map per module -- and nothing ever read it: Build indexes
+    -- by array position and Decode walks Bitmap.ids. It cost a few hundred KB
+    -- of permanently resident tables at every login to answer a question
+    -- nobody asked.
     for _, modKey in ipairs(MODULE_SECTIONS) do
-        local ids = flattenModuleData(modKey)
-        Bitmap.ids[modKey] = ids
-        local lookup = {}
-        for i, id in ipairs(ids) do lookup[id] = i end
-        Bitmap.indexOf[modKey] = lookup
+        Bitmap.ids[modKey] = flattenModuleData(modKey)
     end
 end
 

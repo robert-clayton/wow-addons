@@ -250,6 +250,11 @@ function UI:RenderLearnedGroup(parent, recipes, skillLine, yOff)
 end
 
 function UI:RenderRecipeRow(parent, recipe, skillLine, yOff, isLearned)
+    -- Offscreen: bail before the opts table below is constructed. Lua builds
+    -- it at the call site, so letting RenderItemRow skip saves the frame but
+    -- not the garbage.
+    if MUI.RowHidden(self.panel.pool, yOff, ROW_HEIGHT) then return yOff + ROW_HEIGHT end
+
     local theme = MUI.Theme
     local sr, sg, sb
     if isLearned then

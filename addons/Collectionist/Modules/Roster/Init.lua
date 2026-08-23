@@ -126,6 +126,14 @@ end
 function MC.RosterPostLogin()
     -- Always run cleanup so a user who briefly had the feature on
     -- ends up with a clean DB even if they later turn it off.
+    --
+    -- Age out stale peers here too. autoForgetDays has been configurable and
+    -- documented since the feature shipped, but the only thing that ever
+    -- applied it was the "/mc sharing prune" slash command -- so a peer seen
+    -- once, years ago, stayed in SavedVariables forever. Cheap while peer
+    -- records are small; the point is that it stays that way once peers start
+    -- sending v2 bitmaps, which are three orders of magnitude larger.
+    if MC.RosterPrune then MC.RosterPrune() end
     if MC.RosterDB then
         for k, v in pairs(MC.RosterDB) do
             if type(k) == "string" and k:sub(1, 1) == "_" then

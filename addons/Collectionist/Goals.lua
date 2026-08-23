@@ -185,6 +185,11 @@ function Goals:Render()
 
         if not collapsed then
             for _, entry in ipairs(goal.items) do
+                -- Skip before the opts table is built; Lua constructs it at
+                -- the call site regardless of what RenderItemRow decides.
+                if MUI.RowHidden(panel.pool, yOff, ROW_H) then
+                    yOff = yOff + ROW_H
+                else
                 local sr, sg, sb = theme:SourceColor(entry.source)
                 yOff = MUI.RenderItemRow(panel.pool, child, yOff, {
                     height  = ROW_H,
@@ -207,6 +212,7 @@ function Goals:Render()
                         end
                     end,
                 })
+                end
             end
             if goal.truncated then
                 yOff = MUI.RenderItemRow(panel.pool, child, yOff, {

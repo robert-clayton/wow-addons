@@ -129,14 +129,17 @@ ok(poolC.acquired < ROWS / 10, "scrolled build count stays small")
 local viewportRows = math.ceil(400 / ROW_H)
 ok(poolC.acquired > viewportRows, "built slice exceeds the bare viewport (overscan present)")
 
--- 5. A zero-height scroll frame (panel not yet laid out) must not window,
---    or the first paint after login would render nothing at all.
+-- 5. A zero-height scroll frame -- a panel that has not been laid out yet --
+--    must fail CLOSED. Failing open leaves the window nil, nothing counts as
+--    offscreen, and the whole tab builds real frames. WoW never frees a frame,
+--    so that is permanent residency bought by a transient measurement.
 local unsized = newRegion()
 unsized:SetHeight(0)
 local poolD = newPool()
 MUI.BeginRenderPass(poolD, unsized)
 renderAll(poolD, parent)
-equal(poolD.acquired, ROWS, "unsized viewport falls back to building everything")
+ok(poolD.acquired > 0, "an unsized viewport still paints something")
+ok(poolD.acquired < ROWS / 10, "an unsized viewport does NOT build the whole list")
 
 -- 6. Passing no scroll frame clears any previous window rather than keeping a
 --    stale one, which would silently blank an unrelated consumer's list.
@@ -146,5 +149,64 @@ poolE._winTop = 999999
 MUI.BeginRenderPass(poolE, nil)
 equal(poolE._winTop, nil, "a pass with no scroll frame clears the window")
 
-print(string.format("\n%d passed, %d failed", pass, fail))
+-- 7. The allocation, not just the frame count. Windowing originally checked
+--    inside RenderItemRow, but Lua builds the caller's table constructor
+--    BEFORE the call -- so every row still allocated an opts table, its
+--    sub-tables and two closures. A Recipes pass cost ~9 MB of garbage while
+--    painting 63 rows, and that pass re-runs on scroll. lib.RowHidden lets the
+--    caller skip the constructor entirely.
+--
+--    Both paths below build the SAME row. Comparing a lean opts table against
+--    a rich one would measure the table, not the guard.
+local function renderRich(pool, parent, guarded)
+    local yOff = 0
+    for i = 1, ROWS do
+        if guarded and MUI.RowHidden(pool, yOff, ROW_H) then
+            yOff = yOff + ROW_H
+        else
+            yOff = MUI.RenderItemRow(pool, parent, yOff, {
+                height  = ROW_H,
+                name    = "Row " .. i,
+                leading = { kind = "dot", size = 6, color = { 1, 1, 1, 1 } },
+                onEnter = function() end,
+                onLeave = function() end,
+            })
+        end
+    end
+    return yOff
+end
+
+scroll:SetVerticalScroll(0)
+
+-- Measure ALLOCATION, not residency. collectgarbage("count") reports the live
+-- heap, so with the collector running it reports whatever survived rather than
+-- what was churned -- which is the number that matters here. Stopping the
+-- collector makes the delta the true allocation for the pass.
+local function measure(guarded)
+    local pool = newPool()
+    collectgarbage("collect")
+    collectgarbage("stop")
+    local before = collectgarbage("count")
+    MUI.BeginRenderPass(pool, scroll)
+    local height = renderRich(pool, parent, guarded)
+    local kb = collectgarbage("count") - before
+    collectgarbage("restart")
+    return kb, height, pool
+end
+
+local unguardedKB, unguardedHeight, poolF = measure(false)
+local guardedKB, guardedHeight, poolG = measure(true)
+
+equal(guardedHeight, fullHeight, "LAYOUT INVARIANT: the guarded path lays out identically")
+equal(unguardedHeight, fullHeight, "and so does the unguarded one")
+equal(poolF.acquired, poolG.acquired, "both paths paint the same number of rows")
+ok(guardedKB < unguardedKB / 4,
+    string.format("guarding at the caller cuts allocation (%.0f KB to %.0f KB)",
+        unguardedKB, guardedKB))
+ok(MUI.RowHidden(poolG, 5000000, ROW_H), "a far-offscreen row reports hidden")
+ok(not MUI.RowHidden(poolG, 0, ROW_H), "a row at the viewport top does not")
+
+print(string.format("  allocation per pass: in-callee skip %.0f KB, caller-guarded %.0f KB",
+    unguardedKB, guardedKB))
+print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

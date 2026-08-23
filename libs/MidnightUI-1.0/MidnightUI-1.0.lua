@@ -573,7 +573,12 @@ function lib.BeginRenderPass(pool, scrollFrame)
     pool._winTop, pool._winBot = nil, nil
     if not scrollFrame then return end
     local viewH = scrollFrame:GetHeight()
-    if not viewH or viewH <= 0 then return end
+    -- Fail CLOSED. A scroll frame that has not been laid out yet reports zero
+    -- height, and leaving the window nil means nothing is offscreen -- so the
+    -- whole tab builds real frames, and WoW never frees a frame once created.
+    -- One screen's worth is the safe assumption; the next scroll or refresh
+    -- repaints with the real measurement.
+    if not viewH or viewH <= 0 then viewH = 800 end
     local off = scrollFrame:GetVerticalScroll() or 0
     pool._winTop = off - OVERSCAN
     pool._winBot = off + viewH + OVERSCAN
@@ -586,6 +591,20 @@ local function offscreen(pool, yOff, height)
     return (yOff + (height or 0)) < top or yOff > pool._winBot
 end
 lib.IsOffscreen = offscreen
+
+-- Callers MUST ask this before building a row, not rely on RenderItemRow to
+-- skip. Lua evaluates a table constructor at the CALL SITE, before the callee
+-- runs, so `RenderItemRow(pool, parent, y, { ... })` has already allocated the
+-- opts table, its colour and leading sub-tables, and the onEnter/onLeave
+-- closures by the time RenderItemRow could decide to skip. Windowing bounded
+-- the frames and left the allocation untouched: a Recipes render pass still
+-- cost ~9 MB of garbage with 63 rows painted, and the pass re-runs on scroll.
+--
+-- Guarding at the top of the caller's row function skips the constructor and
+-- every per-row computation above it.
+function lib.RowHidden(pool, yOff, height)
+    return offscreen(pool, yOff, height)
+end
 
 -- Render a collapsible group header.
 --   opts: { height, indent, collKey, accentR/G/B, label, labelColor, count,

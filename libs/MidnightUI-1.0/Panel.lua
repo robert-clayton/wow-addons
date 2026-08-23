@@ -604,6 +604,14 @@ function PanelProto:_MaybeRepaintWindow()
     if not (pool and pool._winTop and self.scrollFrame) then return end
     local off = self.scrollFrame:GetVerticalScroll() or 0
     if math.abs(off - (pool._winAt or 0)) < 300 then return end
+    -- Distance alone is not enough of a brake. Dragging the scroll thumb runs
+    -- onDrag as an OnUpdate, so UpdateScrollBar -- and therefore this -- is
+    -- reached every frame, and a fast drag clears 300px many times a second.
+    -- A render pass walks every row in the list even when it paints almost
+    -- none of them, so cap the rate as well as the distance.
+    local now = GetTime and GetTime() or 0
+    if now > 0 and (now - (self._repaintAt or 0)) < 0.06 then return end
+    self._repaintAt = now
     if self._repainting then return end
     self._repainting = true
     if self.opts and self.opts.onRefresh then self.opts.onRefresh(self) end
