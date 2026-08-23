@@ -333,24 +333,16 @@ function ShellProto:_CreateHeader()
     titleHit:Hide()
     bar.pageTitleHit = titleHit
 
-    -- A caret, shown only while the title is clickable, so the affordance is
-    -- visible rather than something the player has to discover.
-    local caret = bar:CreateFontString(nil, "OVERLAY")
-    caret:SetFont(theme.font, theme.fontSize - 1, lib.FontFlags())
-    caret:SetPoint("LEFT", title, "RIGHT", 5, -2)
-    caret:SetText("h88")
-    caret:Hide()
-    bar.pageTitleCaret = caret
-
+    -- The hover colour IS the affordance. An icon here would need a glyph the
+    -- game's font can draw or a texture escape, and a glyph it cannot draw
+    -- renders as a box beside the page title.
     titleHit:SetScript("OnEnter", function()
         local c = lib.Theme.colors.accent
         title:SetTextColor(c[1], c[2], c[3])
-        caret:SetTextColor(c[1], c[2], c[3])
     end)
     titleHit:SetScript("OnLeave", function()
         local c = lib.Theme.colors.title
         title:SetTextColor(c[1], c[2], c[3], c[4] or 1)
-        caret:SetTextColor(c[1], c[2], c[3], 0.7)
     end)
     local shell = self
     titleHit:SetScript("OnClick", function()
@@ -1073,12 +1065,8 @@ function ShellProto:_ApplyTitlePicker()
     local on = self.opts.onTitleClick and self:GetViewMode() == "compact"
     if on then
         bar.pageTitleHit:Show()
-        bar.pageTitleCaret:Show()
-        local c = lib.Theme.colors.title
-        bar.pageTitleCaret:SetTextColor(c[1], c[2], c[3], 0.7)
     else
         bar.pageTitleHit:Hide()
-        bar.pageTitleCaret:Hide()
     end
 end
 

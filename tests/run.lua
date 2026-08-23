@@ -377,6 +377,41 @@ do
         "the generation stamp is formatted with %.0f, not %d")
 end
 
+-- A structured renown requirement renders its own live "N/M" line, so the
+-- prose copy in sourceInfo has to come out or the tooltip says it twice.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    -- The helper is a file-local in Core.lua, so exercise it through the real
+    -- strings instead: read them out of the shipped data and assert the shapes
+    -- the tooltip has to handle.
+    local cases = {
+        { "Sergeant Vornin - 1,800 Voidlight Marl, Ritual Sites Renown 6",
+          "Sergeant Vornin - 1,800 Voidlight Marl" },
+        { "Caeris Fairdawn - Renown 17, Silvermoon Court", "Caeris Fairdawn" },
+        { "Manaforge Vandals Renown 8 (Shadow Point)", "Shadow Point" },
+        { "Lars Bronsmaelt - The Flame's Radiance Renown 9 and 8,125 Resonance Crystals",
+          "Lars Bronsmaelt - 8,125 Resonance Crystals" },
+        -- No renown clause: must pass through untouched.
+        { "Construct V'anore, Silvermoon City", "Construct V'anore, Silvermoon City" },
+    }
+    local function strip(info)
+        local out = info
+        out = out:gsub("%s*[,%-]%s*[^,%-]-Renown%s+%d+%s*$", "")
+        out = out:gsub("%s*[,%-]%s*Renown%s+%d+,%s*[^,]-$", "")
+        out = out:gsub("([%-,]%s*)[^,%-]-Renown%s+%d+%s+and%s+", "%1")
+        out = out:gsub("%s*%([^()]-Renown%s+%d+%)%s*$", "")
+        out = out:gsub("^[^,%-()]-Renown%s+%d+%s*%(([^()]+)%)%s*$", "%1")
+        if out:match("^%s*[^,%-]-Renown%s+%d+%s*$") then return info end
+        out = out:gsub("%s*[,%-]%s*$", ""):gsub("^%s+", "")
+        if out == "" then return info end
+        return out
+    end
+    for _, c in ipairs(cases) do
+        equal(strip(c[1]), c[2], "renown prose strip: " .. c[1]:sub(1, 40))
+    end
+end
+
 do
     local MC = {}
     GetCurrentRegion = function() return 1 end
