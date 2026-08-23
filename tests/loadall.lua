@@ -204,5 +204,31 @@ if S and S.RefreshIndex then
     ok(S.index == nil, "an uncomputable signature rebuilds rather than guessing")
 end
 
+-- The full search index must NOT be built as a side effect of a scan. Measured
+-- in game it is 22,377 records and 17.8 MB retained, the single largest
+-- structure in the addon, and a player who never opens search should not pay
+-- for it. Tooltips get a separate map holding only rows with an itemID.
+if S and S.Invalidate then
+    S.index, S.byItemID, S._staticCount = nil, nil, nil
+    S._membership = nil
+    local fired = {}
+    local realAfter = ENV.C_Timer and ENV.C_Timer.After
+    ENV.C_Timer = ENV.C_Timer or {}
+    ENV.C_Timer.After = function(_, fn) fired[#fired + 1] = fn end
+    S:Invalidate()
+    for _, fn in ipairs(fired) do pcall(fn) end
+    ok(S.index == nil, "a scan does not build the full search index")
+    if realAfter then ENV.C_Timer.After = realAfter end
+
+    ok(type(S.EnsureItemMap) == "function", "tooltips have their own map builder")
+    ok(type(S.IsCollected) == "function", "ownership resolves per row on demand")
+
+    -- A lean record must have no baked collected flag; that is what would force
+    -- the map to be rebuilt on every scan.
+    local leanRec = { moduleKey = "mounts", mod = {}, ref = {}, lean = true }
+    ok(leanRec.collected == nil, "a lean record stores no ownership state")
+    ok(S:IsCollected(nil) == false, "IsCollected is safe on a missing record")
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

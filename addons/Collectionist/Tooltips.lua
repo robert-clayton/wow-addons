@@ -46,15 +46,24 @@ end
 local function appendStatus(tooltip, itemID)
     local search = MC.Search
     if not search then return end
-    -- Read-only by design: the index maintains itself (Invalidate
-    -- schedules a debounced rebuild ~1s after scan waves settle), so a
-    -- hover never pays for a full rebuild mid-frame. Missing index → no
-    -- enrichment this frame.
-    local rec = search.byItemID and search.byItemID[itemID]
+    -- The itemID map, not the full search index: this needs 4,253 rows, and
+    -- the index is 22,377 records carrying a searchable haystack each. It is
+    -- built once on the first hover and holds only references into the frozen
+    -- catalog, so no rescan can stale it.
+    local byItemID = search.EnsureItemMap and search:EnsureItemMap() or search.byItemID
+    local rec = byItemID and byItemID[itemID]
     if not rec then return end
 
+    -- A lean record carries no ownership state -- resolving it at hover time is
+    -- one call and keeps the map immune to rescans.
+    local collected = rec.collected
+    if rec.lean then
+        local ok, owned = pcall(search.IsCollected, search, rec)
+        collected = ok and owned or false
+    end
+
     local c = MUI.Theme.colors
-    if rec.collected then
+    if collected then
         local lc = c.learnedAccent or c.textComplete or { 0.047, 0.824, 0.616 }
         tooltip:AddLine("Collectionist: Collected", lc[1], lc[2], lc[3])
     else

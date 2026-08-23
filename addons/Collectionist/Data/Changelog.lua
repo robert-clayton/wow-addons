@@ -10,7 +10,7 @@ MC.CHANGELOG = {
     { version = "1.16.0", sections = {
         { heading = "Changed", lines = {
             "|cffffd200Big tabs open instantly now.|r Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can actually see are built now, so switching tabs is immediate no matter how much you track.",
-            "|cffffd200Much lighter on memory.|r The search index used to be thrown away and rebuilt from scratch after every scan, whether or not you'd ever opened search. It's updated in place instead. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.",
+            "|cffffd200Much lighter on memory.|r The search index is no longer built at all until you actually search — it was the single largest thing the addon held, and most sessions never used it. Item tooltips keep working: they use a much smaller lookup of their own. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.",
             "Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.",
         } },
         { heading = "Added", lines = {

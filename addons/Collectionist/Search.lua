@@ -227,6 +227,23 @@ local function makeRecord(mod, ref, byItemID, skillLine, fallbackSource)
     return rec
 end
 
+-- A tooltip needs to name the source and say whether the row is owned. It does
+-- NOT need a searchable haystack, and building one per row is what made the
+-- index expensive. `collected` is deliberately absent and resolved at hover
+-- time instead, so this map never goes stale and never needs a rescan.
+local function leanRecord(mod, ref, byItemID, skillLine, fallbackSource)
+    local itemID = ref.itemID
+    if not (itemID and itemID > 0) or byItemID[itemID] then return end
+    byItemID[itemID] = {
+        moduleKey = mod.key,
+        mod       = mod,
+        ref       = ref,
+        skillLine = skillLine,
+        source    = ref.source or fallbackSource,
+        lean      = true,
+    }
+end
+
 -- Rares/treasures: union of bySource buckets + the collected list gives
 -- every entry whose name the scanner resolved this session.
 local function addResultsBuckets(mod, index, byItemID, stats)
@@ -278,7 +295,12 @@ local function membershipSignature()
     return ok and sig or nil
 end
 
-local function buildIndex(self, index, byItemID)
+-- `lean` walks the same catalog but builds ONLY the itemID map, skipping the
+-- full record and its lowercased haystack string. Tooltips need to answer
+-- "do I own item N", which is 4,253 rows; search needs every row by name,
+-- which is 22,377 records and, measured in game, 17.8 MB. Building the second
+-- to serve the first was the single largest structure in the addon.
+local function buildIndex(self, index, byItemID, lean)
     refreshExpansionLabels()
 
     -- Faction gate mirrors the scanners' inline check.
@@ -313,11 +335,15 @@ local function buildIndex(self, index, byItemID)
                         if type(list) == "table" then
                             for _, ref in ipairs(list) do
                                 if factionOk(ref) then
-                                    local rec = makeRecord(mod, ref, byItemID,
-                                        nil, group.source)
-                                    if rec then
-                                        index[#index + 1] = rec
-                                        stats.n = stats.n + 1
+                                    if lean then
+                                        leanRecord(mod, ref, byItemID, nil, group.source)
+                                    else
+                                        local rec = makeRecord(mod, ref, byItemID,
+                                            nil, group.source)
+                                        if rec then
+                                            index[#index + 1] = rec
+                                            stats.n = stats.n + 1
+                                        end
                                     end
                                 end
                             end
@@ -340,11 +366,16 @@ local function buildIndex(self, index, byItemID)
                         if type(list) == "table" then
                             for _, ref in ipairs(list) do
                                 if factionOk(ref) then
-                                    local rec = makeRecord(recipesMod, ref, byItemID,
-                                        group.skillLine, group.source)
-                                    if rec then
-                                        index[#index + 1] = rec
-                                        stats.n = stats.n + 1
+                                    if lean then
+                                        leanRecord(recipesMod, ref, byItemID,
+                                            group.skillLine, group.source)
+                                    else
+                                        local rec = makeRecord(recipesMod, ref, byItemID,
+                                            group.skillLine, group.source)
+                                        if rec then
+                                            index[#index + 1] = rec
+                                            stats.n = stats.n + 1
+                                        end
                                     end
                                 end
                             end
@@ -360,11 +391,43 @@ local function buildIndex(self, index, byItemID)
     -- scanner buckets that a rescan replaces. RefreshIndex needs the boundary.
     self._staticCount = #index
 
-    -- Rares/treasures from live-resolved scanner results.
-    addResultsBuckets(MC.modulesByKey["rares"], index, byItemID, stats)
-    addResultsBuckets(MC.modulesByKey["treasures"], index, byItemID, stats)
+    -- Rares/treasures from live-resolved scanner results. Lean mode skips
+    -- them: they are criteria, not items, and carry no itemID to look up.
+    if not lean then
+        addResultsBuckets(MC.modulesByKey["rares"], index, byItemID, stats)
+        addResultsBuckets(MC.modulesByKey["treasures"], index, byItemID, stats)
+    end
 
     self._size = stats.n
+end
+
+-- The itemID map on its own, for tooltips. Built once and kept; it holds only
+-- references into the frozen catalog, so a rescan cannot invalidate it and
+-- only a membership change can.
+-- Ownership for a single row, resolved on demand. A lean record deliberately
+-- stores no collected flag: that is what would force the map to be rebuilt or
+-- patched on every scan, and the whole point of the lean map is that it never
+-- has to be.
+function Search:IsCollected(rec)
+    if not rec then return false end
+    if rec.collected ~= nil and not rec.lean then return rec.collected and true or false end
+    local collector = Collectors[rec.moduleKey]
+    if not collector then return rec.ref and rec.ref.collected and true or false end
+    local collected = collector(rec.ref, rec.mod)
+    return collected and true or false
+end
+
+function Search:EnsureItemMap()
+    if self.byItemID then return self.byItemID end
+    local byItemID = {}
+    local ok, err = pcall(buildIndex, self, {}, byItemID, true)
+    if not ok then
+        if geterrorhandler then geterrorhandler()(err) else error(err) end
+        return nil
+    end
+    self.byItemID = byItemID
+    self._itemMapMembership = membershipSignature()
+    return byItemID
 end
 
 function Search:EnsureIndex()
@@ -452,9 +515,12 @@ function Search:Invalidate()
     self._invSeq = (self._invSeq or 0) + 1
     local seq = self._invSeq
     C_Timer.After(1, function()
-        if seq == self._invSeq and self._dirty then
-            if self.index then self:RefreshIndex() else self:EnsureIndex() end
-        end
+        if seq ~= self._invSeq or not self._dirty then return end
+        -- Refresh an index that already EXISTS, but never build one that does
+        -- not. The full index is 22,377 records and 17.8 MB measured in game,
+        -- and a player who never opens search should not pay for it. Execute
+        -- builds it on the first query.
+        if self.index then self:RefreshIndex() end
     end)
 end
 
