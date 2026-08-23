@@ -324,8 +324,16 @@ lib.SetTheme("default")
 lib.Pool = {}
 lib.Pool.__index = lib.Pool
 
+-- Every pool ever created, so a memory report can enumerate them without
+-- knowing who owns them. A pool is never discarded (the panel and shell that
+-- own them live for the session), so this registry retains nothing that was
+-- not already retained.
+lib._pools = lib._pools or {}
+
 function lib.Pool:New()
-    return setmetatable({ inactive = {}, active = {} }, self)
+    local pool = setmetatable({ inactive = {}, active = {} }, self)
+    lib._pools[#lib._pools + 1] = pool
+    return pool
 end
 
 -- Static row script handlers. Bound once at frame creation; they read whatever
@@ -389,6 +397,13 @@ function lib.Pool:ReleaseAll()
         frame:Hide()
         frame:ClearAllPoints()
         frame._onEnter, frame._onLeave, frame._onMouseUp = nil, nil, nil
+        -- RenderItemRow also stashes the CONSUMER's callbacks and hover state,
+        -- and clearing only the three dispatchers left those behind. A frame
+        -- resting in the inactive list kept three closures alive, and through
+        -- their upvalues the scan entry it last displayed -- so the pool held a
+        -- parallel copy of the catalog that no rescan could ever free.
+        frame._userOnEnter, frame._userOnLeave, frame._userOnClick = nil, nil, nil
+        frame._hoverTex, frame._hoverColor = nil, nil
         self.inactive[#self.inactive + 1] = frame
         self.active[i] = nil
     end

@@ -7,6 +7,31 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.16.0", sections = {
+        { heading = "Changed", lines = {
+            "|cffffd200Big tabs open instantly now.|r Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can actually see are built now, so switching tabs is immediate no matter how much you track.",
+            "|cffffd200Much lighter on memory.|r The search index used to be thrown away and rebuilt from scratch after every scan, whether or not you'd ever opened search. It's updated in place instead. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.",
+            "Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.",
+        } },
+        { heading = "Added", lines = {
+            "|cffffd200Sort rows.|r A control in the title bar cycles Default, A-Z, Z-A, and expansion order both ways. Each tab remembers its own.",
+            "|cffffd200Closest to Done.|r A star beside the magnifier, or /mc goals: the collections you're nearest to finishing, fewest-left first, with a click to pin what's missing.",
+            "|cffffd200Locations for older collectibles.|r 519 mounts, pets and toys outside the current expansion now have a map pin where before they had nothing.",
+            "|cffffd200Hide unobtainable recipes|r, in Options > Trackers. Recipes removed from the game stop filling the list and stop counting against your totals; they're still counted as Legacies.",
+            "In the compact window, clicking the page title opens a list of the other tabs — the sidebar isn't there to switch with.",
+            "/mc mem reports where the addon's memory is going, and /mc mem gc collects first so you can tell what's held from what's merely uncollected.",
+        } },
+        { heading = "Fixed", lines = {
+            "Recipes you can no longer obtain no longer count toward Collection Score. They're Legacies, the same as every other tracker treats them.",
+            "Rare and treasure zones show their real names instead of raw keys like arathi_highlands, and six zones that were listed twice under different spellings are merged.",
+            "Recipe map pins name the vendor or quest that actually teaches the recipe, instead of borrowing the name of whatever else stands in the same spot.",
+            "Eight Trading Post pets had an invalid pet family and showed none; a handful of decoration names had their quotes and apostrophes mangled.",
+            "Item tooltips no longer break on clients without the modern tooltip API.",
+        } },
+        { heading = "Removed", lines = {
+            "The \"Location only\" rows in Rares and Treasures. They couldn't be collected, a quarter of them duplicated something already tracked, and a collection tracker is the wrong place for a map reference.",
+        } },
+    } },
     { version = "1.15.0", sections = {
         { heading = "Added", lines = {
             "|cffffd200Search everything.|r A magnifier in the title bar — or /mc find, or just typing anything after /mc — searches every collectible the addon knows by name, zone, or source. \"Storm song\" finds the Stormsong Valley mounts, \"Kael\" finds his drops across five trackers. Results group by tracker, and every row keeps its usual clicks: waypoint, Wowhead link, Alt-click to pin.",
@@ -45,36 +70,6 @@ MC.CHANGELOG = {
         } },
         { heading = "Changed", lines = {
             "|cffffd200Collection Score prices recipes by how hard they are to get.|r While almost every recipe was filed as \"unknown\" they all scored the same flat amount regardless of source. Now that the addon knows the difference, a recipe that drops from a raid boss counts for more than one you buy from a vendor. Most collections will see their recipe score go up.",
-        } },
-    } },
-    { version = "1.13.0", sections = {
-        { heading = "Added", lines = {
-            "|cffffd200The whole game, not just Midnight.|r Complete Classic, The Burning Crusade, Wrath of the Lich King, Cataclysm, Mists of Pandaria, Warlords of Draenor, Legion, Battle for Azeroth, Shadowlands, Dragonflight, and The War Within catalogs for every tracker, with exact manifest validation for collectible, achievement, recipe, rare, and treasure IDs.",
-            "|cffffd200A second interface: Premium.|r An application-style window with sidebar navigation, a collection spine showing progress across every tracker, and a footer that keeps your score and peers in view. The original layout is still there as Simple — switch with /mc style.",
-            "A |cffffd200compact mode|r and a slim minimize strip, so Collectionist can sit on screen while you play without taking a quarter of it.",
-            "|cffffd200Pinned targets.|r Alt-click anything you're chasing to keep it in a small overlay, wherever you are in the addon.",
-            "The |cffffd200Ellesmere|r theme, for anyone running EllesmereUI.",
-            "The Collection Inspector is now a proper window you can move, resize, and close with Escape.",
-            "Every expansion appears in the pickers, greyed out until its content ships, so you can see what's coming.",
-            "Housing decorations are assigned to the expansion where they are obtained, including pre-Midnight rewards that only entered the housing catalog when housing launched.",
-            "Housing recipes taught by an older expansion's profession tiers are tracked with that expansion as well.",
-            "Release-cycle rewards from Remix, seasonal play, anniversaries, Plunderstorm, and other ended events remain under their original expansion and are marked unavailable where their acquisition window has closed.",
-        } },
-        { heading = "Changed", lines = {
-            "|cffffd200Achievements no longer inflate your Collection Score.|r There are three times as many of them as the next-largest tracker and they carried the heaviest weights, so they were making up 59% of the total — the number described achievement progress more than it described a collection. The separate achievement-points tally is gone too; the game's own achievement UI is where that belongs.",
-            "|cffffd200Recipes list every profession|r, not just the ones this character knows, with a toggle to hide the ones you haven't learned. Recipe unlocks are account-wide, so the browser now matches.",
-            "|cffffd200One control decides what a tab shows.|r The per-tab expansion filter is gone; Options > Expansions governs every tracker at once.",
-            "Options moved out of a side dock and into the sidebar as its own tab. Scan lives there now.",
-            "Window controls sit where you expect them — minimize, maximize, and close at the top right of the header.",
-            "The launch expansion is called |cffffd200Vanilla|r rather than Classic, which is what people actually call it.",
-            "Fades and slides throughout both layouts, and tabs cross-fade when you switch.",
-            "Tracker headings dropped their subtitle blurbs.",
-        } },
-        { heading = "Fixed", lines = {
-            "Scrollbars can be clicked and dragged.",
-            "The collection spine kept its full width when collapsing to compact.",
-            "The first time you hovered a sidebar entry it flashed near-white instead of lifting slightly.",
-            "Collectionist could not be expanded again after collapsing it all the way down to the strip.",
         } },
     } },
 }

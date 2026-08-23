@@ -425,11 +425,15 @@ function MC.SetExpansionEnabled(key, enabled)
     -- the memos and let it re-derive.
     MC._latestExpansionKey = nil
     MC._latestExpansionByModule = nil
-    -- Visibility is baked into scanner results, so re-scan.
+    -- Visibility is baked into scanner results, so re-scan -- but DEBOUNCED.
+    -- This ran with a zero delay, so every checkbox click immediately rescanned
+    -- all eight modules; turning eleven expansions off was 88 full scans and,
+    -- measured, about 124 MB of allocation for what is one settled state at the
+    -- end. The player is clicking through a list of twelve, so coalesce.
     if MC.modules and MC.ThrottledScan then
         for _, m in ipairs(MC.modules) do
             if m.Scanner and m.Scanner.Scan then
-                MC.ThrottledScan(m, 0)
+                MC.ThrottledScan(m, 0.3)
             end
         end
     end
@@ -2731,6 +2735,7 @@ local function PrintHelp()
     print("  /mc targets - toggle the pinned-targets overlay")
     print("  /mc find <text> - global search (also: just /mc <anything>)")
     print("  /mc goals       - what you are closest to finishing")
+    print("  /mc mem [gc] - memory report; 'gc' collects first, then re-measures")
     print("  /mc version - show addon version")
     print("  /mc help - show this help")
 end
@@ -2895,6 +2900,15 @@ SlashCmdList["MIDNIGHTCOLLECTIONS"] = function(msg)
         -- /mc goals — what you are closest to finishing.
         if MC.panel and not MC.panel.frame:IsShown() then MC.panel:Show() end
         if MC.SelectGoals then MC.SelectGoals() end
+    elseif cmd == "mem" or cmd == "memory" then
+        -- /mc mem [gc] — where the memory actually is. Diagnostic only:
+        -- it reads, it never changes state, and `gc` only asks the
+        -- collector to run.
+        if MC.MemReport then
+            MC.MemReport(arg)
+        else
+            print(PREFIX .. " Memory report not loaded.")
+        end
     elseif cmd == "help" then
         PrintHelp()
     else

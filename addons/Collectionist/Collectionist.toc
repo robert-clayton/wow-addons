@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.15.0
+## Version: 1.16.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -206,6 +206,10 @@ Modules\Recipes\UI.lua
 Search.lua
 Goals.lua
 Tooltips.lua
+
+# /mc mem. Reads the pools, the index and every scanner's results at call
+# time, so load order only has to put it after the things it reports on.
+Memory.lua
 
 # Roster — standalone (no longer a tab module). Loads after the other
 # modules so it can read their Scanner.results at broadcast time. Comms

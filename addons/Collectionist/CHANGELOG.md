@@ -1,3 +1,27 @@
+# 1.16.0
+### Changed
+- **Big tabs open instantly now.** Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can actually see are built now, so switching tabs is immediate no matter how much you track.
+- **Much lighter on memory.** The search index used to be thrown away and rebuilt from scratch after every scan, whether or not you'd ever opened search. It's updated in place instead. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.
+- Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.
+
+### Added
+- **Sort rows.** A control in the title bar cycles Default, A-Z, Z-A, and expansion order both ways. Each tab remembers its own.
+- **Closest to Done.** A star beside the magnifier, or `/mc goals`: the collections you're nearest to finishing, fewest-left first, with a click to pin what's missing.
+- **Locations for older collectibles.** 519 mounts, pets and toys outside the current expansion now have a map pin where before they had nothing.
+- **Hide unobtainable recipes**, in Options > Trackers. Recipes removed from the game stop filling the list and stop counting against your totals; they're still counted as Legacies.
+- In the compact window, clicking the page title opens a list of the other tabs — the sidebar isn't there to switch with.
+- `/mc mem` reports where the addon's memory is going, and `/mc mem gc` collects first so you can tell what's held from what's merely uncollected.
+
+### Fixed
+- Recipes you can no longer obtain no longer count toward Collection Score. They're Legacies, the same as every other tracker treats them.
+- Rare and treasure zones show their real names instead of raw keys like `arathi_highlands`, and six zones that were listed twice under different spellings are merged.
+- Recipe map pins name the vendor or quest that actually teaches the recipe, instead of borrowing the name of whatever else stands in the same spot.
+- Eight Trading Post pets had an invalid pet family and showed none; a handful of decoration names had their quotes and apostrophes mangled.
+- Item tooltips no longer break on clients without the modern tooltip API.
+
+### Removed
+- The "Location only" rows in Rares and Treasures. They couldn't be collected, a quarter of them duplicated something already tracked, and a collection tracker is the wrong place for a map reference.
+
 # 1.15.0
 ### Added
 - **Search everything.** A magnifier in the title bar — or `/mc find`, or just typing anything after `/mc` — searches every collectible the addon knows by name, zone, or source. "Storm song" finds the Stormsong Valley mounts, "Kael" finds his drops across five trackers. Results group by tracker, and every row keeps its usual clicks: waypoint, Wowhead link, Alt-click to pin.

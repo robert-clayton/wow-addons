@@ -209,4 +209,31 @@ ok(not MUI.RowHidden(poolG, 0, ROW_H), "a row at the viewport top does not")
 print(string.format("  allocation per pass: in-callee skip %.0f KB, caller-guarded %.0f KB",
     unguardedKB, guardedKB))
 print(string.format("%d passed, %d failed", pass, fail))
+-- 8. The pool must be a function of VIEWPORT size, not catalog size. This is
+--    the property that decides whether frames can explain memory that grows
+--    with expansions enabled: WoW never destroys a Frame, so if the pool scaled
+--    with row count its high-water would be a permanent ratchet.
+local function poolCensus(rows)
+    local pool = newPool()
+    pool.acquired = 0
+    local p = newRegion()
+    local yOff = 0
+    scroll:SetVerticalScroll(0)
+    MUI.BeginRenderPass(pool, scroll)
+    for i = 1, rows do
+        if not MUI.RowHidden(pool, yOff, ROW_H) then
+            yOff = MUI.RenderItemRow(pool, p, yOff, { height = ROW_H, name = "R" .. i })
+        else
+            yOff = yOff + ROW_H
+        end
+    end
+    return pool.acquired
+end
+
+local small = poolCensus(1000)
+local large = poolCensus(100000)
+equal(small, large,
+    "the pool is invariant to catalog size (100x the rows builds the same frames)")
+ok(small < 200, "and it stays small in absolute terms (" .. small .. ")")
+
 os.exit(fail == 0 and 0 or 1)
