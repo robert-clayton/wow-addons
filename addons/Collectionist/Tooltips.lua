@@ -98,15 +98,27 @@ elseif GameTooltip and hooksecurefunc then
             if itemID then appendStatus(tooltip, itemID) end
         end
     end
-    hooksecurefunc(GameTooltip, "SetBagItem", onTooltipSetItem)
-    hooksecurefunc(GameTooltip, "SetLootItem", onTooltipSetItem)
-    hooksecurefunc(GameTooltip, "SetInventoryItem", onTooltipSetItem)
-    hooksecurefunc(GameTooltip, "SetAuctionItem", onTooltipSetItem)
-    hooksecurefunc(GameTooltip, "SetGuildBankItem", onTooltipSetItem)
-    hooksecurefunc(GameTooltip, "SetHyperlink", function(tooltip, link)
-        if not isEnabled() then return end
-        if tooltip ~= GameTooltip then return end
-        local itemID = linkItemID(link)
-        if itemID then appendStatus(tooltip, itemID) end
-    end)
+    -- Hook only what this client actually has. hooksecurefunc RAISES when the
+    -- method is missing, and the whole point of this branch is that we are on
+    -- a client whose tooltip API differs -- so assuming any given setter
+    -- exists is exactly the wrong bet here. SetAuctionItem was removed in 8.3
+    -- with the new Auction House, and hooking it blindly threw at load and
+    -- took the rest of this file with it.
+    for _, method in ipairs({
+        "SetBagItem", "SetLootItem", "SetInventoryItem",
+        "SetAuctionItem", "SetGuildBankItem", "SetMerchantItem",
+        "SetQuestItem", "SetTradePlayerItem", "SetTradeTargetItem",
+    }) do
+        if type(GameTooltip[method]) == "function" then
+            hooksecurefunc(GameTooltip, method, onTooltipSetItem)
+        end
+    end
+    if type(GameTooltip.SetHyperlink) == "function" then
+        hooksecurefunc(GameTooltip, "SetHyperlink", function(tooltip, link)
+            if not isEnabled() then return end
+            if tooltip ~= GameTooltip then return end
+            local itemID = linkItemID(link)
+            if itemID then appendStatus(tooltip, itemID) end
+        end)
+    end
 end

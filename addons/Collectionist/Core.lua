@@ -1771,6 +1771,14 @@ end
 
 function MC._ApplyIndicatorVisibility()
     if not MC._premiumShell then return end
+    -- The shell calls onViewChanged from inside its own constructor (restoring
+    -- a saved compact/minimized view), which reaches here before MC.panel has
+    -- been assigned -- the constructor has not returned yet. Every indicator
+    -- this function touches is created after that point, so there is nothing
+    -- to apply; without the guard a single unguarded MC.panel deref in this
+    -- path aborts CreatePanel and the addon comes up with no nav, no header
+    -- and no content.
+    if not MC.panel then return end
     local viewHidden = MC._viewIndicatorsHidden and true or false
     MC._indicatorsHidden = viewHidden
 
@@ -1882,6 +1890,9 @@ function MC.CreatePanel()
             -- can happen before the indicator chain exists; the handler
             -- nil-guards each button and CreatePanel re-applies after
             -- the chain is built.
+            -- Compact drops the sidebar, so the page title becomes the page
+            -- picker. The lib owns the affordance; the list of pages is ours.
+            onTitleClick  = function(_, anchor) MC.ShowPagePicker(anchor) end,
             onViewChanged = function(_, mode)
                 MC._viewIndicatorsHidden = (mode ~= "full")
                 MC._ApplyIndicatorVisibility()
@@ -1946,9 +1957,6 @@ function MC.CreatePanel()
             minHeight     = 140,
             maxHeight     = 900,
             onRefresh     = function() MC.RefreshActive() end,
-            -- Compact drops the sidebar, so the page title becomes the page
-            -- picker. The lib owns the affordance; the list of pages is ours.
-            onTitleClick  = function(shell, anchor) MC.ShowPagePicker(anchor) end,
         })
     end
 

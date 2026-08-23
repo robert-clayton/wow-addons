@@ -352,6 +352,7 @@ function ShellProto:_CreateHeader()
         title:SetTextColor(c[1], c[2], c[3], c[4] or 1)
         caret:SetTextColor(c[1], c[2], c[3], 0.7)
     end)
+    local shell = self
     titleHit:SetScript("OnClick", function()
         if shell.opts.onTitleClick then shell.opts.onTitleClick(shell, titleHit) end
     end)

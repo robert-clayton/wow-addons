@@ -637,9 +637,6 @@ end
 -- floating over the 30px strip. Returning to a full/compact view while
 -- search is still the selection re-shows what HideView took down.
 function Search:OnViewChanged()
-    -- Skip before the opts table is built: Lua constructs it at the call
-    -- site, so a check inside RenderItemRow saves the frame, not the garbage.
-    if MUI.RowHidden(MC.panel.pool, yOff, 22) then return yOff + 22 end
     if not MC.panel or not MC.panel.GetViewMode then return end
     local mode = MC.panel:GetViewMode()
     if mode == "strip" then
@@ -664,6 +661,10 @@ local function showMessage(child, yOff, text, color)
 end
 
 local function renderRow(child, rec, yOff)
+    -- Skip before the opts table below is built. Lua constructs it at the
+    -- call site, so a check inside RenderItemRow saves the frame but not
+    -- the garbage -- and search can match most of the catalog.
+    if MUI.RowHidden(MC.panel.pool, yOff, 22) then return yOff + 22 end
     local info
     if rec.ref.future and MC.GetAvailabilityBadge then
         info = MC.GetAvailabilityBadge(rec.ref)
