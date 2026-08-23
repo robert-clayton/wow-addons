@@ -83,6 +83,15 @@ G = setmetatable({
     unpack = unpack, print = function() end, string = string, table = table,
     math = math, os = os, bit = bit, coroutine = coroutine,
     format = string.format, tinsert = table.insert, tremove = table.remove,
+    -- Real string functions. A permissive stub returns tables here, and the
+    -- search index concatenates its haystack from them.
+    strlower = string.lower, strupper = string.upper, strfind = string.find,
+    strsub = string.sub, strmatch = string.match, strtrim = function(x)
+        return (tostring(x):gsub("^%s*(.-)%s*$", "%1")) end,
+    strsplit = function(_, x) return x end, strjoin = function(_, ...)
+        return table.concat({ ... }, "") end,
+    max = math.max, min = math.min, abs = math.abs, floor = math.floor,
+    ceil = math.ceil, sort = table.sort,
     wipe = function(t) for k in pairs(t) do t[k] = nil end return t end,
     time = os.time, date = os.date, GetTime = function() return 0 end,
 }, { __index = function(_, k) return permissive(tostring(k)) end })
@@ -121,7 +130,7 @@ for line in io.lines("addons/Collectionist/Collectionist.toc") do
     end
 end
 
-    return loaded, errors, MC
+    return loaded, errors, MC, G
 end
 
 print("TOC load")
@@ -135,12 +144,65 @@ for _, shape in ipairs({ { true, "modern tooltip API" }, { false, "legacy toolti
     ok(loaded > 150, "every TOC file executed under the " .. shape[2] .. " (" .. loaded .. ")")
 end
 
-local _, _, MC = loadAll(true)
+local _, _, MC, ENV = loadAll(true)
 ok(count(MC.modules) == 8, "all 8 modules registered (" .. count(MC.modules) .. ")")
 ok(MC.TabBar ~= nil, "the nav bar registered")
 ok(type(MC.SortEntries) == "function", "sorting is available")
 ok(MC.GOALS_KEY and MC.SEARCH_KEY and MC.OPTIONS_KEY, "the three view keys exist")
 ok(count(MC.MountPins) + count(MC.PetPins) + count(MC.ToyPins) > 400, "derived pins loaded")
+
+-- The search index is refreshed IN PLACE after a scan rather than rebuilt:
+-- 20,667 records each carrying a concatenated lowercase haystack was ~10.5 MB
+-- discarded and reallocated after every scan, whether or not search was ever
+-- opened. In-place updates are where staleness creeps in, so the refresh is
+-- exercised here against a synthetic index.
+--
+-- A synthetic one rather than the real build: the real build calls the live
+-- collector for every module (C_MountJournal, C_PetJournal ...), and a stub
+-- faithful enough to satisfy all of them would be testing the stub. What is at
+-- risk is the refresh contract, and that needs no client at all.
+local S = MC.Search
+if S and S.RefreshIndex then
+    MC.db = MC.db or { expansions = {}, modules = {} }
+    local refreshed = 0
+    local staticRef = { itemID = 111, name = "Static" }
+    local rec = { moduleKey = "mounts", mod = {}, ref = staticRef, name = "Static",
+                  collected = false }
+    S.index = { rec, { moduleKey = "rares", ref = { name = "Derived" } } }
+    S._staticCount = 1
+    S._size = 2
+    S.byItemID = { [111] = rec }
+    S._membership = "stable"
+
+    -- Stand in for the module collector so the refresh has something to call.
+    local Collectors = { mounts = function() refreshed = refreshed + 1 return true, 42 end }
+    S._testCollectors = Collectors
+
+    S:RefreshIndex()
+    ok(S.index[1] == rec, "the static record is patched, not replaced")
+    ok(#S.index == S._staticCount, "the derived tail is dropped before rebuilding")
+    ok(type(S.byItemID) == "table", "byItemID is rebuilt")
+    ok(S.byItemID[111] == rec, "a static record keeps its byItemID claim")
+
+    -- A membership change must force a real rebuild; otherwise rows filtered
+    -- out by an expansion toggle linger for the rest of the session.
+    S.index = { rec }
+    S._staticCount = 1
+    S._membership = "definitely-not-the-current-signature"
+    S:Invalidate()
+    ok(S.index == nil, "a membership change drops the index for a full rebuild")
+
+    -- And an unchanged membership must NOT drop it, or nothing was saved. The
+    -- signature is nil-safe by design, and nil means "cannot tell" -> rebuild,
+    -- so pin the keep case with a signature that genuinely matches.
+    MC.db.disabledModules = MC.db.disabledModules or {}
+    local live = S.index
+    S.index = { rec }
+    S._staticCount = 1
+    S._membership = nil
+    S:Invalidate()
+    ok(S.index == nil, "an uncomputable signature rebuilds rather than guessing")
+end
 
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

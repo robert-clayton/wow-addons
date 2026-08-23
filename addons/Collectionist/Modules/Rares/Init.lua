@@ -16,7 +16,7 @@ local mod = MC.RegisterModule("rares", {
     onEvent = function(m, event)
         if event == "RECEIVED_ACHIEVEMENT_LIST"
            or event == "ACHIEVEMENT_EARNED" or event == "CRITERIA_UPDATE" then
-            MC.ThrottledScan(m)
+            MC.ThrottledScan(m, MC.LAZY_SCAN_EVENTS[event])
         end
     end,
     tooltipLines = function(tt, m)

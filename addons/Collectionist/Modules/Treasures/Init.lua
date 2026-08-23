@@ -14,7 +14,7 @@ local mod = MC.RegisterModule("treasures", {
     -- so the tooltip ✓/✗ marks update without needing a /reload.
     events = { "RECEIVED_ACHIEVEMENT_LIST", "ACHIEVEMENT_EARNED", "CRITERIA_UPDATE", "QUEST_TURNED_IN" },
     onEvent = function(m, event)
-        MC.ThrottledScan(m)
+        MC.ThrottledScan(m, MC.LAZY_SCAN_EVENTS[event])
     end,
     tooltipLines = function(tt, m)
         local r = m.Scanner and m.Scanner.results

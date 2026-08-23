@@ -1479,16 +1479,40 @@ function MC.ScheduleContentReleaseScan()
     end)
 end
 
+-- Trailing debounce with an EARLIEST-DEADLINE rule.
+--
+-- The flat version dropped any request that arrived while one was pending, so
+-- whichever event fired first set the delay for everything behind it. That made
+-- a long throttle unusable: parking CRITERIA_UPDATE at five seconds would also
+-- have parked an ACHIEVEMENT_EARNED that landed a moment later. Tracking the
+-- deadline lets a lazy ticker wait while an urgent event still lands promptly.
 function MC.ThrottledScan(mod, delay)
-    if mod._scanPending then return end
+    delay = delay or 0.5
+    local now = (GetTime and GetTime()) or 0
+    local due = now + delay
+    -- Already scheduled, and this request is no more urgent: nothing to do.
+    if mod._scanPending and due >= (mod._scanDue or 0) then return end
     mod._scanPending = true
-    C_Timer.After(delay or 0.5, function()
+    mod._scanDue = due
+    C_Timer.After(delay, function()
+        -- An earlier-due request may have superseded this timer; only the one
+        -- matching the current deadline may fire, or a rescheduled scan would
+        -- run twice.
+        if not mod._scanDue or math.abs(mod._scanDue - due) > 0.001 then return end
         mod._scanPending = false
+        mod._scanDue = nil
         -- Disabled modules remain hidden but continue supplying fresh score
         -- and sharing snapshots.
         MC.ScanNow(mod)
     end)
 end
+
+-- CRITERIA_UPDATE is a progress ticker: it carries no payload and fires on any
+-- tracked criterion change -- every kill, quest counter and exploration step.
+-- Three modules rescan their whole catalog on it, which at the default 0.5s
+-- debounce measured 7.65 MB/s of garbage during ordinary questing. A collection
+-- tracker does not need sub-second freshness for a progress bar.
+MC.LAZY_SCAN_EVENTS = { CRITERIA_UPDATE = 5 }
 
 --------------------------------------------------------------------------
 -- event -> { module, module, ... } so chatty events (BAG_UPDATE_DELAYED,

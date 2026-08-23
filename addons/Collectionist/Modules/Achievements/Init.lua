@@ -14,7 +14,7 @@ local mod = MC.RegisterModule("achievements", {
     -- player picks up glyphs / scopes vistas without a /reload.
     events = { "RECEIVED_ACHIEVEMENT_LIST", "ACHIEVEMENT_EARNED", "CRITERIA_UPDATE" },
     onEvent = function(m, event)
-        MC.ThrottledScan(m)
+        MC.ThrottledScan(m, MC.LAZY_SCAN_EVENTS[event])
     end,
     tooltipLines = function(tt, m)
         local r = m.Scanner and m.Scanner.results

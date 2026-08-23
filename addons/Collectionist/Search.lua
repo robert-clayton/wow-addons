@@ -251,6 +251,33 @@ end
 -- The whole build runs against locals and commits only on success: a
 -- thrower mid-build (an un-pcall'd journal API, a bad ID) must not leave
 -- a half-built index behind — the non-nil guard would serve it forever.
+-- Which rows BELONG in the index, as a cheap string. Only expansion and module
+-- enablement (and the player's faction) change membership; collecting something
+-- never does. Deriving this rather than hooking every place a toggle is written
+-- means a new toggle cannot forget to invalidate.
+-- Returns nil when the signature cannot be computed, which callers treat as
+-- "cannot tell" and answer with a full rebuild. The enablement helpers read
+-- MC.db directly and Invalidate can fire before SavedVariables are wired, so
+-- this must never be the thing that throws.
+local function membershipSignature()
+    if not MC.db then return nil end
+    local ok, sig = pcall(function()
+    local parts = {}
+    for _, e in ipairs(MC.EXPANSIONS or {}) do
+        parts[#parts + 1] = (MC.IsExpansionEnabled and MC.IsExpansionEnabled(e.key)) and "1" or "0"
+    end
+    for _, m in ipairs(MC.modules or {}) do
+        parts[#parts + 1] = (MC.IsModuleEnabled and MC.IsModuleEnabled(m.key) == false) and "0" or "1"
+    end
+    local f = MC.GetExpansionFilter and MC.GetExpansionFilter()
+    if type(f) == "table" then
+        parts[#parts + 1] = tostring(f.mode) .. "/" .. tostring(f.single)
+    end
+    return table.concat(parts, "")
+    end)
+    return ok and sig or nil
+end
+
 local function buildIndex(self, index, byItemID)
     refreshExpansionLabels()
 
@@ -328,6 +355,11 @@ local function buildIndex(self, index, byItemID)
         end
     end
 
+    -- Everything above is static: it points at frozen catalog rows and only
+    -- its collected/icon fields can change. Everything below is derived from
+    -- scanner buckets that a rescan replaces. RefreshIndex needs the boundary.
+    self._staticCount = #index
+
     -- Rares/treasures from live-resolved scanner results.
     addResultsBuckets(MC.modulesByKey["rares"], index, byItemID, stats)
     addResultsBuckets(MC.modulesByKey["treasures"], index, byItemID, stats)
@@ -348,6 +380,7 @@ function Search:EnsureIndex()
     end
     self.index = index
     self.byItemID = byItemID
+    self._membership = membershipSignature()
     self._dirty = false
 end
 
@@ -356,15 +389,71 @@ end
 -- pure waste. Settling ~1s after the last invalidation keeps the index
 -- fresh for tooltips too, without ever paying for the rebuild inside the
 -- tooltip render path.
+-- Refresh the existing index in place.
+--
+-- The index used to be dropped and rebuilt from scratch after EVERY scan --
+-- 20,667 records, each with a freshly concatenated lowercase haystack, roughly
+-- 10.5 MB thrown away and 10.5 MB reallocated, whether or not the player had
+-- ever opened search. Nothing about a scan changes the SHAPE of the index: the
+-- records point at frozen catalog rows and only `collected` and `icon` differ
+-- between generations.
+--
+-- Rares and treasures are the exception. Their records are built from scanner
+-- result buckets, which a rescan replaces wholesale, so a kept record would
+-- point at a detached table and report stale ownership. buildIndex appends them
+-- last, so they are a contiguous tail that can be dropped and rebuilt while the
+-- much larger static head is only patched.
+function Search:RefreshIndex()
+    local index = self.index
+    if not index or not self._staticCount then
+        self.index, self.byItemID = nil, nil
+        return self:EnsureIndex()
+    end
+
+    for i = 1, self._staticCount do
+        local rec = index[i]
+        local collector = rec and Collectors[rec.moduleKey]
+        if collector then
+            rec.collected, rec.icon = collector(rec.ref, rec.mod)
+        end
+    end
+
+    for i = #index, self._staticCount + 1, -1 do index[i] = nil end
+
+    -- byItemID is rebuilt because the derived tail owns entries in it. Static
+    -- records are re-registered first so they keep winning ties, exactly as
+    -- during a full build.
+    local byItemID = {}
+    for i = 1, self._staticCount do
+        local rec = index[i]
+        local ref = rec and rec.ref
+        if ref and ref.itemID and ref.itemID > 0 and not byItemID[ref.itemID] then
+            byItemID[ref.itemID] = rec
+        end
+    end
+
+    local stats = { n = self._staticCount }
+    addResultsBuckets(MC.modulesByKey["rares"], index, byItemID, stats)
+    addResultsBuckets(MC.modulesByKey["treasures"], index, byItemID, stats)
+    self.byItemID = byItemID
+    self._size = stats.n
+    self._dirty = false
+end
+
 function Search:Invalidate()
-    self.index = nil
-    self.byItemID = nil
+    -- A membership change means different ROWS, which only a full rebuild can
+    -- produce. Anything else is a state change over the same rows.
+    local sig = membershipSignature()
+    if sig == nil or self._membership ~= sig then
+        self.index = nil
+        self.byItemID = nil
+    end
     self._dirty = true
     self._invSeq = (self._invSeq or 0) + 1
     local seq = self._invSeq
     C_Timer.After(1, function()
         if seq == self._invSeq and self._dirty then
-            self:EnsureIndex()
+            if self.index then self:RefreshIndex() else self:EnsureIndex() end
         end
     end)
 end
