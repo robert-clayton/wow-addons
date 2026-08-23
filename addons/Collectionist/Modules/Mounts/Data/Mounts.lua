@@ -192,7 +192,7 @@ MC.RegisterContent("midnight", "mounts", {
             -- Zul'Aman
             { mountID = 2760, name = "Amani Sharptalon", source = "drop", sourceInfo = "Rare drop, Zul'Aman",
               zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman", rate = "~1%" } },
-            { mountID = 2775, name = "Escaped Witherbark Pango", source = "drop", sourceInfo = "Rare drop, Zul'Aman",
+            { mountID = 2775, name = "Witherbark Pango", source = "drop", sourceInfo = "Rare drop, Zul'Aman",
               zone = "Zul'Aman", dropInfo = { mob = "Zone rares", zone = "Zul'Aman", rate = "~1%" } },
             -- Harandar
             { mountID = 2615, name = "Rootstalker Grimlynx", source = "drop", sourceInfo = "Rare drop, Harandar",
@@ -251,7 +251,7 @@ MC.RegisterContent("midnight", "mounts", {
               achievementID = 61584 },
             { mountID = 2912, name = "Vivacious Chloroceros", source = "achievement", sourceInfo = "Treasures of Harandar",
               achievementID = 61263, taskList = VIVACIOUS_CHLOROCEROS_TASKS },
-            { mountID = 2829, name = "Lab-grown Stormray", source = "achievement", sourceInfo = "Staring Into The Void",
+            { mountID = 2829, name = "Lab-Grown Stormray", source = "achievement", sourceInfo = "Staring Into The Void",
               achievementID = 62385 },
             { mountID = 2616, name = "Ivory Grimlynx", source = "achievement", sourceInfo = "Allied Race: Haranir",
               achievementID = 61506, score = T.short },

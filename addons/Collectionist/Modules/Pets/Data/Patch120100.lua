@@ -176,14 +176,19 @@ MC.RegisterContent("midnight", "pets", {
               score = T.medium },
         },
     },
+    -- Family Battler rewards. Earned by completing the achievement, so they
+    -- file under "achievement" like every other achievement pet -- not under
+    -- Event / Promo, which reads as "you cannot get this any more".
     {
-        source = "event",
+        source = "achievement",
         pets = {
             { speciesID = 5026, itemID = 270191, npcID = 262210, name = "Lil'Kruul",
-              petType = 1, source = "event", sourceInfo = "Family Battler of Outland",
+              petType = 1, source = "achievement",
+              sourceInfo = "|cFFFFD200Achievement: |rFamily Battler of Outland",
               canBattle = true, achievementID = 62460, taskList = FAMILY_BATTLER_OUTLAND_TASKS, score = T.long },
             { speciesID = 5027, itemID = 270211, npcID = 262220, name = "Furiostraza",
-              petType = 2, source = "event", sourceInfo = "Family Battler of Cataclysm",
+              petType = 2, source = "achievement",
+              sourceInfo = "|cFFFFD200Achievement: |rFamily Battler of Cataclysm",
               canBattle = true, achievementID = 62461, taskList = FAMILY_BATTLER_CATACLYSM_TASKS, score = T.long },
         },
     },

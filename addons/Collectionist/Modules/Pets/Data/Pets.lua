@@ -356,15 +356,18 @@ MC.RegisterContent("midnight", "pets", {
         },
     },
 
-    -- Event / Promotional Pets
-    -- Not obtainable through normal Midnight content. Included for reference.
+    -- Family Battler achievement rewards. Filed under "event" with a note
+    -- saying they were not obtainable through normal content, which was wrong
+    -- twice over: they are earned by finishing an achievement that is still
+    -- available, and the row already carried achievementID and a task list, so
+    -- the tooltip said "Achievement" while the group header said Event / Promo.
+    -- DB2 agrees: SourceTypeEnum 5, "Achievement: Family Battler of <region>".
     {
-        source = "event",
+        source = "achievement",
         pets = {
-            -- Pre-patch Family Battler achievement rewards
-            { speciesID = 4913, name = "Moon Darter",  petType = 2, source = "event", sourceInfo = "Family Battler of Kalimdor",          canBattle = false, achievementID = 61051, taskList = FAMILY_BATTLER_KALIMDOR_TASKS, score = T.long },
-            { speciesID = 3519, name = "Byrn",         petType = 7, source = "event", sourceInfo = "Family Battler of Eastern Kingdoms", canBattle = false, achievementID = 61040, taskList = FAMILY_BATTLER_EK_TASKS, score = T.long },
-            { speciesID = 4475, name = "Webbers",      petType = 4, source = "event", sourceInfo = "Family Battler of Northrend",         canBattle = true,  achievementID = 60956, taskList = FAMILY_BATTLER_NORTHREND_TASKS, score = T.long },
+            { speciesID = 4913, name = "Moon Darter",  petType = 2, source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rFamily Battler of Kalimdor",          canBattle = false, achievementID = 61051, taskList = FAMILY_BATTLER_KALIMDOR_TASKS, score = T.long },
+            { speciesID = 3519, name = "Byrn",         petType = 7, source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rFamily Battler of Eastern Kingdoms", canBattle = false, achievementID = 61040, taskList = FAMILY_BATTLER_EK_TASKS, score = T.long },
+            { speciesID = 4475, name = "Webbers",      petType = 4, source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rFamily Battler of Northrend",         canBattle = true,  achievementID = 60956, taskList = FAMILY_BATTLER_NORTHREND_TASKS, score = T.long },
         },
     },
 })
