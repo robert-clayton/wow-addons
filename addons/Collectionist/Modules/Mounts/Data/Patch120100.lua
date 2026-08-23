@@ -86,6 +86,8 @@ MC.RegisterContent("midnight", "mounts", {
               sourceInfo = "Telemancer Astrandis - Delver's Journey Rank 5 and 10 Voidlight Marl",
               waypoint = MC.LOC.TelemancerAstrandis, zone = "Silvermoon City",
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 10 } },
+              renown = { factionID = MC.FACTION.DelversJourney, level = 5,
+                         factionName = "Delver's Journey" },
               score = T.long },
             { mountID = 2839, itemID = 262496, name = "Delver's Arcane Golem", source = "delve",
               sourceInfo = "Sturdy Chest in Gnarldor Isle", zone = "Gnarldor Isle",

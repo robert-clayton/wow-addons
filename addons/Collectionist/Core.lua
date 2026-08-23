@@ -770,14 +770,19 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         local reqLabel = ""
         if req.factionID and req.level then
             local current = "?"
+            -- The client's own name for the track wins over the stored one.
+            -- Vendors say "Delver's Journey" while the renown UI says
+            -- "Delves: Season 2", and the player is looking at the renown UI.
+            local liveName
             if C_MajorFactions and C_MajorFactions.GetMajorFactionData then
                 local ok, data = pcall(C_MajorFactions.GetMajorFactionData, req.factionID)
                 if ok and data and data.renownLevel then
                     current = tostring(data.renownLevel)
                     metReq = data.renownLevel >= req.level
+                    if data.name and data.name ~= "" then liveName = data.name end
                 end
             end
-            local name = req.factionName or ("Faction " .. req.factionID)
+            local name = liveName or req.factionName or ("Faction " .. req.factionID)
             reqLabel = format("%s Renown %s/%d", name, current, req.level)
         elseif req.factionID and req.standing then
             local current = "?"

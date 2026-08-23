@@ -371,6 +371,10 @@ MC.FACTION = {
     -- as Silvermoon Court and Zul'jarra's Forces, which resolve through
     -- C_MajorFactions today.
     PreyhuntersJourney = 2808, -- 12.1 Prey progression track
+    -- Vendors call this "Delver's Journey"; the client calls it "Delves:
+    -- Season 2". Confirmed live -- the season-1 track (2693) and season 3
+    -- (2839) are not major factions, so only this one answers.
+    DelversJourney     = 2796, -- 12.1 Delves progression track
 }
 
 -- Currency IDs. Used by C_CurrencyInfo.GetCurrencyInfo and cost = { ... } blocks.
