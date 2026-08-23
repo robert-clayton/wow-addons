@@ -2070,7 +2070,13 @@ function MC.CreatePanel()
         function MC.RefreshSortIndicator()
             local btn = MC.sortIndicator
             if not btn then return end
-            -- Options and search have no per-source row groups to order.
+            -- Compact and strip hide the whole indicator chain. This one
+            -- self-Shows from RefreshActive, so like the peer count it has to
+            -- respect the flag itself -- otherwise the next refresh puts it
+            -- back and, with the chain collapsed in compact, it lands on top
+            -- of the page title.
+            if MC._indicatorsHidden then btn:Hide() return end
+            -- Options, search and goals have no per-source row groups to order.
             local applies = not (MC.IsOptionsSelected and MC.IsOptionsSelected())
                 and not (MC.IsSearchSelected and MC.IsSearchSelected())
                 and not (MC.IsGoalsSelected and MC.IsGoalsSelected())
