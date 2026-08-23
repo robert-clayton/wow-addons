@@ -407,6 +407,104 @@ function Mem.ReportGC()
     Mem.Report()
 end
 
+
+--------------------------------------------------------------------------
+-- /mc mem attribute — bytes per structure, measured in THIS runtime.
+--
+-- Every estimate so far has come from LuaJIT on a developer machine, and the
+-- numbers do not fit: a scanner entry measures 260-461 bytes headless, while
+-- the in-game deltas imply several kilobytes per row. WoW runs a different
+-- interpreter with a different table layout, so modelling the gap is guessing.
+-- This measures it instead.
+--
+-- Method, per structure: read the heap, drop the only reference to it, run a
+-- full collect, read the heap again, then rebuild. The difference is what that
+-- structure actually costs HERE, including everything it uniquely retains.
+--
+-- It is destructive and says so. Everything it drops is derived and rebuilds
+-- from a rescan; nothing here touches SavedVariables. Run it when you are
+-- standing still, not mid-pull.
+--------------------------------------------------------------------------
+
+local function heapKB()
+    if type(collectgarbage) ~= "function" then return nil end
+    collectgarbage("collect")
+    local ok, kb = pcall(collectgarbage, "count")
+    return ok and kb or nil
+end
+
+-- release() must drop the last reference and return a restore function.
+local function attribute(label, release)
+    local before = heapKB()
+    if not before then return end
+    local ok, restore = pcall(release)
+    if not ok then
+        print(sformat("  %-22s (could not release: %s)", label, tostring(restore)))
+        return
+    end
+    local after = heapKB()
+    if type(restore) == "function" then pcall(restore) end
+    if after then
+        print(sformat("  %-22s %s", label, kbStr(before - after)))
+    end
+end
+
+function Mem.ReportAttribution()
+    local P = MC.PREFIX or "Collectionist"
+    if type(collectgarbage) ~= "function" then
+        print(P .. " collectgarbage is unavailable on this client.")
+        return
+    end
+    print(P .. " attribution - releasing each structure and measuring the drop")
+    print("  (destructive but recoverable; everything below is derived data)")
+
+    -- The search index, including every record and its haystack string.
+    attribute("search index", function()
+        local S = MC.Search
+        if not (S and S.index) then return end
+        local index, byItemID = S.index, S.byItemID
+        S.index, S.byItemID, S._staticCount = nil, nil, nil
+        return function()
+            S.index, S.byItemID = index, byItemID
+            if S.EnsureIndex then pcall(function() S:EnsureIndex() end) end
+        end
+    end)
+
+    -- One module's scan results at a time, so the per-module cost is visible
+    -- rather than one lump for all eight.
+    for _, mod in ipairs(MC.modules or {}) do
+        local scanner = mod.Scanner
+        if scanner and scanner.results then
+            attribute("scan: " .. (mod.label or mod.key), function()
+                local held = scanner.results
+                scanner.results = {}
+                return function() scanner.results = held end
+            end)
+        end
+    end
+
+    -- The frame pool's idle list. Frames themselves are never freed by the
+    -- client, so this measures only the Lua-side bookkeeping hanging off them.
+    attribute("pooled frame refs", function()
+        -- Resolve the library here; MUI is not a file-scope local in this file,
+        -- and a nil global would make this silently measure nothing.
+        local okLib, lib = pcall(LibStub, "MidnightUI-1.0", true)
+        local pools = (okLib and type(lib) == "table" and rawget(lib, "_pools")) or {}
+        local saved = {}
+        for i, pool in ipairs(pools) do
+            saved[i] = pool.inactive
+            pool.inactive = {}
+        end
+        return function()
+            for i, pool in ipairs(pools) do
+                if saved[i] then pool.inactive = saved[i] end
+            end
+        end
+    end)
+
+    print("  rebuilding - run /mc mem to confirm the totals came back")
+end
+
 -- Single entry point for the slash dispatch. `arg` is the already-lowercased
 -- remainder of the command line.
 function MC.MemReport(arg)
@@ -415,6 +513,8 @@ function MC.MemReport(arg)
     local ok, err
     if sub == "gc" or sub == "collect" then
         ok, err = pcall(Mem.ReportGC)
+    elseif sub == "attribute" or sub == "attrib" then
+        ok, err = pcall(Mem.ReportAttribution)
     else
         ok, err = pcall(Mem.Report)
     end
