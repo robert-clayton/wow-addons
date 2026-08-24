@@ -374,5 +374,31 @@ do
     ok(checked >= 6, "found the source-order arrays (" .. checked .. ")")
 end
 
+-- Texture escapes in Blizzard's own source strings. A bare filename cannot
+-- resolve to a file, and the client then prints the path where the icon
+-- should be -- "Cost: 1800(INV_112_RaidTrinkets_VoidPrism.BLP)".
+do
+    local S = MC.SanitizeGameText
+    ok(type(S) == "function", "SanitizeGameText exists")
+
+    ok(S("Cost: 1800|TINV_112_RaidTrinkets_VoidPrism.BLP:0|t") == "Cost: 1800",
+       "an escape with no directory is dropped")
+
+    local good = "Cost: 1000|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t"
+    ok(S(good) == good, "an escape naming a real directory is kept")
+
+    local forward = "x|TInterface/Icons/Foo.blp:0|t"
+    ok(S(forward) == forward, "a forward-slash path is kept")
+
+    ok(S("no escapes here") == "no escapes here", "plain text is untouched")
+    ok(S(nil) == nil, "nil passes through")
+    ok(S(42) == 42, "a non-string passes through")
+
+    -- Mixed: the resolvable one survives, the bare one goes.
+    local mixed = "a|TBare.blp:0|tb|TInterface\\ICONS\\Ok.blp:0|tc"
+    ok(S(mixed) == "ab|TInterface\\ICONS\\Ok.blp:0|tc",
+       "only the unresolvable escape is removed")
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

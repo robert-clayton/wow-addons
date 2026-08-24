@@ -1151,6 +1151,32 @@ local function pickInZoneEntry(list, currentMap, effCurrent)
     return nil
 end
 
+--------------------------------------------------------------------------
+-- Blizzard's own source strings (C_PetJournal tooltipSource,
+-- C_MountJournal source text) embed texture escapes for currency icons.
+-- Some carry a bare filename with no directory -- "|TINV_112_RaidTrinkets_
+-- VoidPrism.BLP:0|t" rather than "|TInterface\ICONS\...|t" -- which the
+-- client cannot resolve, so it prints the path where the icon should be and
+-- the line reads "Cost: 1800(INV_112_RaidTrinkets_VoidPrism.BLP)".
+--
+-- Escapes that name a real directory are left alone: those resolve, and
+-- Blizzard's gold-cost strings rely on them.
+--------------------------------------------------------------------------
+function MC.SanitizeGameText(text)
+    if type(text) ~= "string" or not text:find("|T", 1, true) then
+        return text
+    end
+    return (text:gsub("|T(.-)|t", function(body)
+        -- body is "<path>:<size>[:more]". A path with no separator cannot
+        -- resolve to a file, so the escape would render as its own filename.
+        local path = body:match("^([^:]*)") or ""
+        if path:find("[\\/]") then
+            return "|T" .. body .. "|t"
+        end
+        return ""
+    end))
+end
+
 function MC.GetSmartWaypoint(item)
     local wp  = item.waypoint
     local owp = item.overworldWaypoint
@@ -1497,9 +1523,16 @@ function MC.DoItemAction(item, skillLine)
     else
         -- Nothing to route to and nothing to open. Silence here is
         -- indistinguishable from a broken click, and 1,673 catalog rows still
-        -- have no location at all.
-        print(format("%s No known location for %s yet.", PREFIX,
-            item.name or "that"))
+        -- have no coordinates. Many of them do know their zone, though, so
+        -- say that rather than claiming to know nothing.
+        local zone = MC.DeriveZone(item)
+        if zone then
+            print(format("%s No map pin for %s yet -- it is in %s.", PREFIX,
+                item.name or "that", zone))
+        else
+            print(format("%s No known location for %s yet.", PREFIX,
+                item.name or "that"))
+        end
     end
 end
 

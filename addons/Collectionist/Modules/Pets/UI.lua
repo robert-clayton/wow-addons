@@ -131,7 +131,13 @@ function UI:RenderPetRow(parent, pet, yOff, isCollected)
                 local _, _, _, _, tooltipSource, tooltipDescription =
                     C_PetJournal.GetPetInfoBySpeciesID(pet.speciesID)
                 if tooltipDescription then GameTooltip:AddLine(tooltipDescription, 0.7, 0.7, 0.7, true) end
-                if tooltipSource then GameTooltip:AddLine(tooltipSource, 0.5, 0.8, 0.5, true) end
+                if tooltipSource then
+                    -- Blizzard embeds currency-icon escapes in this string
+                    -- and some carry a bare filename the client cannot
+                    -- resolve, which then prints as its own path.
+                    GameTooltip:AddLine(MC.SanitizeGameText(tooltipSource),
+                        0.5, 0.8, 0.5, true)
+                end
             end
             GameTooltip:Show()
             local sr, sg, sb = theme:SourceColor(pet.source)

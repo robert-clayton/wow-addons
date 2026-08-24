@@ -123,7 +123,10 @@ function UI:RenderMountRow(parent, mount, yOff, isCollected)
             if mount.mountID and mount.mountID > 0 and C_MountJournal and C_MountJournal.GetMountInfoExtraByID then
                 local _, description, source = C_MountJournal.GetMountInfoExtraByID(mount.mountID)
                 if description then GameTooltip:AddLine(description, 0.7, 0.7, 0.7, true) end
-                if source then GameTooltip:AddLine(source, 0.5, 0.8, 0.5, true) end
+                if source then
+                    GameTooltip:AddLine(MC.SanitizeGameText(source),
+                        0.5, 0.8, 0.5, true)
+                end
             end
             GameTooltip:Show()
             local sr, sg, sb = theme:SourceColor(mount.source)
