@@ -257,13 +257,17 @@ local function ZoneFromWaypoint(wp)
     for _, spot in ipairs(wp) do
         if type(spot) == "table" and type(spot[1]) == "number" then n = n + 1 end
     end
-    return format("%d locations", n)
+    return format("%d locations", n), true
 end
 
+-- Returns the zone text, plus true when that text counts places instead of
+-- naming one.
 function MC.DeriveZone(entry)
-    if not entry or entry.zone then return entry and entry.zone end
-    return ZoneFromWaypoint(entry.waypoint)
-        or ZoneFromWaypoint(entry.overworldWaypoint)
+    if not entry then return nil end
+    if entry.zone then return entry.zone end
+    local zone, spread = ZoneFromWaypoint(entry.waypoint)
+    if zone then return zone, spread end
+    return ZoneFromWaypoint(entry.overworldWaypoint)
 end
 
 function MC.RegisterContent(expansionKey, moduleKey, groups)
@@ -814,23 +818,47 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
 
     -- Use GetSmartWaypoint so the displayed coords match wherever the
     -- player would actually be routed if they clicked.
+    -- What the Zone: line ended up saying, so the drop block below does not
+    -- print the same zone a second time. Both lines are useful when they
+    -- differ (the pin is one place, the mob roams another); when they agree
+    -- the repeat just reads as a rendering bug.
+    -- "Zone:" answers where the thing is. GetSmartWaypoint answers how to get
+    -- there, and in Midnight that is a portal in whichever hub you happen to
+    -- be standing in -- so labelling the zone from the routed waypoint named
+    -- the hub instead of the destination. A player in Silvermoon saw every
+    -- Naigtal rare claim to be in Silvermoon City, with the portal's own
+    -- coordinates printed underneath. Destination and route are now two
+    -- separate lines.
+    local destZone, zoneIsCount = MC.DeriveZone(item)
+    local shownZone = destZone
     local resolvedWp = MC.GetSmartWaypoint(item)
     if resolvedWp then
         local isList = MC._isWaypointList(resolvedWp)
         local first = isList and resolvedWp[1] or resolvedWp
         if first[1] and first[1] > 0 then
             local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(first[1])
-            local mapName = mapInfo and mapInfo.name or ("Map " .. first[1])
-            tt:AddDoubleLine("Zone:", mapName, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
+            local routedName = mapInfo and mapInfo.name or ("Map " .. first[1])
+            -- The routed name is the fallback, not the answer: DeriveZone can
+            -- come back empty when C_Map is not ready yet.
+            shownZone = destZone or routedName
+            if not (isList and zoneIsCount) then
+                tt:AddDoubleLine("Zone:", shownZone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
+            end
             if isList then
                 tt:AddDoubleLine("Spawns:", #resolvedWp .. " possible locations",
                     C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
             elseif first[2] and first[3] then
                 tt:AddDoubleLine("Coords:", format("%.1f, %.1f", first[2] * 100, first[3] * 100), C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
             end
+            -- Clicking routes somewhere else first. Saying so turns what was
+            -- a mislabelled zone into the useful half of the same fact, and
+            -- stops the coords above looking like they belong to destZone.
+            if destZone and routedName ~= destZone and first[4] then
+                tt:AddDoubleLine("Via:", first[4], C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttHintBlue[1], C.ttHintBlue[2], C.ttHintBlue[3])
+            end
         end
-    elseif item.zone then
-        tt:AddDoubleLine("Zone:", item.zone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
+    elseif shownZone then
+        tt:AddDoubleLine("Zone:", shownZone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
     end
 
     -- Renown / rep requirement (red until met, green when met)
@@ -917,7 +945,7 @@ function MC.ShowItemInfoTooltip(owner, item, sourceLabel, sr, sg, sb)
         if di.mob then
             tt:AddDoubleLine("Drops from:", di.mob, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttDropMob[1], C.ttDropMob[2], C.ttDropMob[3])
         end
-        if di.zone then
+        if di.zone and di.zone ~= shownZone then
             tt:AddDoubleLine("Zone:", di.zone, C.ttLabel[1], C.ttLabel[2], C.ttLabel[3], C.ttValue[1], C.ttValue[2], C.ttValue[3])
         end
         if di.rate then

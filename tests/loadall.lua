@@ -322,6 +322,18 @@ do
     ok(byName["One Spot"] == "Tanaris", "a single waypoint names its map")
     ok(byName["Same Map Twice"] == "Tanaris", "spots sharing a map name it once")
     ok(byName["Two Zones"] == "2 locations", "spots across maps report a count")
+
+    -- The second return tells a count apart from a place name. The tooltip
+    -- needs that: it prints its own "N possible locations" line and would
+    -- otherwise say the same thing twice.
+    local oneZone, oneSpread = MC.DeriveZone({ waypoint = { 990071, 0.5, 0.5, "x" } })
+    ok(oneZone == "Tanaris" and not oneSpread, "a named zone is not flagged as a count")
+    local manyZone, manySpread = MC.DeriveZone({
+        waypoint = { { 990071, 0.1, 0.2, "a" }, { 990023, 0.3, 0.4, "b" } } })
+    ok(manyZone == "2 locations" and manySpread == true, "a count is flagged as one")
+    local curated = select(2, MC.DeriveZone({ zone = "Hand Written",
+        waypoint = { { 990071, 0.1, 0.2, "a" }, { 990023, 0.3, 0.4, "b" } } }))
+    ok(not curated, "a curated zone is never flagged as a count")
     ok(byName["No Location"] == nil, "a row with no waypoint gets no zone")
     ok(byName["Unnamed Map"] == nil, "a map the client cannot name yields nothing")
     ok(byName["Overworld Only"] == "Eastern Plaguelands",
