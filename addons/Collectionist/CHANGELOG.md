@@ -2,43 +2,32 @@
 
 ### Added
 - **The whole game, not just Midnight.** Complete catalogs for Classic through The War Within, across every tracker.
-- **A second interface: Premium.** Sidebar navigation, a spine showing progress across every tracker, and your score always in view. The old layout is still there as Simple — `/mc style` switches.
+- **Collection Score** Like Raider.IO or Achievement Points, but better because collectors > all! Heavily WIP.
+- **A new Premium interface.** Sidebar navigation and more!
 - **Search everything.** A magnifier in the title bar, or `/mc find`, or just type after `/mc`. Searches every collectible by name, zone, or source.
 - **Collection status on item tooltips.** Hover a mount, pet, toy or decoration anywhere in the game and see whether you have it, and where to get it if not.
-- **A Targets tab.** Alt-click anything you're chasing to pin it. Pinned things get their own page as well as the small on-screen list.
-- **Recipes tell you where they come from**, and drop map pins. Trainer pins send you to your own faction's capital, and a vendor who wanders gets all his stops.
-- **Locations for thousands of older collectibles** — the zone it comes from, and a clickable pin.
-- **Reward tracks show live progress.** A row needing Preyhunter's Journey rank 8 reads your current rank and turns green once you've met it.
+- **A Targets tab.** Alt-click anything you're chasing to pin it. Pinned things get their own page as well as the small on-screen list. (*Many known bugs with this, will be fixed soon)
+- **Reward tracks show live progress.** Many of the "non-major" factions weren't using the "can you actually buy this?" feature. It does now!
 - **Trading Post pets, mounts and toys are tracked**, with a "Hide Trading Post" toggle on each tab.
-- **Sort rows** — Default, A-Z, Z-A, or expansion order. Each tab remembers its own.
+- **Sort rows** Default, A-Z, Z-A, or expansion order.
 - **Hide unobtainable recipes**, in Options > Trackers.
-- A **compact mode** and a minimize strip, so Collectionist can sit on screen while you play.
-- Hundreds of recipes and housing decorations that were missing entirely.
-- A quiet "what's new" note after updating, and the Ellesmere theme for anyone running EllesmereUI.
+- A **compact mode** and a minimize strip, so Collectionist can sit on screen while you play despite the new interface's Full view.
+- Hundreds of recipes and housing decorations that were missing entirely. So yeah, fixed.
+- A quiet "what's new" note after updating
 
 ### Changed
-- **Achievements are scoped to collecting.** Raid kills, battleground objectives and reputation grinds no longer fill the tab or count against your completion. About half are gone.
-- **Achievements no longer inflate your Collection Score**, and the separate achievement-points tally is gone — the game's own UI is where that belongs.
-- **Collection Score prices recipes by how hard they are to get.** Most collections will see their recipe score go up.
-- **Big tabs open instantly**, and the addon holds far less memory while you play.
-- **Recipes list every profession**, not just the ones this character knows.
-- **One control decides what a tab shows** — Options > Expansions governs every tracker at once.
-- The launch expansion is called **Vanilla** rather than Classic.
+- Virtualized Rows to try and keep performance costs down.
+- **Recipes list every profession**, not just the ones the character you're on knows.
+- **One control decides what a tab shows** Options > Expansions governs every tracker at once.
 
 ### Fixed
 - Tooltips name where a thing is, rather than the portal you'd travel through to reach it.
 - Clicking a row always tells you what happened, instead of quietly doing nothing.
 - The Coiled Isle no longer appears twice in Rares and Treasures.
 - Rares and treasures show their real names. Several shared one name, and hundreds of Legion and Warlords treasures had none at all.
-- A finishing scan no longer paints a tracker list over your search results.
-- Costs show the currency icon instead of a filename.
-- Recipes you can no longer obtain don't count toward Collection Score.
 - Rare and treasure zones show real names instead of keys like `arathi_highlands`.
-- Spring Butterfly is filed under World Event, so it stops showing up under "Unknown".
 - Scrollbars can be dragged, and the window expands again after collapsing to the strip.
 
-### Removed
-- The "Location only" rows in Rares and Treasures. They couldn't be collected, and a collection tracker is the wrong place for a map reference.
 
 # 1.12.1
 ### Added
