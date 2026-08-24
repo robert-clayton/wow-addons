@@ -1337,8 +1337,14 @@ function lib.RenderModulePage(panel, opts)
 
     local seen = {}
     for _, srcType in ipairs(opts.sourceOrder or {}) do
+        -- A key listed twice in sourceOrder used to draw its bucket twice:
+        -- seen only guarded the fallback pass below. A patch file re-adding a
+        -- source key the base file already declared is enough to do it, and
+        -- the result -- the same group, header and rows, rendered twice -- is
+        -- indistinguishable from duplicated data.
+        local already = seen[srcType]
         seen[srcType] = true
-        local entries = r.bySource and r.bySource[srcType]
+        local entries = not already and r.bySource and r.bySource[srcType]
         if entries and #entries > 0 then
             if sortEntries then sortEntries(entries) end
             yOff = opts.renderSourceGroup(child, srcType, entries, yOff)

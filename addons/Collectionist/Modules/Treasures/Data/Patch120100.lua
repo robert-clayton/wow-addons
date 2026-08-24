@@ -1,8 +1,9 @@
 local _, MC = ...
 
 -- Patch 12.1: Curse of Ula'tek.
-table.insert(MC.TreasureSourceOrder, "coiled_isle")
-MC.TreasureSourceLabels.coiled_isle = "The Coiled Isle"
+-- The source key and its label are already declared in the base file.
+-- Re-adding the key here put it in MC.TreasureSourceOrder twice, and the render
+-- walks that list, so the whole Coiled Isle group drew twice.
 
 MC.RegisterContent("midnight", "treasures", {
     { source = "coiled_isle", achievementID = 63359, criteriaCount = 22,

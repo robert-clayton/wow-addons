@@ -330,5 +330,37 @@ do
     ENV.C_Map = savedCMap
 end
 
+-- Source-order arrays must not repeat a key. RenderStandardList walks the
+-- order list to lay groups out, so a repeated key drew that group's header
+-- and every one of its rows a second time -- which reads as duplicated data,
+-- not as a layout bug. Patch120100 re-adding "coiled_isle" (already declared
+-- in the base file) did exactly that to both Rares and Treasures.
+--
+-- The library now skips a repeat, so this guards the data rather than the
+-- symptom: a duplicate here still means two files disagree about who owns a
+-- source key.
+do
+    local orders = {
+        MountSourceOrder = MC.MountSourceOrder,
+        PetSourceOrder = MC.PetSourceOrder,
+        ToySourceOrder = MC.ToySourceOrder,
+        DecoSourceOrder = MC.DecoSourceOrder,
+        RareSourceOrder = MC.RareSourceOrder,
+        TreasureSourceOrder = MC.TreasureSourceOrder,
+    }
+    local checked = 0
+    for name, arr in pairs(orders) do
+        if type(arr) == "table" then
+            checked = checked + 1
+            local seen = {}
+            for _, key in ipairs(arr) do
+                ok(not seen[key], name .. " lists " .. tostring(key) .. " once")
+                seen[key] = true
+            end
+        end
+    end
+    ok(checked >= 6, "found the source-order arrays (" .. checked .. ")")
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)
