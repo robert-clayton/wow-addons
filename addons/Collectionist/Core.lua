@@ -201,6 +201,71 @@ function MC.RegisterExistingRecipeContent(expansionKey, skillLine)
     return registeredAny
 end
 
+--------------------------------------------------------------------------
+-- Zone text derived from the waypoint.
+--
+-- A row's location was stored twice: `zone` for the text in the list, and
+-- `waypoint` for the pin the click drops. Rows that had only the waypoint
+-- rendered with an empty location column while clicking them worked fine,
+-- which reads as a missing feature rather than a missing string.
+--
+-- So the waypoint is the one source and the text comes off it. The client
+-- already knows what a uiMapID is called, and a curated `zone` still wins
+-- where one exists -- it is often more useful than the map name ("Caverns
+-- of Time" against "Tanaris").
+--------------------------------------------------------------------------
+local mapNameCache = {}
+
+local function MapName(mapID)
+    if type(mapID) ~= "number" or mapID <= 0 then return nil end
+    local cached = mapNameCache[mapID]
+    if cached then return cached end
+    local name
+    if C_Map and C_Map.GetMapInfo then
+        local info = C_Map.GetMapInfo(mapID)
+        name = info and info.name
+    end
+    -- Only hits are memoised. Caching the misses would be the cheaper cache
+    -- and the wrong one: a lookup that happens before C_Map can answer would
+    -- pin "this map has no name" for the session, and every row pointing at
+    -- it would render blank for good with no way back.
+    if name then mapNameCache[mapID] = name end
+    return name
+end
+
+-- Accepts either shape Data/Locations.lua uses: one { map, x, y, label }
+-- tuple, or a list of them.
+local function ZoneFromWaypoint(wp)
+    if type(wp) ~= "table" then return nil end
+    if type(wp[1]) == "number" then return MapName(wp[1]) end
+
+    local first, mixed
+    for _, spot in ipairs(wp) do
+        local id = type(spot) == "table" and spot[1] or nil
+        if type(id) == "number" then
+            if not first then
+                first = id
+            elseif id ~= first then
+                mixed = true
+            end
+        end
+    end
+    if not first then return nil end
+    if not mixed then return MapName(first) end
+    -- Spread across zones: naming one of them would be picking a favourite.
+    local n = 0
+    for _, spot in ipairs(wp) do
+        if type(spot) == "table" and type(spot[1]) == "number" then n = n + 1 end
+    end
+    return format("%d locations", n)
+end
+
+function MC.DeriveZone(entry)
+    if not entry or entry.zone then return entry and entry.zone end
+    return ZoneFromWaypoint(entry.waypoint)
+        or ZoneFromWaypoint(entry.overworldWaypoint)
+end
+
 function MC.RegisterContent(expansionKey, moduleKey, groups)
     if not (expansionKey and moduleKey and groups) then return end
     if moduleKey == "recipes" then
@@ -238,6 +303,11 @@ function MC.RegisterContent(expansionKey, moduleKey, groups)
                     entry.expansion = entry.expansion or expansionKey
                     entry.moduleKey = entry.moduleKey or moduleKey
                     entry.availableAfter = entry.availableAfter or group.availableAfter
+                    -- Every entry in every module passes through here, so this
+                    -- is the one place the derivation has to live. Runtime
+                    -- only: Lua state resets each session, and the shipped
+                    -- files keep exactly the zones a human wrote.
+                    entry.zone = entry.zone or MC.DeriveZone(entry)
                 end
             end
         end

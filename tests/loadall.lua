@@ -280,5 +280,55 @@ do
     ENV.CollectionistDB, MC.db = savedDB, savedMCdb
 end
 
+-- Zone text derived from the waypoint. A row carrying only a waypoint used
+-- to render an empty location column while its click dropped a pin
+-- correctly, so the two now come off the same field.
+do
+    local savedCMap = ENV.C_Map
+    ENV.C_Map = {
+        GetMapInfo = function(id)
+            -- Ids no shipped row points at. The harness's permissive global
+            -- stub answers every C_Map call with a truthy junk string, so any
+            -- id the real data load already asked about is memoised before
+            -- this stub exists.
+            local names = { [990071] = "Tanaris", [990023] = "Eastern Plaguelands" }
+            local n = names[id]
+            return n and { name = n } or nil
+        end,
+    }
+
+    local entries = {
+        { decorID = 90001, name = "Curated", zone = "Hand Written",
+          waypoint = { 990071, 0.5, 0.5, "x" } },
+        { decorID = 90002, name = "One Spot",
+          waypoint = { 990071, 0.5, 0.5, "x" } },
+        { decorID = 90003, name = "Same Map Twice",
+          waypoint = { { 990071, 0.1, 0.2, "a" }, { 990071, 0.3, 0.4, "b" } } },
+        { decorID = 90004, name = "Two Zones",
+          waypoint = { { 990071, 0.1, 0.2, "a" }, { 990023, 0.3, 0.4, "b" } } },
+        { decorID = 90005, name = "No Location" },
+        { decorID = 90006, name = "Unnamed Map",
+          waypoint = { 990999, 0.5, 0.5, "x" } },
+        { decorID = 90007, name = "Overworld Only",
+          overworldWaypoint = { 990023, 0.5, 0.5, "x" } },
+    }
+    MC.RegisterContent("midnight", "decorations",
+        { { source = "quest", decorations = entries } })
+
+    local byName = {}
+    for _, e in ipairs(entries) do byName[e.name] = e.zone end
+
+    ok(byName["Curated"] == "Hand Written", "a hand-written zone is not overwritten")
+    ok(byName["One Spot"] == "Tanaris", "a single waypoint names its map")
+    ok(byName["Same Map Twice"] == "Tanaris", "spots sharing a map name it once")
+    ok(byName["Two Zones"] == "2 locations", "spots across maps report a count")
+    ok(byName["No Location"] == nil, "a row with no waypoint gets no zone")
+    ok(byName["Unnamed Map"] == nil, "a map the client cannot name yields nothing")
+    ok(byName["Overworld Only"] == "Eastern Plaguelands",
+       "an overworld waypoint counts too")
+
+    ENV.C_Map = savedCMap
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)
