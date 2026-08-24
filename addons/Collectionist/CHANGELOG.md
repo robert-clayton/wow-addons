@@ -1,93 +1,58 @@
-# 1.16.0
-### Changed
-- **The Premium shell is now the default.** If you never picked a window style you'll come back to the sidebar layout instead of the compact panel. If you deliberately chose Simple, you keep it — Options > Appearance still switches either way.
-- **Big tabs open instantly now.** Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can actually see are built now, so switching tabs is immediate no matter how much you track.
-- **Much lighter on memory.** The search index is no longer built at all until you actually search — it was the single largest thing the addon held, and most sessions never used it. Item tooltips keep working: they use a much smaller lookup of their own. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.
-- Turning expansions on and off in Options no longer rescans everything once per checkbox — it settles once when you're done clicking.
+# 1.16.1
+*Everything since 1.12.1. The 1.13 through 1.16.0 builds were never published, so all of that work arrives here at once.*
 
 ### Added
-- **A Targets tab.** What you pinned now has a page of its own in the sidebar, grouped by what it came from, instead of only the small on-screen list. It sits with Options at the bottom, in its own colour, because it is what you are working on rather than another collection to browse. Right-click a row to unpin it.
+- **The whole game, not just Midnight.** Complete catalogs for Classic through The War Within across every tracker — mounts, pets, toys, decorations, recipes, rares, treasures and achievements.
+- **A second interface: Premium.** An application-style window with sidebar navigation, a collection spine showing progress across every tracker, and a footer that keeps your score and peers in view. The original layout is still there as Simple — switch with `/mc style`, or in Options > Appearance. Premium is the default for anyone who never picked one.
+- **Search everything.** A magnifier in the title bar — or `/mc find`, or just typing anything after `/mc` — searches every collectible by name, zone, or source. "Storm song" finds the Stormsong Valley mounts; "Kael" finds his drops across five trackers. Results group by tracker and keep their usual clicks.
+- **Collection status on item tooltips.** Hover a mount, pet, toy or decoration anywhere in the game — bags, loot, the auction house — and Collectionist appends one line: green "Collected", or "Missing" plus where to get it. Turn it off in Options > General.
+- **A Targets tab.** Alt-click anything you're chasing to pin it. Pinned things now have a page of their own in the sidebar, grouped by where they came from, as well as the small on-screen list. It sits with Options at the bottom, in its own colour, because it's what you're working on rather than another collection to browse. Right-click a row to unpin.
+- **Recipes tell you where they come from.** Around nine in ten used to say "unknown". 8,975 now name the trainer, vendor, boss, quest or container that gives them, and the zone: "Marith Lazuria \<Jewelcrafting Supplies\>, Dalaran". Nine remain uncatalogued.
+- **Recipes drop map pins**, the same way rares and treasures do — roughly 5,900 of them. Trainer pins are faction-paired, so Alliance players get their own capital instead of being sent to Orgrimmar; neutral hubs like Dalaran, Oribos and Valdrakken are shared, as in game. A vendor who wanders gets all his stops pinned rather than one guess.
+- **Locations for thousands of older collectibles.** 2,854 mounts, pets, toys and decorations gained the zone they come from, and 3,135 of them gained a clickable map pin — including 560 that carry several possible spots.
+- **Reward tracks show live progress.** A row that needs Preyhunter's Journey rank 8, or Keg Leg's Crew renown 20, now reads your current rank and turns green when you've met it, instead of stating the requirement as plain text.
+- **401 recipes and 180 housing decorations that were missing entirely**, across every profession, each with the quest or vendor that awards it.
+- **Trading Post pets, mounts and toys are tracked** — 30 pets, 74 mounts, 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own "Hide Trading Post" toggle. 17 that began as Trading Card Game codes, Shop purchases, Recruit-a-Friend rewards or promotions are deliberately left out; those cost real money or are gone for good.
 - **Sort rows.** A control in the title bar cycles Default, A-Z, Z-A, and expansion order both ways. Each tab remembers its own.
-- **Locations for older collectibles.** 519 mounts, pets and toys outside the current expansion now have a map pin where before they had nothing.
 - **Hide unobtainable recipes**, in Options > Trackers. Recipes removed from the game stop filling the list and stop counting against your totals; they're still counted as Legacies.
-- In the compact window, clicking the page title opens a list of the other tabs — the sidebar isn't there to switch with.
+- A **compact mode** and a slim minimize strip, so Collectionist can sit on screen while you play. In the compact window, clicking the page title opens a list of the other tabs — the sidebar isn't there to switch with.
+- **A quiet "what's new" note after updating.** A small line at the edge of the window the first time you open a new version. Click to read, or ignore it and it leaves on its own. `/mc whatsnew` any time.
+- The **Ellesmere** theme, for anyone running EllesmereUI.
+- The Collection Inspector is a proper window you can move, resize, and close with Escape.
+- Every expansion appears in the pickers, greyed out until its content ships.
 - `/mc mem` reports where the addon's memory is going, and `/mc mem gc` collects first so you can tell what's held from what's merely uncollected.
 
+### Changed
+- **Achievements are scoped to collecting.** The tab shipped 4,347 achievements — every raid boss kill, battleground objective and reputation grind — and all of it counted against your completion. An achievement is now included only if it's a collection task, a step toward a meta that rewards a collectible or title, a direct collectible or title reward, or an expansion feature. That keeps 2,310 and drops 2,037.
+- **Achievements no longer inflate your Collection Score.** They were making up 59% of the total, so the number described achievement progress more than it described a collection. The separate achievement-points tally is gone too — the game's own UI is where that belongs.
+- **Collection Score prices recipes by how hard they are to get.** A recipe that drops from a raid boss counts for more than one you buy from a vendor. Most collections will see their recipe score go up.
+- **Big tabs open instantly.** Recipes used to build a frame for all 10,318 rows the moment you clicked it, and the game hitched while it did. Only the rows you can see are built now.
+- **Much lighter on memory.** The search index isn't built until you actually search — it was the single largest thing the addon held, and most sessions never used it. Rare, treasure and achievement progress also stopped rescanning several times a second while you quest.
+- **Recipes list every profession**, not just the ones this character knows, with a toggle to hide unlearned ones. Recipe unlocks are account-wide, so the browser now matches.
+- **One control decides what a tab shows.** The per-tab expansion filter is gone; Options > Expansions governs every tracker at once, and toggling expansions no longer rescans once per checkbox.
+- Options moved into the sidebar as its own tab. Scan lives there now.
+- Window controls sit where you expect them — minimize, maximize and close at the top right.
+- The launch expansion is called **Vanilla** rather than Classic, which is what people actually call it.
+- Fades and slides throughout both layouts, and tabs cross-fade when you switch.
+
 ### Fixed
-- A finishing scan no longer paints a tracker list over whatever you were looking at. Search results could be replaced by the last tab's rows a second after you opened them, with no way to tell why.
-- Recipes you can no longer obtain no longer count toward Collection Score. They're Legacies, the same as every other tracker treats them.
-- Rare and treasure zones show their real names instead of raw keys like `arathi_highlands`, and six zones that were listed twice under different spellings are merged.
-- Recipe map pins name the vendor or quest that actually teaches the recipe, instead of borrowing the name of whatever else stands in the same spot.
-- Eight Trading Post pets had an invalid pet family and showed none; a handful of decoration names had their quotes and apostrophes mangled.
+- **Tooltips name where a thing is, not how you get there.** Hovering a Naigtal rare while standing in Silvermoon reported "Zone: Silvermoon City" and printed the portal's coordinates as if they were the rare's. 473 rows could show a wrong zone this way. A new "Via:" line names the portal when the route differs from the destination.
+- **Clicking a row now always tells you what happened.** A waypoint on a map that can't take one — a Horrific Vision, or a phased copy of a zone — reported success while placing nothing. Pins that could never appear have been removed, and rows with no location say so instead of doing nothing.
+- **The Coiled Isle no longer appears twice** in Rares and Treasures, and 62 zones no longer print twice in the `/mc` summary.
+- **Rares and treasures show their real names.** Three different Coiled Isle rares all displayed as "Slaipaan" because Blizzard's criterion text repeats, and roughly 650 Legion and Warlords treasures had no name at all — the name was already in our data and only being used to look up coordinates.
+- A finishing scan no longer paints a tracker list over whatever you were looking at. Search results could be replaced by the last tab's rows a second after you opened them.
+- Costs no longer print a texture filename where the currency icon should be.
+- Recipes you can no longer obtain don't count toward Collection Score. They're Legacies, like everywhere else.
+- Rare and treasure zones show real names instead of raw keys like `arathi_highlands`, and six zones listed twice under different spellings are merged.
+- Recipe map pins name the vendor or quest that teaches the recipe, instead of borrowing the name of whatever else stands in the same spot. Quest-sourced recipes name the quest.
+- Twelve Draenor recipes said "Not obtainable" when they're craftable today. Recipes show the "Click to open profession" hint again.
+- Spring Butterfly is filed under World Event rather than Rare Drop, so it stops appearing under an "Unknown" heading.
+- Eight Trading Post pets had an invalid pet family and showed none; some decoration names had their quotes and apostrophes mangled.
 - Item tooltips no longer break on clients without the modern tooltip API.
+- Scrollbars can be clicked and dragged. The collection spine keeps its width when collapsing to compact. Collectionist can be expanded again after collapsing all the way to the strip.
 
 ### Removed
 - The "Location only" rows in Rares and Treasures. They couldn't be collected, a quarter of them duplicated something already tracked, and a collection tracker is the wrong place for a map reference.
-
-# 1.15.0
-### Added
-- **Search everything.** A magnifier in the title bar — or `/mc find`, or just typing anything after `/mc` — searches every collectible the addon knows by name, zone, or source. "Storm song" finds the Stormsong Valley mounts, "Kael" finds his drops across five trackers. Results group by tracker, and every row keeps its usual clicks: waypoint, Wowhead link, Alt-click to pin.
-- Search respects Options > Expansions like the tabs do, but ignores the hide-unavailable and Trading Post toggles — those curate the trackers; search answers whether something exists at all. Your last few queries are remembered as clickable recents.
-- **Collection status on item tooltips.** Hover a mount, pet, toy, or decoration anywhere in the game — bags, loot, the auction house — and Collectionist appends one line: green "Collected", or "Missing" plus where to get it, in that source's color. Turn it off in Options > General if you'd rather not know.
-- Escape backs out of search to whatever tab you were reading; an empty input's Escape leaves search, a full one just clears.
-
-# 1.14.0
-### Added
-- **Recipes drop map pins.** Click a recipe you haven't learned and Collectionist points you at it, the same way rares and treasures already did. Around 5,900 recipes now have a location — the vendor who sells it, the boss who drops it, the quest that rewards it, or the trainer who teaches it.
-- **Trainer pins know your faction.** The data everyone builds these from files each recipe under one faction's trainer, which would have sent Alliance players to Orgrimmar. Every trainer pin is paired instead, so you get your own capital. Neutral hubs like Dalaran, Oribos and Valdrakken are shared, as they are in game.
-- A vendor who wanders now gets all of his stops pinned rather than one guess at where he might be.
-- **401 recipes that were missing entirely**, across every profession — Jewelcrafting 90, Inscription 87, Leatherworking 70, Enchanting 40, Blacksmithing 38, Cooking 34, Tailoring 24, and a handful each of Alchemy and Engineering.
-- **180 housing decorations** that were missing, each with the quest or vendor that awards it.
-- **708 rares and 364 treasures as map locations.** These are places to go, not things to collect — the game gives no reliable way to know whether you have already got them, so they show as "Location only", carry a waypoint, and never count towards your totals or your Collection Score. Pandaria through Midnight.
-
-### Fixed
-- Twelve Draenor recipes said "Not obtainable" when they are craftable today — Hexweave Cloth, Truesteel Ingot, Alchemical Catalyst and the rest of the daily-cooldown reagents. They read as trainer-taught now, which is what they are.
-- Recipes show the "Click to open profession" hint again. The hint was checking for something recipe rows never carried, so it never appeared even though the click always worked.
-- Several hundred recipes named the wrong thing as their source — a quest reward would name the container it sat in rather than the quest. Quest-sourced recipes now name the quest.
-
-# 1.13.2
-### Added
-- **Trading Post mounts and toys join the pets.** 74 mounts and 9 toys, filed under the expansion whose Trading Post first offered them. Each tab has its own "Hide Trading Post" toggle if you would rather not see them.
-- 17 collectibles that only reached the Trading Post after starting life as Trading Card Game codes, in-game Shop purchases, Recruit-a-Friend rewards or promotions are deliberately left out. Those are still bought with real money or gone for good, depending on which.
-
-# 1.13.1
-### Added
-- **Recipes tell you where they come from.** Around nine in ten recipes in the browser used to say "unknown" — nothing about who teaches them or where to look. 8,975 of them now name the trainer, vendor, boss, quest or container that gives them, and the zone it is in: "Marith Lazuria \<Jewelcrafting Supplies\>, Dalaran". Nine are still uncatalogued, all Inscription glyphs and Pandaria profession items.
-- Recipes sort into headings that match how you actually get them, including World Drop, Treasure, PvP, and Not obtainable for recipes that exist in the client but were never released.
-- **Trading Post pets are tracked.** 30 of them, filed under the expansion whose Trading Post first offered them. They are bought with Trader's Tender you earn in game and they come back around, so leaving them out was making collections look more complete than they were. Hide them with "Hide Trading Post" in the Pets options.
-- **A quiet "what's new" note after updating.** The first time you open Collectionist on a new version, a small line appears at the edge of the window. Click it to read the changes, or ignore it and it leaves on its own. `/mc whatsnew` any time; turn it off in Options.
-
-### Changed
-- **Collection Score prices recipes by how hard they are to get.** While almost every recipe was filed as "unknown" they all scored the same flat amount regardless of source. Now that the addon knows the difference, a recipe that drops from a raid boss counts for more than one you buy from a vendor. Most collections will see their recipe score go up.
-
-# 1.13.0
-### Added
-- **The whole game, not just Midnight.** Complete Classic, The Burning Crusade, Wrath of the Lich King, Cataclysm, Mists of Pandaria, Warlords of Draenor, Legion, Battle for Azeroth, Shadowlands, Dragonflight, and The War Within catalogs for every tracker, with exact manifest validation for collectible, achievement, recipe, rare, and treasure IDs.
-- **A second interface: Premium.** An application-style window with sidebar navigation, a collection spine showing progress across every tracker, and a footer that keeps your score and peers in view. The original layout is still there as Simple — switch with `/mc style`.
-- A **compact mode** and a slim minimize strip, so Collectionist can sit on screen while you play without taking a quarter of it.
-- **Pinned targets.** Alt-click anything you're chasing to keep it in a small overlay, wherever you are in the addon.
-- The **Ellesmere** theme, for anyone running EllesmereUI.
-- The Collection Inspector is now a proper window you can move, resize, and close with Escape.
-- Every expansion appears in the pickers, greyed out until its content ships, so you can see what's coming.
-- Housing decorations are assigned to the expansion where they are obtained, including pre-Midnight rewards that only entered the housing catalog when housing launched.
-- Housing recipes taught by an older expansion's profession tiers are tracked with that expansion as well.
-- Release-cycle rewards from Remix, seasonal play, anniversaries, Plunderstorm, and other ended events remain under their original expansion and are marked unavailable where their acquisition window has closed.
-
-### Changed
-- **Achievements no longer inflate your Collection Score.** There are three times as many of them as the next-largest tracker and they carried the heaviest weights, so they were making up 59% of the total — the number described achievement progress more than it described a collection. The separate achievement-points tally is gone too; the game's own achievement UI is where that belongs.
-- **Recipes list every profession**, not just the ones this character knows, with a toggle to hide the ones you haven't learned. Recipe unlocks are account-wide, so the browser now matches.
-- **One control decides what a tab shows.** The per-tab expansion filter is gone; Options > Expansions governs every tracker at once.
-- Options moved out of a side dock and into the sidebar as its own tab. Scan lives there now.
-- Window controls sit where you expect them — minimize, maximize, and close at the top right of the header.
-- The launch expansion is called **Vanilla** rather than Classic, which is what people actually call it.
-- Fades and slides throughout both layouts, and tabs cross-fade when you switch.
-- Tracker headings dropped their subtitle blurbs.
-
-### Fixed
-- Scrollbars can be clicked and dragged.
-- The collection spine kept its full width when collapsing to compact.
-- The first time you hovered a sidebar entry it flashed near-white instead of lifting slightly.
-- Collectionist could not be expanded again after collapsing it all the way down to the strip.
 
 # 1.12.1
 ### Added
