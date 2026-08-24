@@ -95,9 +95,9 @@ MC.RegisterContent("bfa", "toys", {
         { itemID = 163742, name = "Heartsbane Grimoire", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rRunebound Chest|n|cFFFFD200Zone: |rDrustvar", zone = "Drustvar", waypoint = { 896, 0.4420, 0.2780, "Heartsbane Grimoire" } },
         { itemID = 163740, name = "Drust Ritual Knife", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rRunebound Coffer|n|cFFFFD200Zone: |rDrustvar", zone = "Drustvar", waypoint = { 896, 0.3368, 0.7174, "Drust Ritual Knife" } },
         { itemID = 168824, name = "Ocean Simulator", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rWorld Arcane Chest Drop", zone = "Nazjatar" },
-        { itemID = 174920, name = "Coifcurl's Close Shave Kit", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rCoifcurl's Close Shave Kit|n|cFFFFD200Zone: |rVision of Orgrimmar", waypoint = { { 1469, 0.4050, 0.6030, "Coifcurl's Close Shave Kit" }, { 2403, 0.4050, 0.6030, "Coifcurl's Close Shave Kit" } } },
+        { itemID = 174920, name = "Coifcurl's Close Shave Kit", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rCoifcurl's Close Shave Kit|n|cFFFFD200Zone: |rVision of Orgrimmar" },
         { itemID = 174928, name = "Rotten Apple", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rAlleria's Corrupted Chest|n|cFFFFD200Zone: |rVision of Stormwind" },
-        { itemID = 174924, name = "Void-Touched Souvenir Totem", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rZekhan's Corrupted Chest|n|cFFFFD200Zone: |rVision of Orgrimmar", waypoint = { { 1469, 0.3980, 0.7920, "Void-Touched Souvenir Totem" }, { 2403, 0.4880, 0.5830, "Void-Touched Souvenir Totem" } } },
+        { itemID = 174924, name = "Void-Touched Souvenir Totem", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rZekhan's Corrupted Chest|n|cFFFFD200Zone: |rVision of Orgrimmar" },
         { itemID = 174921, name = "Void-Touched Skull", source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rVoid-Touched Skull|n|cFFFFD200Zone: |rVision of Stormwind", waypoint = { { 1470, 0.5890, 0.5290, "Void-Touched Skull" }, { 2404, 0.5890, 0.5290, "Void-Touched Skull" } } },
     } },
     { source = "profession", toys = {

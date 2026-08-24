@@ -249,6 +249,11 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5038, npcID = 262786, name = "Wriggling Capybara",   petType = 8,  source = "drop", sourceInfo = "Wriggling Field Pouch (Void Assault, Zul'Aman)",        canBattle = true, zone = "Zul'Aman",
               dropInfo = { mob = "Wriggling Field Pouch", zone = "Zul'Aman" } },
             { speciesID = 5020, npcID = 262066, name = "Overloaded Manaling",  petType = 6,  source = "drop", sourceInfo = "Mana-Gorged Greatwyrm (rare elite, Void Assault)",     canBattle = true, zone = "Eversong Woods",
+              -- Daggerspine Point is a sub-area map with no world
+              -- position of its own, so the pin below only works
+              -- once inside. The entrance is what to route to from
+              -- outside, exactly as the curated Daggerspine rows do.
+              overworldWaypoint = LOC.DaggerspinePointEntrance,
               dropInfo = { mob = "Mana-Gorged Greatwyrm", zone = "Eversong Woods" }, score = T.epic, waypoint = { 2594, 0.5510, 0.3870, "Overloaded Manaling" } },
         },
     },

@@ -355,9 +355,9 @@ MC.RegisterContent("tww", "pets", {
             { speciesID = 4748, itemID = 235793, npcID = 237852, name = "Void-Scarred Parrot", petType = 3, source = "treasure", sourceInfo = "Wyrmbane's Corrupted Chest, Vision of Stormwind (Revisited)",
               canBattle = true, zone = "Vision of Stormwind", score = T.medium, waypoint = { 2404, 0.4130, 0.3410, "Void-Scarred Parrot" } },
             { speciesID = 4749, itemID = 235795, npcID = 237855, name = "Void-Scarred Scorpid", petType = 8, source = "treasure", sourceInfo = "Garona's Corrupted Chest, Vision of Orgrimmar (Revisited)",
-              canBattle = true, zone = "Vision of Orgrimmar", score = T.medium, waypoint = { 2403, 0.4850, 0.5830, "Void-Scarred Scorpid" } },
+              canBattle = true, zone = "Vision of Orgrimmar", score = T.medium },
             { speciesID = 4750, itemID = 235797, npcID = 237856, name = "Void-Scarred Tallstrider Chick", petType = 3, source = "treasure", sourceInfo = "Geya'rah's Corrupted Chest, Vision of Orgrimmar (Revisited)",
-              canBattle = true, zone = "Vision of Orgrimmar", score = T.medium, waypoint = { 2403, 0.4890, 0.5810, "Void-Scarred Tallstrider Chick" } },
+              canBattle = true, zone = "Vision of Orgrimmar", score = T.medium },
 
             -- Tazavesh secret — Wowhead still lists the source as unknown.
             { speciesID = 4860, itemID = 246723, npcID = 247465, name = "Unfazed Diver",       petType = 8, source = "treasure", sourceInfo = "Tazavesh, the Veiled Market - secret (source not yet documented)",

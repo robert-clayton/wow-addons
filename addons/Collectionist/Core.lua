@@ -1322,9 +1322,21 @@ function MC.AddWaypoint(mapID, x, y, title)
     if not (mapID and x and y) or mapID <= 0 then return false end
     title = title or "Collectionist waypoint"
     if TomTom and TomTom.AddWaypoint then
-        TomTom:AddWaypoint(mapID, x, y, { title = title })
-        print(format("%s Waypoint set: %s", PREFIX, title))
-        return true
+        -- TomTom returns a uid, or nothing when it refuses the map -- which it
+        -- does for phased copies that have no world position of their own.
+        -- We used to print "Waypoint set" regardless, so a click that placed
+        -- no arrow still reported success and there was nothing to debug.
+        local ok, uid = pcall(TomTom.AddWaypoint, TomTom, mapID, x, y,
+                              { title = title })
+        if ok and uid then
+            print(format("%s Waypoint set: %s", PREFIX, title))
+            return true
+        end
+        local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(mapID)
+        print(format("%s TomTom would not take a waypoint on %s -- that map has"
+            .. " no position of its own. (%s)", PREFIX,
+            (mapInfo and mapInfo.name) or ("map " .. mapID), title))
+        return false
     end
     if C_Map and C_Map.SetUserWaypoint and UiMapPoint then
         -- Blizzard's pin cannot go on every map -- instance and micro maps
