@@ -189,6 +189,8 @@ MC.RegisterContent("df", "toys", {
         { itemID = 211864, name = "Exquisite Love Boat", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air", waypoint = { { 1, 0.4190, 0.1730, "Exquisite Love Boat" }, { 37, 0.3220, 0.5040, "Exquisite Love Boat" } } },
         { itemID = 211946, name = "Hearthstone Game Table", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Hearthstone's 10th Anniversary|n|cFFFFD200Achievement:|r Hearthstone Beginner", unavailable = true },
         { itemID = 212337, name = "Stone of the Hearth", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Hearthstone's 10th Anniversary|n|cFFFFD200Drop:|r Dr. Boom", zone = "Durotar", unavailable = true, waypoint = { 1, 0.5310, 0.1617, "Stone of the Hearth" } },
-        { itemID = 170197, name = "Swarthy Warning Sign", source = "worldevent", sourceInfo = "|cFFFFD200Faction: |rKeg Leg's Crew|n|cFFFFD200Renown: |r16", unavailable = true },
+        { itemID = 170197, name = "Swarthy Warning Sign", source = "worldevent", sourceInfo = "|cFFFFD200Faction: |rKeg Leg's Crew|n|cFFFFD200Renown: |r16", unavailable = true,
+              renown = { factionID = MC.FACTION.KegLegsCrew, level = 16,
+              factionName = "Keg Leg's Crew" } },
     } },
 })
