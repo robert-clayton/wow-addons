@@ -28,12 +28,12 @@ MC.RegisterContent("shadowlands", "decorations", {
         { decorID = 16090, itemID = 264713, name = "Heart of the Forest Banner", source = "crafted", sourceInfo = "Crafting: Tailoring; Profession: Shadowlands Tailoring (80)", skillLine = MC.PROFESSION.Tailoring },
     } },
     { source = "vendor", decorations = {
-        { decorID = 756, itemID = 245501, name = "Venthyr Tome of Unforgiven Sins", source = "vendor", sourceInfo = "Vendor: Chachi the Artiste (Sinfall), 1500 Reservoir Anima" },
+        { decorID = 756, itemID = 245501, name = "Venthyr Tome of Unforgiven Sins", source = "vendor", sourceInfo = "Vendor: Chachi the Artiste (Sinfall), 1500 Reservoir Anima", zone = "Sinfall" },
     } },
     { source = "achievement", decorations = {
-        { decorID = 4181, itemID = 248125, name = "Portal to Damnation", source = "achievement", sourceInfo = "Achievement: Back from the Beyond; Vendor: Ve'nari (The Maw), 10000 Stygia", achievementID = 15654 },
+        { decorID = 4181, itemID = 248125, name = "Portal to Damnation", source = "achievement", sourceInfo = "Achievement: Back from the Beyond; Vendor: Ve'nari (The Maw), 10000 Stygia", zone = "The Maw", achievementID = 15654 },
     } },
     { source = "quest", decorations = {
-        { decorID = 4405, itemID = 248336, name = "Stormwind Wooden Table", source = "quest", sourceInfo = "Quest: Welcome to Stormwind (59583); Vendor: Captain Lancy Revshon (Stormwind City), 285 gold" },
+        { decorID = 4405, itemID = 248336, name = "Stormwind Wooden Table", source = "quest", sourceInfo = "Quest: Welcome to Stormwind (59583); Vendor: Captain Lancy Revshon (Stormwind City), 285 gold", zone = "Stormwind City" },
     } },
 })

@@ -27,9 +27,9 @@ MC.RegisterContent("vanilla", "decorations", {
         { decorID = 3893, itemID = 247756, name = "Challenger's Dueling Flag", source = "achievement", sourceInfo = "3 Challenger's Dueling Flag Accents › Ornamental Duel-icious Joruh (Orgrimmar) 1000 Honor +1 more source", achievementID = 1157, npcID = 254606 },
     } },
     { source = "quest", decorations = {
-        { decorID = 11274, itemID = 256673, name = "Stormwind Forge", source = "quest", sourceInfo = "5 Stormwind Forge Structural › Misc Structural A Binding Contract Captain Lancy Revshon (Stormwind City) 950", questID = 7604, npcID = 49877 },
+        { decorID = 11274, itemID = 256673, name = "Stormwind Forge", source = "quest", sourceInfo = "5 Stormwind Forge Structural › Misc Structural A Binding Contract Captain Lancy Revshon (Stormwind City) 950", zone = "Stormwind City", questID = 7604, npcID = 49877 },
     } },
     { source = "drop", decorations = {
-        { decorID = 2246, itemID = 246429, name = "Dark Iron Chandelier", source = "drop", sourceInfo = "1 Dark Iron Chandelier Lighting › Ceiling Lights Encounter: Emperor Dagran Thaurissan (Blackrock Depths)" },
+        { decorID = 2246, itemID = 246429, name = "Dark Iron Chandelier", source = "drop", sourceInfo = "1 Dark Iron Chandelier Lighting › Ceiling Lights Encounter: Emperor Dagran Thaurissan (Blackrock Depths)", zone = "Blackrock Mountain" },
     } },
 })

@@ -18,7 +18,7 @@ MC.RegisterContent("tww", "toys", {
             { itemID = 224251, name = "Memory Chord", source = "achievement",
               sourceInfo = "Achievement: Memories of a World Soul", score = T.medium },
             { itemID = 225969, name = "Forged Flag of Victory", source = "achievement",
-              sourceInfo = "Achievement: Sparking Battle (World)", score = T.short },
+              sourceInfo = "Achievement: Sparking Battle (World)", zone = "Dornogal", score = T.short },
             { itemID = 235050, name = "Desk-in-a-Box", source = "achievement",
               sourceInfo = "Achievement: Read Between the Lines", zone = "Undermine", score = T.medium },
             { itemID = 236769, name = "Gallagio Pipeline Rerouter", source = "achievement",
@@ -122,15 +122,15 @@ MC.RegisterContent("tww", "toys", {
             -- The DB2 inventory carries no source text for the entries below;
             -- flagged for enrichment rather than inventing sources.
             { itemID = 224643, name = "Pet-Sized Candle", source = "drop",
-              sourceInfo = "Source not yet documented" },
+              sourceInfo = "Source not yet documented", zone = "The Ringing Deeps" },
             { itemID = 225641, name = "Illusive Kobyss Lure", source = "drop",
-              sourceInfo = "Source not yet documented" },
+              sourceInfo = "Source not yet documented", zone = "Hallowfall" },
             { itemID = 226519, name = "General's Expertise", source = "drop",
-              sourceInfo = "Source not yet documented (Severed Threads-themed)" },
+              sourceInfo = "Source not yet documented (Severed Threads-themed)", zone = "Azj-Kahet" },
             { itemID = 244888, name = "Echo of Xal'atath, Blade of the Black Empire", source = "drop",
-              sourceInfo = "Source not yet documented" },
+              sourceInfo = "Source not yet documented", zone = "Ny'alotha, the Waking City" },
             { itemID = 245631, name = "Royal Visage", source = "drop",
-              sourceInfo = "Source not yet documented" },
+              sourceInfo = "Source not yet documented", zone = "Stormwind City" },
         },
     },
 
@@ -305,7 +305,7 @@ MC.RegisterContent("tww", "toys", {
         source = "worldevent",
         toys = {
             { itemID = 239007, name = "Dastardly Banner", source = "worldevent",
-              sourceInfo = "Dastardly Duos event reward" },
+              sourceInfo = "Dastardly Duos event reward", zone = "Stormwind City" },
             { itemID = 218310, name = "Box of Puntables", source = "worldevent",
               sourceInfo = "Feast of Winter Veil (TWW-era addition)" },
             { itemID = 218308, name = "Winter Veil Cracker", source = "worldevent",
@@ -315,7 +315,7 @@ MC.RegisterContent("tww", "toys", {
               zone = "Tanaris",
               cost = { currency = { MC.CURRENCY.TimewarpedBadges, 200 } } },
             { itemID = 228966, name = "Starry-Eyed Goggles", source = "worldevent",
-              sourceInfo = "WoW's Anniversary holiday (11.0.5 addition)" },
+              sourceInfo = "WoW's Anniversary holiday (11.0.5 addition)", zone = "Karazhan Catacombs" },
             -- 20th Anniversary: verify these still return at the current-year
             -- anniversary event before treating them as reliably obtainable.
             { itemID = 228789, name = "Coldflame Ring", source = "worldevent",
@@ -330,10 +330,10 @@ MC.RegisterContent("tww", "toys", {
               sourceInfo = "Brewfest vendors - 200 Brewfest Prize Tokens" },
             -- Timewalking vendor additions (TWW-era items on older-era vendors)
             { itemID = 245942, name = "Sea-Blessed Shrine", source = "worldevent",
-              sourceInfo = "Churbro - 1,000 Timewarped Badges during Battle for Azeroth Timewalking (Boralus Harbor / Zuldazar)",
+              sourceInfo = "Churbro - 1,000 Timewarped Badges during Battle for Azeroth Timewalking (Boralus Harbor / Zuldazar)", zone = "Zuldazar",
               cost = { currency = { MC.CURRENCY.TimewarpedBadges, 1000 } } },
             { itemID = 246227, name = "Lightning-Blessed Spire", source = "worldevent",
-              sourceInfo = "Churbro - 1,000 Timewarped Badges during Battle for Azeroth Timewalking (Boralus Harbor / Zuldazar)",
+              sourceInfo = "Churbro - 1,000 Timewarped Badges during Battle for Azeroth Timewalking (Boralus Harbor / Zuldazar)", zone = "Zuldazar",
               cost = { currency = { MC.CURRENCY.TimewarpedBadges, 1000 } } },
             { itemID = 256881, name = "Steward's Bauble", source = "worldevent",
               sourceInfo = "Collector Ta'steld - 750 Timewarped Badges during Shadowlands Timewalking",

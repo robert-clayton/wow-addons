@@ -21,20 +21,20 @@ local _, MC = ...
 
 MC.RegisterContent("df", "toys", {
     { source = "tradingpost", toys = {
-        { itemID = 206268, name = "Ethereal Transmogrifier", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5" },
-        { itemID = 206347, name = "Mannequin Charm", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5" },
-        { itemID = 212500, name = "Delicate Silk Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6" },
-        { itemID = 212523, name = "Delicate Jade Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5" },
-        { itemID = 212524, name = "Delicate Crimson Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7" },
-        { itemID = 218112, name = "Colorful Beach Chair", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7" },
-        { itemID = 220692, name = "X-treme Water Blaster Display", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7" },
+        { itemID = 206268, name = "Ethereal Transmogrifier", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", zone = "Dornogal" },
+        { itemID = 206347, name = "Mannequin Charm", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5", zone = "Dornogal" },
+        { itemID = 212500, name = "Delicate Silk Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6", zone = "Dornogal" },
+        { itemID = 212523, name = "Delicate Jade Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5", zone = "Dornogal" },
+        { itemID = 212524, name = "Delicate Crimson Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7", zone = "Dornogal" },
+        { itemID = 218112, name = "Colorful Beach Chair", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7", zone = "Dornogal" },
+        { itemID = 220692, name = "X-treme Water Blaster Display", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7", zone = "Dornogal" },
     } },
 })
 
 MC.RegisterContent("tww", "toys", {
     { source = "tradingpost", toys = {
         { itemID = 112324, name = "Nightmarish Hitching Post", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.7" },
-        { itemID = 212525, name = "Delicate Ebony Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.2" },
+        { itemID = 212525, name = "Delicate Ebony Parasol", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.2", zone = "Dornogal" },
     } },
 })
 

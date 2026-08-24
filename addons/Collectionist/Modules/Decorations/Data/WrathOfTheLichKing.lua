@@ -27,14 +27,14 @@ MC.RegisterContent("wrath", "decorations", {
     } },
     { source = "achievement", decorations = {
         { decorID = 1674, itemID = 244852, name = "Head of the Broodmother", source = "achievement", sourceInfo = "3 Head of the Broodmother Accents › Wall Hangings More Dots! (25 player) Axle (Mudsprocket, Dustwallow Marsh) 250", achievementID = 4405, npcID = 23995 },
-        { decorID = 4839, itemID = 248807, name = "Nesingwary Mounted Shoveltusk Head", source = "achievement", sourceInfo = "3 Nesingwary Mounted Shoveltusk Head Accents › Wall Hangings The Snows of Northrend Purser Boulian (Sholazar Basin) 500", achievementID = 938, npcID = 28038 },
+        { decorID = 4839, itemID = 248807, name = "Nesingwary Mounted Shoveltusk Head", source = "achievement", sourceInfo = "3 Nesingwary Mounted Shoveltusk Head Accents › Wall Hangings The Snows of Northrend Purser Boulian (Sholazar Basin) 500", zone = "Sholazar Basin", achievementID = 938, npcID = 28038 },
     } },
     { source = "quest", decorations = {
-        { decorID = 4448, itemID = 248622, name = "Wooden Outhouse", source = "quest", sourceInfo = "5 Wooden Outhouse Structural › Large Structures Doing Your Duty (Grizzly Hills) Woodsman Drake 500", questID = 12227, npcID = 27391 },
-        { decorID = 11872, itemID = 258145, name = "Eversong Party Platter", source = "quest", sourceInfo = "1 Eversong Party Platter Accents › Food and Drink Cheese for Glowergold (Dalaran)" },
-        { decorID = 11906, itemID = 258220, name = "Murloc Driftwood Hut", source = "quest", sourceInfo = "5 Murloc Driftwood Hut Structural › Large Structures Surrender... Not! (Borean Tundra) Ahlurglgr (Borean Tundra)", questID = 11566, npcID = 25206 },
+        { decorID = 4448, itemID = 248622, name = "Wooden Outhouse", source = "quest", sourceInfo = "5 Wooden Outhouse Structural › Large Structures Doing Your Duty (Grizzly Hills) Woodsman Drake 500", zone = "Grizzly Hills", questID = 12227, npcID = 27391 },
+        { decorID = 11872, itemID = 258145, name = "Eversong Party Platter", source = "quest", sourceInfo = "1 Eversong Party Platter Accents › Food and Drink Cheese for Glowergold (Dalaran)", zone = "Dalaran" },
+        { decorID = 11906, itemID = 258220, name = "Murloc Driftwood Hut", source = "quest", sourceInfo = "5 Murloc Driftwood Hut Structural › Large Structures Surrender... Not! (Borean Tundra) Ahlurglgr (Borean Tundra)", zone = "Borean Tundra", questID = 11566, npcID = 25206 },
     } },
     { source = "drop", decorations = {
-        { decorID = 18483, itemID = 267007, name = "Eye of Acherus", source = "drop", sourceInfo = "5 Eye of Acherus Accents › Ornamental Encounter: Scourgelord Tyrannus (Pit of Saron)" },
+        { decorID = 18483, itemID = 267007, name = "Eye of Acherus", source = "drop", sourceInfo = "5 Eye of Acherus Accents › Ornamental Encounter: Scourgelord Tyrannus (Pit of Saron)", zone = "Icecrown" },
     } },
 })

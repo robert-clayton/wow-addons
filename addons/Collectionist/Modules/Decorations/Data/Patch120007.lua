@@ -167,10 +167,10 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "achievement",
         decorations = {
-            { decorID = 20679, itemID = 269316, name = "Bartender Bob's \"No Weapons Allowed\" Rack", source = "achievement", sourceInfo = "Jan'alai's Eggstravaganza", achievementID = 61083 },
-            { decorID = 24194, itemID = 274736, name = "Framed Alliance Pride", source = "achievement", sourceInfo = "Goal!", achievementID = 63343 },
-            { decorID = 24193, itemID = 274734, name = "Framed Horde Pride", source = "achievement", sourceInfo = "Goal!", achievementID = 63343 },
-            { decorID = 23706, itemID = 274731, name = "Prized Orb of Azeroth", source = "achievement", sourceInfo = "Goal!", achievementID = 63343 },
+            { decorID = 20679, itemID = 269316, name = "Bartender Bob's \"No Weapons Allowed\" Rack", source = "achievement", sourceInfo = "Jan'alai's Eggstravaganza", zone = "Arcantina", achievementID = 61083 },
+            { decorID = 24194, itemID = 274736, name = "Framed Alliance Pride", source = "achievement", sourceInfo = "Goal!", zone = "Silvermoon City", achievementID = 63343 },
+            { decorID = 24193, itemID = 274734, name = "Framed Horde Pride", source = "achievement", sourceInfo = "Goal!", zone = "Silvermoon City", achievementID = 63343 },
+            { decorID = 23706, itemID = 274731, name = "Prized Orb of Azeroth", source = "achievement", sourceInfo = "Goal!", zone = "Silvermoon City", achievementID = 63343 },
         },
     },
 
@@ -186,7 +186,7 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "vendor",
         decorations = {
-            { decorID = 21857, itemID = 271971, name = "Tome of Kings", source = "vendor", sourceInfo = "Legacy vendor - 2,000 gold", cost = { gold = 20000000 } },
+            { decorID = 21857, itemID = 271971, name = "Tome of Kings", source = "vendor", sourceInfo = "Legacy vendor - 2,000 gold", zone = "Vale of Eternal Blossoms", cost = { gold = 20000000 } },
         },
     },
     {

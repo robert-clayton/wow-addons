@@ -9,8 +9,8 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "achievement",
         decorations = {
-            { decorID = 15283, itemID = 263873, name = "Amani Forge", source = "achievement", sourceInfo = "Coiled to Strike (Patch 12.1)", achievementID = 63358 },
-            { decorID = 5130, itemID = 248962, name = "Mysterious Voodoo Mask", source = "achievement", sourceInfo = "Mysterious Mix Master (Patch 12.1)", achievementID = 63432 },
+            { decorID = 15283, itemID = 263873, name = "Amani Forge", source = "achievement", sourceInfo = "Coiled to Strike (Patch 12.1)", zone = "The Coiled Isle", achievementID = 63358 },
+            { decorID = 5130, itemID = 248962, name = "Mysterious Voodoo Mask", source = "achievement", sourceInfo = "Mysterious Mix Master (Patch 12.1)", zone = "The Coiled Isle", achievementID = 63432 },
         },
     },
     {

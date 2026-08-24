@@ -196,7 +196,7 @@ MC.RegisterContent("tww", "decorations", {
         { decorID = 2548, itemID = 246882, name = "Long Orgrimmar Bench", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },
         { decorID = 2549, itemID = 246883, name = "Crude Banded Crate", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },
         { decorID = 2592, itemID = 247221, name = "Small Orgrimmar Chair", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },
-        { decorID = 4029, itemID = 247915, name = "Square Suramar Table", source = "quest", sourceInfo = "Quest: Last Light" },
+        { decorID = 4029, itemID = 247915, name = "Square Suramar Table", source = "quest", sourceInfo = "Quest: Last Light", zone = "Stormwind City" },
         { decorID = 4386, itemID = 248246, name = "Razorwind Storage Table", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },
         { decorID = 4562, itemID = 248760, name = "Lovely Elven Shelf", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },
         { decorID = 7842, itemID = 250920, name = "Horned Hanging Sconce", source = "quest", sourceInfo = "Quest: Decor Treasure Hunt", zone = "Razorwind Shores" },

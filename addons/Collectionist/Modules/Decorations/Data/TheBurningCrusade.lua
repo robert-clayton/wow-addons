@@ -35,6 +35,6 @@ MC.RegisterContent("tbc", "decorations", {
         { decorID = 3899, itemID = 247762, name = "Netherstorm Battlefield Flag", source = "achievement", sourceInfo = "3 Netherstorm Battlefield Flag Accents › Ornamental Stormtrooper Joruh (Orgrimmar) 300 Honor +1 more source", achievementID = 213, npcID = 254606 },
     } },
     { source = "drop", decorations = {
-        { decorID = 15570, itemID = 264332, name = "Amani Ritual Altar", source = "drop", sourceInfo = "3 Amani Ritual Altar Furnishings › Tables and Desks Encounter: Nalorakk" },
+        { decorID = 15570, itemID = 264332, name = "Amani Ritual Altar", source = "drop", sourceInfo = "3 Amani Ritual Altar Furnishings › Tables and Desks Encounter: Nalorakk", zone = "Zul'Aman" },
     } },
 })

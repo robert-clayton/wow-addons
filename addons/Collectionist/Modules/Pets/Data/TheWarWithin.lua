@@ -136,15 +136,15 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, zone = "Hallowfall", cost = { currency = { MC.CURRENCY.ResonanceCrystals, 6500 } } },
 
             -- Polished Pet Charm world vendors
-            { speciesID = 4495, itemID = 221494, npcID = 222079, name = "Skippy",              petType = 9, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms",
+            { speciesID = 4495, itemID = 221494, npcID = 222079, name = "Skippy",              petType = 9, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms", zone = "Dornogal",
               canBattle = true, cost = { item = { 163036, 50 } } },
-            { speciesID = 4511, itemID = 221761, npcID = 222607, name = "Venomwing",           petType = 3, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms",
+            { speciesID = 4511, itemID = 221761, npcID = 222607, name = "Venomwing",           petType = 3, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms", zone = "Dornogal",
               canBattle = true, cost = { item = { 163036, 50 } } },
-            { speciesID = 4524, itemID = 221811, npcID = 222764, name = "Starkstripe Hopper",  petType = 9, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms",
+            { speciesID = 4524, itemID = 221811, npcID = 222764, name = "Starkstripe Hopper",  petType = 9, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms", zone = "Dornogal",
               canBattle = true, cost = { item = { 163036, 50 } } },
-            { speciesID = 4546, itemID = 222978, npcID = 223088, name = "Sandstone Ramolith",  petType = 8, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms",
+            { speciesID = 4546, itemID = 222978, npcID = 223088, name = "Sandstone Ramolith",  petType = 8, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms", zone = "Dornogal",
               canBattle = true, cost = { item = { 163036, 50 } } },
-            { speciesID = 4586, itemID = 224101, npcID = 224090, name = "Brown Leafbug",       petType = 5, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms",
+            { speciesID = 4586, itemID = 224101, npcID = 224090, name = "Brown Leafbug",       petType = 5, source = "vendor", sourceInfo = "World pet-charm vendors - 50 Polished Pet Charms", zone = "Dornogal",
               canBattle = true, cost = { item = { 163036, 50 } } },
 
             -- Undercoin
@@ -377,7 +377,7 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, achievementID = 40980, score = T.long },
             { speciesID = 4581, itemID = 223802, npcID = 223859, name = "Ruby-Eyed Stagshell", petType = 8, source = "achievement", sourceInfo = "A Champion's Tour: The War Within (world PvP world quests)",
               canBattle = true, achievementID = 40088, score = T.long },
-            { speciesID = 4631, itemID = 232855, npcID = 231469, name = "Foreman",             petType = 8, source = "achievement", sourceInfo = "Family Battler of Undermine",
+            { speciesID = 4631, itemID = 232855, npcID = 231469, name = "Foreman",             petType = 8, source = "achievement", sourceInfo = "Family Battler of Undermine", zone = "Undermine",
               canBattle = true, achievementID = 41551, score = T.long },
             { speciesID = 4664, itemID = 232807, npcID = 231621, name = "Iron Chick",          petType = 10, source = "achievement", sourceInfo = "In with the Cartels (Honored with all four Undermine cartels)",
               canBattle = true, zone = "Undermine", achievementID = 41349, taskList = IN_WITH_THE_CARTELS_TASKS, score = T.long },
@@ -433,13 +433,13 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, score = T.medium },
 
             -- WoW's 20th Anniversary (11.0.5)
-            { speciesID = 4614, itemID = 228740, npcID = 229779, name = "Gizmo the Pure",      petType = 5, source = "event", sourceInfo = "WoW's 20th Anniversary event",
+            { speciesID = 4614, itemID = 228740, npcID = 229779, name = "Gizmo the Pure",      petType = 5, source = "event", sourceInfo = "WoW's 20th Anniversary event", zone = "Tanaris",
               canBattle = true, score = T.medium },
-            { speciesID = 4450, itemID = 218086, npcID = 220420, name = "Remembered Riverpaw", petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Memory of a Duke (Searing Gorge) - 10,000 Residual Memories",
+            { speciesID = 4450, itemID = 218086, npcID = 220420, name = "Remembered Riverpaw", petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Memory of a Duke (Searing Gorge) - 10,000 Residual Memories", zone = "Dalaran",
               canBattle = true, cost = { currency = { MC.CURRENCY.ResidualMemories, 10000 } }, score = T.medium },
-            { speciesID = 4451, itemID = 218245, npcID = 220675, name = "Remembered Construct", petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Echo of the Silver Hand (Dragonblight) - 10,000 Residual Memories",
+            { speciesID = 4451, itemID = 218245, npcID = 220675, name = "Remembered Construct", petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Echo of the Silver Hand (Dragonblight) - 10,000 Residual Memories", zone = "Dalaran",
               canBattle = true, cost = { currency = { MC.CURRENCY.ResidualMemories, 10000 } }, score = T.medium },
-            { speciesID = 4452, itemID = 218246, npcID = 220680, name = "Remembered Spawn",    petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Forgotten Hero (Dustwallow Marsh) - 10,000 Residual Memories",
+            { speciesID = 4452, itemID = 218246, npcID = 220680, name = "Remembered Spawn",    petType = 6, source = "event", sourceInfo = "Remembrancer Amuul (Dalaran) or Forgotten Hero (Dustwallow Marsh) - 10,000 Residual Memories", zone = "Dalaran",
               canBattle = true, cost = { currency = { MC.CURRENCY.ResidualMemories, 10000 } }, score = T.medium },
             { speciesID = 4678, itemID = 228781, npcID = 231840, name = "Lil'Doomy",           petType = 1, source = "event", sourceInfo = "Historian Ma'di (Tanaris) - 10 Bronze Celebration Tokens",
               canBattle = true, zone = "Tanaris", cost = { currency = { 3100, 10 } }, score = T.medium },
@@ -458,9 +458,9 @@ MC.RegisterContent("tww", "pets", {
             { speciesID = 4911, itemID = 254876, npcID = 253374, name = "P.O.S.T. Assistant",  petType = 6, source = "event", sourceInfo = "Collector Ta'steld (Oribos, Shadowlands Timewalking) - 2,200 Timewarped Badges",
               canBattle = true, zone = "Oribos", cost = { currency = { MC.CURRENCY.TimewarpedBadges, 2200 } }, score = T.medium },
             -- BfA Timewalking vendor Churbro — cost not in the ID inventory.
-            { speciesID = 4849, itemID = 245543, npcID = 245545, name = "Flotsam Harvester",   petType = 10, source = "event", sourceInfo = "Churbro (Zuldazar / Boralus Harbor, BfA Timewalking) - cost undocumented",
+            { speciesID = 4849, itemID = 245543, npcID = 245545, name = "Flotsam Harvester",   petType = 10, source = "event", sourceInfo = "Churbro (Zuldazar / Boralus Harbor, BfA Timewalking) - cost undocumented", zone = "Zuldazar",
               canBattle = true, score = T.medium },
-            { speciesID = 4852, itemID = 245574, npcID = 245647, name = "Lil' Daz'ti",         petType = 8, source = "event", sourceInfo = "Churbro (Zuldazar / Boralus Harbor, BfA Timewalking) - cost undocumented",
+            { speciesID = 4852, itemID = 245574, npcID = 245647, name = "Lil' Daz'ti",         petType = 8, source = "event", sourceInfo = "Churbro (Zuldazar / Boralus Harbor, BfA Timewalking) - cost undocumented", zone = "Zuldazar",
               canBattle = true, score = T.medium },
 
             -- WoW Remix: Legion
@@ -468,7 +468,7 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, score = T.medium },
             { speciesID = 4802, itemID = 239705, npcID = 242180, name = "Morsel",              petType = 5, source = "event", sourceInfo = "WoW Remix: Legion",
               canBattle = true, score = T.medium },
-            { speciesID = 4901, itemID = 252301, npcID = 251889, name = "Fledgling Warden's Companion", petType = 3, source = "event", sourceInfo = "WoW Remix: Legion",
+            { speciesID = 4901, itemID = 252301, npcID = 251889, name = "Fledgling Warden's Companion", petType = 3, source = "event", sourceInfo = "WoW Remix: Legion", zone = "Azsuna",
               canBattle = true, score = T.medium },
 
             -- Holiday events
@@ -476,7 +476,7 @@ MC.RegisterContent("tww", "pets", {
               canBattle = true, score = T.medium },
             { speciesID = 4694, itemID = 232653, npcID = 233965, name = "Portentous Present",  petType = 6, source = "event", sourceInfo = "Feast of Winter Veil",
               canBattle = true, score = T.medium },
-            { speciesID = 4851, itemID = 245544, npcID = 245616, name = "Tiny Snow Buddy",     petType = 7, source = "event", sourceInfo = "Feast of Winter Veil",
+            { speciesID = 4851, itemID = 245544, npcID = 245616, name = "Tiny Snow Buddy",     petType = 7, source = "event", sourceInfo = "Feast of Winter Veil", zone = "Orgrimmar",
               canBattle = true, score = T.medium },
             { speciesID = 4704, itemID = 232923, npcID = 234131, name = "Living Rose",         petType = 7, source = "event", sourceInfo = "Love is in the Air - 40 Love Tokens",
               canBattle = true, cost = { item = { 49927, 40 } }, score = T.medium },

@@ -113,7 +113,7 @@ MC.RegisterContent("midnight", "toys", {
               sourceInfo = "End of the Arator's Journey campaign chapter",
               zone = "Silvermoon City", score = T.medium },
             { itemID = 264413, name = "Dominating Victory", source = "quest",
-              sourceInfo = "Quest: Nulling Nullaeus (Torment's Rise nemesis delve)" },
+              sourceInfo = "Quest: Nulling Nullaeus (Torment's Rise nemesis delve)", zone = "Silvermoon City" },
             { itemID = 263871, name = "Holy Pet Leash", source = "quest",
               sourceInfo = "Quest: Pet Wranglin' (capture a wild pet in any Midnight zone)",
               zone = "Silvermoon City" },
@@ -222,7 +222,7 @@ MC.RegisterContent("midnight", "toys", {
             -- has nothing to sell. sourceInfo keeps the historical record, but
             -- a pin would send players to an empty vendor.
             { itemID = 249468, name = "Twilight's Blade Top Secret Strategy Training Guide", source = "vendor",
-              sourceInfo = "Materialist Ophinell - 30 Twilight's Blade Insignia (pre-patch event; Twilight Highlands)",
+              sourceInfo = "Materialist Ophinell - 30 Twilight's Blade Insignia (pre-patch event; Twilight Highlands)", zone = "Twilight Highlands",
               cost = { currency = { MC.CURRENCY.TwilightsBladeInsignia, 30 } }, score = T.legendary, unavailable = true },
         },
     },

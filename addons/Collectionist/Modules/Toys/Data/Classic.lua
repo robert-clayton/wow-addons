@@ -9,7 +9,7 @@ MC.RegisterContent("vanilla", "toys", {
         { itemID = 208096, name = "Familiar Journal", source = "drop", sourceInfo = "|cFFFFD200Discovery:|r Naxxramas|n" },
     } },
     { source = "quest", toys = {
-        { itemID = 21540, name = "Elune's Lantern", source = "quest", sourceInfo = "|cFFFFD200Quest: |rElune's Blessing|n|cFFFFD200Zone: |rMoonglade" },
+        { itemID = 21540, name = "Elune's Lantern", source = "quest", sourceInfo = "|cFFFFD200Quest: |rElune's Blessing|n|cFFFFD200Zone: |rMoonglade", zone = "Moonglade" },
     } },
     { source = "profession", toys = {
         { itemID = 17716, name = "Snowmaster 9000", source = "profession", sourceInfo = "|cFFFFD200Profession: |rEngineering" },

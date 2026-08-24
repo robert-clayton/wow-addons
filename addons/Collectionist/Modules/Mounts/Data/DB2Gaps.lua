@@ -47,15 +47,15 @@ MC.RegisterContent("midnight", "mounts", {
         { mountID = 2492, name = "Spring Butterfly", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Drop:|r Apothecary Hummel" },
     } },
     { source = "quest", mounts = {
-        { mountID = 2754, name = "Peridot Dragonhawk", source = "quest", sourceInfo = "|cFFFFD200World Quest: |rFrom Darkness, Light|n|cFFFFD200Zone: |rIsle of Quel'Danas" },
-        { mountID = 2818, name = "Emerald Hawkstrider", source = "quest", sourceInfo = "|cFFFFD200Quest: |rThe Battle of the Bridge|n|cFFFFD200Zone: |rSilvermoon City|n|n" },
+        { mountID = 2754, name = "Peridot Dragonhawk", source = "quest", sourceInfo = "|cFFFFD200World Quest: |rFrom Darkness, Light|n|cFFFFD200Zone: |rIsle of Quel'Danas", zone = "Isle of Quel'Danas" },
+        { mountID = 2818, name = "Emerald Hawkstrider", source = "quest", sourceInfo = "|cFFFFD200Quest: |rThe Battle of the Bridge|n|cFFFFD200Zone: |rSilvermoon City|n|n", zone = "Silvermoon City" },
     } },
     { source = "vendor", mounts = {
-        { mountID = 3005, name = "Cerulean Deathwalker", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
-        { mountID = 3006, name = "Amethyst Mechsuit", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
-        { mountID = 3007, name = "Blue-Chip Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
-        { mountID = 3008, name = "Profit-Green Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
-        { mountID = 3009, name = "Speculative Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
-        { mountID = 3010, name = "High-Yield Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n" },
+        { mountID = 3005, name = "Cerulean Deathwalker", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3006, name = "Amethyst Mechsuit", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3007, name = "Blue-Chip Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3008, name = "Profit-Green Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3009, name = "Speculative Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3010, name = "High-Yield Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
     } },
 })

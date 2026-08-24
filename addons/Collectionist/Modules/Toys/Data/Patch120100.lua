@@ -104,7 +104,7 @@ MC.RegisterContent("midnight", "toys", {
         source = "worldevent",
         toys = {
             { itemID = 267472, name = "Gnomatic Projector", source = "worldevent",
-              sourceInfo = "The Great Gnomeregan Run", faction = "Alliance", score = T.medium },
+              sourceInfo = "The Great Gnomeregan Run", zone = "New Tinkertown", faction = "Alliance", score = T.medium },
         },
     },
 })

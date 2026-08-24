@@ -315,9 +315,9 @@ MC.RegisterContent("midnight", "pets", {
     {
         source = "achievement",
         pets = {
-            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)",   canBattle = true,  achievementID = 61091, taskList = SAFARI_TASKS },
+            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)", zone = "Mount Hyjal",   canBattle = true,  achievementID = 61091, taskList = SAFARI_TASKS },
             { speciesID = 4803, npcID = 242452, name = "Niblet",                petType = 5,  source = "achievement", sourceInfo = "Midnight Dungeon Hero",                        canBattle = false, achievementID = 61567, score = T.medium },
-            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods",                  canBattle = false, achievementID = 61960, taskList = SOOTPAW_TASKS, score = T.short },
+            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods", zone = "Eversong Woods",                  canBattle = false, achievementID = 61960, taskList = SOOTPAW_TASKS, score = T.short },
         },
     },
 
