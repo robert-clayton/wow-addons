@@ -1301,14 +1301,35 @@ function MC.AddWaypoint(mapID, x, y, title)
         return true
     end
     if C_Map and C_Map.SetUserWaypoint and UiMapPoint then
-        local pt = UiMapPoint.CreateFromCoordinates(mapID, x, y)
-        local ok = pcall(C_Map.SetUserWaypoint, pt)
-        if ok then
-            if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
-                pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true)
+        -- Blizzard's pin cannot go on every map -- instance and micro maps
+        -- have no world position to hang it on -- and SetUserWaypoint raises
+        -- rather than returning false when it cannot. The pcall below caught
+        -- that and said nothing, so clicking such a row did nothing at all
+        -- and gave the player no reason why. Ask first, so the failure can be
+        -- explained instead of swallowed.
+        local canPin = true
+        if C_Map.CanSetUserWaypointOnMap then
+            local ok, allowed = pcall(C_Map.CanSetUserWaypointOnMap, mapID)
+            canPin = ok and allowed and true or false
+        end
+        if canPin then
+            local pt = UiMapPoint.CreateFromCoordinates(mapID, x, y)
+            local ok = pcall(C_Map.SetUserWaypoint, pt)
+            if ok then
+                if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
+                    pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true)
+                end
+                print(format("%s Map pin set: %s", PREFIX, title))
+                return true
             end
-            print(format("%s Map pin set: %s", PREFIX, title))
-            return true
+        else
+            -- Every failure says so. The old code warned once per session and
+            -- was silent afterwards, which reads as the click being ignored.
+            local mapInfo = C_Map.GetMapInfo and C_Map.GetMapInfo(mapID)
+            print(format("%s Can't drop a map pin in %s -- Blizzard's pin only"
+                .. " works outdoors. Install TomTom to mark it anyway. (%s)",
+                PREFIX, (mapInfo and mapInfo.name) or ("map " .. mapID), title))
+            return false
         end
     end
     if not _warnedNoWaypointProvider then
@@ -1473,6 +1494,12 @@ function MC.DoItemAction(item, skillLine)
                 print(PREFIX .. " Could not open profession frame.")
             end
         end
+    else
+        -- Nothing to route to and nothing to open. Silence here is
+        -- indistinguishable from a broken click, and 1,673 catalog rows still
+        -- have no location at all.
+        print(format("%s No known location for %s yet.", PREFIX,
+            item.name or "that"))
     end
 end
 
