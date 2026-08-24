@@ -31,10 +31,10 @@ MC.RegisterContent("tbc", "decorations", {
         { decorID = 16220, itemID = 264900, name = "Arakkoan Alchemist's Bottle", source = "crafted", sourceInfo = "1 Arakkoan Alchemist's Bottle Accents › Ornamental Crafting: Alchemy Profession: Outland Alchemy (60)", skillLine = MC.PROFESSION.Alchemy },
     } },
     { source = "achievement", decorations = {
-        { decorID = 3898, itemID = 247761, name = "Uncontested Battlefield Banner", source = "achievement", sourceInfo = "3 Uncontested Battlefield Banner Accents › Ornamental Storm Capper Joruh (Orgrimmar) 400 Honor +1 more source", achievementID = 212, npcID = 254606 },
-        { decorID = 3899, itemID = 247762, name = "Netherstorm Battlefield Flag", source = "achievement", sourceInfo = "3 Netherstorm Battlefield Flag Accents › Ornamental Stormtrooper Joruh (Orgrimmar) 300 Honor +1 more source", achievementID = 213, npcID = 254606 },
+        { decorID = 3898, itemID = 247761, name = "Uncontested Battlefield Banner", source = "achievement", sourceInfo = "3 Uncontested Battlefield Banner Accents › Ornamental Storm Capper Joruh (Orgrimmar) 400 Honor +1 more source", achievementID = 212, npcID = 254606, waypoint = { { 84, 0.7780, 0.6570, "Uncontested Battlefield Banner" }, { 85, 0.3880, 0.7200, "Uncontested Battlefield Banner" } } },
+        { decorID = 3899, itemID = 247762, name = "Netherstorm Battlefield Flag", source = "achievement", sourceInfo = "3 Netherstorm Battlefield Flag Accents › Ornamental Stormtrooper Joruh (Orgrimmar) 300 Honor +1 more source", achievementID = 213, npcID = 254606, waypoint = { { 84, 0.7780, 0.6570, "Netherstorm Battlefield Flag" }, { 85, 0.3880, 0.7200, "Netherstorm Battlefield Flag" } } },
     } },
     { source = "drop", decorations = {
-        { decorID = 15570, itemID = 264332, name = "Amani Ritual Altar", source = "drop", sourceInfo = "3 Amani Ritual Altar Furnishings › Tables and Desks Encounter: Nalorakk", zone = "Zul'Aman" },
+        { decorID = 15570, itemID = 264332, name = "Amani Ritual Altar", source = "drop", sourceInfo = "3 Amani Ritual Altar Furnishings › Tables and Desks Encounter: Nalorakk", zone = "Zul'Aman", waypoint = { 2437, 0.3000, 0.8450, "Amani Ritual Altar" } },
     } },
 })

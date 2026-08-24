@@ -358,6 +358,76 @@ do
     print = realPrint
 end
 
+-- Every inline waypoint in the catalog, whatever module it belongs to. The
+-- backfilled pins are machine-written from ATT coordinates, so the shape the
+-- runtime depends on is worth asserting in bulk rather than by sample:
+-- MC.AddWaypoint rejects mapID <= 0, and a fraction outside 0..1 puts the pin
+-- somewhere the player is not.
+do
+    local MC = {}
+    loadAddon("addons/Collectionist/Data/Expansions.lua", MC)
+    loadAddon("addons/Collectionist/Data/Constants.lua", MC)
+    loadAddon("addons/Collectionist/Data/Locations.lua", MC)
+
+    local LISTS = { mounts = "mountID", pets = "speciesID", toys = "itemID",
+                    decorations = "decorID" }
+    local pinned, listed = 0, 0
+
+    local function checkTuple(t, what)
+        truthy(type(t) == "table" and #t >= 3, what .. " tuple shape")
+        truthy(type(t[1]) == "number" and t[1] > 0, what .. " mapID > 0")
+        truthy(type(t[2]) == "number" and t[2] > 0 and t[2] < 1, what .. " x in 0..1")
+        truthy(type(t[3]) == "number" and t[3] > 0 and t[3] < 1, what .. " y in 0..1")
+        truthy(type(t[4]) == "string" and t[4] ~= "", what .. " label")
+    end
+
+    MC.RegisterContent = function(_, mod, groups)
+        local idField = LISTS[mod]
+        if not idField then return end
+        for _, g in ipairs(groups) do
+            for _, e in ipairs(g[mod] or {}) do
+                local wp = e.waypoint
+                if wp then
+                    local what = mod .. " " .. tostring(e[idField])
+                    if type(wp[1]) == "table" then
+                        listed = listed + 1
+                        truthy(#wp >= 2, what .. " waypoint list has 2+ spots")
+                        for i, t in ipairs(wp) do
+                            checkTuple(t, what .. " spot " .. i)
+                        end
+                    else
+                        pinned = pinned + 1
+                        checkTuple(wp, what .. " waypoint")
+                    end
+                end
+            end
+        end
+    end
+
+    -- The TOC is the file list. Hardcoding one here would go stale the next
+    -- time a data file is added, and silently stop checking it.
+    local toc = assert(io.open("addons/Collectionist/Collectionist.toc"))
+    local loaded = 0
+    for line in toc:lines() do
+        local path = line:gsub("%s+$", "")
+        if path:match("^Modules\\%a+\\Data\\.+%.lua$") then
+            local rel = path:gsub("\\", "/")
+            local mod = rel:match("^Modules/(%a+)/")
+            if LISTS[mod:lower()] then
+                loadAddon("addons/Collectionist/" .. rel, MC)
+                loaded = loaded + 1
+            end
+        end
+    end
+    toc:close()
+    truthy(loaded > 40, "found the collectible data files in the TOC (got " .. loaded .. ")")
+
+    -- A ratchet, not a target: a drop here means a backfill was reverted or a
+    -- data file stopped loading, both of which are silent otherwise.
+    truthy(pinned + listed >= 3000,
+        "catalog carries the backfilled map pins (got " .. (pinned + listed) .. ")")
+end
+
 -- Derived HandyNotes pins for mounts, pets and toys.
 do
     local MC = {}

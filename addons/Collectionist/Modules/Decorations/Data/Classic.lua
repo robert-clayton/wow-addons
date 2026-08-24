@@ -24,12 +24,12 @@ MC.RegisterContent("vanilla", "decorations", {
         { decorID = 14816, itemID = 263027, name = "Darkmaster's Mystical Brazier", source = "crafted", sourceInfo = "3 Darkmaster's Mystical Brazier Lighting › Large Lights Crafting: Enchanting Profession: Classic Enchanting (240)", skillLine = MC.PROFESSION.Enchanting },
     } },
     { source = "achievement", decorations = {
-        { decorID = 3893, itemID = 247756, name = "Challenger's Dueling Flag", source = "achievement", sourceInfo = "3 Challenger's Dueling Flag Accents › Ornamental Duel-icious Joruh (Orgrimmar) 1000 Honor +1 more source", achievementID = 1157, npcID = 254606 },
+        { decorID = 3893, itemID = 247756, name = "Challenger's Dueling Flag", source = "achievement", sourceInfo = "3 Challenger's Dueling Flag Accents › Ornamental Duel-icious Joruh (Orgrimmar) 1000 Honor +1 more source", achievementID = 1157, npcID = 254606, waypoint = { { 84, 0.7780, 0.6570, "Challenger's Dueling Flag" }, { 85, 0.3880, 0.7200, "Challenger's Dueling Flag" } } },
     } },
     { source = "quest", decorations = {
-        { decorID = 11274, itemID = 256673, name = "Stormwind Forge", source = "quest", sourceInfo = "5 Stormwind Forge Structural › Misc Structural A Binding Contract Captain Lancy Revshon (Stormwind City) 950", zone = "Stormwind City", questID = 7604, npcID = 49877 },
+        { decorID = 11274, itemID = 256673, name = "Stormwind Forge", source = "quest", sourceInfo = "5 Stormwind Forge Structural › Misc Structural A Binding Contract Captain Lancy Revshon (Stormwind City) 950", zone = "Stormwind City", questID = 7604, npcID = 49877, waypoint = { 84, 0.6760, 0.7280, "Stormwind Forge" } },
     } },
     { source = "drop", decorations = {
-        { decorID = 2246, itemID = 246429, name = "Dark Iron Chandelier", source = "drop", sourceInfo = "1 Dark Iron Chandelier Lighting › Ceiling Lights Encounter: Emperor Dagran Thaurissan (Blackrock Depths)", zone = "Blackrock Mountain" },
+        { decorID = 2246, itemID = 246429, name = "Dark Iron Chandelier", source = "drop", sourceInfo = "1 Dark Iron Chandelier Lighting › Ceiling Lights Encounter: Emperor Dagran Thaurissan (Blackrock Depths)", zone = "Blackrock Mountain", waypoint = { 35, 0.3906, 0.1812, "Dark Iron Chandelier" } },
     } },
 })

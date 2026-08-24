@@ -36,7 +36,7 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 2950, itemID = 269240, name = "Luminous Sporeglider",
               source = "raid", sourceInfo = "Combine 4 Delicious Sporesnacks from Rotmire in Sporefall",
-              zone = "Sporefall", taskList = SPOREGLIDER_TASKS, score = T.epic },
+              zone = "Sporefall", taskList = SPOREGLIDER_TASKS, score = T.epic, waypoint = { 2413, 0.7350, 0.6640, "Luminous Sporeglider" } },
         },
     },
     {
@@ -52,7 +52,7 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 2611, itemID = 246731, name = "Dusk Grimlynx",
               source = "quest", sourceInfo = "History Lesson - Legacy of the Amani storyline",
-              zone = "Harandar", score = T.medium },
+              zone = "Harandar", score = T.medium, waypoint = { 2576, 0.4390, 0.5320, "Dusk Grimlynx" } },
         },
     },
     {
@@ -63,10 +63,10 @@ MC.RegisterContent("midnight", "mounts", {
               dropInfo = { mob = "Ahune", zone = "Midsummer Fire Festival", boss = true, rate = "Increasing daily Warband chance" }, score = T.epic },
             { mountID = 1470, itemID = 192778, name = "Liquid Hot Magma Slug",
               source = "worldevent", sourceInfo = "Xydan - 5,000 Timewarped Badges during Dragonflight Timewalking", zone = "Valdrakken",
-              cost = { currency = { MC.CURRENCY.TimewarpedBadges, 5000 } }, score = T.long },
+              cost = { currency = { MC.CURRENCY.TimewarpedBadges, 5000 } }, score = T.long, waypoint = { 2112, 0.8150, 0.4720, "Liquid Hot Magma Slug" } },
             { mountID = 1710, itemID = 210140, name = "Black-Furred Bakar",
               source = "worldevent", sourceInfo = "Xydan - 5,000 Timewarped Badges during Dragonflight Timewalking", zone = "Valdrakken",
-              cost = { currency = { MC.CURRENCY.TimewarpedBadges, 5000 } }, score = T.long },
+              cost = { currency = { MC.CURRENCY.TimewarpedBadges, 5000 } }, score = T.long, waypoint = { 2112, 0.8150, 0.4720, "Black-Furred Bakar" } },
         },
     },
 })

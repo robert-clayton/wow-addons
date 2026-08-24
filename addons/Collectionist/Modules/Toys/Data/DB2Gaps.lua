@@ -8,46 +8,46 @@ MC.RegisterContent("vanilla", "toys", {
         { itemID = 88566, name = "Krastinov's Bag of Horrors", source = "drop", sourceInfo = "|cFFFFD200Drop: |rDoctor Theolen Krastinov|n|cFFFFD200Zone: |rScholomance" },
     } },
     { source = "vendor", toys = {
-        { itemID = 97919, name = "Whole-Body Shrinka'", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rRavika|n|cFFFFD200Cost: |r25|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Durotar" },
-        { itemID = 97921, name = "Bom'bay's Color-Seein' Sauce", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rLenny \"Fingers\" McCoy|n|cFFFFD200Zone: |rStormwind City|n|cFFFFD200Cost: |r200|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Stormwind City" },
-        { itemID = 98552, name = "Xan'tish's Flute", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rRavika|n|cFFFFD200Cost: |r5|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Durotar" },
+        { itemID = 97919, name = "Whole-Body Shrinka'", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rRavika|n|cFFFFD200Cost: |r25|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Durotar", waypoint = { 1, 0.5540, 0.1120, "Whole-Body Shrinka'" } },
+        { itemID = 97921, name = "Bom'bay's Color-Seein' Sauce", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rLenny \"Fingers\" McCoy|n|cFFFFD200Zone: |rStormwind City|n|cFFFFD200Cost: |r200|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Stormwind City", waypoint = { 84, 0.7280, 0.5880, "Bom'bay's Color-Seein' Sauce" } },
+        { itemID = 98552, name = "Xan'tish's Flute", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rRavika|n|cFFFFD200Cost: |r5|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Durotar", waypoint = { 1, 0.5540, 0.1120, "Xan'tish's Flute" } },
     } },
 })
 
 MC.RegisterContent("cata", "toys", {
     { source = "worldevent", toys = {
-        { itemID = 90899, name = "Darkmoon Whistle", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rGelvas Grimegate|n|cFFFFD200Zone: |rDarkmoon Island|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-SILVERICON.BLP:0|t", zone = "Darkmoon Island" },
-        { itemID = 101571, name = "Moonfang Shroud", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island" },
-        { itemID = 105898, name = "Moonfang's Paw", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island" },
+        { itemID = 90899, name = "Darkmoon Whistle", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rGelvas Grimegate|n|cFFFFD200Zone: |rDarkmoon Island|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-SILVERICON.BLP:0|t", zone = "Darkmoon Island", waypoint = { 407, 0.4770, 0.6470, "Darkmoon Whistle" } },
+        { itemID = 101571, name = "Moonfang Shroud", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.3965, 0.4407, "Moonfang Shroud" } },
+        { itemID = 105898, name = "Moonfang's Paw", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.3965, 0.4407, "Moonfang's Paw" } },
     } },
 })
 
 MC.RegisterContent("mop", "toys", {
     { source = "achievement", toys = {
         { itemID = 87528, name = "Honorary Brewmaster Keg", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rPub Crawl|n|cFFFFD200Category: |rMists of Pandaria" },
-        { itemID = 89205, name = "Mini Mana Bomb", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rTheramore's Fall|n|cFFFFD200Category: |rFeats of Strength" },
+        { itemID = 89205, name = "Mini Mana Bomb", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rTheramore's Fall|n|cFFFFD200Category: |rFeats of Strength", waypoint = { 70, 0.5580, 0.4960, "Mini Mana Bomb" } },
     } },
     { source = "worldevent", toys = {
-        { itemID = 89999, name = "Everlasting Alliance Firework", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Lunar Festival|n|n|cFFFFD200Vendor: |rFariel Starsong|n|cFFFFD200Zone: |rMoonglade|n|cFFFFD200Cost: |r25|TINTERFACE\\ICONS\\INV_MISC_ELVENCOINS.BLP:0|t", zone = "Moonglade" },
-        { itemID = 90000, name = "Everlasting Horde Firework", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Lunar Festival|n|n|cFFFFD200Vendor: |rFariel Starsong|n|cFFFFD200Zone: |rMoonglade|n|cFFFFD200Cost: |r25|TINTERFACE\\ICONS\\INV_MISC_ELVENCOINS.BLP:0|t", zone = "Moonglade" },
+        { itemID = 89999, name = "Everlasting Alliance Firework", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Lunar Festival|n|n|cFFFFD200Vendor: |rFariel Starsong|n|cFFFFD200Zone: |rMoonglade|n|cFFFFD200Cost: |r25|TINTERFACE\\ICONS\\INV_MISC_ELVENCOINS.BLP:0|t", zone = "Moonglade", waypoint = { 80, 0.5380, 0.3530, "Everlasting Alliance Firework" } },
+        { itemID = 90000, name = "Everlasting Horde Firework", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Lunar Festival|n|n|cFFFFD200Vendor: |rFariel Starsong|n|cFFFFD200Zone: |rMoonglade|n|cFFFFD200Cost: |r25|TINTERFACE\\ICONS\\INV_MISC_ELVENCOINS.BLP:0|t", zone = "Moonglade", waypoint = { 80, 0.5380, 0.3530, "Everlasting Horde Firework" } },
         { itemID = 90883, name = "The Pigskin", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
         { itemID = 90888, name = "Special Edition Foot Ball", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
         { itemID = 104318, name = "Crashin' Thrashin' Flyer Controller", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
     } },
     { source = "vendor", toys = {
-        { itemID = 32542, name = "Imp in a Ball", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r", zone = "Dornogal" },
+        { itemID = 32542, name = "Imp in a Ball", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r", zone = "Dornogal", waypoint = { 2339, 0.4807, 0.5216, "Imp in a Ball" } },
         { itemID = 32566, name = "Picnic Basket", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
         { itemID = 33219, name = "Goblin Gumbo Kettle", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
         { itemID = 33223, name = "Fishing Chair", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
         { itemID = 34499, name = "Paper Flying Machine Kit", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
         { itemID = 35227, name = "Goblin Weather Machine - Prototype 01-B", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
         { itemID = 38578, name = "The Flag of Ownership", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
-        { itemID = 45063, name = "Foam Sword Rack", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r", zone = "Dornogal" },
+        { itemID = 45063, name = "Foam Sword Rack", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r", zone = "Dornogal", waypoint = { 2339, 0.4807, 0.5216, "Foam Sword Rack" } },
         { itemID = 46780, name = "Ogre Pinata", source = "vendor", sourceInfo = "|cFFFFD200Black Market Auction House|r" },
-        { itemID = 90427, name = "Pandaren Brewpack", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t" },
-        { itemID = 97994, name = "Darkmoon Seesaw", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGelvas Grimegate|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island" },
-        { itemID = 104323, name = "The Swineskin", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r40|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
-        { itemID = 104324, name = "Foot Ball", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r40|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t" },
+        { itemID = 90427, name = "Pandaren Brewpack", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t", waypoint = { { 1, 0.4030, 0.1700, "Pandaren Brewpack" }, { 27, 0.5630, 0.3670, "Pandaren Brewpack" } } },
+        { itemID = 97994, name = "Darkmoon Seesaw", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGelvas Grimegate|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.4770, 0.6470, "Darkmoon Seesaw" } },
+        { itemID = 104323, name = "The Swineskin", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r40|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", waypoint = { { 84, 0.5660, 0.6760, "The Swineskin" }, { 85, 0.5780, 0.5100, "The Swineskin" }, { 125, 0.4480, 0.4630, "The Swineskin" }, { 535, 0.4520, 0.3880, "The Swineskin" }, { 1165, 0.4840, 0.8950, "The Swineskin" } } },
+        { itemID = 104324, name = "Foot Ball", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rWorld Vendors|n|cFFFFD200Cost: |r40|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", waypoint = { { 84, 0.5660, 0.6760, "Foot Ball" }, { 85, 0.5780, 0.5100, "Foot Ball" }, { 125, 0.4480, 0.4630, "Foot Ball" }, { 535, 0.4520, 0.3880, "Foot Ball" }, { 1165, 0.4840, 0.8950, "Foot Ball" } } },
     } },
 })
 
@@ -63,73 +63,73 @@ MC.RegisterContent("wod", "toys", {
         { itemID = 122129, name = "Fire-Eater's Vial", source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rDarkmoon Racer Roadhog|n|cFFFFD200Category: |rDarkmoon Faire" },
     } },
     { source = "drop", toys = {
-        { itemID = 120857, name = "Barrel of Bandanas", source = "drop", sourceInfo = "|cFFFFD200Pickpocketing|r|n", zone = "Dalaran" },
+        { itemID = 120857, name = "Barrel of Bandanas", source = "drop", sourceInfo = "|cFFFFD200Pickpocketing|r|n", zone = "Dalaran", waypoint = { 626, 0.4540, 0.2760, "Barrel of Bandanas" } },
     } },
     { source = "worldevent", toys = {
         { itemID = 108632, name = "Crashin' Thrashin' Flamer Controller", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil|n" },
-        { itemID = 108635, name = "Crashin' Thrashin' Killdozer Controller", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil|n|n", zone = "Lunarfall" },
-        { itemID = 116067, name = "Ring of Broken Promises", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Quest: |rBroken Promises", zone = "Darkmoon Island" },
+        { itemID = 108635, name = "Crashin' Thrashin' Killdozer Controller", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil|n|n", zone = "Lunarfall", waypoint = { 582, 0.4420, 0.5100, "Crashin' Thrashin' Killdozer Controller" } },
+        { itemID = 116067, name = "Ring of Broken Promises", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Quest: |rBroken Promises", zone = "Darkmoon Island", waypoint = { 407, 0.7480, 0.3340, "Ring of Broken Promises" } },
         { itemID = 116115, name = "Blazing Wings", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rDarkmoon Faire|n|cFFFFD200Achievement: |rBrood of Alysrazor" },
-        { itemID = 116139, name = "Haunting Memento", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rChester|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island" },
+        { itemID = 116139, name = "Haunting Memento", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rChester|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.5140, 0.7500, "Haunting Memento" } },
         { itemID = 116400, name = "Silver-Plated Turkey Shooter", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rPilgrim's Bounty" },
-        { itemID = 116435, name = "Cozy Bonfire", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rMidsummer Merchant|n|cFFFFD200Zone: |rCapital Cities|n|cFFFFD200Cost: |r300|TINTERFACE\\ICONS\\INV_SUMMERFEST_FIREFLOWER.BLP:0|t|n" },
+        { itemID = 116435, name = "Cozy Bonfire", source = "worldevent", sourceInfo = "|cFFFFD200Vendor: |rMidsummer Merchant|n|cFFFFD200Zone: |rCapital Cities|n|cFFFFD200Cost: |r300|TINTERFACE\\ICONS\\INV_SUMMERFEST_FIREFLOWER.BLP:0|t|n", waypoint = { { 84, 0.4920, 0.7180, "Cozy Bonfire" }, { 85, 0.4780, 0.3740, "Cozy Bonfire" } } },
         { itemID = 116456, name = "Scroll of Storytelling", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil" },
         { itemID = 116651, name = "True Love Prism", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rLove is in the Air" },
         { itemID = 116689, name = "Pineapple Lounge Cushion", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
         { itemID = 116690, name = "Safari Lounge Cushion", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
         { itemID = 116691, name = "Zhevra Lounge Cushion", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
         { itemID = 116692, name = "Fuzzy Green Lounge Cushion", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
-        { itemID = 116757, name = "Steamworks Sausage Grill", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rBrewfest|n|cFFFFD200Cost: |r200|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t" },
-        { itemID = 116758, name = "Brewfest Banner", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rBrewfest|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t" },
+        { itemID = 116757, name = "Steamworks Sausage Grill", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rBrewfest|n|cFFFFD200Cost: |r200|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t", waypoint = { { 1, 0.4030, 0.1700, "Steamworks Sausage Grill" }, { 27, 0.5630, 0.3670, "Steamworks Sausage Grill" } } },
+        { itemID = 116758, name = "Brewfest Banner", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rBrewfest|n|cFFFFD200Cost: |r100|TINTERFACE\\ICONS\\INV_MISC_COIN_01.BLP:0|t", waypoint = { { 1, 0.4030, 0.1700, "Brewfest Banner" }, { 27, 0.5630, 0.3670, "Brewfest Banner" } } },
         { itemID = 116763, name = "Crashin' Thrashin' Shredder Controller", source = "worldevent", sourceInfo = "|cFFFFD200World Event: |rFeast of Winter Veil" },
-        { itemID = 116856, name = "\"Blooming Rose\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar" },
-        { itemID = 116888, name = "\"Night Demon\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar" },
-        { itemID = 116889, name = "\"Purple Phantom\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar" },
-        { itemID = 116890, name = "\"Santo's Sun\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar" },
-        { itemID = 116891, name = "\"Snowy Owl\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar" },
+        { itemID = 116856, name = "\"Blooming Rose\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar", waypoint = { 1, 0.4720, 0.1780, "\"Blooming Rose\" Contender's Costume" } },
+        { itemID = 116888, name = "\"Night Demon\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar", waypoint = { 1, 0.4720, 0.1780, "\"Night Demon\" Contender's Costume" } },
+        { itemID = 116889, name = "\"Purple Phantom\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar", waypoint = { 1, 0.4720, 0.1780, "\"Purple Phantom\" Contender's Costume" } },
+        { itemID = 116890, name = "\"Santo's Sun\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar", waypoint = { 1, 0.4720, 0.1780, "\"Santo's Sun\" Contender's Costume" } },
+        { itemID = 116891, name = "\"Snowy Owl\" Contender's Costume", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead|n", zone = "Durotar", waypoint = { 1, 0.4720, 0.1780, "\"Snowy Owl\" Contender's Costume" } },
         { itemID = 128776, name = "Red Wooden Sled", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil|n" },
-        { itemID = 128794, name = "Sack of Spectral Spiders", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Hallow's End|n", zone = "Lunarfall" },
+        { itemID = 128794, name = "Sack of Spectral Spiders", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Hallow's End|n", zone = "Lunarfall", waypoint = { 582, 0.7450, 0.3390, "Sack of Spectral Spiders" } },
         { itemID = 128807, name = "Coin of Many Faces", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Hallow's End|n" },
     } },
     { source = "quest", toys = {
-        { itemID = 110560, name = "Garrison Hearthstone", source = "quest", sourceInfo = "|cFFFFD200Quest: |rEstablish Your Garrison|n|cFFFFD200Zone: |rFrostfire Ridge|n|cFFFFD200Zone: |rFrostwall|n|n|cFFFFD200Quest: |rEstablish Your Garrison|n|cFFFFD200Zone: |rShadowmoon Valley|n|cFFFFD200Zone: |rLunarfall" },
+        { itemID = 110560, name = "Garrison Hearthstone", source = "quest", sourceInfo = "|cFFFFD200Quest: |rEstablish Your Garrison|n|cFFFFD200Zone: |rFrostfire Ridge|n|cFFFFD200Zone: |rFrostwall|n|n|cFFFFD200Quest: |rEstablish Your Garrison|n|cFFFFD200Zone: |rShadowmoon Valley|n|cFFFFD200Zone: |rLunarfall", waypoint = { { 582, 0.3270, 0.3400, "Garrison Hearthstone" }, { 590, 0.5120, 0.3960, "Garrison Hearthstone" } } },
         { itemID = 122674, name = "S.E.L.F.I.E. Camera MkII", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Crystal Clarity|n|cFFFFD200Zone: |rStormwind|n|cFFFFD200Zone: |rOrgrimmar" },
     } },
     { source = "vendor", toys = {
-        { itemID = 116440, name = "Burning Defender's Medallion", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rMidsummer Merchant|n|cFFFFD200Zone: |rCapital Cities|n|cFFFFD200Cost: |r300|TINTERFACE\\ICONS\\INV_SUMMERFEST_FIREFLOWER.BLP:0|t|n" },
-        { itemID = 126931, name = "Seafarer's Slidewhistle", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGalissa Sundew|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island" },
+        { itemID = 116440, name = "Burning Defender's Medallion", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rMidsummer Merchant|n|cFFFFD200Zone: |rCapital Cities|n|cFFFFD200Cost: |r300|TINTERFACE\\ICONS\\INV_SUMMERFEST_FIREFLOWER.BLP:0|t|n", waypoint = { { 84, 0.4920, 0.7180, "Burning Defender's Medallion" }, { 85, 0.4780, 0.3740, "Burning Defender's Medallion" } } },
+        { itemID = 126931, name = "Seafarer's Slidewhistle", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rGalissa Sundew|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.5250, 0.8870, "Seafarer's Slidewhistle" } },
     } },
 })
 
 MC.RegisterContent("legion", "toys", {
     { source = "quest", toys = {
-        { itemID = 131717, name = "Starlight Beacon", source = "quest", sourceInfo = "|cFFFFD200Quest: |rA Beacon of Hope|n|cFFFFD200Zone: |rAzsuna|n|cFFFFD200Zone: |rVal'sharah|n|cFFFFD200Zone: |rSuramar" },
-        { itemID = 138111, name = "Stormforged Grapple Launcher", source = "quest", sourceInfo = "|cFFFFD200Quest: |rStormforged Grapple Launcher|n|cFFFFD200Zone: |rStormheim", zone = "Stormheim" },
-        { itemID = 140192, name = "Dalaran Hearthstone", source = "quest", sourceInfo = "|cFFFFD200Quest:|r In the Blink of an Eye|n|cFFFFD200Zone:|r Broken Isles|n|cFFFFD200Zone:|r Dalaran", zone = "Stormwind City" },
-        { itemID = 141605, name = "Flight Master's Whistle", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Uniting the Isles|n|cFFFFD200Zone:|r Dalaran|n|n|cFFFFD200Quest:|r Uniting Kul Tiras|n|cFFFFD200Zone:|r Tiragarde Sound|n|n|cFFFFD200Quest:|r Uniting Zandalar|n|cFFFFD200Zone:|r Zuldazar" },
+        { itemID = 131717, name = "Starlight Beacon", source = "quest", sourceInfo = "|cFFFFD200Quest: |rA Beacon of Hope|n|cFFFFD200Zone: |rAzsuna|n|cFFFFD200Zone: |rVal'sharah|n|cFFFFD200Zone: |rSuramar", waypoint = { 630, 0.4740, 0.4260, "Starlight Beacon" } },
+        { itemID = 138111, name = "Stormforged Grapple Launcher", source = "quest", sourceInfo = "|cFFFFD200Quest: |rStormforged Grapple Launcher|n|cFFFFD200Zone: |rStormheim", zone = "Stormheim", waypoint = { 634, 0.3380, 0.4570, "Stormforged Grapple Launcher" } },
+        { itemID = 140192, name = "Dalaran Hearthstone", source = "quest", sourceInfo = "|cFFFFD200Quest:|r In the Blink of an Eye|n|cFFFFD200Zone:|r Broken Isles|n|cFFFFD200Zone:|r Dalaran", zone = "Stormwind City", waypoint = { 84, 0.4040, 0.7780, "Dalaran Hearthstone" } },
+        { itemID = 141605, name = "Flight Master's Whistle", source = "quest", sourceInfo = "|cFFFFD200Quest:|r Uniting the Isles|n|cFFFFD200Zone:|r Dalaran|n|n|cFFFFD200Quest:|r Uniting Kul Tiras|n|cFFFFD200Zone:|r Tiragarde Sound|n|n|cFFFFD200Quest:|r Uniting Zandalar|n|cFFFFD200Zone:|r Zuldazar", waypoint = { { 627, 0.2850, 0.4830, "Flight Master's Whistle" }, { 862, 0.5840, 0.6260, "Flight Master's Whistle" }, { 1161, 0.6940, 0.2700, "Flight Master's Whistle" } } },
     } },
 })
 
 MC.RegisterContent("bfa", "toys", {
     { source = "vendor", toys = {
-        { itemID = 167698, name = "Secret Fish Goggles", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDanielle Anglers|n|cFFFFD200Zone: |rMechagon|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Mechagon Island" },
+        { itemID = 167698, name = "Secret Fish Goggles", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDanielle Anglers|n|cFFFFD200Zone: |rMechagon|n|cFFFFD200Cost: |r10|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t", zone = "Mechagon Island", waypoint = { 1462, 0.3720, 0.4716, "Secret Fish Goggles" } },
     } },
 })
 
 MC.RegisterContent("df", "toys", {
     { source = "drop", toys = {
-        { itemID = 204405, name = "Stuffed Bear", source = "drop", sourceInfo = "|cFFFFD200Treasure: |rStuffed Bear|n|cFFFFD200Zone: |rThe Forbidden Reach", zone = "The Forbidden Reach" },
+        { itemID = 204405, name = "Stuffed Bear", source = "drop", sourceInfo = "|cFFFFD200Treasure: |rStuffed Bear|n|cFFFFD200Zone: |rThe Forbidden Reach", zone = "The Forbidden Reach", waypoint = { 2151, 0.3050, 0.5760, "Stuffed Bear" } },
     } },
     { source = "vendor", toys = {
-        { itemID = 200640, name = "Obsidian Egg Clutch", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rSamia Inkling|n|cFFFFD200Zone: |rThe Waking Shores|n|cFFFFD200Cost: |r1|Hitem:201399|h|TInterface\\ICONS\\INV_SkeletonSpinePet_Green.blp:0|t|h 1|Hitem:201402|h|TInterface\\ICONS\\INV_Leatherworking_90_Bone.blp:0|t|h 100|Hcurrency:2003|h|TInterface\\ICONS\\INV_Faction_WarResources.BLP:0|t|h|n|n|cFFFFD200Vendor: |rXaldrass|n|cFFFFD200Zone: |rThe Waking Shores|n|cFFFFD200Cost: |r1|Hitem:201399|h|TInterface\\ICONS\\INV_SkeletonSpinePet_Green.blp:0|t|h 1|Hitem:201402|h|TInterface\\ICONS\\INV_Leatherworking_90_Bone.blp:0|t|h 100|Hcurrency:2003|h|TInterface\\ICONS\\INV_Faction_WarResources.BLP:0|t|h", zone = "The Waking Shores" },
+        { itemID = 200640, name = "Obsidian Egg Clutch", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rSamia Inkling|n|cFFFFD200Zone: |rThe Waking Shores|n|cFFFFD200Cost: |r1|Hitem:201399|h|TInterface\\ICONS\\INV_SkeletonSpinePet_Green.blp:0|t|h 1|Hitem:201402|h|TInterface\\ICONS\\INV_Leatherworking_90_Bone.blp:0|t|h 100|Hcurrency:2003|h|TInterface\\ICONS\\INV_Faction_WarResources.BLP:0|t|h|n|n|cFFFFD200Vendor: |rXaldrass|n|cFFFFD200Zone: |rThe Waking Shores|n|cFFFFD200Cost: |r1|Hitem:201399|h|TInterface\\ICONS\\INV_SkeletonSpinePet_Green.blp:0|t|h 1|Hitem:201402|h|TInterface\\ICONS\\INV_Leatherworking_90_Bone.blp:0|t|h 100|Hcurrency:2003|h|TInterface\\ICONS\\INV_Faction_WarResources.BLP:0|t|h", zone = "The Waking Shores", waypoint = { 2022, 0.2470, 0.5680, "Obsidian Egg Clutch" } },
     } },
 })
 
 MC.RegisterContent("midnight", "toys", {
     { source = "vendor", toys = {
-        { itemID = 263933, name = "Preyseeker's Hearthstone", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rConstruct E'nui|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r800|Hcurrency:3392|h|TInterface\\ICONS\\INV_10_ElementalCombinedFoozles_Blood.BLP:0|t|h", zone = "Silvermoon City" },
-        { itemID = 264517, name = "Galactic Flag of Victory", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rThraxadar|n|cFFFFD200Zone: |rMasters' Perch|n|cFFFFD200Faction: |rSlayer's Duellum - Honored|n|cFFFFD200Cost: |r4000|Hcurrency:3316|h|TInterface\\ICONS\\INV_112_RaidTrinkets_VoidPrism.BLP:0|t|h", zone = "Slayer's Rise" },
-        { itemID = 264666, name = "Rod of Exanguishation", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rConstruct V'anore|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r600|Hcurrency:3392|h|TInterface\\ICONS\\INV_10_ElementalCombinedFoozles_Blood.BLP:0|t|h", zone = "Silvermoon City" },
-        { itemID = 267291, name = "Coffer Key Glue", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rNaleidea Rivergleam|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r250|Hcurrency:2803|h|TInterface\\ICONS\\INV_Misc_ElvenCoins.blp:0|t|h", zone = "Silvermoon City" },
+        { itemID = 263933, name = "Preyseeker's Hearthstone", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rConstruct E'nui|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r800|Hcurrency:3392|h|TInterface\\ICONS\\INV_10_ElementalCombinedFoozles_Blood.BLP:0|t|h", zone = "Silvermoon City", waypoint = { 2393, 0.5690, 0.6700, "Preyseeker's Hearthstone" } },
+        { itemID = 264517, name = "Galactic Flag of Victory", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rThraxadar|n|cFFFFD200Zone: |rMasters' Perch|n|cFFFFD200Faction: |rSlayer's Duellum - Honored|n|cFFFFD200Cost: |r4000|Hcurrency:3316|h|TInterface\\ICONS\\INV_112_RaidTrinkets_VoidPrism.BLP:0|t|h", zone = "Slayer's Rise", waypoint = { 2444, 0.3930, 0.8100, "Galactic Flag of Victory" } },
+        { itemID = 264666, name = "Rod of Exanguishation", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rConstruct V'anore|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r600|Hcurrency:3392|h|TInterface\\ICONS\\INV_10_ElementalCombinedFoozles_Blood.BLP:0|t|h", zone = "Silvermoon City", waypoint = { 2393, 0.5690, 0.6700, "Rod of Exanguishation" } },
+        { itemID = 267291, name = "Coffer Key Glue", source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rNaleidea Rivergleam|n|cFFFFD200Zone: |rSilvermoon City|n|cFFFFD200Cost: |r250|Hcurrency:2803|h|TInterface\\ICONS\\INV_Misc_ElvenCoins.blp:0|t|h", zone = "Silvermoon City", waypoint = { 2393, 0.5280, 0.7790, "Coffer Key Glue" } },
     } },
 })

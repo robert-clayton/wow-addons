@@ -59,7 +59,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "achievement",
         mounts = {
             { mountID = 3023, itemID = 275656, name = "Auriferous Venomfang", source = "achievement",
-              sourceInfo = "Treasures of the Coiled Isle", achievementID = 63359, zone = "The Coiled Isle", score = T.epic },
+              sourceInfo = "Treasures of the Coiled Isle", achievementID = 63359, zone = "The Coiled Isle", score = T.epic, waypoint = { 2512, 0.6790, 0.8150, "Auriferous Venomfang" } },
             { mountID = 3053, itemID = 276553, name = "Emerald Skyfang", source = "achievement",
               sourceInfo = "Pro Poison Patroller - complete 250 patrols in the Vaults", achievementID = 63653,
               zone = "Vaults of Atal'Utek", score = T.epic },
@@ -115,7 +115,7 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 3058, itemID = 276804, name = "The Writhing Brood", source = "dungeon",
               sourceInfo = "Zul'jan, Altar of Fangs (Mythic or Mythic+)", zone = "Altar of Fangs",
-              dropInfo = { mob = "Zul'jan", zone = "Altar of Fangs", boss = true, rate = "Rare" }, score = T.epic },
+              dropInfo = { mob = "Zul'jan", zone = "Altar of Fangs", boss = true, rate = "Rare" }, score = T.epic, waypoint = { 2509, 0.4720, 0.6850, "The Writhing Brood" } },
         },
     },
     {
@@ -124,10 +124,10 @@ MC.RegisterContent("midnight", "mounts", {
         mounts = {
             { mountID = 3021, itemID = 275652, name = "Crimson Venomfang", source = "raid",
               sourceInfo = "Glory of the Venomous Raider (Season 2 raid)",
-              achievementID = 63254, zone = "The Venomous Abyss", score = T.epic },
+              achievementID = 63254, zone = "The Venomous Abyss", score = T.epic, waypoint = { 2393, 0.4030, 0.6550, "Crimson Venomfang" } },
             { mountID = 3030, itemID = 275658, name = "Primeval Skyfriend", source = "raid",
               sourceInfo = "Mythic Ula'tek (Season 2 raid)", zone = "The Venomous Abyss",
-              dropInfo = { mob = "Ula'tek", zone = "The Venomous Abyss", boss = true, rate = "Mythic" }, score = T.legendary },
+              dropInfo = { mob = "Ula'tek", zone = "The Venomous Abyss", boss = true, rate = "Mythic" }, score = T.legendary, waypoint = { 2509, 0.4720, 0.2270, "Primeval Skyfriend" } },
         },
     },
     {

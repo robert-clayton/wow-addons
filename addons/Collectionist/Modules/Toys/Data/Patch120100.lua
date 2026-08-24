@@ -19,7 +19,7 @@ MC.RegisterContent("midnight", "toys", {
         toys = {
             { itemID = 280419, name = "Cursed Badge of the Soulcoilers", source = "achievement",
               sourceInfo = "Student of Hissstory", zone = "The Coiled Isle",
-              achievementID = 63662, score = T.medium },
+              achievementID = 63662, score = T.medium, waypoint = { 2512, 0.6790, 0.8150, "Cursed Badge of the Soulcoilers" } },
             { itemID = 275825, name = "Ula'tek's Sssacrificial Rain", source = "achievement",
               sourceInfo = "Tour of Duty: The Coiled Isle - earn 1,000 honor on the Coiled Isle in War Mode",
               zone = "The Coiled Isle", achievementID = 63167, score = T.medium },
@@ -104,7 +104,7 @@ MC.RegisterContent("midnight", "toys", {
         source = "worldevent",
         toys = {
             { itemID = 267472, name = "Gnomatic Projector", source = "worldevent",
-              sourceInfo = "The Great Gnomeregan Run", zone = "New Tinkertown", faction = "Alliance", score = T.medium },
+              sourceInfo = "The Great Gnomeregan Run", zone = "New Tinkertown", faction = "Alliance", score = T.medium, waypoint = { 469, 0.3630, 0.3650, "Gnomatic Projector" } },
         },
     },
 })

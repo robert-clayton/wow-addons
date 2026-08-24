@@ -176,7 +176,7 @@ MC.RegisterContent("midnight", "mounts", {
               cost = { currency = { MC.CURRENCY.VoidlightMarl, 6000 } }, renown = { factionID = MC.FACTION.SlayersDuellum, standing = "Exalted", factionName = "Slayer's Duellum" }, score = T.medium },
             { mountID = 2764, name = "Duskbrute Harrower", source = "reputation", sourceInfo = "Slayer's Duellum Trove (Paragon cache drop)",
               zone = "Voidstorm",
-              dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" } },
+              dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" }, waypoint = { 2444, 0.3930, 0.8100, "Duskbrute Harrower" } },
         },
     },
 
@@ -250,7 +250,7 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2756, name = "Crimson Dragonhawk", source = "achievement", sourceInfo = "Midnight Glyph Hunter",
               achievementID = 61584 },
             { mountID = 2912, name = "Vivacious Chloroceros", source = "achievement", sourceInfo = "Treasures of Harandar", zone = "Harandar",
-              achievementID = 61263, taskList = VIVACIOUS_CHLOROCEROS_TASKS },
+              achievementID = 61263, taskList = VIVACIOUS_CHLOROCEROS_TASKS, waypoint = { 2413, 0.5240, 0.8020, "Vivacious Chloroceros" } },
             { mountID = 2829, name = "Lab-Grown Stormray", source = "achievement", sourceInfo = "Staring Into The Void", zone = "Voidstorm",
               achievementID = 62385 },
             { mountID = 2616, name = "Ivory Grimlynx", source = "achievement", sourceInfo = "Allied Race: Haranir", zone = "Harandar",
@@ -277,9 +277,9 @@ MC.RegisterContent("midnight", "mounts", {
         source = "quest",
         mounts = {
             { mountID = 2785, name = "Relinquished Scarlet Charger", source = "quest", sourceInfo = "Quest: Relinquishing Relics (Silvermoon City)",
-              zone = "Silvermoon City" },
+              zone = "Silvermoon City", waypoint = { 2424, 0.5260, 0.5590, "Relinquished Scarlet Charger" } },
             { mountID = 2749, name = "Echo of Aln'sharan", source = "quest", sourceInfo = "Questline: The Legend of Aln'sharan + 500 Mysterious Skyshards",
-              zone = "Harandar", taskList = ALN_SHARAN_TASKS, score = T.legendary },
+              zone = "Harandar", taskList = ALN_SHARAN_TASKS, score = T.legendary, waypoint = { 2413, 0.6620, 0.2550, "Echo of Aln'sharan" } },
         },
     },
 
@@ -315,9 +315,9 @@ MC.RegisterContent("midnight", "mounts", {
         source = "dungeon",
         mounts = {
             { mountID = 2817, name = "Lucent Hawkstrider", source = "dungeon", sourceInfo = "Magisters' Terrace (Mythic) - Degentrius",
-              dropInfo = { mob = "Degentrius", zone = "Magisters' Terrace", boss = true, rate = "~1%" } },
+              dropInfo = { mob = "Degentrius", zone = "Magisters' Terrace", boss = true, rate = "~1%" }, waypoint = { 2424, 0.6300, 0.1510, "Lucent Hawkstrider" } },
             { mountID = 2805, name = "Spectral Hawkstrider", source = "dungeon", sourceInfo = "Windrunner Spire (Mythic) - The Restless Heart",
-              dropInfo = { mob = "The Restless Heart", zone = "Windrunner Spire", boss = true, rate = "~1%" } },
+              dropInfo = { mob = "The Restless Heart", zone = "Windrunner Spire", boss = true, rate = "~1%" }, waypoint = { 2395, 0.3550, 0.7880, "Spectral Hawkstrider" } },
         },
     },
 
@@ -326,7 +326,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "raid",
         mounts = {
             { mountID = 2607, name = "Ashes of Belo'ren", source = "raid", sourceInfo = "March on Quel'Danas (Mythic) - Midnight Falls",
-              dropInfo = { mob = "Midnight Falls", zone = "March on Quel'Danas", boss = true, rate = "~3 per kill (Mythic, current expansion)" }, score = T.legendary },
+              dropInfo = { mob = "Midnight Falls", zone = "March on Quel'Danas", boss = true, rate = "~3 per kill (Mythic, current expansion)" }, score = T.legendary, waypoint = { 2424, 0.5260, 0.8600, "Ashes of Belo'ren" } },
         },
     },
 
@@ -391,7 +391,7 @@ MC.RegisterContent("midnight", "mounts", {
         source = "profession",
         mounts = {
             { mountID = 16, name = "Nether-Swept Drake", source = "profession", sourceInfo = "Fishing - Nether-Warped Egg (7 day hatch), Voidstorm",
-              zone = "Voidstorm" },
+              zone = "Voidstorm", waypoint = { 2405, 0.5110, 0.6930, "Nether-Swept Drake" } },
             -- Patch 12.0.5: Leatherworking craft
             { mountID = 2965, name = "Void-Corrupted Lynx", source = "profession",
               sourceInfo = "Leatherworking 90 craft — needs Pattern: Rope Lynx Harness + Broken Lynx Leash reagent (both drop from the end-of-run chest at Ritual Sites, guaranteed on Tier 5 first clear)",
@@ -417,7 +417,7 @@ MC.RegisterContent("midnight", "mounts", {
             { mountID = 2608, name = "Light-Forged Mechsuit", source = "prepatch", sourceInfo = "Two Minutes to Midnight achievement (Twilight Ascension pre-patch event, no longer earnable)",
               achievementID = 42300, unavailable = true },
             { mountID = 2220, name = "Retrained Skyrazor", source = "prepatch", sourceInfo = "Materialist Ophinell - 100 Twilight's Blade Insignia (no longer available)", zone = "Twilight Highlands",
-              unavailable = true },
+              unavailable = true, waypoint = { 241, 0.4980, 0.8130, "Retrained Skyrazor" } },
         },
     },
 })

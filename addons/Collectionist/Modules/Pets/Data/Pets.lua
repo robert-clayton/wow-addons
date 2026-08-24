@@ -241,7 +241,7 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 4983, npcID = 257908, name = "Kai",                   petType = 8,  source = "drop", sourceInfo = "Victorious Stormarion Cache, Voidstorm",   canBattle = true,  waypoint = LOC.StormarionAssault, zone = "Voidstorm",
               dropInfo = { mob = "Stormarion Assault event cache", zone = "Voidstorm" } },
             { speciesID = 4981, npcID = 257695, name = "Nova",                  petType = 5,  source = "drop", sourceInfo = "Slayer's Duellum Trove (Paragon cache)",   canBattle = false, zone = "Voidstorm",
-              dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" }, score = T.epic },
+              dropInfo = { mob = "Slayer's Duellum Trove", zone = "Voidstorm" }, score = T.epic, waypoint = { 2444, 0.3930, 0.8100, "Nova" } },
 
             -- Patch 12.0.5: Void Assault Wriggling Field Pouch drops
             { speciesID = 5040, npcID = 262788, name = "Curious Lynx Kitten",  petType = 8,  source = "drop", sourceInfo = "Wriggling Field Pouch (Void Assault, Eversong Woods)", canBattle = true, zone = "Eversong Woods",
@@ -249,7 +249,7 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5038, npcID = 262786, name = "Wriggling Capybara",   petType = 8,  source = "drop", sourceInfo = "Wriggling Field Pouch (Void Assault, Zul'Aman)",        canBattle = true, zone = "Zul'Aman",
               dropInfo = { mob = "Wriggling Field Pouch", zone = "Zul'Aman" } },
             { speciesID = 5020, npcID = 262066, name = "Overloaded Manaling",  petType = 6,  source = "drop", sourceInfo = "Mana-Gorged Greatwyrm (rare elite, Void Assault)",     canBattle = true, zone = "Eversong Woods",
-              dropInfo = { mob = "Mana-Gorged Greatwyrm", zone = "Eversong Woods" }, score = T.epic },
+              dropInfo = { mob = "Mana-Gorged Greatwyrm", zone = "Eversong Woods" }, score = T.epic, waypoint = { 2594, 0.5510, 0.3870, "Overloaded Manaling" } },
         },
     },
 
@@ -315,9 +315,9 @@ MC.RegisterContent("midnight", "pets", {
     {
         source = "achievement",
         pets = {
-            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)", zone = "Mount Hyjal",   canBattle = true,  achievementID = 61091, taskList = SAFARI_TASKS },
+            { speciesID = 4910, npcID = 254689, name = "Do, Child of Filo",     petType = 8,  source = "achievement", sourceInfo = "Midnight Safari (collect all 21 wild pets)", zone = "Mount Hyjal",   canBattle = true,  achievementID = 61091, taskList = SAFARI_TASKS, waypoint = { 198, 0.5840, 0.3000, "Do, Child of Filo" } },
             { speciesID = 4803, npcID = 242452, name = "Niblet",                petType = 5,  source = "achievement", sourceInfo = "Midnight Dungeon Hero",                        canBattle = false, achievementID = 61567, score = T.medium },
-            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods", zone = "Eversong Woods",                  canBattle = false, achievementID = 61960, taskList = SOOTPAW_TASKS, score = T.short },
+            { speciesID = 5012, npcID = 260899, name = "Sootpaw",              petType = 8,  source = "achievement", sourceInfo = "Treasures of Eversong Woods", zone = "Eversong Woods",                  canBattle = false, achievementID = 61960, taskList = SOOTPAW_TASKS, score = T.short, waypoint = { 2395, 0.4260, 0.3870, "Sootpaw" } },
         },
     },
 

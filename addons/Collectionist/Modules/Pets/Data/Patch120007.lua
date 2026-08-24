@@ -59,7 +59,7 @@ MC.RegisterContent("midnight", "pets", {
         pets = {
             { speciesID = 4949, itemID = 260885, npcID = 256080, name = "Shadowflame Remnant",
               petType = 7, source = "event", sourceInfo = "Xydan - 2,200 Timewarped Badges during Dragonflight Timewalking", zone = "Valdrakken",
-              canBattle = true, cost = { currency = { MC.CURRENCY.TimewarpedBadges, 2200 } }, score = T.medium },
+              canBattle = true, cost = { currency = { MC.CURRENCY.TimewarpedBadges, 2200 } }, score = T.medium, waypoint = { 2112, 0.8150, 0.4720, "Shadowflame Remnant" } },
         },
     },
 })

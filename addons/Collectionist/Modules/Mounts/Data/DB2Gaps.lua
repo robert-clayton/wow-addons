@@ -26,7 +26,7 @@ MC.RegisterContent("wod", "mounts", {
 
 MC.RegisterContent("legion", "mounts", {
     { source = "drop", mounts = {
-        { mountID = 633, name = "Hellfire Infernal", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Gul'dan (Mythic)|n|cFFFFD200Zone:|r The Nighthold" },
+        { mountID = 633, name = "Hellfire Infernal", source = "drop", sourceInfo = "|cFFFFD200Drop:|r Gul'dan (Mythic)|n|cFFFFD200Zone:|r The Nighthold", waypoint = { 680, 0.4330, 0.6230, "Hellfire Infernal" } },
     } },
 })
 
@@ -47,15 +47,15 @@ MC.RegisterContent("midnight", "mounts", {
         { mountID = 2492, name = "Spring Butterfly", source = "worldevent", sourceInfo = "|cFFFFD200World Event:|r Love is in the Air|n|cFFFFD200Drop:|r Apothecary Hummel" },
     } },
     { source = "quest", mounts = {
-        { mountID = 2754, name = "Peridot Dragonhawk", source = "quest", sourceInfo = "|cFFFFD200World Quest: |rFrom Darkness, Light|n|cFFFFD200Zone: |rIsle of Quel'Danas", zone = "Isle of Quel'Danas" },
-        { mountID = 2818, name = "Emerald Hawkstrider", source = "quest", sourceInfo = "|cFFFFD200Quest: |rThe Battle of the Bridge|n|cFFFFD200Zone: |rSilvermoon City|n|n", zone = "Silvermoon City" },
+        { mountID = 2754, name = "Peridot Dragonhawk", source = "quest", sourceInfo = "|cFFFFD200World Quest: |rFrom Darkness, Light|n|cFFFFD200Zone: |rIsle of Quel'Danas", zone = "Isle of Quel'Danas", waypoint = { 2424, 0.5260, 0.4610, "Peridot Dragonhawk" } },
+        { mountID = 2818, name = "Emerald Hawkstrider", source = "quest", sourceInfo = "|cFFFFD200Quest: |rThe Battle of the Bridge|n|cFFFFD200Zone: |rSilvermoon City|n|n", zone = "Silvermoon City", waypoint = { 2393, 0.4590, 0.7030, "Emerald Hawkstrider" } },
     } },
     { source = "vendor", mounts = {
-        { mountID = 3005, name = "Cerulean Deathwalker", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
-        { mountID = 3006, name = "Amethyst Mechsuit", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
-        { mountID = 3007, name = "Blue-Chip Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
-        { mountID = 3008, name = "Profit-Green Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
-        { mountID = 3009, name = "Speculative Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
-        { mountID = 3010, name = "High-Yield Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City" },
+        { mountID = 3005, name = "Cerulean Deathwalker", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "Cerulean Deathwalker" } },
+        { mountID = 3006, name = "Amethyst Mechsuit", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "Amethyst Mechsuit" } },
+        { mountID = 3007, name = "Blue-Chip Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "Blue-Chip Shreddertank" } },
+        { mountID = 3008, name = "Profit-Green Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "Profit-Green Shreddertank" } },
+        { mountID = 3009, name = "Speculative Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "Speculative Shreddertank" } },
+        { mountID = 3010, name = "High-Yield Shreddertank", source = "vendor", sourceInfo = "|cFFFFD200Vendor:|r Lindormi|n", zone = "Silvermoon City", waypoint = { 2393, 0.4210, 0.5880, "High-Yield Shreddertank" } },
     } },
 })

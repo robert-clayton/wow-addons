@@ -107,7 +107,7 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5137, itemID = 280540, name = "Lil' Mon",
               petType = 8, source = "drop", sourceInfo = "Big Mon",
               canBattle = false, zone = "The Coiled Isle",
-              dropInfo = { mob = "Big Mon", zone = "The Coiled Isle" } },
+              dropInfo = { mob = "Big Mon", zone = "The Coiled Isle" }, waypoint = { 2512, 0.6980, 0.6350, "Lil' Mon" } },
             { speciesID = 5092, itemID = 276234, name = "Vibrant Venomfang",
               petType = 8, source = "drop", sourceInfo = "Wriggling Venom-Soaked Satchel",
               canBattle = false, zone = "The Coiled Isle",
@@ -146,7 +146,7 @@ MC.RegisterContent("midnight", "pets", {
             { speciesID = 5133, itemID = 280178, name = "Poison Dart Frog",
               petType = 8, source = "treasure", sourceInfo = "Unfortunate Scout's Satchel",
               canBattle = false, zone = "The Coiled Isle",
-              dropInfo = { mob = "Unfortunate Scout's Satchel", zone = "The Coiled Isle" } },
+              dropInfo = { mob = "Unfortunate Scout's Satchel", zone = "The Coiled Isle" }, waypoint = { 2512, 0.2150, 0.6430, "Poison Dart Frog" } },
             -- Hotfix-added Aug 2026 secret (pet the Silvermoon raccoon for the
             -- Stubby Whistle). Blizzard confirmed the secret is not active
             -- yet; drop `unavailable` once it is.
@@ -165,7 +165,7 @@ MC.RegisterContent("midnight", "pets", {
               achievementID = 63633, score = T.medium },
             { speciesID = 5132, itemID = 280138, npcID = 271086, name = "Zesty",
               petType = 8, source = "achievement", sourceInfo = "The Coiled Isle Safari",
-              canBattle = false, zone = "The Coiled Isle", achievementID = 62492, score = T.medium },
+              canBattle = false, zone = "The Coiled Isle", achievementID = 62492, score = T.medium, waypoint = { 2512, 0.6790, 0.8150, "Zesty" } },
             { speciesID = 5130, itemID = 279387, npcID = 270425, name = "Ula'took",
               petType = 8, source = "achievement", sourceInfo = "No Egg Scramble - The Venomous Abyss",
               canBattle = false, zone = "The Venomous Abyss", achievementID = 63609,
