@@ -400,5 +400,60 @@ do
        "only the unresolvable escape is removed")
 end
 
+-- Horrific Vision maps carry no world position, so TomTom refuses them and
+-- C_Map cannot pin them: a waypoint there is one that silently never appears.
+-- Both ids are named "Vision of Orgrimmar" and both got pins from the ATT
+-- backfill, which had no way to know the difference.
+--
+-- Phased maps in general are NOT banned here. Daggerspine Point (2594) and
+-- the Zul'Aman phase (2585) are legitimately used by curated rows that pair
+-- them with an overworldWaypoint giving the entrance, which is what
+-- GetSmartWaypoint routes to from outside. The Vision maps have no entrance
+-- to offer -- you enter from the Chamber of Heart -- so nothing may point
+-- there at all.
+do
+    local BANNED = { [1469] = "Vision of Orgrimmar (orphan)",
+                     [2403] = "Vision of Orgrimmar (phased)" }
+    local offenders, checked = {}, 0
+
+    local function check(where, wp)
+        if type(wp) ~= "table" then return end
+        if type(wp[1]) == "number" then
+            checked = checked + 1
+            if BANNED[wp[1]] then
+                offenders[#offenders + 1] = where .. " -> " .. BANNED[wp[1]]
+            end
+        else
+            for _, spot in ipairs(wp) do check(where, spot) end
+        end
+    end
+
+    for _, name in ipairs({ "RecipeWaypoints", "RareNPCs", "TreasureCoords",
+                            "RareCoords", "LOC" }) do
+        local tbl = MC[name]
+        if type(tbl) == "table" then
+            for key, wp in pairs(tbl) do
+                if type(wp) == "table" then check(name .. "." .. tostring(key), wp) end
+            end
+        end
+    end
+
+    local LISTS = { mounts = "MountData", pets = "PetData", toys = "ToyData",
+                    decorations = "DecorationData" }
+    for listKey, field in pairs(LISTS) do
+        for _, group in ipairs(MC[field] or {}) do
+            for _, e in ipairs(group[listKey] or {}) do
+                check(listKey .. " " .. tostring(e.name), e.waypoint)
+                check(listKey .. " " .. tostring(e.name), e.overworldWaypoint)
+            end
+        end
+    end
+
+    ok(checked > 3000, "walked the waypoint tables (" .. checked .. " spots)")
+    ok(#offenders == 0, "no waypoint points into a Horrific Vision ("
+       .. #offenders .. ": " .. table.concat(offenders, ", ", 1,
+          math.min(#offenders, 3)) .. ")")
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

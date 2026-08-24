@@ -727,7 +727,11 @@ do
     end
     equal(wpUnknown, 0, "every recipe waypoint maps to a shipped recipe")
     -- Ratchets UP as coverage grows; a drop means the generator lost data.
-    equal(wpCount, 3248, "recipe waypoint coverage")
+    -- 3248 -> 3247 deliberately: Big Keech's pin sat inside the Horrific
+    -- Vision of Orgrimmar, a map with no world position, so it could never
+    -- place an arrow. He travels anyway, so there is no fixed spot to point
+    -- at and the recipe's own source line carries the useful part.
+    equal(wpCount, 3247, "recipe waypoint coverage")
 
     -- Faction-paired trainer pins. The failure this guards against is a pin
     -- that sends one faction into the other's capital, which is exactly what
