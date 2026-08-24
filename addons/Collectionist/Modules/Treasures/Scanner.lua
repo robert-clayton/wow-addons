@@ -82,7 +82,14 @@ function Scanner:Scan()
                     local taskList = MC.TreasureSteps and MC.TreasureSteps[metadataName]
                     local entry = {
                         moduleKey     = "treasures",
-                        name          = name,
+                        -- The shipped criterion name, when the positional
+                        -- metadata is trustworthy. Blizzard leaves the
+                        -- criterion text blank on most Legion and WoD treasure
+                        -- achievements -- 310 of them under Grand Treasure
+                        -- Hunter alone -- so the rows rendered nameless while
+                        -- the name we already ship was used only to look up
+                        -- their coordinates.
+                        name          = metadataName or name,
                         -- Treasure achievements carry GAMEOBJECT IDs in assetID;
                         -- store as objectID so Wowhead links resolve to /object=.
                         objectID      = (assetID and assetID > 0) and assetID or nil,

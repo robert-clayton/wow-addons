@@ -97,9 +97,18 @@ function Scanner:Scan()
                 if visible then
                     local coords = (npcID and MC.RareNPCs and MC.RareNPCs[npcID])
                                 or (name and MC.RareCoords and MC.RareCoords[name])
+                    -- Blizzard's criterion text is not always the rare's name.
+                    -- Achievement 62883 has three criteria all described as
+                    -- "Slaipaan" -- two were hotfixed in with the description
+                    -- copied from a sibling while their assets stayed correct
+                    -- -- so the tab listed the same rare three times. The
+                    -- shipped waypoint carries the real name for that npcID,
+                    -- and the positional map is only trusted when the live
+                    -- criterion count matches the shipped one.
+                    local shipped = coords and coords[4]
                     local entry = {
                         moduleKey     = "rares",
-                        name          = name,
+                        name          = (hasPositionalEntityMap and shipped) or name,
                         npcID         = npcID,
                         objectID      = objectID,
                         source        = ach.source,

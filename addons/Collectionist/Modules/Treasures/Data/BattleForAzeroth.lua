@@ -48,7 +48,20 @@ local SOURCE_KEYS = {
 local function merge()
     MC.TreasureSourceOrder = MC.TreasureSourceOrder or {}
     MC.TreasureSourceLabels = MC.TreasureSourceLabels or {}
-    for i, pair in ipairs(SOURCE_KEYS) do table.insert(MC.TreasureSourceOrder, i, pair[1]); MC.TreasureSourceLabels[pair[1]] = pair[2] end
+    local have = {}
+    for _, key in ipairs(MC.TreasureSourceOrder) do have[key] = true end
+    -- The base file already declares every key it owns. Inserting a
+    -- second copy put the zone in the order list twice, which draws
+    -- its group twice and prints it twice in the /mc summary.
+    local at = 0
+    for _, pair in ipairs(SOURCE_KEYS) do
+        MC.TreasureSourceLabels[pair[1]] = pair[2]
+        if not have[pair[1]] then
+            at = at + 1
+            have[pair[1]] = true
+            table.insert(MC.TreasureSourceOrder, at, pair[1])
+        end
+    end
 end
 if MC.TreasureSourceOrder then merge() else
     local frame = CreateFrame("Frame"); frame:RegisterEvent("ADDON_LOADED")

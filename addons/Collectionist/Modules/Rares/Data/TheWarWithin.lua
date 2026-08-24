@@ -264,9 +264,18 @@ local scoreOverrides = {
 local function merge()
     MC.RareSourceOrder = MC.RareSourceOrder or {}
     MC.RareSourceLabels = MC.RareSourceLabels or {}
-    for i, sk in ipairs(SOURCE_KEYS) do
-        table.insert(MC.RareSourceOrder, i, sk[1])
+    local have = {}
+    for _, key in ipairs(MC.RareSourceOrder) do have[key] = true end
+    -- The base file already declares every key it owns; a second copy puts
+    -- the zone in the order list twice.
+    local at = 0
+    for _, sk in ipairs(SOURCE_KEYS) do
         MC.RareSourceLabels[sk[1]] = sk[2]
+        if not have[sk[1]] then
+            at = at + 1
+            have[sk[1]] = true
+            table.insert(MC.RareSourceOrder, at, sk[1])
+        end
     end
     MC.RareNPCs = MC.RareNPCs or {}
     for npcID, waypoint in pairs(added) do
