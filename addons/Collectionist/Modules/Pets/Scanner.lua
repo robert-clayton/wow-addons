@@ -85,6 +85,11 @@ function Scanner:Scan()
                         cost              = pet.cost,
                         dropInfo          = pet.dropInfo,
                         achievementID     = pet.achievementID,
+                        -- Free-text "How to:" block, rendered by the shared
+                        -- tooltip. Secrets like J'imothy have no quest or
+                        -- criteria IDs to drive a taskList, so the write-up is
+                        -- the only thing that can explain them.
+                        steps             = pet.steps,
                         taskList          = pet.taskList,
                         canBattle         = pet.canBattle,
                         zone              = pet.zone,

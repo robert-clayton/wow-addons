@@ -1,3 +1,11 @@
+# 1.13.1
+
+### Added
+- **J'imothy is catchable.** Blizzard switched the Silvermoon raccoon secret on, so the Pets tab now marks all three Ensorcelled Cryptid spawns and explains how to break the barrier and claim the Stubby Whistle before he wanders off.
+
+### Changed
+- Pets can carry a **How to** write-up in their tooltip, the same way treasures already did.
+
 # 1.13.0
 
 ### Added

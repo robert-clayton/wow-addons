@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.13.0
+## Version: 1.13.1
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB

@@ -7,6 +7,14 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.13.1", sections = {
+        { heading = "Added", lines = {
+            "|cffffd200J'imothy is catchable.|r Blizzard switched the Silvermoon raccoon secret on, so the Pets tab now marks all three Ensorcelled Cryptid spawns and explains how to break the barrier and claim the Stubby Whistle before he wanders off.",
+        } },
+        { heading = "Changed", lines = {
+            "Pets can carry a |cffffd200How to|r write-up in their tooltip, the same way treasures already did.",
+        } },
+    } },
     { version = "1.13.0", sections = {
         { heading = "Added", lines = {
             "|cffffd200The whole game, not just Midnight.|r Complete catalogs for Classic through The War Within, across every tracker.",
@@ -81,19 +89,6 @@ MC.CHANGELOG = {
     { version = "1.6.2", sections = {
         { heading = "Changed", lines = {
             "Mounts tab now has dedicated sections for the three Midnight feature systems: Prey, Ritual Sites, and Void Assaults.",
-        } },
-    } },
-    { version = "1.6.1", sections = {
-        { heading = "Fixed", lines = {
-            "Eight mounts in the Mounts tab were showing wrong icons/tooltips because their journal IDs were mistyped. Corrected:",
-            "Witherbark Warbear Mother",
-            "Void-Corrupted Hex Eagle",
-            "Void-Touched Hawkstrider",
-            "Void-Touched Snapdragon",
-            "Void-Corrupted Lynx",
-            "Retrained Skyrazor",
-            "Nether-Swept Drake",
-            "Magister's Spell Bee",
         } },
     } },
 }

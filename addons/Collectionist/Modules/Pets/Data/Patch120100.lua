@@ -155,13 +155,22 @@ MC.RegisterContent("midnight", "pets", {
               petType = 8, source = "treasure", sourceInfo = "Unfortunate Scout's Satchel",
               canBattle = false, zone = "The Coiled Isle",
               dropInfo = { mob = "Unfortunate Scout's Satchel", zone = "The Coiled Isle" }, waypoint = { 2512, 0.2150, 0.6430, "Poison Dart Frog" } },
-            -- Hotfix-added Aug 2026 secret (pet the Silvermoon raccoon for the
-            -- Stubby Whistle). Blizzard confirmed the secret is not active
-            -- yet; drop `unavailable` once it is.
+            -- Silvermoon secret, live since 28 Aug 2026. J'imothy is caged
+            -- inside an Ensorcelled Cryptid that spawns at one of three spots
+            -- at a time, so the pin is a spawn list rather than a single
+            -- location -- the tooltip renders it as "3 possible locations".
+            -- No quest or criteria ID is exposed for the barrier minigame,
+            -- so the write-up lives in `steps` instead of a taskList.
             { speciesID = 5164, itemID = 282417, npcID = 273775, name = "J'imothy",
               petType = 5, source = "treasure",
-              sourceInfo = "Discovery: Silvermoon City secret (not yet activated by Blizzard)",
-              canBattle = false, zone = "Silvermoon City", unavailable = true },
+              sourceInfo = "Discovery: Ensorcelled Cryptid, Silvermoon City",
+              canBattle = false, zone = "Silvermoon City", score = T.medium,
+              steps = "Find the Ensorcelled Cryptid at one of three Silvermoon spawns (/tar Ensorcelled Cryptid) and interact with the arcane prison to siphon it. Dodge the falling arcane orbs while channelling until all 100 stacks of Barrier Integrity are stripped -- other players can siphon the same prison, so a group clears it far faster. Interact with J'imothy within the minute he stays free to receive the Stubby Whistle.",
+              waypoint = {
+                  { MC.MAP.Silvermoon, 0.2875, 0.4669, "Ensorcelled Cryptid (NW outskirts, past the university)" },
+                  { MC.MAP.Silvermoon, 0.5132, 0.5375, "Ensorcelled Cryptid (end of Murder Row)" },
+                  { MC.MAP.Silvermoon, 0.5830, 0.4190, "Ensorcelled Cryptid (Lithiel's Landing, under the bridge)" },
+              } },
         },
     },
     {
