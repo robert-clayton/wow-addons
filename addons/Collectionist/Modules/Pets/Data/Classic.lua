@@ -15,7 +15,8 @@ MC.RegisterContent("vanilla", "pets", {
         { speciesID = 114, npcID = 15429, name = "Disgusting Oozeling", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r World Drop|n|cFFFFD200Creature:|r Oozes, Slimes and Worms", zone = "Eastern Plaguelands" },
         { speciesID = 233, npcID = 35395, name = "Deviate Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rDeviate Guardian, Deviate Ravager|n|cFFFFD200Zone: |rWailing Caverns", zone = "Wailing Caverns", waypoint = { 11, 0.5520, 0.6610, "Deviate Hatchling" } },
         { speciesID = 239, npcID = 35394, name = "Razzashi Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rWorld Drop|n|cFFFFD200Zone: |rNorthern Stranglethorn, The Cape of Stranglethorn" },
-        { speciesID = 1073, npcID = 16445, name = "Terky", petType = 1, source = "drop", sourceInfo = "|cFFFFD200Drop:|r White Murloc Egg", zone = "Borean Tundra", waypoint = { 114, 0.5460, 0.8940, "Terky" } },
+        { speciesID = 1073, npcID = 16445, name = "Terky", petType = 1, source = "drop", sourceInfo = "|cFFFFD200Drop:|r White Murloc Egg", zone = "Borean Tundra", waypoint = { 114, 0.5460, 0.8940, "Terky" },
+          steps = "Dive into the water off Riplash Ruins in southern Borean Tundra and swim into the narrow crack in the rock face at 55.8, 88.1. Follow the tunnel through and swim upward into the small air chamber, then loot the egg from the debris behind the giant pearl at 54.6, 89.4." },
         { speciesID = 1147, npcID = 68665, name = "Harbinger of Flame", petType = 1, source = "drop", sourceInfo = "|cFFFFD200Drop: |rSulfuron Harbinger|n|cFFFFD200Zone: |rMolten Core", zone = "Blackrock Mountain", waypoint = { 33, 0.5418, 0.8325, "Harbinger of Flame" } },
         { speciesID = 1149, npcID = 68664, name = "Corefire Imp", petType = 1, source = "drop", sourceInfo = "|cFFFFD200Drop: |rMagmadar|n|cFFFFD200Zone: |rMolten Core", zone = "Blackrock Mountain", waypoint = { 33, 0.5418, 0.8325, "Corefire Imp" } },
         { speciesID = 1150, npcID = 68666, name = "Ashstone Core", petType = 7, source = "drop", sourceInfo = "|cFFFFD200Drop: |rGolemagg the Incinerator|n|cFFFFD200Zone: |rMolten Core|n", zone = "Blackrock Mountain", waypoint = { 33, 0.5418, 0.8325, "Ashstone Core" } },
@@ -30,7 +31,8 @@ MC.RegisterContent("vanilla", "pets", {
         { speciesID = 1145, npcID = 68655, name = "Mr. Bigglesworth", petType = 4, source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rRaiding with Leashes|n|cFFFFD200Category: |rCollect" },
     } },
     { source = "quest", pets = {
-        { speciesID = 83, npcID = 8376, name = "Mechanical Chicken", petType = 10, source = "quest", sourceInfo = "|cFFFFD200Quest:|r An OOX of Your Own|n|cFFFFD200Zone:|r Booty Bay|n", zone = "The Cape of Stranglethorn", waypoint = { 210, 0.4300, 0.7200, "Mechanical Chicken" } },
+        { speciesID = 83, npcID = 8376, name = "Mechanical Chicken", petType = 10, source = "quest", sourceInfo = "|cFFFFD200Quest:|r An OOX of Your Own|n|cFFFFD200Zone:|r Booty Bay|n", zone = "The Cape of Stranglethorn", waypoint = { 210, 0.4300, 0.7200, "Mechanical Chicken" },
+          steps = "Farm the three distress beacons (OOX-22/FE from Feralas mobs, OOX-09/HL around Jintha'Alor in the Hinterlands, and OOX-17/TN in Tanaris and Zul'Farrak) and run each escort to safety. With all three robots saved, Oglethorpe Obnoticus in Booty Bay offers An OOX of Your Own." },
         { speciesID = 84, npcID = 30379, name = "Westfall Chicken", petType = 3, source = "quest", sourceInfo = "|cFFFFD200Quest: |rCLUCK!|n|cFFFFD200Zone: |rWestfall", zone = "Westfall" },
     } },
     { source = "profession", pets = {
@@ -62,7 +64,8 @@ MC.RegisterContent("vanilla", "pets", {
         { speciesID = 78, npcID = 7567, name = "Crimson Snake", petType = 8, source = "vendor", sourceInfo = "|cFFFFD200Vendor: |rDealer Rashaad|n|cFFFFD200Zone: |rNetherstorm|n|cFFFFD200Cost: |r50|TINTERFACE\\MONEYFRAME\\UI-SILVERICON.BLP:0|t|n|n|cFFFFD200Vendor: |rXan'tish|n|cFFFFD200Zone: |rOrgrimmar|n|cFFFFD200Cost: |r50|TINTERFACE\\MONEYFRAME\\UI-SILVERICON.BLP:0|t", waypoint = { { 85, 0.3400, 0.6760, "Crimson Snake" }, { 109, 0.4340, 0.3520, "Crimson Snake" } } },
     } },
     { source = "event", pets = {
-        { speciesID = 106, npcID = 14878, name = "Jubling", petType = 9, source = "event", sourceInfo = "|cFFFFD200World Event:|r Darkmoon Faire" },
+        { speciesID = 106, npcID = 14878, name = "Jubling", petType = 9, source = "event", sourceInfo = "|cFFFFD200World Event:|r Darkmoon Faire",
+          steps = "Buy several Dark Iron Ale Mugs from Plugger Spazzring in the Grim Guzzler in Blackrock Depths. At the Faire, drop mugs on the ground in a trail to walk the frog Jubjub back to Morja, who then offers Spawn of Jubjub; hand in one more mug, then carry the Unhatched Jubling Egg for seven days until it hatches." },
         { speciesID = 117, npcID = 15710, name = "Tiny Snowman", petType = 7, source = "event", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil|n", zone = "Orgrimmar", waypoint = { 85, 0.4960, 0.7820, "Tiny Snowman" } },
         { speciesID = 118, npcID = 15706, name = "Winter Reindeer", petType = 5, source = "event", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil", zone = "Orgrimmar", waypoint = { 85, 0.4960, 0.7820, "Winter Reindeer" } },
         { speciesID = 119, npcID = 15698, name = "Father Winter's Helper", petType = 1, source = "event", sourceInfo = "|cFFFFD200World Event:|r Feast of Winter Veil", zone = "Orgrimmar", waypoint = { 85, 0.4960, 0.7820, "Father Winter's Helper" } },

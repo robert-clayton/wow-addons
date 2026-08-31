@@ -7,6 +7,11 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.13.2", sections = {
+        { heading = "Added", lines = {
+            "|cffffd200How-to guides for 100 more pets.|r Every secret, puzzle and multi-step unlock in the Pets tab now spells out what to actually do, across all twelve expansions. Hover Baa'l, Uuna, Terky, Jenafur or Mr. Pinchy's crawdad box to see the steps, coordinates and gotchas.",
+        } },
+    } },
     { version = "1.13.1", sections = {
         { heading = "Added", lines = {
             "|cffffd200J'imothy is catchable.|r Blizzard switched the Silvermoon raccoon secret on, so the Pets tab now marks all three Ensorcelled Cryptid spawns and explains how to break the barrier and claim the Stubby Whistle before he wanders off.",
@@ -84,11 +89,6 @@ MC.CHANGELOG = {
             "If Blizzard adds rares or treasures to an existing achievement, they just show up without needing for the addon to be updated.",
             "If an achievement's criteria get reordered, waypoints and puzzle steps fall back to safe lookups rather than pointing at the wrong spot.",
             "Corrected bad collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.",
-        } },
-    } },
-    { version = "1.6.2", sections = {
-        { heading = "Changed", lines = {
-            "Mounts tab now has dedicated sections for the three Midnight feature systems: Prey, Ritual Sites, and Void Assaults.",
         } },
     } },
 }

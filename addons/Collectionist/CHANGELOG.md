@@ -1,3 +1,8 @@
+# 1.13.2
+
+### Added
+- **How-to guides for 100 more pets.** Every secret, puzzle and multi-step unlock in the Pets tab now spells out what to actually do, across all twelve expansions. Hover Baa'l, Uuna, Terky, Jenafur or Mr. Pinchy's crawdad box to see the steps, coordinates and gotchas.
+
 # 1.13.1
 
 ### Added

@@ -32,7 +32,8 @@ MC.RegisterContent("wrath", "pets", {
         { speciesID = 1968, npcID = 115152, name = "Wicked Soul", petType = 4, source = "drop", sourceInfo = "Wicked Soul\n			“An unrepentant soul that was once trapped inside Frostmourne, and now flits restlessly between worlds.”\n			Drop: The Lich King\n			Icecrown Citadel\n			--", zone = "Icecrown", waypoint = { 118, 0.5370, 0.8700, "Wicked Soul" } },
     } },
     { source = "achievement", pets = {
-        { speciesID = 199, npcID = 32643, name = "Kirin Tor Familiar", petType = 7, source = "achievement", sourceInfo = "|cFFFFD200Achievement:|r Higher Learning|n|cFFFFD200Category: |rGeneral", zone = "Dalaran" },
+        { speciesID = 199, npcID = 32643, name = "Kirin Tor Familiar", petType = 7, source = "achievement", sourceInfo = "|cFFFFD200Achievement:|r Higher Learning|n|cFFFFD200Category: |rGeneral", zone = "Dalaran",
+          steps = "Read all eight The Schools of Arcane Magic books around Dalaran. They share fixed spawn points with junk decoy books and take three to four hours to respawn, so coordinating with other players on your server helps. Rhonin then mails you The Schools of Arcane Magic - Mastery; use it to teleport atop the Violet Citadel and speak to Archmage Vargoth." },
     } },
     { source = "quest", pets = {
         { speciesID = 214, npcID = 33238, name = "Argent Squire", petType = 1, source = "quest", sourceInfo = "Argent Squire\n			“Many of Stormwind’s youth joined the Argent Crusade as squires, hoping to one day serve the Holy Light in battle.”\n			Quest: A Champion Rises\n			Icecrown\n			--", zone = "Icecrown", waypoint = { { 118, 0.7610, 0.1910, "Argent Squire" }, { 118, 0.7630, 0.1900, "Argent Squire" }, { 118, 0.7650, 0.1980, "Argent Squire" }, { 118, 0.7660, 0.1910, "Argent Squire" }, { 118, 0.7660, 0.1950, "Argent Squire" } } },

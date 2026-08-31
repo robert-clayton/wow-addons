@@ -9,7 +9,8 @@ MC.RegisterContent("vanilla", "pets", {
         { speciesID = 232, npcID = 35396, name = "Darting Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rDart's Nest|n|cFFFFD200Zone: |rDustwallow Marsh", zone = "Dustwallow Marsh", waypoint = { 70, 0.4650, 0.1720, "Darting Hatchling" } },
         { speciesID = 235, npcID = 35387, name = "Leaping Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rTakk's Nest|n|cFFFFD200Zone: |rThe Barrens", zone = "Northern Barrens", waypoint = { 10, 0.6100, 0.1980, "Leaping Hatchling" } },
         { speciesID = 237, npcID = 35397, name = "Ravasaur Hatchling", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rRavasaur Matriarch's Nest|n|cFFFFD200Zone: |rUn'goro Crater", zone = "Un'Goro Crater", waypoint = { 78, 0.6200, 0.7360, "Ravasaur Hatchling" } },
-        { speciesID = 286, npcID = 50586, name = "Mr. Grubbs", petType = 8, source = "drop", sourceInfo = "|cFFFFD200World Drop:|r Eastern Plaguelands (requires Fiona's Lucky Charm)", zone = "Eastern Plaguelands" },
+        { speciesID = 286, npcID = 50586, name = "Mr. Grubbs", petType = 8, source = "drop", sourceInfo = "|cFFFFD200World Drop:|r Eastern Plaguelands (requires Fiona's Lucky Charm)", zone = "Eastern Plaguelands",
+          steps = "Complete Fiona's Caravan chain in Eastern Plaguelands through the quest Fiona's Lucky Charm to gain its buff. With the charm active, kill anything in the zone; mobs will start dropping Hidden Stash containers, which rarely contain it. Without the buff no stashes drop at all." },
     } },
     { source = "quest", pets = {
         { speciesID = 220, npcID = 34278, name = "Withers", petType = 7, source = "quest", sourceInfo = "|cFFFFD200Quest: |rRemembrance of Auberdine|n|cFFFFD200Zone: |rDarkshore", zone = "Darkshore", waypoint = { { 62, 0.5010, 0.1950, "Withers" }, { 62, 0.5720, 0.3380, "Withers" } } },
@@ -116,13 +117,15 @@ MC.RegisterContent("mop", "pets", {
         { speciesID = 381, npcID = 61086, name = "Porcupette", petType = 5, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Sack of Pet Supplies|n" },
         { speciesID = 848, npcID = 59358, name = "Darkmoon Rabbit", petType = 5, source = "drop", sourceInfo = "|cFFFFD200Drop: |rDarkmoon Rabbit|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.7569, 0.7817, "Darkmoon Rabbit" } },
         { speciesID = 1063, npcID = 67332, name = "Darkmoon Eye", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Darkmoon Pet Supplies|n" },
-        { speciesID = 1276, npcID = 72160, name = "Moon Moon", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.3965, 0.4407, "Moon Moon" } },
+        { speciesID = 1276, npcID = 72160, name = "Moon Moon", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop: |rMoonfang|n|cFFFFD200Zone: |rDarkmoon Island", zone = "Darkmoon Island", waypoint = { 407, 0.3965, 0.4407, "Moon Moon" },
+          steps = "Clear the Moonfang Snarlers in the woods of western Darkmoon Island until a zone-wide announcement brings the elite Moonfang Dreadhowls, then kill most of those to draw out Moonfang herself. She is no-tap, so everyone on her threat table can loot; it is only a rare drop, so expect to come back each faire week." },
         { speciesID = 1320, npcID = 73011, name = "Lil' Bling", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Blingtron Gift Package|n" },
         { speciesID = 1322, npcID = 73352, name = "Blackfuse Bombling", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Siegecrafter Blackfuse|n|cFFFFD200Raid:|r Siege of Orgrimmar", zone = "Vale of Eternal Blossoms", waypoint = { 390, 0.7230, 0.4430, "Blackfuse Bombling" } },
         { speciesID = 1331, npcID = 73350, name = "Droplet of Y'Shaarj", petType = 7, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Sha of Pride|n|cFFFFD200Raid:|r Siege of Orgrimmar|n|cFFFFD200Difficulty:|r Flexible, Normal or Heroic", zone = "Vale of Eternal Blossoms", waypoint = { 390, 0.7230, 0.4430, "Droplet of Y'Shaarj" } },
     } },
     { source = "event", pets = {
-        { speciesID = 1351, npcID = 34770, name = "Macabre Marionette", petType = 4, source = "event", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead", waypoint = { { 1, 0.4740, 0.1760, "Macabre Marionette" }, { 18, 0.6230, 0.6830, "Macabre Marionette" }, { 27, 0.6160, 0.3740, "Macabre Marionette" }, { 84, 0.4760, 0.2660, "Macabre Marionette" }, { 88, 0.5680, 0.1760, "Macabre Marionette" }, { 89, 0.6860, 0.4060, "Macabre Marionette" } } },
+        { speciesID = 1351, npcID = 34770, name = "Macabre Marionette", petType = 4, source = "event", sourceInfo = "|cFFFFD200World Event:|r Day of the Dead", waypoint = { { 1, 0.4740, 0.1760, "Macabre Marionette" }, { 18, 0.6230, 0.6830, "Macabre Marionette" }, { 27, 0.6160, 0.3740, "Macabre Marionette" }, { 84, 0.4760, 0.2660, "Macabre Marionette" }, { 88, 0.5680, 0.1760, "Macabre Marionette" }, { 89, 0.6860, 0.4060, "Macabre Marionette" } },
+          steps = "Buy Recipe: Bread of the Dead and an Orange Marigold (not the Bouquet, which no longer grants invisibility detection) from Chapman beside Catrina in a capital city graveyard, then cook a loaf from Simple Flour and Ice Cold Milk at the Ghostly Cooking Fire there; it needs Cooking 30. Use the marigold to reveal the Cheerful Spirit for 30 seconds, accept The Grateful Dead, and hand over the bread." },
     } },
     { source = "profession", pets = {
         { speciesID = 115, npcID = 86445, name = "Land Shark", petType = 9, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Fishing|n|cFFFFD200Vendor:|r Nat Pagle|n|cFFFFD200Zone:|r Garrison, Fishing Shack|n|cFFFFD200Cost:|r 50|Tinterface\\icons\\inv_misc_coin_19.blp:0|t" },
@@ -153,7 +156,8 @@ MC.RegisterContent("legion", "pets", {
         { speciesID = 2003, npcID = 117343, name = "Hearthy", petType = 7, source = "achievement", sourceInfo = "|cFFFFD200Achievement: |rMaster of Minions|n|cFFFFD200Category: |rCollect" },
     } },
     { source = "drop", pets = {
-        { speciesID = 382, npcID = 61087, name = "Sun Darter Hatchling", petType = 2, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Oddly-Colored Egg|n", zone = "Winterspring", waypoint = { 83, 0.5090, 0.0230, "Sun Darter Hatchling" } },
+        { speciesID = 382, npcID = 61087, name = "Sun Darter Hatchling", petType = 2, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Oddly-Colored Egg|n", zone = "Winterspring", waypoint = { 83, 0.5090, 0.0230, "Sun Darter Hatchling" },
+          steps = "Enter the Caverns of Consumption on Winterspring's north coast, 57, 16 on the Kalimdor map. Consuming Silence blocks spells and toys, so bring all six Major Protection Potions, 10x Noggenfogger Elixir, 10x Pygmy Oil, Scotty's Lucky Coin, Dire Brew, Ethereal Oil, Gordok Ogre Suit, Winterfall Firewater, Perky Pug, the \"Little Princess\" Costume and a Scroll of Intellect. Grab the Water Stone inside; hug path centers or anti-cheat resets it." },
     } },
 })
 

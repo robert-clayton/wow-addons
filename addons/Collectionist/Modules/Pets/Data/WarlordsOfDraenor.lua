@@ -10,9 +10,11 @@ MC.RegisterContent("wod", "pets", {
     { source = "drop", pets = {
         { speciesID = 1416, itemID = 112699, npcID = 81431, name = "Teroclaw Hatchling", petType = 3, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Teroclaw Nest|n|cFFFFD200Zone:|r Talador", zone = "Talador", waypoint = { 535, 0.7075, 0.3196, "Teroclaw Hatchling" } },
         { speciesID = 1467, itemID = 115483, npcID = 85284, name = "Sky-Bo", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Blingtron 5000 Gift Package" },
-        { speciesID = 1471, itemID = 117564, npcID = 85387, name = "Fruit Hunter", petType = 3, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Wiggling Egg|n|cFFFFD200Zone:|r Frostfire Ridge|n|n", zone = "Frostfire Ridge" },
+        { speciesID = 1471, itemID = 117564, npcID = 85387, name = "Fruit Hunter", petType = 3, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Wiggling Egg|n|cFFFFD200Zone:|r Frostfire Ridge|n|n", zone = "Frostfire Ridge",
+          steps = "Climb to the rylak nest above Grom'gar in southeastern Frostfire Ridge and loot the Wiggling Egg at 64.4, 65.8 for a Mysterious Egg. Leave it in your bags for 72 real-world hours until it becomes a Cracked Egg, then open that. You can loot the nest once per character." },
         { speciesID = 1478, itemID = 116064, npcID = 85527, name = "Syd the Squid", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Greater Darkmoon Pet Supplies|n" },
-        { speciesID = 1515, itemID = 116402, npcID = 85231, name = "Stonegrinder", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Talador", zone = "Talador", waypoint = { 535, 0.5330, 0.2570, "Stonegrinder" } },
+        { speciesID = 1515, itemID = 116402, npcID = 85231, name = "Stonegrinder", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Talador", zone = "Talador", waypoint = { 535, 0.5330, 0.2570, "Stonegrinder" },
+          steps = "Enter Ketya's Hideaway on the Orunai Coast in northern Talador, east of Shattrath, at 53.2, 26.2, then cross the ward maze to the stash at 54.0, 27.7. Scanner and sentry beams hit for about 75 percent of your health and the red slowing wards cut your speed, so time the sweeps or leap past them. You can loot the stash once per character." },
         { speciesID = 1524, itemID = 116815, npcID = 86081, name = "Netherspawn, Spawn of Netherspawn", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Netherspawn|n|cFFFFD200Zone:|r Nagrand|n", zone = "Nagrand", waypoint = { 550, 0.4760, 0.7039, "Netherspawn, Spawn of Netherspawn" } },
         { speciesID = 1533, itemID = 117528, npcID = 86532, name = "Lanticore Spawnling", petType = 2, source = "drop", sourceInfo = "|cFFFFD200Drop:|r The Lanticore|n|cFFFFD200Zone:|r Upper Black Rock Spire" },
         { speciesID = 1536, itemID = 118101, npcID = 86715, name = "Zangar Spore", petType = 3, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Fel-Touched Pet Supplies|n|cFFFFD200Zone:|r Tanaan Jungle|n", zone = "Tanaan Jungle" },
@@ -26,7 +28,8 @@ MC.RegisterContent("wod", "pets", {
         { speciesID = 1564, itemID = 118709, npcID = 88103, name = "Doom Bloom", petType = 7, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Mandrakor|n|cFFFFD200Location:|r Gorgrond|n", zone = "Gorgrond", waypoint = { 543, 0.5060, 0.5320, "Doom Bloom" } },
         { speciesID = 1576, itemID = 119170, npcID = 88490, name = "Eye of Observation", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Oromo the Observer|n|cFFFFD200Zone:|r Talador", zone = "Talador", waypoint = { 535, 0.3140, 0.4760, "Eye of Observation" } },
         { speciesID = 1601, itemID = 119431, npcID = 88692, name = "Servant of Demidos", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Demidos|n|cFFFFD200Zone:|r Shadowmoon Valley", zone = "Shadowmoon Valley", waypoint = { 539, 0.4600, 0.7160, "Servant of Demidos" } },
-        { speciesID = 1604, npcID = 88814, name = "Nethaera's Light", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Zone:|r Dalaran|n", zone = "Dalaran" },
+        { speciesID = 1604, npcID = 88814, name = "Nethaera's Light", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Zone:|r Dalaran|n", zone = "Dalaran",
+          steps = "Find the small floating candle NPC in Northrend's Dalaran (not the Broken Isles city) or in Dazar'alor; it despawns and reappears elsewhere every few minutes, so hunt it with a /tar Nethaera macro. Dismount, stand right beside it, and /cheer over and over; after anywhere from one to about fifteen cheers it flares up and joins your journal. One per character." },
         { speciesID = 1663, itemID = 127754, npcID = 93352, name = "Periwinkle Calf", petType = 8, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Fel-Touched Pet Supplies|n|cFFFFD200Zone:|r Tanaan Jungle|n", zone = "Tanaan Jungle" },
         { speciesID = 1664, itemID = 127753, npcID = 93483, name = "Nightmare Bell", petType = 6, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Fel-Touched Pet Supplies|n|cFFFFD200Zone:|r Tanaan Jungle|n", zone = "Tanaan Jungle" },
         { speciesID = 1672, itemID = 127749, npcID = 94623, name = "Corrupted Nest Guardian", petType = 10, source = "drop", sourceInfo = "|cFFFFD200Drop:|r Shadow-Lord Iskar|n|cFFFFD200Zone:|r Hellfire Citadel|n", zone = "Tanaan Jungle", waypoint = { 534, 0.4556, 0.5361, "Corrupted Nest Guardian" } },
@@ -52,7 +55,8 @@ MC.RegisterContent("wod", "pets", {
         { speciesID = 1687, itemID = 127856, npcID = 94867, name = "Left Shark", petType = 9, source = "quest", sourceInfo = "|cFFFFD200Garrison Mission:|r Orphaned Aquatic Animal Rescue|n" },
     } },
     { source = "treasure", pets = {
-        { speciesID = 1690, itemID = 128309, npcID = 95572, name = "Shard of Cyrukh", petType = 7, source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rForgotten Shard of the Cipher|n|cFFFFD200Zone: |rTanaan Jungle", zone = "Tanaan Jungle", waypoint = { 534, 0.6330, 0.2800, "Shard of Cyrukh" } },
+        { speciesID = 1690, itemID = 128309, npcID = 95572, name = "Shard of Cyrukh", petType = 7, source = "treasure", sourceInfo = "|cFFFFD200Treasure: |rForgotten Shard of the Cipher|n|cFFFFD200Zone: |rTanaan Jungle", zone = "Tanaan Jungle", waypoint = { 534, 0.6330, 0.2800, "Shard of Cyrukh" },
+          steps = "Complete the garrison campaign quest The Cipher of Damnation from Oronok Torn-heart in Tanaan Jungle, which breaks the barrier into the Corrupted Refuge in The Felblight, then loot the Forgotten Shard of the Cipher crystal inside." },
     } },
     { source = "profession", pets = {
         { speciesID = 1395, itemID = 20769, npcID = 78895, name = "Lil' Leftovers", petType = 6, source = "profession", sourceInfo = "|cFFFFD200Profession:|r Cooking" },

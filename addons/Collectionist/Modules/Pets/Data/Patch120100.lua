@@ -150,7 +150,8 @@ MC.RegisterContent("midnight", "pets", {
         pets = {
             { speciesID = 5134, itemID = 280189, name = "Cauldron Concoction",
               petType = 6, source = "treasure", sourceInfo = "Discovery: Ofi's Offerings",
-              canBattle = false, zone = "The Coiled Isle" },
+              canBattle = false, zone = "The Coiled Isle",
+              steps = "Reach Renown 3 with Zul'jarra's Forces and unlock the Ofi's Offerings trait at the Altar of Corrosion in the Amani Foothold. Common treasures on the Coiled Isle then hand out the Esoteric Ingredients pickup quest, which sends you to Ofi the Sky at the great cauldron in Tokka's Landing. Turn ingredients in through the Mixing Mysteries daily and repeat, since it is a rare roll on that reward." },
             { speciesID = 5133, itemID = 280178, name = "Poison Dart Frog",
               petType = 8, source = "treasure", sourceInfo = "Unfortunate Scout's Satchel",
               canBattle = false, zone = "The Coiled Isle",
@@ -165,7 +166,7 @@ MC.RegisterContent("midnight", "pets", {
               petType = 5, source = "treasure",
               sourceInfo = "Discovery: Ensorcelled Cryptid, Silvermoon City",
               canBattle = false, zone = "Silvermoon City", score = T.medium,
-              steps = "Find the Ensorcelled Cryptid at one of three Silvermoon spawns (/tar Ensorcelled Cryptid) and interact with the arcane prison to siphon it. Dodge the falling arcane orbs while channelling until all 100 stacks of Barrier Integrity are stripped -- other players can siphon the same prison, so a group clears it far faster. Interact with J'imothy within the minute he stays free to receive the Stubby Whistle.",
+              steps = "Find the Ensorcelled Cryptid at one of three Silvermoon spawns (/tar Ensorcelled Cryptid) and interact with the arcane prison to siphon it. Dodge the falling arcane orbs while channelling until you strip all 100 stacks of Barrier Integrity. Other players can siphon the same prison, so a group clears it far faster. Interact with J'imothy within the minute he stays free to receive the Stubby Whistle.",
               waypoint = {
                   { MC.MAP.Silvermoon, 0.2875, 0.4669, "Ensorcelled Cryptid (NW outskirts, past the university)" },
                   { MC.MAP.Silvermoon, 0.5132, 0.5375, "Ensorcelled Cryptid (end of Murder Row)" },
