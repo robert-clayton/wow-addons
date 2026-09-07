@@ -586,9 +586,9 @@ do
             points=points+1
         end
     end end
-    ok(points >= 2600, "older criterion coordinates all validate")
+    ok(points == 2715, "all audited criterion coordinates are present")
     -- BattlePetSpecies.PetTypeEnum is zero-based; the journal uses 1..10.
-    local expected = { [3362]=9, [3243]=10, [3244]=4, [3250]=5, [3251]=3, [3252]=1, [3255]=8, [3297]=9, [3582]=9, [4253]=3, [4286]=6, [4311]=5, [4402]=5, [4407]=5, [4408]=5, [4436]=6, [4548]=1, [4565]=1, [4615]=1, [3542]=7, [4566]=1, [4602]=9, [4669]=6, [4718]=10, [4719]=10, [4728]=1, [4729]=1, [4757]=1, [4793]=8, [4853]=8, [4900]=9 }
+    local expected = { [168]=10, [179]=2, [242]=6, [248]=1, [249]=4, [665]=5, [3362]=9, [3243]=10, [3244]=4, [3250]=5, [3251]=3, [3252]=1, [3255]=8, [3297]=9, [3582]=9, [4253]=3, [4286]=6, [4311]=5, [4402]=5, [4407]=5, [4408]=5, [4436]=6, [4548]=1, [4565]=1, [4595]=6, [4615]=1, [4617]=10, [4618]=10, [3542]=7, [4566]=1, [4602]=9, [4669]=6, [4718]=10, [4719]=10, [4728]=1, [4729]=1, [4757]=1, [4793]=8, [4853]=8, [4900]=9 }
     local matched=0
     for _, group in ipairs(A.PetData) do for _, pet in ipairs(group.pets) do
         if expected[pet.speciesID] then
@@ -596,7 +596,7 @@ do
             matched=matched+1
         end
     end end
-    ok(matched == 31, "all corrected pet families are present")
+    ok(matched == 40, "all corrected pet families are present")
 
 end
 

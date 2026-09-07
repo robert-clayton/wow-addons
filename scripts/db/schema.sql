@@ -268,6 +268,7 @@ CREATE TABLE criterion (
     ord             INTEGER NOT NULL,      -- position in the achievement
     tree_id         INTEGER,
     npc_id          INTEGER,
+    source_npc_id   INTEGER,               -- physical NPC when npc_id is an invisible credit
     object_id       INTEGER,
     label           TEXT,
     PRIMARY KEY (collectible_id, ord)

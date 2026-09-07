@@ -85,6 +85,12 @@ function Scanner:Scan()
                 local assetNPC, assetObject, questID = MC.GetCriterionAssetIDs(criteriaType, assetID)
                 if not hasPositionalEntityMap then
                     npcID, objectID = assetNPC, assetObject
+                elseif ach.criteriaSourceNPCIDs and ach.criteriaSourceNPCIDs[i] then
+                    -- A few criteria expose an invisible credit creature rather
+                    -- than the physical rare. Route and link the physical NPC
+                    -- while the achievement criterion remains the completion
+                    -- authority.
+                    npcID = ach.criteriaSourceNPCIDs[i]
                 end
                 -- Per-rare stable NPC-ID override wins over
                 -- the achievement-level source default. Used to bump

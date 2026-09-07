@@ -16,25 +16,16 @@ rares,shadowlands,15054,12,Intercessor Razzra,npc:178004;npc:178004
 rares,shadowlands,15054,13,Malleus Grakizz,npc:177972;npc:177972
 rares,shadowlands,15054,14,Manifestation of Pain,npc:178899;npc:178899
 rares,shadowlands,15054,15,Golmak the Monstrosity,npc:178898;npc:178898
-rares,shadowlands,15107,3,Consumption,npc:180132;npc:180132
-rares,df,16676,5,Helmet Missingway,npc:199645;npc:199645
 rares,df,16677,34,The Great Enla,npc:196334;npc:196334
 rares,df,16677,35,Old Stormhide,npc:196350;npc:196350
 rares,df,16678,21,"Seereel, the Spring",npc:193710;npc:193710
 rares,df,16678,22,Moth'go Deeploom,npc:193735;npc:193735
 rares,df,16678,23,Swog'ranka,npc:193634;npc:193634
 rares,df,16678,32,Astray Splasher,npc:197411;npc:197411
-rares,df,16679,3,Blightpaw the Depraved,npc:193128;npc:193128
 treasures,mop,8784,1,Cloudstrike Family Helm,object:222796
 treasures,mop,8784,2,Flameheart Shawl,object:223537
 treasures,mop,8784,3,Riverspeaker's Trident,object:223538
 treasures,mop,8784,4,Snowdrift Tiger Talons,object:223539
-treasures,wod,9548,1,Garrosh's Shackles,quest:37130
-treasures,wod,9548,2,Warsong Relics,quest:37132
-treasures,wod,9548,3,Warsong Remains,quest:37133
-treasures,wod,9548,4,Stolen Draenei Tome,quest:37134
-treasures,wod,9548,5,Wolf Pup Remains,quest:37135
-treasures,wod,9548,6,Gnarled Bone,quest:37136
 treasures,wod,9728,3,,quest:33016
 treasures,wod,9728,9,,quest:33930
 treasures,wod,9728,15,,quest:33949
@@ -44,60 +35,9 @@ treasures,wod,9728,18,,quest:33996
 treasures,wod,9728,19,,quest:33998
 treasures,wod,9728,28,,quest:34652
 treasures,wod,9728,29,,quest:34713
-treasures,wod,9728,66,,quest:35279
 treasures,wod,9728,104,,quest:36363
 treasures,wod,9728,140,,quest:36459
 treasures,wod,9728,215,,quest:36052
-treasures,wod,9728,232,,quest:35701
-treasures,wod,9728,234,,quest:35952
-treasures,wod,9728,235,,quest:35965
-treasures,wod,9728,236,,quest:35966
-treasures,wod,9728,237,,quest:35967
-treasures,wod,9728,238,,quest:35968
-treasures,wod,9728,239,,quest:35971
-treasures,wod,9728,240,,quest:35975
-treasures,wod,9728,241,,quest:35979
-treasures,wod,9728,242,,quest:35980
-treasures,wod,9728,243,,quest:35981
-treasures,wod,9728,244,,quest:35982
-treasures,wod,9728,245,,quest:35984
-treasures,wod,9728,246,,quest:36001
-treasures,wod,9728,247,,quest:36003
-treasures,wod,9728,248,,quest:36015
-treasures,wod,9728,249,,quest:36019
-treasures,wod,9728,253,,quest:36430
-treasures,wod,9728,269,,quest:36710
-treasures,wod,9728,270,,quest:36713
-treasures,wod,9728,271,,quest:36714
-treasures,wod,9728,272,,quest:36715
-treasures,wod,9728,273,,quest:36716
-treasures,wod,9728,274,,quest:36717
-treasures,wod,9728,275,,quest:36718
-treasures,wod,9728,276,,quest:36720
-treasures,wod,9728,277,,quest:36721
-treasures,wod,9728,278,,quest:36722
-treasures,wod,9728,279,,quest:36723
-treasures,wod,9728,280,,quest:36726
-treasures,wod,9728,281,,quest:36727
-treasures,wod,9728,282,,quest:36728
-treasures,wod,9728,283,,quest:36729
-treasures,wod,9728,284,,quest:36730
-treasures,wod,9728,285,,quest:36731
-treasures,wod,9728,286,,quest:36732
-treasures,wod,9728,287,,quest:36733
-treasures,wod,9728,288,,quest:36734
-treasures,wod,9728,289,,quest:36735
-treasures,wod,9728,290,,quest:36736
-treasures,wod,9728,291,,quest:36737
-treasures,wod,9728,292,,quest:36738
-treasures,wod,9728,293,,quest:36739
-treasures,wod,9728,294,,quest:36740
-treasures,wod,9728,295,,quest:36781
-treasures,wod,9728,296,,quest:36782
-treasures,wod,9728,297,,quest:36783
-treasures,wod,9728,298,,quest:36784
-treasures,wod,9728,299,,quest:36787
-treasures,wod,9728,300,,quest:36789
 treasures,legion,11256,5,,quest:37826
 treasures,legion,11256,7,,quest:37827
 treasures,legion,11256,12,,quest:37833
@@ -105,7 +45,6 @@ treasures,legion,11256,49,,object:256790
 treasures,legion,11258,2,,quest:38392
 treasures,legion,11258,12,,quest:39110
 treasures,legion,11258,17,,quest:39100
-treasures,legion,11258,18,,quest:44135
 treasures,legion,11258,22,,quest:39111
 treasures,legion,11258,24,,quest:39112
 treasures,legion,11258,25,,quest:39114
@@ -120,7 +59,6 @@ treasures,legion,11258,43,,quest:39106
 treasures,legion,11258,44,,quest:39109
 treasures,legion,11258,48,,quest:39099
 treasures,legion,11258,49,,quest:39101
-treasures,legion,11258,51,,quest:38371
 treasures,legion,11258,59,,quest:40273
 treasures,legion,11258,63,,quest:39103
 treasures,legion,11258,65,,quest:39095
@@ -140,23 +78,12 @@ treasures,legion,11257,45,,object:257290
 treasures,legion,11260,2,,object:257291
 treasures,legion,11260,3,,quest:41048
 treasures,legion,11260,4,,quest:41050
-treasures,legion,11260,9,,quest:44179
 treasures,legion,11260,21,,quest:43843
 treasures,legion,11260,23,,quest:41681
 treasures,legion,11260,24,,quest:41682
 treasures,legion,11260,36,,quest:41051
 treasures,legion,11260,42,,quest:43833
 treasures,legion,11260,43,,quest:41049
-treasures,legion,11260,55,,quest:43416
-treasures,legion,12074,9,Desperate Eredar's Cache,quest:48749
-treasures,shadowlands,15099,7,Helsworn Chest,quest:64256
-treasures,shadowlands,15099,8,Jeweled Heart,quest:64261
-treasures,shadowlands,15502,2,Glinting Sand Pile,quest:65495
-treasures,shadowlands,15502,3,Shifting Sand Pile,quest:65496
-treasures,shadowlands,15502,4,Humming Sand Pile,quest:65497
-treasures,shadowlands,15502,5,Misshapen Sand Pile,quest:65498
-treasures,shadowlands,15502,6,Sparkling Sand Pile,quest:65499
-treasures,shadowlands,15502,7,Ticking Sand Pile,quest:65500
 treasures,df,17526,1,Forbidden Hoard,
 treasures,df,17526,2,Avian Trove,
 treasures,df,17526,3,Obsidian Coffer,

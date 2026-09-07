@@ -26,11 +26,9 @@ The highest declared interface, `120105`, puts the checkout at or after client
 
 ### What this costs
 
-Every ATT-derived figure shipped through 1.14.0 — 8,975 resolved recipe
-sources, 3,115 waypoints, 885 faction-paired trainers, 401 recipe gaps, 180
-decorations, 708 rares, 364 treasures — was produced from a tree that cannot be
-reconstructed. Re-running any generator against a fresh clone will produce
-*some* different output, and there is no way to tell which differences are
+Every ATT-derived figure shipped through 1.15.0 was produced from a tree that
+cannot be reconstructed. Re-running any generator against a fresh clone will
+produce *some* different output, and there is no way to tell which differences are
 upstream data improvements and which are regressions in our own tooling.
 
 ### Fixing it
@@ -53,7 +51,7 @@ exists, that a coordinate is in range, that a name is non-empty — none of them
 check that a vendor is actually standing where ATT says. ATT is a
 community-maintained catalog and is wrong in places; the Draenor
 daily-cooldown reagents it classified as never-implemented, corrected in
-1.14.0, are one confirmed example.
+1.15.0, are one confirmed example.
 
 A stratified sample against Wowhead — roughly 50 waypoints and 30 newly
 ingested rows, spread across source kinds and expansions — has not yet been

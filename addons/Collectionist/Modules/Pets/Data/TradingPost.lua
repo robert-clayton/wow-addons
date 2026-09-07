@@ -2,8 +2,9 @@ local _, MC = ...
 
 -- HAND-MAINTAINED. Edit this file directly.
 --
--- One-time extraction from the Trading Post inventory. Out-of-game
--- origins (Shop, TCG, Recruit-a-Friend) are excluded by standing policy.
+-- One-time extraction from the Trading Post inventory. A confirmed in-game
+-- Trading Post offer is tracked even when the collectible originated in the
+-- Shop, TCG, Recruit-a-Friend, or another promotion.
 --
 -- Frozen from its generator, which has been deleted. The upstream it read is a
 -- one-time research artifact, not a live feed -- re-running it could only
@@ -19,11 +20,12 @@ local _, MC = ...
 -- Expansion is the one whose Trading Post first offered the item, not the
 -- expansion its model or original promotion came from.
 --
--- 9 whose original source was a TCG code, the in-game Shop, Recruit-a-Friend
--- or a promotion are deliberately NOT listed here, pending review.
-
 MC.RegisterContent("df", "pets", {
     { source = "tradingpost", pets = {
+        { speciesID = 179, npcID = 27217, name = "Spirit of Competition", petType = 2, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", zone = "Dornogal", itemID = 207962, waypoint = { 2339, 0.4807, 0.5216, "Spirit of Competition" } },
+        { speciesID = 242, npcID = 36511, name = "Spectral Tiger Cub", petType = 6, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", zone = "Dornogal", itemID = 49343, waypoint = { 2339, 0.4807, 0.5216, "Spectral Tiger Cub" } },
+        { speciesID = 248, npcID = 36911, name = "Pandaren Monk", petType = 1, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.0.5", zone = "Dornogal", itemID = 49665, waypoint = { 2339, 0.4807, 0.5216, "Pandaren Monk" } },
+        { speciesID = 249, npcID = 36979, name = "Lil' K.T.", petType = 4, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.7", zone = "Dornogal", itemID = 49693, waypoint = { 2339, 0.4807, 0.5216, "Lil' K.T." } },
         { speciesID = 3243, npcID = 183686, name = "Pippin", petType = 10, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.0", itemID = 190175 },
         { speciesID = 3244, npcID = 185324, name = "Drazka'zet the Wrathful", petType = 4, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.0", zone = "Dornogal", itemID = 190176, waypoint = { 2339, 0.4807, 0.5216, "Drazka'zet the Wrathful" } },
         { speciesID = 3250, npcID = 183708, name = "Egbob", petType = 5, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.0.5", zone = "Dornogal", itemID = 190603, waypoint = { 2339, 0.4807, 0.5216, "Egbob" } },
@@ -46,12 +48,17 @@ MC.RegisterContent("df", "pets", {
 
 MC.RegisterContent("midnight", "pets", {
     { source = "tradingpost", pets = {
+        { speciesID = 665, npcID = 54745, name = "Sand Scarab", petType = 5, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.5", zone = "Dornogal", itemID = 72153, waypoint = { 2339, 0.4807, 0.5216, "Sand Scarab" } },
+        { speciesID = 4595, npcID = 225354, name = "Lil' Flameo", petType = 6, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.5", zone = "Dornogal", itemID = 224576, waypoint = { 2339, 0.4807, 0.5216, "Lil' Flameo" } },
         { speciesID = 4615, npcID = 229846, name = "Parrlok", petType = 1, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.5", itemID = 228758 },
+        { speciesID = 4617, npcID = 229890, name = "Thrillbot 9000", petType = 10, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.7", zone = "Dornogal", itemID = 228790, waypoint = { 2339, 0.4807, 0.5216, "Thrillbot 9000" } },
+        { speciesID = 4618, npcID = 229901, name = "Chillbot 9000", petType = 10, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.7", zone = "Dornogal", itemID = 228793, waypoint = { 2339, 0.4807, 0.5216, "Chillbot 9000" } },
     } },
 })
 
 MC.RegisterContent("tww", "pets", {
     { source = "tradingpost", pets = {
+        { speciesID = 168, npcID = 25109, name = "Rocket Chicken", petType = 10, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.1.5", zone = "Dornogal", itemID = 34492, waypoint = { 2339, 0.4807, 0.5216, "Rocket Chicken" } },
         { speciesID = 3542, npcID = 204340, name = "Soot-Stained Shalewing", petType = 7, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.2", zone = "Dornogal", itemID = 205148, waypoint = { 2339, 0.4807, 0.5216, "Soot-Stained Shalewing" } },
         { speciesID = 4566, npcID = 223645, name = "Worgli the Apprehensive", petType = 1, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.0", zone = "Dornogal", itemID = 223474, waypoint = { 2339, 0.4807, 0.5216, "Worgli the Apprehensive" } },
         { speciesID = 4602, npcID = 227414, name = "Claudius", petType = 9, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.2", zone = "Dornogal", itemID = 226104, waypoint = { 2339, 0.4807, 0.5216, "Claudius" } },
@@ -66,4 +73,3 @@ MC.RegisterContent("tww", "pets", {
         { speciesID = 4900, npcID = 251822, name = "Bundled-Up Bob", petType = 9, source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.2.5", itemID = 252200 },
     } },
 })
-

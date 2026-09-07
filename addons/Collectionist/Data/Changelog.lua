@@ -7,6 +7,19 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.15.0", sections = {
+        { heading = "Added", lines = {
+            "108 recipes: 44 Patch 12.1 recipes and 64 older Inscription recipes that were omitted by a source-classification conflict.",
+            "38 source-verified housing decorations, including current neighborhood endeavors, Arcantina rewards, and two older boss/vendor rewards.",
+            "8 mounts and 9 pets whose current in-game Trading Post acquisition was hidden by their older promotional origin.",
+            "73 more older rare and treasure criteria now have source-backed map pins.",
+        } },
+        { heading = "Fixed", lines = {
+            "Corrected 100 Inscription recipes that were falsely marked unobtainable after an NYI heading leaked across patch sections.",
+            "Historical ATT conditional branches can no longer overwrite current-retail recipe classifications.",
+            "Rare criteria that use invisible credit creatures now route and link to the physical rare.",
+        } },
+    } },
     { version = "1.14.0", sections = {
         { heading = "Added", lines = {
             "Map pins for more than 1,900 older rare and treasure achievement criteria, from Outland through Dragonflight.",

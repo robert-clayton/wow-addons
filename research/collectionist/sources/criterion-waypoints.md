@@ -1,14 +1,14 @@
-# Older rare and treasure waypoints — 1.14.0
+# Older rare and treasure waypoints — 1.15.0
 
 `criterion-waypoints.csv` records the frozen coordinates shipped in
 `addons/Collectionist/Data/CriteriaWaypoints.lua`. These are source-backed
 locations, not observations in a live game client. The curated Lua remains
 the source of truth; do not regenerate it blindly against a newer upstream.
 
-The lookup contains 2,207 separate NPC/object/quest identities and 2,630
-coordinate tuples. It supplies pins for 1,934 of 2,104 older achievement
+The lookup contains 2,280 separate NPC/object/quest identities and 2,715
+coordinate tuples. It supplies pins for 2,007 of 2,104 older achievement
 criteria (duplicates across achievements count separately). The remaining
-26 rare and 144 treasure criteria are listed in
+23 rare and 74 treasure criteria are listed in
 `criterion-waypoint-gaps.csv`; their positions were not inferred from nearby
 nodes. Twelve of these treasures are spell-backed criteria with no physical
 entity ID in the achievement asset.

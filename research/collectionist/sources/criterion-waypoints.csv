@@ -1260,6 +1260,9 @@ npc,210111,Surging Lasher,2200,0.5900,0.7190,ATT/Zones.lua:npc:210111
 npc,210111,Surging Lasher,2200,0.6000,0.6330,ATT/Zones.lua:npc:210111
 npc,210161,Ristar the Rabid,2200,0.4447,0.3929,HandyNotes_Dragonflight
 npc,210508,Voracious Mikanji,2200,0.3843,0.6213,HandyNotes_Dragonflight
+npc,179769,Consumption,1961,0.5110,0.4170,ATT/Zones.lua:crit:52285@n:179769
+npc,193128,Blightpaw the Depraved,2023,0.9020,0.4020,ATT/Zones.lua:crit:56136@n:193128;ATT/Zones.lua:npc:193128
+npc,193263,Helmet Missingway,2022,0.4340,0.7360,ATT/Zones.lua:crit:56037@n:193263
 object,220832,Sunken Treasure,554,0.4040,0.9290,ATT/Zones.lua:object:220832
 object,220901,Gleaming Treasure Chest,554,0.4970,0.6950,ATT/Zones.lua:object:220901
 object,220901,Gleaming Treasure Chest,554,0.5150,0.7340,ATT/Zones.lua:object:220901
@@ -2629,3 +2632,85 @@ quest,78359,Reliquary of Ashamane,2254,0.6290,0.3510,HandyNotes_Dragonflight;Han
 quest,78360,Reliquary of Aviana,2200,0.6423,0.1928,HandyNotes_Dragonflight;HandyNotes_DragonflightTreasures
 quest,78361,Reliquary of Goldrinn,2200,0.3293,0.8325,HandyNotes_Dragonflight;HandyNotes_DragonflightTreasures
 quest,78361,Reliquary of Goldrinn,2200,0.3320,0.8330,HandyNotes_Dragonflight;HandyNotes_DragonflightTreasures
+quest,35279,Quest 35279,539,0.2880,0.0720,ATT/Zones.lua:crit:26867@o:232066;ATT/Zones.lua:object:232066
+quest,35701,Quest 35701,543,0.5340,0.4680,ATT/Zones.lua:crit:25576@o:236267;ATT/Zones.lua:object:236267
+quest,35952,Quest 35952,543,0.4910,0.4840,ATT/Zones.lua:crit:25577@o:236399;ATT/Zones.lua:object:236399
+quest,35965,Quest 35965,543,0.5680,0.5730,ATT/Zones.lua:crit:25578@o:233558;ATT/Zones.lua:object:233558
+quest,35966,Quest 35966,543,0.5180,0.6150,ATT/Zones.lua:crit:25579@o:233504;ATT/Zones.lua:object:233504
+quest,35967,Quest 35967,543,0.4720,0.5180,ATT/Zones.lua:crit:25580@o:236266;ATT/Zones.lua:object:236266
+quest,35968,Quest 35968,543,0.4970,0.7890,ATT/Zones.lua:crit:25581@o:233507;ATT/Zones.lua:object:233507
+quest,35971,Quest 35971,543,0.4700,0.6910,ATT/Zones.lua:crit:25582@o:233513;ATT/Zones.lua:object:233513
+quest,35975,Quest 35975,543,0.4590,0.9360,ATT/Zones.lua:crit:25583@o:233520;ATT/Zones.lua:object:233520
+quest,35979,Quest 35979,543,0.4090,0.6730,ATT/Zones.lua:crit:25584@o:236282;ATT/Zones.lua:object:236282
+quest,35980,Quest 35980,543,0.4110,0.7730,ATT/Zones.lua:crit:25585@o:233523;ATT/Zones.lua:object:233523
+quest,35981,Quest 35981,543,0.4530,0.8190,ATT/Zones.lua:crit:25586@o:233524;ATT/Zones.lua:object:233524
+quest,35982,Quest 35982,543,0.4200,0.8150,ATT/Zones.lua:crit:25587@o:233525;ATT/Zones.lua:object:233525
+quest,35984,Quest 35984,543,0.5020,0.5370,ATT/Zones.lua:crit:25588@o:233526;ATT/Zones.lua:object:233526
+quest,36001,Quest 36001,543,0.4290,0.4350,ATT/Zones.lua:crit:25589@o:233550;ATT/Zones.lua:object:233550
+quest,36003,Quest 36003,543,0.4240,0.5480,ATT/Zones.lua:crit:25590@o:236350;ATT/Zones.lua:object:236350
+quest,36015,Quest 36015,543,0.4770,0.7680,ATT/Zones.lua:crit:25591@o:236259;ATT/Zones.lua:object:236259
+quest,36019,Quest 36019,543,0.3940,0.5630,ATT/Zones.lua:crit:25592@o:236264;ATT/Zones.lua:object:236264
+quest,36430,Quest 36430,543,0.5680,0.5730,ATT/Zones.lua:crit:25593@o:233501;ATT/Zones.lua:object:233501
+quest,36710,Quest 36710,543,0.4950,0.5080,ATT/Zones.lua:crit:27108@o:236402;ATT/Zones.lua:object:236402
+quest,36713,Quest 36713,543,0.5140,0.7760,ATT/Zones.lua:crit:27109@o:233505;ATT/Zones.lua:object:233505
+quest,36713,Quest 36713,543,0.5160,0.7220,ATT/Zones.lua:crit:27109@o:233505;ATT/Zones.lua:object:233505
+quest,36714,Quest 36714,543,0.5170,0.6910,ATT/Zones.lua:crit:27110@o:236260;ATT/Zones.lua:object:236260
+quest,36715,Quest 36715,543,0.6320,0.5720,ATT/Zones.lua:crit:27111@o:235127;ATT/Zones.lua:object:235127
+quest,36716,Quest 36716,543,0.4580,0.8940,ATT/Zones.lua:crit:27112@o:233559;ATT/Zones.lua:object:233559
+quest,36717,Quest 36717,543,0.4750,0.4360,ATT/Zones.lua:crit:27113@o:236404;ATT/Zones.lua:object:236404
+quest,36718,Quest 36718,543,0.4720,0.5180,ATT/Zones.lua:crit:27114@o:236258;ATT/Zones.lua:object:236258
+quest,36720,Quest 36720,543,0.5330,0.4690,ATT/Zones.lua:crit:27115@o:233139;ATT/Zones.lua:object:233139
+quest,36721,Quest 36721,543,0.4820,0.4640,ATT/Zones.lua:crit:27116@o:236269;ATT/Zones.lua:object:236269
+quest,36722,Quest 36722,543,0.4570,0.4930,ATT/Zones.lua:crit:27117@o:236270;ATT/Zones.lua:object:236270
+quest,36723,Quest 36723,543,0.4750,0.4370,ATT/Zones.lua:crit:27118@o:236265;ATT/Zones.lua:object:236265
+quest,36726,Quest 36726,543,0.4240,0.5480,ATT/Zones.lua:crit:27119@o:233552;ATT/Zones.lua:object:233552
+quest,36727,Quest 36727,543,0.4220,0.5200,ATT/Zones.lua:crit:27120@o:236349;ATT/Zones.lua:object:236349
+quest,36728,Quest 36728,543,0.4180,0.5900,ATT/Zones.lua:crit:27121@o:236276;ATT/Zones.lua:object:236276
+quest,36729,Quest 36729,543,0.4210,0.6430,ATT/Zones.lua:crit:27122@o:236278;ATT/Zones.lua:object:236278
+quest,36730,Quest 36730,543,0.4810,0.5520,ATT/Zones.lua:crit:27123@o:236274;ATT/Zones.lua:object:236274
+quest,36731,Quest 36731,543,0.4330,0.5170,ATT/Zones.lua:crit:27124@o:236275;ATT/Zones.lua:object:236275
+quest,36732,Quest 36732,543,0.4090,0.6730,ATT/Zones.lua:crit:27125@o:233522;ATT/Zones.lua:object:233522
+quest,36733,Quest 36733,543,0.4550,0.4300,ATT/Zones.lua:crit:27126@o:236406;ATT/Zones.lua:object:236406
+quest,36734,Quest 36734,543,0.4910,0.4840,ATT/Zones.lua:crit:27127@o:233455;ATT/Zones.lua:object:233455
+quest,36735,Quest 36735,543,0.4800,0.3990,ATT/Zones.lua:crit:27128@o:236288;ATT/Zones.lua:object:236288
+quest,36736,Quest 36736,543,0.4600,0.6310,ATT/Zones.lua:crit:27129@o:236271;ATT/Zones.lua:object:236271
+quest,36737,Quest 36737,543,0.4500,0.6990,ATT/Zones.lua:crit:27130@o:236400;ATT/Zones.lua:object:236400
+quest,36738,Quest 36738,543,0.5040,0.6660,ATT/Zones.lua:crit:27131@o:236280;ATT/Zones.lua:object:236280
+quest,36739,Quest 36739,543,0.5820,0.5150,ATT/Zones.lua:crit:27132@o:236279;ATT/Zones.lua:object:236279
+quest,36740,Quest 36740,543,0.4500,0.6990,ATT/Zones.lua:crit:27133@o:236348;ATT/Zones.lua:object:236348
+quest,36781,Quest 36781,543,0.5960,0.7270,ATT/Zones.lua:crit:27134@o:236285;ATT/Zones.lua:object:236285
+quest,36782,Quest 36782,543,0.5420,0.7310,ATT/Zones.lua:crit:27135@o:236284;ATT/Zones.lua:object:236284
+quest,36783,Quest 36783,543,0.4910,0.8240,ATT/Zones.lua:crit:27136@o:236257;ATT/Zones.lua:object:236257
+quest,36784,Quest 36784,543,0.4580,0.8820,ATT/Zones.lua:crit:27137@o:236289;ATT/Zones.lua:object:236289
+quest,36787,Quest 36787,543,0.4220,0.9300,ATT/Zones.lua:crit:27138@o:236407;ATT/Zones.lua:object:236407
+quest,36789,Quest 36789,543,0.4150,0.8650,ATT/Zones.lua:crit:27139@o:236351;ATT/Zones.lua:object:236351
+quest,37130,Garrosh's Shackles,550,0.4170,0.3750,ATT/Zones.lua:crit:26145@n:87522;ATT/Zones.lua:npc:87522
+quest,37132,Warsong Relics,550,0.4550,0.3680,ATT/Zones.lua:crit:26146@n:87524;ATT/Zones.lua:npc:87524
+quest,37133,Warsong Remains,550,0.4270,0.3760,ATT/Zones.lua:crit:26147@n:87525;ATT/Zones.lua:npc:87525
+quest,37133,Warsong Remains,550,0.4300,0.3560,ATT/Zones.lua:crit:26147@n:87525;ATT/Zones.lua:npc:87525
+quest,37133,Warsong Remains,550,0.4330,0.3660,ATT/Zones.lua:crit:26147@n:87525;ATT/Zones.lua:npc:87525
+quest,37133,Warsong Remains,550,0.4360,0.3880,ATT/Zones.lua:crit:26147@n:87525;ATT/Zones.lua:npc:87525
+quest,37134,Stolen Draenei Tome,550,0.4200,0.3400,ATT/Zones.lua:crit:26148@n:87526;ATT/Zones.lua:npc:87526
+quest,37134,Stolen Draenei Tome,550,0.4510,0.3820,ATT/Zones.lua:crit:26148@n:87526;ATT/Zones.lua:npc:87526
+quest,37134,Stolen Draenei Tome,550,0.4530,0.3380,ATT/Zones.lua:crit:26148@n:87526;ATT/Zones.lua:npc:87526
+quest,37135,Wolf Pup Remains,550,0.4270,0.3760,ATT/Zones.lua:crit:26149@n:87527;ATT/Zones.lua:npc:87527
+quest,37135,Wolf Pup Remains,550,0.4300,0.3560,ATT/Zones.lua:crit:26149@n:87527;ATT/Zones.lua:npc:87527
+quest,37135,Wolf Pup Remains,550,0.4330,0.3660,ATT/Zones.lua:crit:26149@n:87527;ATT/Zones.lua:npc:87527
+quest,37135,Wolf Pup Remains,550,0.4360,0.3880,ATT/Zones.lua:crit:26149@n:87527;ATT/Zones.lua:npc:87527
+quest,37136,Gnarled Bone,550,0.4270,0.3760,ATT/Zones.lua:crit:26150@n:87528;ATT/Zones.lua:npc:87528
+quest,37136,Gnarled Bone,550,0.4300,0.3560,ATT/Zones.lua:crit:26150@n:87528;ATT/Zones.lua:npc:87528
+quest,37136,Gnarled Bone,550,0.4330,0.3660,ATT/Zones.lua:crit:26150@n:87528;ATT/Zones.lua:npc:87528
+quest,37136,Gnarled Bone,550,0.4360,0.3880,ATT/Zones.lua:crit:26150@n:87528;ATT/Zones.lua:npc:87528
+quest,38371,Quest 38371,641,0.7380,0.3230,ATT/Zones.lua:crit:33426@o:240619;ATT/Zones.lua:object:240619
+quest,43416,Quest 43416,683,0.7700,0.6190,ATT/Zones.lua:crit:33609@o:258034;ATT/Zones.lua:object:258034
+quest,44135,Quest 44135,641,0.7380,0.5440,ATT/Zones.lua:crit:33393@o:254126;ATT/Zones.lua:object:254126
+quest,44179,Quest 44179,683,0.3810,0.4250,ATT/Zones.lua:crit:33563@o:251052;ATT/Zones.lua:object:251052
+quest,48749,Desperate Eredar's Cache,882,0.5710,0.7680,ATT/Zones.lua:crit:37600@o:276228;ATT/Zones.lua:object:276228
+quest,64256,Helsworn Chest,1543,0.6920,0.4520,ATT/Zones.lua:crit:52243@o:369216;ATT/Zones.lua:object:369216
+quest,64261,Jeweled Heart,1543,0.6650,0.6220,ATT/Zones.lua:crit:52244@o:369224;ATT/Zones.lua:object:369224
+quest,65495,Glinting Sand Pile,2029,0.4510,0.3600,ATT/Zones.lua:crit:53259@o:375397;ATT/Zones.lua:object:375397
+quest,65496,Shifting Sand Pile,2029,0.4370,0.3710,ATT/Zones.lua:crit:53260@o:375398;ATT/Zones.lua:object:375398
+quest,65497,Humming Sand Pile,2029,0.4430,0.3670,ATT/Zones.lua:crit:53261@o:375399;ATT/Zones.lua:object:375399
+quest,65498,Misshapen Sand Pile,2029,0.4460,0.3570,ATT/Zones.lua:crit:53262@o:375400;ATT/Zones.lua:object:375400
+quest,65499,Sparkling Sand Pile,2029,0.4390,0.3650,ATT/Zones.lua:crit:53263@o:375401;ATT/Zones.lua:object:375401
+quest,65500,Ticking Sand Pile,2029,0.4380,0.3760,ATT/Zones.lua:crit:53265@o:375402;ATT/Zones.lua:object:375402

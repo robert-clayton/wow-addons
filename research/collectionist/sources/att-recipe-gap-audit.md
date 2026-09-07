@@ -1,5 +1,9 @@
 # ATT recipe coverage gap audit
 
+Release 1.15.0 resolves the 64 omitted Inscription rows caused by the
+patch-scoped NYI parser defect. The broader CSV remains a historical baseline;
+current placement decisions are recorded in the September 7 follow-up audit.
+
 Current named retail profession abilities are compared with every Collectionist recipe and ATT's curated recipe catalog. Profession UI glossary/stat entries, optional-reagent internals, training steps, and ATT-only never-implemented recipes are classified separately.
 
 ## Result

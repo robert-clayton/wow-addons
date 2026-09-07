@@ -26,6 +26,9 @@ MC.RegisterContent("vanilla", "decorations", {
     { source = "achievement", decorations = {
         { decorID = 3893, itemID = 247756, name = "Challenger's Dueling Flag", source = "achievement", sourceInfo = "3 Challenger's Dueling Flag Accents › Ornamental Duel-icious Joruh (Orgrimmar) 1000 Honor +1 more source", achievementID = 1157, npcID = 254606, waypoint = { { 84, 0.7780, 0.6570, "Challenger's Dueling Flag" }, { 85, 0.3880, 0.7200, "Challenger's Dueling Flag" } } },
     } },
+    { source = "vendor", decorations = {
+        { decorID = 4841, itemID = 248808, name = "Nesingwary Mounted Elk Head", source = "vendor", sourceInfo = "Jaquilina Dramet - 450 gold; The Green Hills of Stranglethorn", zone = "Stranglethorn Vale", achievementID = 940, npcID = 2483, cost = { gold = 4500000 }, waypoint = { 50, 0.4370, 0.2320, "Nesingwary Mounted Elk Head" } },
+    } },
     { source = "quest", decorations = {
         { decorID = 11274, itemID = 256673, name = "Stormwind Forge", source = "quest", sourceInfo = "5 Stormwind Forge Structural › Misc Structural A Binding Contract Captain Lancy Revshon (Stormwind City) 950", zone = "Stormwind City", questID = 7604, npcID = 49877, waypoint = { 84, 0.6760, 0.7280, "Stormwind Forge" } },
     } },

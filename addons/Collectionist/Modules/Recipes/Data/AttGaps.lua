@@ -19,7 +19,8 @@ local _, MC = ...
 -- rewritten wholesale by their generators, and The War Within has none.
 --
 -- Expansion follows trade-category membership, the same signal that placed
--- every other recipe in the catalog. Never-implemented rows are excluded.
+-- every other recipe in the catalog. The 1.15.0 additions also recover rows
+-- that a patch-scoped ATT NYI heading incorrectly classified as unavailable.
 
 MC.RegisterContent("bfa", "recipes", {
     { skillLine = 755, name = "Battle for Azeroth", recipes = { -- Jewelcrafting: 1
@@ -60,43 +61,152 @@ MC.RegisterContent("legion", "recipes", {
     { skillLine = 755, name = "Legion", recipes = { -- Jewelcrafting: 1
         { id = 382975, name = "Legion Prospecting", source = "trainer", sourceInfo = "Timethy Jones <Jewelcrafting Trainer>" },
     } },
-    { skillLine = 773, name = "Legion", recipes = { -- Inscription: 1
+    { skillLine = 773, name = "Legion", recipes = { -- Inscription: 56
         { id = 360882, name = "Mark of the Duskwing Raven", source = "vendor", sourceInfo = "Sylvia Hartshorn <Dreamweaver Emissary>" },
+
+        { id = 192838, name = "Glyph of Ghostly Fade", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192839, name = "Grimoire of Fel Imp", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192840, name = "Glyph of Sparkles", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192841, name = "Glyph of Blackout", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192842, name = "Glyph of the Sentinel", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192843, name = "Glyph of Crackling Crane Lightning", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192844, name = "Glyph of the Spectral Raptor", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192845, name = "Glyph of Stellar Flare", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192846, name = "Glyph of the Queen", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 192849, name = "Glyph of Fel Touched Souls", source = "quest", sourceInfo = "Quest: The Price of Power (non-DH)" },
+        { id = 192850, name = "Glyph of Crackling Flames", source = "quest", sourceInfo = "Quest: Runes of Power" },
+        { id = 192851, name = "Glyph of Fallow Wings", source = "quest", sourceInfo = "Quest: Containing the Demon Within (non-DH)" },
+        { id = 192852, name = "Glyph of Tattered Wings", source = "quest", sourceInfo = "Quest: The Burdens of Hunting" },
+        { id = 225522, name = "Glyph of Cracked Ice", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225524, name = "Glyph of the Chilled Shell", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225525, name = "Glyph of the Crimson Shell", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225527, name = "Glyph of Fel Wings", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225528, name = "Glyph of Fel-Enemies", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225529, name = "Glyph of Mana Touched Souls", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225530, name = "Glyph of Shadow-Enemies", source = "vendor", sourceInfo = "Oxana Demonslay <Weapons and Secrets>" },
+        { id = 225531, name = "Glyph of the Doe", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225532, name = "Glyph of the Feral Chameleon", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225533, name = "Glyph of the Forest Path", source = "vendor", sourceInfo = "Lorelae Wintersong <Trade Supplies>" },
+        { id = 225534, name = "Glyph of Autumnal Bloom", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225535, name = "Glyph of Arachnophobia", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225536, name = "Glyph of Nesingwary's Nemeses", source = "vendor", sourceInfo = "Lucas Sigmund <Repairs>" },
+        { id = 225538, name = "Glyph of the Dire Stable", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225539, name = "Glyph of the Goblin Anti-Grav Flare", source = "vendor", sourceInfo = "Hobart Grapplehammer <Engineering Supplies>" },
+        { id = 225541, name = "Glyph of the Hook", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225543, name = "Glyph of the Trident", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 225545, name = "Glyph of Polymorphic Proportions", source = "quest", sourceInfo = "Quest: The Arcway: Wandering Plague" },
+        { id = 225546, name = "Glyph of Smolder", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225547, name = "Glyph of Yu'lon's Grace", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225548, name = "Glyph of Burnout", source = "vendor", sourceInfo = "Cravitz Lorent <Shady Book Dealer>" },
+        { id = 225549, name = "Glyph of Flash Bang", source = "vendor", sourceInfo = "The Widow <Tools of Deception>" },
+        { id = 225550, name = "Glyph of Critterhex", source = "vendor", sourceInfo = "K'huta <Portals and Jujus>" },
+        { id = 225551, name = "Glyph of Flickering", source = "vendor", sourceInfo = "Elementalist Sharvak <The Earthen Ring>" },
+        { id = 225552, name = "Glyph of Pebbles", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225553, name = "Grimoire of the Abyssal", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 225554, name = "Glyph of the Inquisitor's Eye", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 225556, name = "Grimoire of the Shivarra", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 225558, name = "Grimoire of the Voidlord", source = "vendor", sourceInfo = "Matthew Rabis <Feral Warlock>" },
+        { id = 225559, name = "Grimoire of Wrathguard", source = "vendor", sourceInfo = "Warmage Kath'leen <Legionfall Artificer>" },
+        { id = 225560, name = "Glyph of the Blazing Savior", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 228381, name = "Glyph of Falling Thunder", source = "vendor", sourceInfo = "Jang Quillpaw <Inscription Supplies>" },
+        { id = 232274, name = "Glyph of Crackling Ox Lightning", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 232275, name = "Glyph of the Trusted Steed", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 233278, name = "Glyph of Twilight Bloom", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 240272, name = "Grimoire of the Shadow Succubus", source = "vendor", sourceInfo = "Syaith <Loaner Demon>" },
+        { id = 246982, name = "Glyph of Ember Shards", source = "drop", sourceInfo = "Instance or raid drop" },
+        { id = 246984, name = "Glyph of Floating Shards", source = "vendor", sourceInfo = "Warmage Kath'leen <Legionfall Artificer>" },
+        { id = 246999, name = "Glyph of Fel-Touched Shards", source = "vendor", sourceInfo = "Inquisitor Vethroz" },
+        { id = 254227, name = "Glyph of the Lightspawn", source = "vendor", sourceInfo = "Vindicator Jaelaana <Army of the Light Emissary>" },
+        { id = 254231, name = "Glyph of the Voidling", source = "vendor", sourceInfo = "Ataxon" },
+        { id = 254238, name = "Glyph of Dark Absolution", source = "drop", sourceInfo = "Instance or raid drop" },
     } },
 })
 
 MC.RegisterContent("midnight", "recipes", {
-    { skillLine = 164, name = "Midnight", recipes = { -- Blacksmithing: 1
+    { skillLine = 164, name = "Midnight", recipes = { -- Blacksmithing: 5
         { id = 471041, name = "Recraft Equipment", source = "trainer", sourceInfo = "Bemarrin <Blacksmithing Trainer>" },
+
+        { id = 1291683, name = "Hunter's Ritual Stone", source = "vendor", sourceInfo = "Construct V'anore", zone = "Silvermoon City", waypoint = { 2393, 0.5570, 0.6580, "Hunter's Ritual Stone" } },
+        { id = 1296495, name = "Amani Forgemaster's Workbench", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Amani Forgemaster's Workbench" } },
+        { id = 1296496, name = "Amani Forgemaster's Decorative Spear", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1296497, name = "Amani Forgemaster's Rack", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
     } },
-    { skillLine = 165, name = "Midnight", recipes = { -- Leatherworking: 1
+    { skillLine = 165, name = "Midnight", recipes = { -- Leatherworking: 5
         { id = 471046, name = "Recraft Equipment", source = "trainer", sourceInfo = "Talmar <Leatherworking Trainer>" },
+
+        { id = 1291691, name = "Adorned Fang", source = "drop", sourceInfo = "Twin Fangs", zone = "Voidstorm", waypoint = { 2509, 0.4720, 0.2270, "Adorned Fang" } },
+        { id = 1296509, name = "Flat Snakeskin Canopy", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Flat Snakeskin Canopy" } },
+        { id = 1296510, name = "Stretched Snakeskin Rack", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1296511, name = "Mounted Moby", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Mounted Moby" } },
     } },
-    { skillLine = 171, name = "Midnight", recipes = { -- Alchemy: 3
+    { skillLine = 171, name = "Midnight", recipes = { -- Alchemy: 7
         { id = 471040, name = "Recraft Equipment", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
         { id = 1233129, name = "Recycle Potions", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
         { id = 1233130, name = "Recycle Flasks", source = "trainer", sourceInfo = "Camberon <Alchemy Trainer>" },
+
+        { id = 1289744, name = "Concentrated Silvermoon Health Potion", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Concentrated Silvermoon Health Potion" } },
+        { id = 1289745, name = "Liquid Luster", source = "vendor", sourceInfo = "Skull of Er'inye", zone = "Voidstorm", waypoint = { 2509, 0.5120, 0.6240, "Liquid Luster" } },
+        { id = 1289746, name = "Alluring Nostrum", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Alluring Nostrum" } },
+        { id = 1296429, name = "Ersatz Venom Splatter", source = "vendor", sourceInfo = "Construct V'anore", zone = "Silvermoon City", waypoint = { 2393, 0.5570, 0.6580, "Ersatz Venom Splatter" } },
     } },
-    { skillLine = 185, name = "Midnight", recipes = { -- Cooking: 1
+    { skillLine = 185, name = "Midnight", recipes = { -- Cooking: 9
         { id = 1259655, name = "Thalassian Fillet", source = "trainer", sourceInfo = "Sylann <Cooking Trainer>" },
+
+        { id = 1295534, name = "Amani Cornucopia", source = "trainer", sourceInfo = "Sylann <Cooking Trainer>", zone = "Silvermoon City", waypoint = { 2393, 0.5640, 0.6980, "Amani Cornucopia" } },
+        { id = 1295776, name = "Loa's Gathering", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Loa's Gathering" } },
+        { id = 1295777, name = "Feast of Knowledge", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Feast of Knowledge" } },
+        { id = 1295783, name = "Venom-Spiced Cutlets", source = "vendor", sourceInfo = "Navigator Otoola", zone = "The Coiled Isle", waypoint = { 2512, 0.5720, 0.4830, "Venom-Spiced Cutlets" } },
+        { id = 1296418, name = "Puffer Plate", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Puffer Plate" } },
+        { id = 1296419, name = "Sweet-And-Sour Skewers", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1296449, name = "Practically Pork", source = "trainer", sourceInfo = "Sylann <Cooking Trainer>", zone = "Silvermoon City", waypoint = { 2393, 0.5640, 0.6980, "Practically Pork" } },
+        { id = 1296450, name = "Plant Protein", source = "trainer", sourceInfo = "Sylann <Cooking Trainer>", zone = "Silvermoon City", waypoint = { 2393, 0.5640, 0.6980, "Plant Protein" } },
     } },
-    { skillLine = 197, name = "Midnight", recipes = { -- Tailoring: 1
+    { skillLine = 197, name = "Midnight", recipes = { -- Tailoring: 4
         { id = 471047, name = "Recraft Equipment", source = "trainer", sourceInfo = "Galana <Tailoring Trainer>" },
+
+        { id = 1288335, name = "Snakeskin Lining", source = "drop", sourceInfo = "Altar of Fangs", zone = "Voidstorm", waypoint = { 2509, 0.4720, 0.6850, "Snakeskin Lining" } },
+        { id = 1296512, name = "Twilight's Blade Bedroll", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1296514, name = "Tortollan Slingsack", source = "vendor", sourceInfo = "Navigator Otoola", zone = "The Coiled Isle", waypoint = { 2512, 0.5720, 0.4830, "Tortollan Slingsack" } },
     } },
-    { skillLine = 202, name = "Midnight", recipes = { -- Engineering: 1
+    { skillLine = 202, name = "Midnight", recipes = { -- Engineering: 8
         { id = 471043, name = "Recraft Equipment", source = "trainer", sourceInfo = "Danwe <Engineering Trainer>" },
+
+        { id = 1291687, name = "Coiled Snake-Eye", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 1296501, name = "Coiled Amani Hookshot", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Coiled Amani Hookshot" } },
+        { id = 1296502, name = "Proudmoore Ship-in-a-Bottle", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Proudmoore Ship-in-a-Bottle" } },
+        { id = 1296503, name = "Aetherlume Field Lamp", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1297585, name = "R0CKY", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1297647, name = "G-00", source = "unknown", sourceInfo = "Acquisition source requires confirmation" },
+        { id = 1305148, name = "R0CKY-To-Go", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
     } },
-    { skillLine = 333, name = "Midnight", recipes = { -- Enchanting: 1
+    { skillLine = 333, name = "Midnight", recipes = { -- Enchanting: 5
         { id = 471042, name = "Recraft Equipment", source = "trainer", sourceInfo = "Dolothos <Enchanting Trainer>" },
+
+        { id = 1291694, name = "Enchant Weapon - Rite of the Hash'ey", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Enchant Weapon - Rite of the Hash'ey" } },
+        { id = 1296498, name = "Keen Hex Mask", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Keen Hex Mask" } },
+        { id = 1296499, name = "Furious Tiki Mask", source = "vendor", sourceInfo = "Construct V'anore", zone = "Silvermoon City", waypoint = { 2393, 0.5570, 0.6580, "Furious Tiki Mask" } },
+        { id = 1296500, name = "Enchanted Voidwell Fish", source = "vendor", sourceInfo = "Navigator Otoola", zone = "The Coiled Isle", waypoint = { 2512, 0.5720, 0.4830, "Enchanted Voidwell Fish" } },
     } },
-    { skillLine = 755, name = "Midnight", recipes = { -- Jewelcrafting: 3
+    { skillLine = 755, name = "Midnight", recipes = { -- Jewelcrafting: 9
         { id = 471045, name = "Recraft Equipment", source = "trainer", sourceInfo = "Amin <Jewelcrafting Trainer>" },
         { id = 1231127, name = "Midnight Prospecting", source = "trainer", sourceInfo = "Amin <Jewelcrafting Trainer>" },
         { id = 1231132, name = "Midnight Crushing", source = "discovery", sourceInfo = "Discovered while crafting" },
+
+        { id = 1291690, name = "Polished Ammolite", source = "worlddrop", sourceInfo = "World drop" },
+        { id = 1297679, name = "Opalescent Amani Peridot", source = "vendor", sourceInfo = "Second Mate Sluggs", zone = "The Coiled Isle", waypoint = { 2512, 0.5160, 0.4980, "Opalescent Amani Peridot" } },
+        { id = 1297680, name = "Piercing Amani Lapis", source = "unknown", sourceInfo = "Acquisition source requires confirmation" },
+        { id = 1297681, name = "Roaring Amani Garnet", source = "vendor", sourceInfo = "Navigator Otoola", zone = "The Coiled Isle", waypoint = { 2512, 0.5720, 0.4830, "Roaring Amani Garnet" } },
+        { id = 1307462, name = "Refine Crystalline Glass", source = "trainer", sourceInfo = "Shalenn", zone = "Silvermoon City", waypoint = { 2393, 0.4820, 0.5510, "Refine Crystalline Glass" } },
+        { id = 1307466, name = "Refine Duskshrouded Stone", source = "trainer", sourceInfo = "Shalenn", zone = "Silvermoon City", waypoint = { 2393, 0.4820, 0.5510, "Refine Duskshrouded Stone" } },
     } },
-    { skillLine = 773, name = "Midnight", recipes = { -- Inscription: 2
+    { skillLine = 773, name = "Midnight", recipes = { -- Inscription: 6
         { id = 471044, name = "Recraft Equipment", source = "trainer", sourceInfo = "Zantasia <Inscription Trainer>" },
         { id = 1269575, name = "Midnight Milling", source = "trainer", sourceInfo = "Zantasia <Inscription Trainer>" },
+
+        { id = 1290561, name = "Vantus Rune: Tides", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Vantus Rune: Tides" } },
+        { id = 1296505, name = "\"Cursed Gaze of Ula'tek\" Mural", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1296506, name = "Chiseled Amani Tablet", source = "drop", sourceInfo = "Thalassian Recipe in a Bottle" },
+        { id = 1303151, name = "Contract: Zul'jarra's Forces", source = "vendor", sourceInfo = "Jan'sari the Watchful", zone = "The Coiled Isle", waypoint = { 2512, 0.5880, 0.4500, "Contract: Zul'jarra's Forces" } },
     } },
 })
 
@@ -437,6 +547,18 @@ MC.RegisterContent("wod", "recipes", {
         { id = 177355, name = "Remove Illusion", source = "drop", sourceInfo = "Drops from creatures" },
         { id = 217655, name = "Tome of Illusions: Draenor", source = "vendor", sourceInfo = "Bob <Enchanting Recipes>" },
     } },
+    { skillLine = 773, name = "Warlords of Draenor", recipes = { -- Inscription: 9
+        { id = 165304, name = "Research: Midnight Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 165456, name = "Research: Lion's Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 165460, name = "Research: Jadefire Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 165461, name = "Research: Celestial Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 165463, name = "Research: Shimmering Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 165464, name = "Research: Ethereal Ink", source = "unknown", sourceInfo = "Acquisition source requires confirmation" },
+        { id = 165466, name = "Research: Blackfallow Ink", source = "unknown", sourceInfo = "Acquisition source requires confirmation" },
+        { id = 165564, name = "Research: Moonglow Ink", source = "trainer", sourceInfo = "Jo'mah <Inscription Trainer>" },
+        { id = 176513, name = "Draenor Merchant Order", source = "unknown", sourceInfo = "Acquisition source requires confirmation" },
+    } },
+
 })
 
 MC.RegisterContent("wrath", "recipes", {
@@ -533,4 +655,3 @@ MC.RegisterContent("wrath", "recipes", {
         { id = 416690, name = "Wanderer's Guide", source = "vendor", sourceInfo = "Quartermaster Miranda Breechlock <The Argent Crusade>" },
     } },
 })
-

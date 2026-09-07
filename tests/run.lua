@@ -670,8 +670,8 @@ do
     equal(wrathRecipes, 944, "Wrath recipe count")
     equal(cataRecipes, 696, "Cataclysm recipe count")
     equal(mopRecipes, 982, "Pandaria recipe count")
-    equal(wodRecipes, 372, "Warlords recipe count")
-    equal(legionRecipes, 779, "Legion recipe count")
+    equal(wodRecipes, 381, "Warlords recipe count")
+    equal(legionRecipes, 834, "Legion recipe count")
     equal(bfaRecipes, 1258, "BFA recipe count")
     equal(slRecipes, 636, "Shadowlands recipe count")
     equal(dfRecipes, 1004, "Dragonflight recipe count")
@@ -698,7 +698,7 @@ do
         end
     end
     equal(sourcelessRecipes, 0, "every recipe carries a source string")
-    equal(unsourcedRecipes, 9, "recipe acquisition burndown (enrichment lowers this)")
+    equal(unsourcedRecipes, 14, "recipe acquisition burndown (enrichment lowers this)")
 
     -- Generated recipe waypoints. Guards the shape the runtime relies on:
     -- MC.AddWaypoint rejects mapID <= 0, TomTom and C_Map both want 0-1
@@ -1066,7 +1066,7 @@ do
 
     local dataFixtures = {
         mounts = {
-            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 94, cataCount = 48, mopCount = 93, wodCount = 69, legionCount = 125, bfaCount = 140, slCount = 181, dfCount = 187, twwCount = 222,
+            field = "MountData", list = "mounts", id = "mountID", classicCount = 85, tbcCount = 68, wrathCount = 94, cataCount = 48, mopCount = 93, wodCount = 69, legionCount = 125, bfaCount = 140, slCount = 181, dfCount = 192, twwCount = 224,
             files = {
                 "Modules/Mounts/Data/Classic.lua",
                 "Modules/Mounts/Data/TheBurningCrusade.lua",
@@ -1084,7 +1084,7 @@ do
             },
         },
         pets = {
-            field = "PetData", list = "pets", id = "speciesID", classicCount = 204, tbcCount = 70, wrathCount = 81, cataCount = 82, mopCount = 173, wodCount = 117, legionCount = 158, bfaCount = 300, slCount = 237, dfCount = 234, twwCount = 220,
+            field = "PetData", list = "pets", id = "speciesID", classicCount = 204, tbcCount = 70, wrathCount = 81, cataCount = 82, mopCount = 173, wodCount = 117, legionCount = 158, bfaCount = 300, slCount = 237, dfCount = 238, twwCount = 221,
             files = {
                 "Modules/Pets/Data/Classic.lua",
                 "Modules/Pets/Data/TheBurningCrusade.lua",
@@ -1121,7 +1121,7 @@ do
             },
         },
         decorations = {
-            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 137, slCount = 26, dfCount = 76, twwCount = 210,
+            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 23, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 42, wodCount = 80, legionCount = 211, bfaCount = 137, slCount = 26, dfCount = 76, twwCount = 210,
             files = {
                 "Modules/Decorations/Data/Classic.lua",
                 "Modules/Decorations/Data/TheBurningCrusade.lua",
@@ -1888,6 +1888,7 @@ do
             equal(classicDecorationSources.achievement, 1, "Classic achievement decoration count")
             equal(classicDecorationSources.quest, 1, "Classic quest decoration count")
             equal(classicDecorationSources.drop, 1, "Classic drop decoration count")
+            equal(classicDecorationSources.vendor, 1, "Classic vendor decoration count")
             equal(classicCraftedDecorations, 19, "Classic crafted decoration profession count")
             equal(tbcDecorationSources.crafted, 26, "TBC crafted decoration count")
             equal(tbcDecorationSources.achievement, 2, "TBC achievement decoration count")
@@ -1908,7 +1909,7 @@ do
             equal(mopDecorationSources.vendor, 11, "Pandaria vendor decoration count")
             equal(mopDecorationSources.quest, 5, "Pandaria quest decoration count")
             equal(mopDecorationSources.achievement, 2, "Pandaria achievement decoration count")
-            equal(mopDecorationSources.drop, 2, "Pandaria drop decoration count")
+            equal(mopDecorationSources.drop, 3, "Pandaria drop decoration count")
             equal(mopCraftedDecorations, 21, "Pandaria crafted decoration profession count")
             equal(wodDecorationSources.crafted, 21, "Warlords crafted decoration count")
             equal(wodDecorationSources.vendor, 26, "Warlords vendor decoration count")
@@ -2414,14 +2415,18 @@ do
     rareMC.IsGroupVisible = function() return true end
     rareMC.RareData = {
         { achievementID = 10, criteriaCount = 2, source = "coiled_isle",
-          zone = "Test", expansion = "midnight", criteriaNPCIDs = { 1, 2 } },
+          zone = "Test", expansion = "midnight", criteriaNPCIDs = { 1, 2 },
+          criteriaSourceNPCIDs = { [2] = 99 } },
         { source = "navigation", zone = "Test",
           expansion = "midnight", rares = {
               { npcID = 333, name = "Untracked Rare",
                 waypoint = { 1, 0.3, 0.4 } },
           } },
     }
-    rareMC.RareNPCs = { [1] = { 1, 0.1, 0.1 }, [2] = { 1, 0.2, 0.2 } }
+    rareMC.RareNPCs = {
+        [1] = { 1, 0.1, 0.1 }, [2] = { 1, 0.2, 0.2 },
+        [99] = { 1, 0.9, 0.9, "Physical Rare" },
+    }
     loadAddon("addons/Collectionist/Modules/Rares/Scanner.lua", rareMC)
     local rareScanner = rareMC.modulesByKey.rares.Scanner
     equal(rareScanner:Scan(), true, "short rare criteria still commits")
@@ -2430,6 +2435,10 @@ do
     criteriaCount = 2
     equal(rareScanner:Scan(), true, "complete rare criteria scan")
     equal(rareScanner.results._partial, nil, "complete rare scan is not partial")
+    local physicalEncounter = rareScanner.results.bySource.coiled_isle[1]
+    equal(physicalEncounter.npcID, 99, "rare source-NPC override")
+    equal(physicalEncounter.name, "Physical Rare", "rare source-NPC display name")
+    rareMC.RareData[1].criteriaSourceNPCIDs = nil
     rareMC.RareData[1].criteriaNPCIDs = { 1, false }
     rareMC.RareData[1].criteriaObjectIDs = { false, 777 }
     equal(rareScanner:Scan(), true, "mixed rare NPC/object criteria scan")
@@ -2916,13 +2925,13 @@ do
         truthy(MC.TreasureCoords[name], "missing Coiled Isle treasure coordinate: " .. name)
     end
 
-    equal(#entries("decorations") - patch120007Counts.decorations, 145,
+    equal(#entries("decorations") - patch120007Counts.decorations, 181,
         "12.1 decoration count")
     assertIDs("decorations", "decorID", {
         15283, 5130, 21833, 27041, 26484, 27042, 26377, 26203, 21616, 26481,
         21725, 15290, 25121, 25106, 25102, 25103, 25122, 25105, 25101,
         26704, 25765, 26705, 25895, 26940, 26706, 26707, 26877, 27973,
-        25896, 26876, 26703, 27045,
+        25896, 26876, 26703, 27045, 23176, 26378,
     }, "12.1 representative decoration")
 
     local vendorWaypointCounts = {

@@ -2,8 +2,9 @@ local _, MC = ...
 
 -- HAND-MAINTAINED. Edit this file directly.
 --
--- One-time extraction from the Trading Post inventory. Out-of-game
--- origins (Shop, TCG, Recruit-a-Friend) are excluded by standing policy.
+-- One-time extraction from the Trading Post inventory. A confirmed in-game
+-- Trading Post offer is tracked even when the collectible originated in the
+-- Shop, TCG, Recruit-a-Friend, or another promotion.
 --
 -- Frozen from its generator, which has been deleted. The upstream it read is a
 -- one-time research artifact, not a live feed -- re-running it could only
@@ -19,17 +20,19 @@ local _, MC = ...
 -- Expansion is the one whose Trading Post first offered the item, not the
 -- expansion its model or original promotion came from.
 --
--- 8 whose original source was a TCG code, the in-game Shop, Recruit-a-Friend
--- or a promotion are deliberately NOT listed here, pending review.
-
 MC.RegisterContent("df", "mounts", {
     { source = "tradingpost", mounts = {
         { mountID = 125, name = "Riding Turtle", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.7", zone = "Dornogal", itemID = 23720, waypoint = { 2339, 0.4807, 0.5216, "Riding Turtle" } },
+        { mountID = 224, name = "Swift Zhevra", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.0", zone = "Dornogal", itemID = 37719, waypoint = { 2339, 0.4807, 0.5216, "Swift Zhevra" } },
         { mountID = 371, name = "Blazing Hippogryph", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6", zone = "Dornogal", itemID = 54069, waypoint = { 2339, 0.4807, 0.5216, "Blazing Hippogryph" } },
         { mountID = 376, name = "Celestial Steed", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.0.5", itemID = 54811 },
         { mountID = 382, name = "X-53 Touring Rocket", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.5", zone = "Dornogal", itemID = 54860, waypoint = { 2339, 0.4807, 0.5216, "X-53 Touring Rocket" } },
         { mountID = 439, name = "Tyrael's Charger", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", itemID = 76755 },
+        { mountID = 440, name = "Spectral Gryphon", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.0", zone = "Dornogal", itemID = 76889, waypoint = { 2339, 0.4807, 0.5216, "Spectral Gryphon" } },
+        { mountID = 441, name = "Spectral Wind Rider", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.0", zone = "Dornogal", itemID = 76902, waypoint = { 2339, 0.4807, 0.5216, "Spectral Wind Rider" } },
+        { mountID = 454, name = "Cindermane Charger", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.0", zone = "Dornogal", itemID = 118515, waypoint = { 2339, 0.4807, 0.5216, "Cindermane Charger" } },
         { mountID = 646, name = "Coldflame Infernal", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.7", itemID = 137576 },
+        { mountID = 1051, name = "The Dreadwake", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6", zone = "Dornogal", itemID = 160589, waypoint = { 2339, 0.4807, 0.5216, "The Dreadwake" } },
         { mountID = 1266, name = "Alabaster Stormtalon", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", itemID = 207964 },
         { mountID = 1267, name = "Alabaster Thunderwing", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.1.5", itemID = 207963 },
         { mountID = 1468, name = "Amber Skitterfly", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r10.2.6", zone = "Dornogal", itemID = 192766, waypoint = { 2339, 0.4807, 0.5216, "Amber Skitterfly" } },
@@ -55,6 +58,7 @@ MC.RegisterContent("df", "mounts", {
 
 MC.RegisterContent("midnight", "mounts", {
     { source = "tradingpost", mounts = {
+        { mountID = 1947, name = "Hateforged Blazecycle", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.7", zone = "Dornogal", itemID = 211087, waypoint = { 2339, 0.4807, 0.5216, "Hateforged Blazecycle" } },
         { mountID = 2825, name = "Cloudborn Razorwing", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.0", itemID = 260580 },
         { mountID = 2833, name = "Arboreal Pseudoshell", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.1", itemID = 260893 },
         { mountID = 2845, name = "Vicious Snapvine", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r12.0.1", itemID = 262705 },
@@ -72,9 +76,11 @@ MC.RegisterContent("midnight", "mounts", {
 
 MC.RegisterContent("tww", "mounts", {
     { source = "tradingpost", mounts = {
+        { mountID = 593, name = "Warforged Nightmare", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.7", zone = "Dornogal", itemID = 112326, waypoint = { 2339, 0.4807, 0.5216, "Warforged Nightmare" } },
         { mountID = 1550, name = "Depthstalker", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.2", zone = "Dornogal", itemID = 187674, waypoint = { 2339, 0.4816, 0.5199, "Depthstalker" } },
         { mountID = 1824, name = "Brown-Furred Spiky Bakar", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.1.5", itemID = 210141 },
         { mountID = 1945, name = "Jeweled Sapphire Scarab", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.2.5", itemID = 211085 },
+        { mountID = 1957, name = "Soaring Sky Fox", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.2.5", zone = "Dornogal", itemID = 212228, waypoint = { 2339, 0.4807, 0.5216, "Soaring Sky Fox" } },
         { mountID = 1958, name = "Twilight Sky Prowler", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.5", zone = "Dornogal", itemID = 212229, waypoint = { 2339, 0.4807, 0.5216, "Twilight Sky Prowler" } },
         { mountID = 2036, name = "Brilliant Sunburst Peafowl", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.7", itemID = 212631 },
         { mountID = 2198, name = "Kor'kron Warsaber", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.0.0", zone = "Dornogal", itemID = 223449, waypoint = { 2339, 0.4807, 0.5216, "Kor'kron Warsaber" } },
@@ -110,4 +116,3 @@ MC.RegisterContent("tww", "mounts", {
         { mountID = 2823, name = "Savage Crimson Battle Turtle", source = "tradingpost", sourceInfo = "|cFFFFD200Trading Post|r|n|cFFFFD200First offered: |r11.2.7", itemID = 260409 },
     } },
 })
-

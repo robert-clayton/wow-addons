@@ -52,5 +52,6 @@ MC.RegisterContent("mop", "decorations", {
     { source = "drop", decorations = {
         { decorID = 2512, itemID = 246846, name = "Tome of Pandaren Wisdom", source = "drop", sourceInfo = "1 Tome of Pandaren Wisdom Accents › Ornamental Encounter: Sha of Doubt (Temple of the Jade Serpent)", zone = "The Jade Forest", waypoint = { 371, 0.5600, 0.5780, "Tome of Pandaren Wisdom" } },
         { decorID = 5111, itemID = 248934, name = "Golden Cloud Serpent Treasure Chest", source = "drop", sourceInfo = "3 Golden Cloud Serpent Treasure Chest Furnishings › Storage Treasure: Golden Cloud Serpent Treasure Chest (Jade Forest) Second Chair Pawdo (Dornogal)", zone = "Stormwind City", npcID = 252312, waypoint = { 84, 0.5610, 0.7710, "Golden Cloud Serpent Treasure Chest" } },
+        { decorID = 9263, itemID = 253242, name = "Horde Warlord's Throne", source = "drop", sourceInfo = "Garrosh Hellscream, Siege of Orgrimmar", zone = "Siege of Orgrimmar", waypoint = { 390, 0.7230, 0.4430, "Horde Warlord's Throne" } },
     } },
 })

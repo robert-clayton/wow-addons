@@ -330,15 +330,26 @@ def main():
 
         trees = entry.get("criteriaTreeIDs") or []
         npcs = entry.get("criteriaNPCIDs") or []
+        source_npcs = entry.get("criteriaSourceNPCIDs") or []
         objs = entry.get("criteriaObjectIDs") or []
         names = entry.get("criteriaNames") or []
-        for i in range(max(len(trees), len(npcs), len(objs), len(names))):
+
+        def positional_length(arr):
+            if isinstance(arr, dict):
+                return max((int(k) for k in arr), default=0)
+            return len(arr)
+
+        for i in range(max(positional_length(a) for a in
+                           (trees, npcs, source_npcs, objs, names))):
             def at(arr, want=int):
-                v = arr[i] if i < len(arr) else None
+                if isinstance(arr, dict):
+                    v = arr.get(str(i + 1))
+                else:
+                    v = arr[i] if i < len(arr) else None
                 return v if isinstance(v, want) else None
-            con.execute("INSERT INTO criterion (collectible_id, ord, tree_id, npc_id, object_id, label)"
-                        " VALUES (?,?,?,?,?,?)",
-                        (cid, i, at(trees), at(npcs), at(objs), at(names, str)))
+            con.execute("INSERT INTO criterion (collectible_id, ord, tree_id, npc_id, source_npc_id, object_id, label)"
+                        " VALUES (?,?,?,?,?,?,?)",
+                        (cid, i, at(trees), at(npcs), at(source_npcs), at(objs), at(names, str)))
 
         tl = entry.get("taskList") or {}
         if tl.get("intro"):

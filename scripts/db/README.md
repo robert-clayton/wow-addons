@@ -100,7 +100,7 @@ sat on the group or the entry is not observable to the addon; the value the
 scanner ends up with is. Present-and-false is treated as equal to absent for
 `unavailable` and `navigationOnly`, which behave identically at runtime.
 
-Current state: **21,948 collectibles, 97 locations, 3,248 recipe pins and 2,921
+Current state: **18,910 registered rows, 97 locations, 3,247 recipe pins and 2,921
 trainer entries round trip identically.**
 
 ## What the schema refuses to store
@@ -131,9 +131,10 @@ shrinks.
 
 ## Upstream reconciliation
 
-`ingest-upstream.py` loads 48,335 upstream records — 34,289 DB2 rows from 66
-per-expansion inventories, and 14,046 ATT recipe-acquisition rows — each with
-the file path, its SHA-256, and its row count recorded in `source_snapshot`.
+`ingest-upstream.py` loads 60,765 upstream records — 38,979 DB2 rows from 68
+per-expansion inventories, 14,046 ATT recipe-acquisition rows and 7,740
+normalized HandyNotes rows — each with the file path, its SHA-256, and its row
+count recorded in `source_snapshot`.
 That does not pin the ATT *repository* (the checkout that resolved 8,975 recipe
 sources lived in `%TEMP%` and is gone), but it makes "which bytes produced this
 row" answerable and turns a silent upstream change into a hash change.
@@ -147,11 +148,11 @@ Four views replace what used to be a bespoke script per audit:
 
 | View | Count | What it means |
 |---|---|---|
-| `upstream_missing_from_catalog` | 15,258 | A work queue, not a defect list — most are `internal_dnt`, `snapshot_candidate` or store-only, excluded by policy. Filter on `statuses`. |
-| `catalog_missing_from_upstream` | 467 | The catalog ships an id no inventory contains. 225 are Midnight, which has no inventory. |
-| `upstream_name_mismatch` | 10 | All ten verified as the *snapshot* being stale, not the catalog. |
-| `upstream_expansion_mismatch` | 687 | 601 are Midnight decorations datamined during DF; correct as shipped. |
-| `handynotes_navigation_queue` | 6,341 | Map nodes HandyNotes describes that the catalog does not track, ranked by publisher corroboration. |
+| `upstream_missing_from_catalog` | 24,941 | A work queue, not a defect list — most are filtered candidates, exclusions or navigation providers. |
+| `catalog_missing_from_upstream` | 44 | The newly added Patch 12.1 recipe spells are newer than the checked-in DB2 inventories. |
+| `upstream_name_mismatch` | 8 | All eight are older snapshot names for identities whose current catalog name changed. |
+| `upstream_expansion_mismatch` | 956 | Acquisition expansion and the expansion of the first datamined item record disagree. |
+| `handynotes_navigation_queue` | 7,396 | Map nodes HandyNotes describes that the catalog does not track, ranked by publisher corroboration. |
 
 `upstream_name_mismatch` and `upstream_expansion_mismatch` are **DB2-only by
 construction**. HandyNotes' "name" is a map-pin label written by the publisher,
@@ -159,20 +160,14 @@ not a canonical string; including it turned a 10-row list into 509 rows of
 noise.
 
 **Grouped by identity, not by row.** The per-expansion inventories overlap by
-design — 14,048 distinct recipe ids appear across 23,337 rows — so comparing
-each listing separately reported 4,221 expansion mismatches where the real
-figure is 687.
+design, so the reconciliation views group by natural identity before counting.
 
 ### Direction is not obvious, and the views do not assert one
 
-All 32 name differences were checked by hand. Twenty-two were genuinely
-different strings, and in **every** case the upstream snapshot was the wrong
-side: Blizzard renamed the MoP yaks for the Remix event, "The Pigskin" became
-"The Swineskin", and five decoration rows carry a literal `[DNT] [AUTOGEN]`
-datamine placeholder upstream against a real name in the catalog. Only the ten
-punctuation differences ran the other way — the catalog had substituted `'` for
-`"` and dropped apostrophes, presumably to avoid Lua escaping — and those are
-now fixed.
+The remaining eight name differences were checked by hand. Each comes from an
+older DB2 snapshot: reused pet species IDs, "The Pigskin" becoming "The
+Swineskin", or a decoration renamed after its initial datamine. The current
+catalog carries the newer player-facing name.
 
 Treat a non-empty view as a question, not an answer.
 
@@ -229,8 +224,8 @@ present and ingests the committed CSV regardless.
 
 ### The queue
 
-**1,680 untracked nodes are corroborated by two or more independent
-publishers** (106 rares, 1,574 treasures); 4,661 more rest on a single
+**1,991 untracked nodes are corroborated by two or more independent
+publishers** (172 rares, 1,819 treasures); 5,405 more rest on a single
 publisher. Sort by `publishers` and the defensible candidates come first.
 
 These are navigation candidates, not collectibles: per existing policy they

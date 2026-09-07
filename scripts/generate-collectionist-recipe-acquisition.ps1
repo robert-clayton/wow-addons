@@ -96,7 +96,28 @@ try {
     $recipeItem = @{}
     foreach ($file in (Get-ChildItem -LiteralPath (Join-Path $AttRoot ".contrib/Parser/DATAS/00 - Profession DB") -Filter *.lua)) {
         $current = $null
+        $beforeDepth = 0
         foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
+            # ATT keeps historical alternatives in BEFORE branches. Collectionist
+            # targets the current retail client, so those branches must not
+            # overwrite the live classification from an AFTER branch.
+            if ($line -match '^\s*--\s*#if\s+BEFORE\b') {
+                $beforeDepth++
+                continue
+            }
+            if ($beforeDepth -gt 0) {
+                if ($line -match '^\s*--\s*#if\b') { $beforeDepth++ }
+                elseif ($line -match '^\s*--\s*#endif\b') { $beforeDepth-- }
+                continue
+            }
+
+            # Acquisition headings apply only to their patch block. Resetting
+            # here prevents a trailing NYI section from leaking into later
+            # patches that do not start with another acquisition heading.
+            if ($line -match '^\s*--\s+PATCH\s+') {
+                $current = $null
+                continue
+            }
             # "--- TRAINER ---". Separator rules ("-----------") match the same
             # shape, so require at least one letter.
             if ($line -match '^---\s*(.+?)\s*---\s*$') {

@@ -112,10 +112,10 @@ def collect(con):
         wp.setdefault(cid, {}).setdefault((role, faction), []).append((lk, m, x, y, lb))
 
     crit = {}
-    for cid, ord_, tree, npc, obj, label in con.execute(
-            "SELECT collectible_id, ord, tree_id, npc_id, object_id, label"
+    for cid, ord_, tree, npc, source_npc, obj, label in con.execute(
+            "SELECT collectible_id, ord, tree_id, npc_id, source_npc_id, object_id, label"
             " FROM criterion ORDER BY collectible_id, ord"):
-        crit.setdefault(cid, []).append((tree, npc, obj, label))
+        crit.setdefault(cid, []).append((tree, npc, source_npc, obj, label))
 
     tasks = {}
     tcols = [c[0] for c in con.execute("SELECT * FROM task LIMIT 0").description]
@@ -184,11 +184,16 @@ def entry_lua(r, wp, crit, tasks, costs, indent="        "):
         # (37 declared against 35 present). Emitting len() makes that class of
         # desync unrepresentable.
         parts.append("criteriaCount = %d" % len(cl))
-        for idx, field in ((0, "criteriaTreeIDs"), (1, "criteriaNPCIDs"), (2, "criteriaObjectIDs")):
+        for idx, field in ((0, "criteriaTreeIDs"), (1, "criteriaNPCIDs"), (3, "criteriaObjectIDs")):
             vals = [c[idx] for c in cl]
             if any(v is not None for v in vals):
                 parts.append("%s = { %s }" % (field, ", ".join(str(v or 0) for v in vals)))
-        names = [c[3] for c in cl]
+        source_npcs = [c[2] for c in cl]
+        if any(v is not None for v in source_npcs):
+            pairs = ["[%d] = %d" % (i + 1, v)
+                     for i, v in enumerate(source_npcs) if v is not None]
+            parts.append("criteriaSourceNPCIDs = { %s }" % ", ".join(pairs))
+        names = [c[4] for c in cl]
         # `is not None`, not truthiness: six achievements ship an array of empty
         # placeholder strings, and "present but blank" is a different fact from
         # "absent" -- the array's length is what pairs it with the ID arrays.

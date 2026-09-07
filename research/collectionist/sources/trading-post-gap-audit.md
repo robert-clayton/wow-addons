@@ -1,5 +1,9 @@
 # Trading Post collectible gap audit
 
+Release 1.15.0 resolves the final 17 `confirmed_policy_gap` rows (8 mounts and
+9 pets). The CSV remains the historical input and decision record for the
+audit.
+
 ATT's curated Trading Post catalog is compared with current retail DB2 and every Collectionist runtime data file. The first ATT availability patch assigns each item to the expansion in which it first became obtainable from the Trading Post, regardless of its older promotional or shop origin.
 
 ## Result
