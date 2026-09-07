@@ -2,6 +2,14 @@ local _, MC = ...
 
 -- BFA-acquisition housing decor. Ownership follows the awarding content, not the housing row build.
 MC.RegisterContent("bfa", "decorations", {
+    -- Plugger's vendor is in the Dark Iron allied-race version of Blackrock
+    -- Depths, reached with the racial Mole Machine, not the Classic dungeon.
+    { source = "vendor", decorations = {
+        { decorID = 1120, itemID = 245291, name = "Replica Dark Iron Mole Machine", source = "vendor",
+          sourceInfo = "Plugger Spazzring - 2500 gold (Dark Iron dwarf required; Mole Machine to Shadowforge City)",
+          zone = "Blackrock Depths", faction = "Alliance", npcID = 144129,
+          waypoint = { 1186, 0.499, 0.325, "Plugger Spazzring" }, cost = { gold = 25000000 } },
+    } },
     { source = "crafted", decorations = {
         { decorID = 755, itemID = 245484, name = "Boralus-Style Lobster Platter", source = "crafted", sourceInfo = "Cooking Battle for Azeroth Cooking (140)", skillLine = MC.PROFESSION.Cooking },
         { decorID = 1161, itemID = 245496, name = "Small Mask of Bwonsamdi, Loa of Graves", source = "crafted", sourceInfo = "Jewelcrafting Battle for Azeroth Jewelcrafting (140)", skillLine = MC.PROFESSION.Jewelcrafting },

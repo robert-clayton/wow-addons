@@ -79,10 +79,35 @@ end
 -- worse than the extra precision.
 local MAX_SPAWNS = 4
 
+-- Stop at this node's closing table or its children. A fixed look-ahead can
+-- otherwise steal coords/awp from the next sibling when this node has none.
+local function ownFieldsAt(src, pos)
+    local start = src:find("{", pos, true)
+    local close = src:find(")", pos, true)
+    if not start or (close and close < start) then return "" end
+    local depth, quote, escaped = 0, nil, false
+    for i = start, #src do
+        local c = src:sub(i, i)
+        if quote then
+            if escaped then escaped = false
+            elseif c == "\\" then escaped = true
+            elseif c == quote then quote = nil end
+        elseif c == '"' or c == "'" then
+            quote = c
+        elseif depth == 1 and c == "g" and src:match("^g%s*=%s*{", i) then
+            return src:sub(start, i - 1)
+        elseif c == "{" then
+            depth = depth + 1
+        elseif c == "}" then
+            depth = depth - 1
+            if depth == 0 then return src:sub(start, i) end
+        end
+    end
+    return ""
+end
+
 local function coordsAt(src, pos)
-    local window = src:sub(pos, pos + 1200)
-    local g = window:find("g%s*=%s*{")
-    if g then window = window:sub(1, g) end
+    local window = ownFieldsAt(src, pos)
     local body = window:match("coords%s*=%s*(%b{})")
     if not body then return nil, nil end
 
@@ -111,9 +136,7 @@ end
 -- awp began with the 2.0 convention and pre-TBC content inherits whatever
 -- later patch last touched its zone.
 local function awpAt(src, pos)
-    local window = src:sub(pos, pos + 400)
-    local g = window:find("g%s*=%s*{")
-    if g then window = window:sub(1, g) end
+    local window = ownFieldsAt(src, pos)
     return window:match("awp%s*=%s*(%d+)")
 end
 

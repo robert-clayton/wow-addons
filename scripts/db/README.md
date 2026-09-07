@@ -10,6 +10,12 @@ bash scripts/db/run.sh        # load, validate, and prove the round trip
 Exits non-zero on any constraint violation or round-trip difference, so it
 works as a gate.
 
+Missing names and waypoints on unavailable collectibles are informational
+counts: the live journal can fill names, and historical locations remain
+visible when the player chooses to show unavailable entries. All other
+integrity views and rejected rows fail validation. Plain-text acquisition
+guides (`steps`) and ID-based criterion waypoints are included in the proof.
+
 `data/collectionist.db` is a build artifact and is not committed. Committing a
 binary that nothing can diff, review, blame or merge would make it look
 authoritative when it is derived.

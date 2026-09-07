@@ -149,6 +149,7 @@ function MC.ToggleTargetPin(item, skillLine)
                 prefix, MAX_PINS, evicted.name or "?"))
         end
     end
+    local waypoint = MC.GetEntryWaypoint and MC.GetEntryWaypoint(item) or item.waypoint
     db.pins[#db.pins + 1] = {
         key     = key,
         module  = item.moduleKey or MC.activeModule,
@@ -156,7 +157,7 @@ function MC.ToggleTargetPin(item, skillLine)
         icon    = item.icon,
         addedAt = time(),
         zone    = item.zone,
-        wp      = item.waypoint and CopyTable(item.waypoint) or nil,
+        wp      = waypoint and CopyTable(waypoint) or nil,
         owp     = item.overworldWaypoint and CopyTable(item.overworldWaypoint) or nil,
         -- Recipes: keeps DoItemAction's open-profession fallback alive
         -- for overlay clicks before the first scan of a session.

@@ -1,5 +1,35 @@
 local _, MC = ...
 
+-- Raw search entries and scanned rows share the same supplemental pin data.
+-- Resolve on use: trainer locations depend on the player's faction.
+function MC.GetEntryWaypoint(entry)
+    if entry.waypoint then return entry.waypoint end
+    if entry.mountID then return MC.MountPins and MC.MountPins[entry.mountID] end
+    if entry.speciesID then return MC.PetPins and MC.PetPins[entry.speciesID] end
+    if entry.id then
+        return (MC.RecipeWaypoints and MC.RecipeWaypoints[entry.id])
+            or (MC.RecipeTrainerWaypoint and MC.RecipeTrainerWaypoint(entry.id))
+    end
+    if entry.itemID then return MC.ToyPins and MC.ToyPins[entry.itemID] end
+end
+
+-- The achievement asset namespace depends on the criterion type. A quest
+-- flag is never an NPC or gameobject ID, even when all three are integers.
+function MC.GetCriterionAssetIDs(criteriaType, assetID)
+    if type(assetID) ~= "number" or assetID <= 0 then return nil end
+    if criteriaType == 0 then return assetID end -- KillCreature
+    if criteriaType == 68 then return nil, assetID end -- UseGameObject
+    if criteriaType == 27 then return nil, nil, assetID end -- CompleteQuest
+end
+
+function MC.GetCriterionWaypoint(npcID, objectID, questID)
+    local pins = MC.CriteriaWaypoints
+    if not pins then return nil end
+    return (npcID and pins.npc[npcID])
+        or (objectID and pins.object[objectID])
+        or (questID and pins.quest[questID])
+end
+
 -- Time-gated content stays visible for planning, but scanners exclude it
 -- from obtainable totals and Collection Score until the regional unlock.
 -- Region IDs follow GetCurrentRegion: US/OCE 1, KR 2, EU 3, TW 4, CN 5.

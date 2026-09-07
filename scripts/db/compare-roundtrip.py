@@ -145,7 +145,10 @@ def main():
     report, bad = [], False
     for kind, label in (("collectible", "collectibles"), ("location", "locations"),
                         ("recipe_waypoint", "recipe waypoints"),
-                        ("recipe_trainer", "recipe trainers")):
+                        ("recipe_trainer", "recipe trainers"),
+                        ("criterion_npc", "criterion NPCs"),
+                        ("criterion_object", "criterion objects"),
+                        ("criterion_quest", "criterion quests")):
         a, b = index(shipped, kind), index(emitted, kind)
         header = "%-18s shipped %6d   emitted %6d" % (label, len(a), len(b))
         sub = []

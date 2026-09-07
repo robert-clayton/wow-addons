@@ -57,7 +57,7 @@ function Scanner:Scan()
         for i = 1, n do
             -- pcall: the API hard-errors on criteria the client hasn't
             -- streamed in, even after the count preflight passed.
-            local ok, name, _, completed, _, _, _, _, assetID =
+            local ok, name, criteriaType, completed, _, _, _, _, assetID =
                 pcall(GetAchievementCriteriaInfo, ach.achievementID, i)
             if not ok or name == nil or completed == nil then
                 pending = pending + 1
@@ -78,8 +78,15 @@ function Scanner:Scan()
                 MC.AccumulateScanEntry(result, completed, w, exp, nil, available)
 
                 if visible then
-                    local coords = MC.TreasureCoords and MC.TreasureCoords[metadataName]
+                    local npcID, objectID, questID = MC.GetCriterionAssetIDs(criteriaType, assetID)
+                    local coords = (MC.TreasureCoords and MC.TreasureCoords[metadataName])
+                        or MC.GetCriterionWaypoint(npcID, objectID, questID)
                     local taskList = MC.TreasureSteps and MC.TreasureSteps[metadataName]
+                    local zone = ach.zone
+                    if coords and MC.DeriveZone then
+                        local mapZone, spread = MC.DeriveZone({waypoint = coords})
+                        if mapZone and not spread then zone = mapZone end
+                    end
                     local entry = {
                         moduleKey     = "treasures",
                         -- The shipped criterion name, when the positional
@@ -90,14 +97,14 @@ function Scanner:Scan()
                         -- the name we already ship was used only to look up
                         -- their coordinates.
                         name          = metadataName or name,
-                        -- Treasure achievements carry GAMEOBJECT IDs in assetID;
-                        -- store as objectID so Wowhead links resolve to /object=.
-                        objectID      = (assetID and assetID > 0) and assetID or nil,
+                        npcID         = npcID,
+                        objectID      = objectID,
+                        questID       = questID,
                         source        = ach.source,
-                        sourceInfo    = "Treasure in " .. ach.zone,
+                        sourceInfo    = "Treasure in " .. zone,
                         achievementID = ach.achievementID,
                         criteriaIndex = i,
-                        zone          = ach.zone,
+                        zone          = zone,
                         waypoint      = coords,
                         -- Plain text note suppressed when the richer taskList is
                         -- present so the tooltip doesn't render the same info twice.

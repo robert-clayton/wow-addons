@@ -36,6 +36,7 @@ ENTRY_FIELDS = [
     ("pet_type", "petType"), ("skill_line", "skillLine"), ("priority", "priority"),
     ("zone", "zone"), ("zone_map_id", "zoneMapID"), ("description", "description"),
     ("category", "category"), ("score", "score"), ("faction", "faction"),
+    ("steps", "steps"),
 ]
 
 GROUP_FIELDS = [
@@ -321,7 +322,16 @@ def emit(con):
             fh.write("\n".join(body) + "\n")
         files += 1
 
-    return files
+    body = ["local _, MC = ...", "MC.CriteriaWaypoints = { npc = {}, object = {}, quest = {} }"]
+    pins = {}
+    for kind, asset, ordinal, m, x, y, label in con.execute(
+            "SELECT * FROM criterion_waypoint ORDER BY kind, asset_id, ord"):
+        pins.setdefault((kind, asset), []).append((None, m, x, y, label))
+    for (kind, asset), rows in sorted(pins.items()):
+        body.append("MC.CriteriaWaypoints.%s[%d] = %s" % (kind, asset, emit_waypoint(rows)))
+    with open(os.path.join(OUT_DIR, "CriteriaWaypoints.lua"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(body) + "\n")
+    return files + 1
 
 
 def main():

@@ -100,9 +100,12 @@ local function listFiles(dir)
     local out = {}
     -- io.popen is available under LuaJIT on Windows; `dir /b` avoids needing a
     -- filesystem library just to enumerate a build directory.
-    local pipe = io.popen('dir /b "' .. dir:gsub("/", "\\") .. '\\*.lua" 2>nul')
+    local windows = package.config:sub(1, 1) == "\\"
+    local command = windows and ('dir /b "' .. dir:gsub("/", "\\") .. '\\*.lua" 2>nul')
+        or ('ls -1 "' .. dir .. '"/*.lua 2>/dev/null')
+    local pipe = io.popen(command)
     if pipe then
-        for line in pipe:lines() do out[#out + 1] = line end
+        for line in pipe:lines() do out[#out + 1] = line:match("[^/]+$") end
         pipe:close()
     end
     if #out == 0 then
@@ -158,6 +161,9 @@ local function dumpLookup(tbl, kind)
 end
 local wpN = dumpLookup(MC.RecipeWaypoints, "recipe_waypoint")
 local trN = dumpLookup(MC.RecipeTrainers, "recipe_trainer")
+for _, kind in ipairs({ "npc", "object", "quest" }) do
+    dumpLookup(MC.CriteriaWaypoints and MC.CriteriaWaypoints[kind], "criterion_" .. kind)
+end
 
 local LIST_KEY = {
     mounts = "mounts", pets = "pets", toys = "toys", decorations = "decorations",

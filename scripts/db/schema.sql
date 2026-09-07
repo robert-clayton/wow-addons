@@ -145,6 +145,7 @@ CREATE TABLE collectible (
     zone            TEXT,
     zone_map_id     INTEGER,
     description     TEXT,
+    steps           TEXT,                  -- plain-text acquisition guide
     category        TEXT,                  -- achievements
     score           INTEGER,               -- per-item weight override
 
@@ -216,6 +217,18 @@ CREATE TABLE location (
     y           REAL NOT NULL CHECK (y > 0 AND y <= 1),
     label       TEXT NOT NULL CHECK (label <> ''),
     PRIMARY KEY (key, ord)
+);
+
+-- ID namespaces are separate: quest 31284 is not object 31284.
+CREATE TABLE criterion_waypoint (
+    kind      TEXT NOT NULL CHECK (kind IN ('npc', 'object', 'quest')),
+    asset_id  INTEGER NOT NULL CHECK (asset_id > 0),
+    ord       INTEGER NOT NULL CHECK (ord >= 0),
+    map_id    INTEGER NOT NULL CHECK (map_id > 0),
+    x         REAL NOT NULL CHECK (x > 0 AND x < 1),
+    y         REAL NOT NULL CHECK (y > 0 AND y < 1),
+    label     TEXT NOT NULL,
+    PRIMARY KEY (kind, asset_id, ord)
 );
 
 -- ---------------------------------------------------------------- waypoints
@@ -322,7 +335,8 @@ LEFT JOIN expansion e ON e.key = c.expansion
 WHERE e.key IS NULL
 GROUP BY c.module, c.expansion;
 
--- A pin on something that cannot be obtained is a bug, not a shortcut.
+-- Informational: historical locations remain useful when a player chooses
+-- to show unavailable collectibles. They must survive the round trip.
 CREATE VIEW waypoint_on_unavailable AS
 SELECT c.id, c.module, c.name
 FROM collectible c JOIN waypoint w ON w.collectible_id = c.id

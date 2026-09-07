@@ -246,6 +246,8 @@ MC.RegisterContent("midnight", "decorations", {
     {
         source = "renown",
         decorations = {
+            { decorID = 1198, itemID = 245290, name = "Long Silvermoon Table", source = "renown", sourceInfo = "Caeris Fairdawn - 250 Voidlight Marl",
+              waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods", cost = { currency = { MC.CURRENCY.VoidlightMarl, 250 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 7, factionName = "Silvermoon Court" } },
             { decorID = 14985, name = "Gilded Sky-Blue Drapery", source = "renown", sourceInfo = "Caeris Fairdawn - 750 Voidlight Marl",
               waypoint = LOC.CaerisFairdawn, zone = "Eversong Woods", cost = { currency = { MC.CURRENCY.VoidlightMarl, 750 } }, renown = { factionID = MC.FACTION.SilvermoonCourt, level = 3, factionName = "Silvermoon Court" } },
             { decorID = 14971, name = "Crimson Silvermoon Runner", source = "renown", sourceInfo = "Caeris Fairdawn - 750 Voidlight Marl",

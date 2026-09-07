@@ -1,3 +1,19 @@
+# 1.14.0
+
+### Added
+- Map pins for more than 1,900 older rare and treasure achievement criteria, from Outland through Dragonflight.
+- Long Silvermoon Table and Replica Dark Iron Mole Machine, with item IDs, vendors, costs, and unlock information.
+
+### Fixed
+- Search and item tooltips correctly report mount ownership. Mount and toy search results use the correct icons.
+- Search results and newly pinned Targets use the same recipe, trainer, mount, pet, and toy locations as their tracker tabs.
+- Treasure links distinguish completion quests from game objects. Rares keep the correct ID type when achievement criteria change.
+- Clicking a collectible with multiple spawns keeps every location in your current zone, including all three J'imothy bushes.
+- A rejected TomTom marker no longer causes a Lua error on multi-location or prerequisite clicks, and success messages count only markers actually placed.
+- Corrected 31 missing or incorrect pet families, primarily Trading Post pets.
+- Moved "I'm In Your Base, Killing Your Dudes" to Krasarang Wilds.
+- Content validation preserves pet how-to guides and now fails when it rejects data instead of silently dropping it.
+
 # 1.13.2
 
 ### Added

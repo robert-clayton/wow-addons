@@ -7,6 +7,22 @@ local _, MC = ...
 -- Newest first. WhatsNew.lua shows every entry newer than the version
 -- the player last logged in on.
 MC.CHANGELOG = {
+    { version = "1.14.0", sections = {
+        { heading = "Added", lines = {
+            "Map pins for more than 1,900 older rare and treasure achievement criteria, from Outland through Dragonflight.",
+            "Long Silvermoon Table and Replica Dark Iron Mole Machine, with item IDs, vendors, costs, and unlock information.",
+        } },
+        { heading = "Fixed", lines = {
+            "Search and item tooltips correctly report mount ownership. Mount and toy search results use the correct icons.",
+            "Search results and newly pinned Targets use the same recipe, trainer, mount, pet, and toy locations as their tracker tabs.",
+            "Treasure links distinguish completion quests from game objects. Rares keep the correct ID type when achievement criteria change.",
+            "Clicking a collectible with multiple spawns keeps every location in your current zone, including all three J'imothy bushes.",
+            "A rejected TomTom marker no longer causes a Lua error on multi-location or prerequisite clicks, and success messages count only markers actually placed.",
+            "Corrected 31 missing or incorrect pet families, primarily Trading Post pets.",
+            "Moved \"I'm In Your Base, Killing Your Dudes\" to Krasarang Wilds.",
+            "Content validation preserves pet how-to guides and now fails when it rejects data instead of silently dropping it.",
+        } },
+    } },
     { version = "1.13.2", sections = {
         { heading = "Added", lines = {
             "|cffffd200How-to guides for 100 more pets.|r Every secret, puzzle and multi-step unlock in the Pets tab now spells out what to actually do, across all twelve expansions. Hover Baa'l, Uuna, Terky, Jenafur or Mr. Pinchy's crawdad box to see the steps, coordinates and gotchas.",
@@ -61,34 +77,6 @@ MC.CHANGELOG = {
             "Ten pets show their real battle family.",
             "The Ever Painting checklist and three relic tasks in the Arcantina and Zul'Aman tick the correct criteria.",
             "The Ritual Sites gate tracks the actual \"Ritual Site Disruptor\" achievement.",
-        } },
-    } },
-    { version = "1.12.0", sections = {
-        { heading = "Added", lines = {
-            "Expansion filter in the title bar: Current, All Expansions, or pin one expansion. Also /mc filter all|current|<expansion>. The Collection Inspector rescopes peer columns to match.",
-            "|cffffd200Collection Score|r, in the title bar and /mc score. Each collectible has a difficulty tier (1 / 5 / 10 / 25 / 50 / 100) and your score is the sum of what you own.",
-            "A |cffffd200Legacies|r count next to the score: collected items that can't be obtained anymore.",
-            "|cffffd200UI themes|r: Modern (slate and bronze, the new default) and Simple (the old warm-gold look). Applies account-wide.",
-            "Everything from |cffffd200Revelations (12.0.7)|r: Void Showdowns in Val and Naigtal, their rares and achievements, Showdown vendors, Rotmire, Dragonflight Timewalking, Midsummer, Lorewalking, Arcantina, and the opening Curse of Ula'tek story.",
-            "Everything from |cffffd200Curse of Ula'tek (12.1)|r: the Coiled Isle, Vaults of Atal'Utek, Curse Surges, Zul'jarra's Forces, Captain Tokka's Crew, Season 2 Prey, three new Delves, Altar of Fangs, and the Venomous Abyss.",
-            "Coiled Isle rare and treasure trackers, with waypoints and puzzle steps.",
-            "New 12.1 housing decor, Community Coupon rewards, pet beds, mounts, pets, toys, and achievements. Season 2 rewards show their regional unlock date.",
-        } },
-        { heading = "Changed", lines = {
-            "Achievements get their own row in the Collection Inspector.",
-            "Learned recipes count account-wide now. Your alts share recipe progress.",
-            "Item-priced collectibles show the item icon, how many you're carrying, and whether you can afford it.",
-            "Targets client 12.1.0.",
-            "The panel is wider to fit the new title-bar indicators.",
-            "Collection sharing asks for consent on first run.",
-            "Disabled tabs stay hidden but still feed your score and shared progress.",
-            "Future rewards stay visible for planning.",
-        } },
-        { heading = "Fixed", lines = {
-            "A Blizzard hotfix to an achievement can no longer blank a tab. Rows the game can't answer yet are skipped and retried for a couple of minutes.",
-            "If Blizzard adds rares or treasures to an existing achievement, they just show up without needing for the addon to be updated.",
-            "If an achievement's criteria get reordered, waypoints and puzzle steps fall back to safe lookups rather than pointing at the wrong spot.",
-            "Corrected bad collectible records, achievement reward text, rare criterion order, 12.1 vendors, and vendor waypoints.",
         } },
     } },
 }

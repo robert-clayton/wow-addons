@@ -65,7 +65,7 @@ function Scanner:Scan()
             -- future achievement uses kill-creature criteria (type 0).
             -- pcall: the API hard-errors on criteria the client hasn't
             -- streamed in, even after the count preflight passed.
-            local ok, name, _, completed, _, _, _, _, assetID =
+            local ok, name, criteriaType, completed, _, _, _, _, assetID =
                 pcall(GetAchievementCriteriaInfo, ach.achievementID, i)
             if not ok or name == nil or completed == nil then
                 pending = pending + 1
@@ -82,8 +82,9 @@ function Scanner:Scan()
                     and ach.criteriaNPCIDs and ach.criteriaNPCIDs[i] or nil
                 local objectID = hasPositionalEntityMap
                     and ach.criteriaObjectIDs and ach.criteriaObjectIDs[i] or nil
+                local assetNPC, assetObject, questID = MC.GetCriterionAssetIDs(criteriaType, assetID)
                 if not hasPositionalEntityMap then
-                    npcID = (assetID and assetID > 0) and assetID or nil
+                    npcID, objectID = assetNPC, assetObject
                 end
                 -- Per-rare stable NPC-ID override wins over
                 -- the achievement-level source default. Used to bump
@@ -97,6 +98,7 @@ function Scanner:Scan()
                 if visible then
                     local coords = (npcID and MC.RareNPCs and MC.RareNPCs[npcID])
                                 or (name and MC.RareCoords and MC.RareCoords[name])
+                                or MC.GetCriterionWaypoint(npcID, objectID, questID)
                     -- Blizzard's criterion text is not always the rare's name.
                     -- Achievement 62883 has three criteria all described as
                     -- "Slaipaan" -- two were hotfixed in with the description
@@ -105,17 +107,25 @@ function Scanner:Scan()
                     -- shipped waypoint carries the real name for that npcID,
                     -- and the positional map is only trusted when the live
                     -- criterion count matches the shipped one.
-                    local shipped = coords and coords[4]
+                    local namedCoords = npcID and MC.RareNPCs and MC.RareNPCs[npcID]
+                    local first = namedCoords and (type(namedCoords[1]) == "table" and namedCoords[1] or namedCoords)
+                    local shipped = first and first[4]
+                    local zone = ach.zone
+                    if coords and MC.DeriveZone then
+                        local mapZone, spread = MC.DeriveZone({waypoint = coords})
+                        if mapZone and not spread then zone = mapZone end
+                    end
                     local entry = {
                         moduleKey     = "rares",
                         name          = (hasPositionalEntityMap and shipped) or name,
                         npcID         = npcID,
                         objectID      = objectID,
+                        questID       = questID,
                         source        = ach.source,
-                        sourceInfo    = "Rare in " .. ach.zone,
+                        sourceInfo    = "Rare in " .. zone,
                         achievementID = ach.achievementID,
                         criteriaIndex = i,
-                        zone          = ach.zone,
+                        zone          = zone,
                         waypoint      = coords,
                         collected     = completed and true or false,
                         expansion     = ach.expansion,

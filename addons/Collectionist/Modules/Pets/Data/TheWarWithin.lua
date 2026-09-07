@@ -323,7 +323,7 @@ MC.RegisterContent("tww", "pets", {
     {
         source = "treasure",
         pets = {
-            { speciesID = 3362, itemID = 224579, npcID = 192365, name = "Sapphire Crab",      petType = 8, source = "treasure", sourceInfo = "Magical Treasure Chest (Lionel), Isle of Dorn",
+            { speciesID = 3362, itemID = 224579, npcID = 192365, name = "Sapphire Crab",      petType = 9, source = "treasure", sourceInfo = "Magical Treasure Chest (Lionel), Isle of Dorn",
               canBattle = true, zone = "Isle of Dorn", waypoint = { 2248, 0.4070, 0.5970, "Sapphire Crab" },
               steps = "Speak to Lionel, the stranded fish on the small island southwest of Dornogal (40.6, 60.0), and help him back into the water. Then click the 5 Plump Snapcrabs along the nearby shore and return to him; the Magical Treasure Chest only appears once he has all five." },
             { speciesID = 4470, itemID = 224439, npcID = 222319, name = "Oop'lajax",           petType = 9, source = "treasure", sourceInfo = "Scary Dark Chest, The Ringing Deeps",

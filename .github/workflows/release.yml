@@ -31,7 +31,14 @@ jobs:
         run: |
           luajit tests/toc_smoke.lua
           luajit tests/run.lua
+          luajit tests/loadall.lua
+          luajit tests/loadorder.lua
+          luajit tests/virtualization.lua
           luajit tests/whatsnew.lua
+          python tests/db_validation.py
+
+      - name: Validate catalog round trip
+        run: bash scripts/db/run.sh
 
       - name: Build self-contained addon zip
         id: package

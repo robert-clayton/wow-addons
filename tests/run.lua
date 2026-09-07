@@ -1121,7 +1121,7 @@ do
             },
         },
         decorations = {
-            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 136, slCount = 26, dfCount = 76, twwCount = 210,
+            field = "DecorationData", list = "decorations", id = "decorID", classicCount = 22, tbcCount = 29, wrathCount = 27, cataCount = 46, mopCount = 41, wodCount = 80, legionCount = 211, bfaCount = 137, slCount = 26, dfCount = 76, twwCount = 210,
             files = {
                 "Modules/Decorations/Data/Classic.lua",
                 "Modules/Decorations/Data/TheBurningCrusade.lua",
@@ -1923,7 +1923,7 @@ do
             equal(legionDecorationSources.drop, 8, "Legion drop decoration count")
             equal(legionCraftedDecorations, 23, "Legion crafted decoration profession count")
             equal(bfaDecorationSources.crafted, 28, "BFA crafted decoration count")
-            equal(bfaDecorationSources.vendor, 44, "BFA vendor decoration count")
+            equal(bfaDecorationSources.vendor, 45, "BFA vendor decoration count")
             equal(bfaDecorationSources.quest, 28, "BFA quest decoration count")
             equal(bfaDecorationSources.achievement, 21, "BFA achievement decoration count")
             equal(bfaDecorationSources.drop, 15, "BFA drop decoration count")

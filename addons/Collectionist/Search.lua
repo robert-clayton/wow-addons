@@ -115,7 +115,7 @@ local Collectors = {}
 Collectors.mounts = function(ref)
     local collected, icon = false, nil
     if C_MountJournal and C_MountJournal.GetMountInfoByID and ref.mountID and ref.mountID > 0 then
-        local ok, name, mountIcon, _, _, _, _, _, _, _, isCollected =
+        local ok, name, _, mountIcon, _, _, _, _, _, _, _, isCollected =
             pcall(C_MountJournal.GetMountInfoByID, ref.mountID)
         if ok then
             collected = isCollected and true or false
@@ -145,7 +145,7 @@ Collectors.toys = function(ref)
         collected = PlayerHasToy(ref.itemID) and true or false
     end
     if C_ToyBox and C_ToyBox.GetToyInfo and ref.itemID and ref.itemID > 0 then
-        local ok, _, fileID = pcall(C_ToyBox.GetToyInfo, ref.itemID)
+        local ok, _, _, fileID = pcall(C_ToyBox.GetToyInfo, ref.itemID)
         if ok and fileID and fileID ~= 0 then icon = fileID end
     end
     return collected, icon

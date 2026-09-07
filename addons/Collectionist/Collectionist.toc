@@ -2,7 +2,7 @@
 ## Title: Collectionist
 ## Notes: Tracks mounts, pets, toys, housing decor, recipes, rares, treasures, and achievements across expansions in one panel.
 ## Author: robert-clayton
-## Version: 1.13.2
+## Version: 1.14.0
 ## IconTexture: Interface\AddOns\Collectionist\Media\icon.tga
 ## SavedVariables: CollectionistDB, CollectionistRosterDB
 ## SavedVariablesPerCharacter: CollectionistCharDB
@@ -20,6 +20,7 @@ Core.lua
 Data\Constants.lua
 Data\Locations.lua
 Data\HandyNotesPins.lua
+Data\CriteriaWaypoints.lua
 Data\Expansions.lua
 Data\Changelog.lua
 TabBar.lua

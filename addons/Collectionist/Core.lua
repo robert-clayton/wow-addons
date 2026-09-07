@@ -265,7 +265,7 @@ end
 function MC.DeriveZone(entry)
     if not entry then return nil end
     if entry.zone then return entry.zone end
-    local zone, spread = ZoneFromWaypoint(entry.waypoint)
+    local zone, spread = ZoneFromWaypoint(MC.GetEntryWaypoint and MC.GetEntryWaypoint(entry) or entry.waypoint)
     if zone then return zone, spread end
     return ZoneFromWaypoint(entry.overworldWaypoint)
 end
@@ -1088,13 +1088,11 @@ function MC.OpenItemWowhead(item)
         url = "https://www.wowhead.com/spell=" .. tonumber(item.id)
     elseif item.objectID and item.objectID > 0 then
         url = "https://www.wowhead.com/object=" .. tonumber(item.objectID)
-    elseif item.questID and item.questID > 0 then
-        -- Navigation-only treasures identify by quest completion flag rather
-        -- than an object, so this is the only link they can offer. Ordered
-        -- after objectID so a row carrying both still prefers the object.
-        url = "https://www.wowhead.com/quest=" .. tonumber(item.questID)
-    elseif item.npcID then
+    elseif item.npcID and item.npcID > 0 then
         url = "https://www.wowhead.com/npc=" .. tonumber(item.npcID)
+    elseif item.questID and item.questID > 0 then
+        -- Use the completion flag when no physical entity is known.
+        url = "https://www.wowhead.com/quest=" .. tonumber(item.questID)
     elseif item.achievementID then
         url = "https://www.wowhead.com/achievement=" .. tonumber(item.achievementID)
     end
@@ -1137,18 +1135,19 @@ local function effectiveMap(m)
     return (MC.MAP_PARENT and MC.MAP_PARENT[m]) or m
 end
 
--- For a multi-spawn waypoint list, pick the entry whose effective map matches
--- effCurrent (preferred) or any portal-reachable target. Returns the matching
--- single tuple, or nil if no entry is in-zone.
+-- Keep every spawn in the current zone. A single match remains a tuple for
+-- callers that display one pin; multiple matches remain a waypoint list.
 local function pickInZoneEntry(list, currentMap, effCurrent)
-    if not list then return nil end
+    if not list or not effCurrent then return nil end
+    local matches = {}
     for _, w in ipairs(list) do
         local m = w[1]
         if m == currentMap or effectiveMap(m) == effCurrent then
-            return w
+            matches[#matches + 1] = w
         end
     end
-    return nil
+    if #matches == 1 then return matches[1] end
+    if #matches > 1 then return matches end
 end
 
 --------------------------------------------------------------------------
@@ -1178,15 +1177,14 @@ function MC.SanitizeGameText(text)
 end
 
 function MC.GetSmartWaypoint(item)
-    local wp  = item.waypoint
+    local wp  = MC.GetEntryWaypoint and MC.GetEntryWaypoint(item) or item.waypoint
     local owp = item.overworldWaypoint
     if not wp and not owp then return nil end
 
     local currentMap = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
     local effCurrent = effectiveMap(currentMap)
 
-    -- If wp is a list and the player is already in one of its zones, prefer
-    -- that exact spawn rather than dropping all of them.
+    -- If wp spans zones, retain all spawns in the player's current zone.
     if wp and isWaypointList(wp) then
         local match = pickInZoneEntry(wp, currentMap, effCurrent)
         if match then return match end
@@ -1318,7 +1316,7 @@ end
 -- TomTom if available, Blizzard's user map pin if not.
 --------------------------------------------------------------------------
 local _warnedNoWaypointProvider = false
-function MC.AddWaypoint(mapID, x, y, title)
+function MC.AddWaypoint(mapID, x, y, title, quiet)
     if not (mapID and x and y) or mapID <= 0 then return false end
     title = title or "Collectionist waypoint"
     if TomTom and TomTom.AddWaypoint then
@@ -1329,7 +1327,7 @@ function MC.AddWaypoint(mapID, x, y, title)
         local ok, uid = pcall(TomTom.AddWaypoint, TomTom, mapID, x, y,
                               { title = title })
         if ok and uid then
-            print(format("%s Waypoint set: %s", PREFIX, title))
+            if not quiet then print(format("%s Waypoint set: %s", PREFIX, title)) end
             return true
         end
         local mapInfo = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(mapID)
@@ -1397,8 +1395,9 @@ function MC.PrintItemInfo(item)
     if item.source     then print("  source: " .. tostring(item.source)) end
     if item.sourceInfo then print("  info: " .. tostring(item.sourceInfo)) end
     if item.zone       then print("  zone: " .. tostring(item.zone)) end
-    if item.waypoint then
-        local wp = item.waypoint
+    local resolvedWaypoint = MC.GetEntryWaypoint and MC.GetEntryWaypoint(item) or item.waypoint
+    if resolvedWaypoint then
+        local wp = resolvedWaypoint
         if type(wp[1]) == "table" then
             print(format("  waypoint: %d locations (first map=%s, %.2f, %.2f)",
                 #wp, tostring(wp[1][1]), wp[1][2] or 0, wp[1][3] or 0))
@@ -1468,11 +1467,16 @@ function MC.DoItemAction(item, skillLine)
         end
         if #pending > 0 then
             if TomTom and TomTom.AddWaypoint then
+                local added = 0
                 for _, w in ipairs(pending) do
-                    TomTom:AddWaypoint(w[1], w[2], w[3], { title = w[4] or item.name })
+                    if MC.AddWaypoint(w[1], w[2], w[3], w[4] or item.name, true) then
+                        added = added + 1
+                    end
                 end
-                print(format("%s Set %d waypoint%s for %s prerequisites.",
-                    PREFIX, #pending, #pending == 1 and "" or "s", item.name))
+                if added > 0 then
+                    print(format("%s Set %d of %d waypoints for %s prerequisites.",
+                        PREFIX, added, #pending, item.name))
+                end
             else
                 local first = pending[1]
                 MC.AddWaypoint(first[1], first[2], first[3],
@@ -1492,10 +1496,15 @@ function MC.DoItemAction(item, skillLine)
             -- Multi-spawn: drop a TomTom marker at each. The Blizzard map-pin
             -- fallback only holds one at a time, so we warn and pin the first.
             if TomTom and TomTom.AddWaypoint then
+                local added = 0
                 for _, w in ipairs(wp) do
-                    TomTom:AddWaypoint(w[1], w[2], w[3], { title = w[4] or item.name })
+                    if MC.AddWaypoint(w[1], w[2], w[3], w[4] or item.name, true) then
+                        added = added + 1
+                    end
                 end
-                print(format("%s Set %d waypoints for %s.", PREFIX, #wp, item.name))
+                if added > 0 then
+                    print(format("%s Set %d of %d waypoints for %s.", PREFIX, added, #wp, item.name))
+                end
             else
                 local first = wp[1]
                 MC.AddWaypoint(first[1], first[2], first[3],

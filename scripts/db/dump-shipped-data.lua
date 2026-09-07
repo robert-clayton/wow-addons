@@ -226,6 +226,9 @@ local function dumpLookup(tbl, kind)
 end
 local wpN = dumpLookup(MC.RecipeWaypoints, "recipe_waypoint")
 local trN = dumpLookup(MC.RecipeTrainers, "recipe_trainer")
+for _, kind in ipairs({ "npc", "object", "quest" }) do
+    dumpLookup(MC.CriteriaWaypoints and MC.CriteriaWaypoints[kind], "criterion_" .. kind)
+end
 io.stderr:write(string.format("dumped %d recipe waypoints and %d trainer entries\n", wpN, trN))
 
 -- The per-profession recipe tables are assigned directly rather than

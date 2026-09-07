@@ -151,9 +151,7 @@ function Scanner:ScanProfession(skillLine, recipeData)
                     -- win; everything else falls back to the generated table,
                     -- attached here rather than inlined on thousands of rows.
                     -- Mirrors how Rares/Scanner.lua attaches MC.RareNPCs.
-                    waypoint   = recipe.waypoint
-                        or (recipe.id and MC.RecipeWaypoints and MC.RecipeWaypoints[recipe.id])
-                        or (MC.RecipeTrainerWaypoint and MC.RecipeTrainerWaypoint(recipe.id)),
+                    waypoint   = MC.GetEntryWaypoint(recipe),
                     cost       = recipe.cost,
                     dropInfo   = recipe.dropInfo,
                     -- MC.ShowItemInfoTooltip gates its "Click to open

@@ -455,5 +455,150 @@ do
           math.min(#offenders, 3)) .. ")")
 end
 
+-- API tuples, ID namespaces and navigation paths that previously failed with
+-- real journal/provider responses. Use a fresh loaded namespace for isolation.
+do
+    local _, errors, A, G = loadAll(true)
+    ok(#errors == 0, "audit regression fixture loads")
+    local currentMap = 2393
+    G.UnitFactionGroup = function() return "Alliance" end
+    G.C_Map = { GetBestMapForUnit = function() return currentMap end }
+    G.IsShiftKeyDown = function() return false end
+    G.IsControlKeyDown = function() return false end
+    G.IsAltKeyDown = function() return false end
+    G.InCombatLockdown = function() return false end
+    G.CanShowAchievementUI = function() return true end
+    G.C_QuestLog = { IsQuestFlaggedCompleted = function() return false end }
+    A.IsGroupVisible = function() return true end
+    A.IsContentAvailable = function() return true end
+    A.PORTALS = nil
+    G.C_MountJournal = { GetMountInfoByID = function(id)
+        return "Brown Horse", 458, 132261, false, true, 2, false, false, nil, id == 7, id == 6, id
+    end }
+    G.C_ToyBox = { GetToyInfo = function(id) return id, "Orb of Deception", 133711 end }
+    G.PlayerHasToy = function() return false end
+    local S = A.Search
+    S.index = {
+        { moduleKey = "mounts", ref = { mountID = 6, itemID = 5656 } },
+        { moduleKey = "mounts", ref = { mountID = 7 } },
+        { moduleKey = "toys", ref = { itemID = 1973 } },
+    }
+    S._staticCount = #S.index
+    S:RefreshIndex()
+    ok(S.index[1].collected and S.index[1].icon == 132261, "owned mount search uses collected and icon API slots")
+    ok(not S.index[2].collected, "hidden unowned mount does not appear collected")
+    ok(S.index[3].icon == 133711, "toy search icon is the texture ID")
+    ok(S:IsCollected({ moduleKey = "mounts", ref = { mountID = 6 }, lean = true }), "lean item tooltip reports owned mount")
+
+    local recipe = { id = 1261659, name = "Ironforge Chandelier", moduleKey = "recipes" }
+    ok(A.RecipeWaypoints[recipe.id] ~= nil, "real supplemental recipe pin exists")
+    ok(A.GetSmartWaypoint(recipe) == A.RecipeWaypoints[recipe.id], "raw search recipe resolves supplemental pin")
+    local trainerID, trainer
+    for id, row in pairs(A.RecipeTrainers) do
+        if not A.RecipeWaypoints[id] and row.a and row.h then trainerID, trainer = id, row; break end
+    end
+    ok(trainerID and A.GetEntryWaypoint({id=trainerID}) == trainer.a, "raw trainer pin uses Alliance location")
+    G.UnitFactionGroup = function() return "Horde" end
+    ok(trainerID and A.GetEntryWaypoint({id=trainerID}) == trainer.h, "raw trainer pin follows faction on use")
+    for _, pair in ipairs({ {"MountPins", "mountID"}, {"PetPins", "speciesID"}, {"ToyPins", "itemID"} }) do
+        local id, pin = next(A[pair[1]])
+        ok(A.GetEntryWaypoint({[pair[2]]=id}) == pin, pair[1] .. " resolves on raw entries")
+        local manual = {1,.4,.4}
+        ok(A.GetEntryWaypoint({[pair[2]]=id, waypoint=manual}) == manual, pair[1] .. " preserves curated pin")
+    end
+
+    local jimothy
+    for _, group in ipairs(A.PetData) do for _, pet in ipairs(group.pets) do
+        if pet.speciesID == 5164 then jimothy = pet end
+    end end
+    local routed = A.GetSmartWaypoint(jimothy)
+    ok(A._isWaypointList(routed) and #routed == 3, "all three J'imothy bushes remain marked in Silvermoon")
+    local mixed = { waypoint = {{2393,.1,.2}, {2393,.3,.4}, {2395,.5,.6}} }
+    ok(#A.GetSmartWaypoint(mixed) == 2, "multi-zone route keeps every local spawn")
+    currentMap = 2395
+    ok(A.GetSmartWaypoint(mixed) == mixed.waypoint[3], "one local spawn remains a tuple")
+    currentMap = nil
+    ok(A.GetSmartWaypoint(mixed) == mixed.waypoint, "unknown current map keeps all spawns")
+    currentMap = 2393
+
+    local messages, calls = {}, 0
+    G.print = function(message) messages[#messages+1] = message end
+    G.TomTom = { AddWaypoint = function()
+        calls = calls + 1
+        if calls == 1 then error("provider rejected map") end
+        if calls == 2 then return nil end
+        return "uid"
+    end }
+    ok(pcall(A.DoItemAction, jimothy), "multi-spawn provider error is contained")
+    ok(calls == 3 and messages[#messages]:find("Set 1 of 3",1,true), "multi-spawn success counts only accepted pins")
+    calls, messages = 0, {}
+    local taskItem = {name="Prerequisites", taskList={tasks={
+        {questID=1, pickupWaypoint={2393,.1,.2}, waypoint={2393,.3,.4}},
+        {questID=2, waypoint={2393,.5,.6}},
+    }}}
+    ok(pcall(A.DoItemAction, taskItem), "task provider error is contained")
+    ok(calls == 3 and messages[#messages]:find("Set 1 of 3",1,true), "task success counts only accepted pins")
+    messages = {}
+    G.TomTom.AddWaypoint = function() return nil end
+    A.DoItemAction(taskItem)
+    local claimed = false
+    for _, message in ipairs(messages) do if message:find("Set ",1,true) then claimed=true end end
+    ok(not claimed, "refused task markers never claim success")
+
+    local types = {27,29,68,0}
+    G.GetAchievementNumCriteria = function() return 4 end
+    G.GetAchievementCriteriaInfo = function(_, index)
+        return "Localized criterion "..index, types[index], false, 0, 1, "", 0, 31284
+    end
+    A.TreasureData = {{achievementID=7284, criteriaCount=4, source="pandaria",zone="Pandaria",expansion="mop"}}
+    local T = A.modulesByKey.treasures.Scanner
+    ok(T:Scan(), "typed treasure criteria scan")
+    local rows = T.results.bySource.pandaria
+    ok(rows[1].questID == 31284 and rows[1].objectID == nil, "quest criterion keeps quest namespace")
+    ok(rows[1].waypoint == A.CriteriaWaypoints.quest[31284], "localized criterion finds stable quest coordinates")
+    ok(rows[2].objectID == nil and rows[2].npcID == nil and rows[2].questID == nil, "spell criterion is not a physical entity")
+    ok(rows[3].objectID == 31284 and rows[3].questID == nil, "object criterion keeps object namespace")
+    ok(rows[4].npcID == 31284 and rows[4].questID == nil, "kill criterion keeps NPC namespace")
+    local url
+    G.StaticPopup_Show = function(_,_,_,value) url=value end
+    A.OpenItemWowhead(rows[1]); ok(url == "https://www.wowhead.com/quest=31284", "treasure link is a quest")
+    A.OpenItemWowhead(rows[2]); ok(url == "https://www.wowhead.com/achievement=7284", "spell-backed treasure links to achievement")
+    A.OpenItemWowhead({npcID=123,questID=456}); ok(url == "https://www.wowhead.com/npc=123", "rare links prefer known NPC over completion flag")
+    A.RareData = {{achievementID=1,criteriaCount=3,criteriaNPCIDs={1,2,3},source="pandaria",zone="Pandaria",expansion="mop"}}
+    local R=A.modulesByKey.rares.Scanner
+    ok(R:Scan(), "rare scan survives changed criterion count")
+    ok(R.results.bySource.pandaria[1].npcID == nil and R.results.bySource.pandaria[1].questID == 31284,
+       "count mismatch never converts a quest asset to an NPC")
+
+    local decorations = {}
+    for _, group in ipairs(A.DecorationData) do for _, item in ipairs(group.decorations or group.items or {}) do
+        decorations[item.decorID] = item
+    end end
+    ok(decorations[1198].itemID == 245290 and decorations[1198].renown.level == 7, "Long Silvermoon Table ID and unlock")
+    ok(decorations[1120].itemID == 245291 and decorations[1120].waypoint[1] == 1186, "Mole Machine ID and allied-race map")
+    ok(A.CriteriaWaypoints.npc[18695] ~= nil, "Outland rare coordinates are loaded")
+    local points=0
+    for _, namespace in pairs(A.CriteriaWaypoints) do for id, pins in pairs(namespace) do
+        local list = type(pins[1]) == "table" and pins or {pins}
+        for _, point in ipairs(list) do
+            assert(id > 0 and point[1] > 0 and point[2] > 0 and point[2] < 1 and point[3] > 0 and point[3] < 1,
+                "invalid criterion waypoint "..id)
+            points=points+1
+        end
+    end end
+    ok(points >= 2600, "older criterion coordinates all validate")
+    -- BattlePetSpecies.PetTypeEnum is zero-based; the journal uses 1..10.
+    local expected = { [3362]=9, [3243]=10, [3244]=4, [3250]=5, [3251]=3, [3252]=1, [3255]=8, [3297]=9, [3582]=9, [4253]=3, [4286]=6, [4311]=5, [4402]=5, [4407]=5, [4408]=5, [4436]=6, [4548]=1, [4565]=1, [4615]=1, [3542]=7, [4566]=1, [4602]=9, [4669]=6, [4718]=10, [4719]=10, [4728]=1, [4729]=1, [4757]=1, [4793]=8, [4853]=8, [4900]=9 }
+    local matched=0
+    for _, group in ipairs(A.PetData) do for _, pet in ipairs(group.pets) do
+        if expected[pet.speciesID] then
+            ok(pet.petType == expected[pet.speciesID], "DB2 family for "..pet.name)
+            matched=matched+1
+        end
+    end end
+    ok(matched == 31, "all corrected pet families are present")
+
+end
+
 print(string.format("%d passed, %d failed", pass, fail))
 os.exit(fail == 0 and 0 or 1)

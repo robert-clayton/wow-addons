@@ -47,6 +47,7 @@ FIELD_MAP = {
     "petType": "pet_type", "skillLine": "skill_line", "priority": "priority",
     "zone": "zone", "zoneMapID": "zone_map_id", "description": "description", "score": "score",
     "criteriaCount": None,
+    "steps": "steps",
     "availableAfter": "available_after",
     "faction": "faction",
 }
@@ -148,24 +149,30 @@ def main():
         os.remove(DB_PATH)
 
     con = sqlite3.connect(DB_PATH)
-    con.executescript(open(SCHEMA, encoding="utf-8").read())
+    with open(SCHEMA, encoding="utf-8") as schema:
+        con.executescript(schema.read())
 
     n_exp = load_expansions(con)
     load_modules(con)
 
     # An empty Lua table is indistinguishable from an empty array, so a row with
     # no fields arrives as [] rather than {}. Normalise before anything reads it.
-    rows = []
-    for line in open(DUMP, encoding="utf-8"):
-        r = json.loads(line)
+    with open(DUMP, encoding="utf-8") as dump:
+        rows = [json.loads(line) for line in dump]
+    for r in rows:
         if not isinstance(r.get("entry"), dict):
             r["entry"] = {}
         if not isinstance(r.get("group"), dict):
             r["group"] = {}
-        rows.append(r)
 
     locations = [r for r in rows if r.get("__kind") == "location"]
     lookups = [r for r in rows if r.get("__kind") in ("recipe_waypoint", "recipe_trainer")]
+    for r in rows:
+        if r.get("__kind", "").startswith("criterion_"):
+            kind = r["__kind"].removeprefix("criterion_")
+            for ordinal, point in enumerate(norm_waypoints(r["value"])):
+                con.execute("INSERT INTO criterion_waypoint VALUES (?,?,?,?,?,?,?)",
+                            (kind, r["id"], ordinal, *point))
     rows = [r for r in rows if r.get("__kind") == "collectible"]
 
     con.executemany("INSERT OR REPLACE INTO location (key, ord, map_id, x, y, label) VALUES (?,?,?,?,?,?)",
@@ -242,7 +249,7 @@ def main():
                             ("skillLine", "skill_line"), ("availableAfter", "available_after")):
             col.setdefault(db_col, group.get(key))
         col["source"] = col.get("source") or "_unsorted"
-        col["navigation_only"] = 1 if group.get("navigationOnly") else 0
+        col["navigation_only"] = 1 if entry.get("navigationOnly", group.get("navigationOnly")) else 0
         col["unavailable"] = 1 if entry.get("unavailable") else 0
         # Empty names are kept, not skipped. See the nameless_collectible
         # view: a handful of rows have no offline-derivable name and the
@@ -297,8 +304,8 @@ def main():
                                 " VALUES (?,?,?,?,?,?,?)",
                                 (cid, role, i, t[0], t[1], t[2],
                                  (t[3] if len(t) > 3 else col["name"]) or col["name"]))
-                except sqlite3.IntegrityError:
-                    pass
+                except sqlite3.IntegrityError as exc:
+                    raise ValueError("Invalid %s waypoint for %s: %r" % (role, col["name"], t)) from exc
 
         add_waypoints(entry.get("waypoint"), "primary")
         # A pin outside the instance for something that lives inside one. Same
@@ -391,8 +398,8 @@ def main():
                             (cid, role, ord_, faction, t2[0], t2[1], t2[2],
                              t2[3] if len(t2) > 3 else "?"))
                 attached += 1
-            except sqlite3.IntegrityError:
-                pass
+            except sqlite3.IntegrityError as exc:
+                raise ValueError("Invalid %s pin for recipe %s" % (role, r["id"])) from exc
     print("recipe pins attached %d   orphaned %d" % (attached, orphaned))
 
     con.commit()
@@ -409,13 +416,24 @@ def main():
         for m, k in undeclared[:12]:
             print("   %-13s %s" % (m, k))
     print()
+    violations = validate_integrity(con)
+    con.close()
+    if skipped or nonscalar or undeclared or violations:
+        raise SystemExit("Catalog validation failed; see errors above.")
+
+
+def validate_integrity(con):
+    violations = 0
     for view in ("bad_source_key", "bad_expansion", "waypoint_on_unavailable",
                  "scored_navigation_row", "criterion_gap", "nameless_collectible",
                  "dangling_location"):
         n = con.execute("SELECT COUNT(*) FROM %s" % view).fetchone()[0]
-        flag = "clean" if n == 0 else ("%d tracked" % n if view == "nameless_collectible" else "%d VIOLATIONS" % n)
+        informational = view in ("nameless_collectible", "waypoint_on_unavailable")
+        if not informational:
+            violations += n
+        flag = "clean" if n == 0 else ("%d tracked" % n if informational else "%d VIOLATIONS" % n)
         print("   %-24s %s" % (view, flag))
-    con.close()
+    return violations
 
 
 if __name__ == "__main__":
